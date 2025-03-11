@@ -17,6 +17,7 @@ const HolidayList = () => {
   const [isEditHolidayModalVisible, setIsEditHolidayModalVisible] = useState(false);
   const [selectedHoliday, setSelectedHoliday] = useState(null);
   const [idd, setIdd] = useState("");
+  const [selectedLeaveType, setSelectedLeaveType] = useState('all');
 
   useEffect(() => {
     dispatch(getsholidayss());
@@ -42,11 +43,22 @@ const HolidayList = () => {
   };
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const filtered = holidays?.filter(holiday =>
-      holiday?.holiday_name?.toLowerCase().includes(value.toLowerCase())
+    const value = e.currentTarget.value.toLowerCase();
+    const filtered = holidays?.filter(holiday => 
+      holiday?.holiday_name?.toLowerCase().includes(value) ||
+      holiday?.leave_type?.toLowerCase().includes(value)
     ) || [];
     setFilteredHolidays(filtered);
+  };
+
+  const handleLeaveTypeFilter = (value) => {
+    setSelectedLeaveType(value);
+    if (value === 'all') {
+      setFilteredHolidays(holidays);
+    } else {
+      const filtered = holidays.filter(holiday => holiday.leave_type === value);
+      setFilteredHolidays(filtered);
+    }
   };
 
   const deleteHoliday = async (id) => {
@@ -107,6 +119,21 @@ const HolidayList = () => {
       sorter: (a, b) => a.holiday_name.localeCompare(b.holiday_name),
     },
     {
+      title: 'Leave Type',
+      dataIndex: 'leave_type',
+      render: (text) => (
+        <Tag color={text === 'paid' ? 'green' : 'red'} className="capitalize px-3 py-1">
+          {text || 'N/A'}
+        </Tag>
+      ),
+      sorter: (a, b) => (a.leave_type || '').localeCompare(b.leave_type || ''),
+      filters: [
+        { text: 'Paid', value: 'paid' },
+        { text: 'Unpaid', value: 'unpaid' },
+      ],
+      onFilter: (value, record) => record.leave_type === value,
+    },
+    {
       title: 'Start Date',
       dataIndex: 'start_date',
       render: (text) => dayjs(text).format('DD-MM-YYYY'),
@@ -118,17 +145,7 @@ const HolidayList = () => {
       render: (text) => dayjs(text).format('DD-MM-YYYY'),
       sorter: (a, b) => dayjs(a.end_date).unix() - dayjs(b.end_date).unix(),
     },
-    {
-      title: 'Created By',
-      dataIndex: 'created_by',
-      sorter: (a, b) => (a.created_by || '').localeCompare(b.created_by || ''),
-    },
-    {
-      title: 'Created At',
-      dataIndex: 'createdAt',
-      render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm:ss'),
-      sorter: (a, b) => dayjs(a.createdAt).unix() - dayjs(b.createdAt).unix(),
-    },
+   
     {
       title: 'Action',
       dataIndex: 'actions',
@@ -143,17 +160,30 @@ const HolidayList = () => {
   return (
     <Card bodyStyle={{ padding: '-3px' }}>
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
-        <div className="mr-md-3 mb-3">
-          <Input
-            placeholder="Search Holiday"
-            prefix={<SearchOutlined />}
+        <div className="mr-md-3 mb-3 flex items-center gap-4">
+          <Input 
+            placeholder="Search Holiday" 
+            prefix={<SearchOutlined />} 
             onChange={onSearch}
+            className="min-w-[200px]"
           />
+          <Select
+            value={selectedLeaveType}
+            onChange={handleLeaveTypeFilter}
+            style={{ width: 120 }}
+            className="ml-2"
+          >
+            <Option value="all">All Types</Option>
+            <Option value="paid">Paid</Option>
+            <Option value="unpaid">Unpaid</Option>
+          </Select>
         </div>
-        <Button type="primary" onClick={openAddHolidayModal}>
-          <PlusOutlined />
-          <span>Add Holiday</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button type="primary" onClick={openAddHolidayModal}>
+            <PlusOutlined />
+            <span>Add Holiday</span>
+          </Button>
+        </div>
       </Flex>
 
       <div className="table-responsive">
@@ -192,6 +222,33 @@ const HolidayList = () => {
           onSuccess={handleEditSuccess}
         />
       </Modal>
+
+      <style jsx="true">{`
+        .capitalize {
+          text-transform: capitalize;
+        }
+        .ant-tag {
+          border-radius: 20px;
+          font-weight: 500;
+        }
+        .table-responsive .ant-table-thead > tr > th {
+          background: #f8fafc;
+          color: #1f2937;
+        }
+        .ant-select-selector {
+          border-radius: 6px !important;
+        }
+        .ant-input-affix-wrapper {
+          border-radius: 6px !important;
+        }
+        .ant-input-affix-wrapper:hover {
+          border-color: #40a9ff !important;
+        }
+        .ant-input-affix-wrapper-focused {
+          border-color: #40a9ff !important;
+          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+        }
+      `}</style>
     </Card>
   );
 };

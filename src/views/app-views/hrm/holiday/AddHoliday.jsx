@@ -7,11 +7,14 @@ import {
   Row,
   Col,
   message,
+  Select,
 } from "antd";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { addsholidayss, getsholidayss } from "./AttendanceReducer/holidaySlice";
 import moment from "moment-timezone";
+
+const { Option } = Select;
 
 const AddHoliday = ({ onClose }) => {
   const dispatch = useDispatch();
@@ -23,6 +26,7 @@ const AddHoliday = ({ onClose }) => {
     end_date: Yup.date()
       .required("End Date is required")
       .min(Yup.ref('start_date'), "End date must be after start date"),
+    leave_type: Yup.string().required("Leave type is required"),
   });
 
   const handleSubmit = (values, { resetForm, setFieldValue }) => {
@@ -43,6 +47,7 @@ const AddHoliday = ({ onClose }) => {
       holiday_name: values.holiday_name.trim(),
       start_date: startDate,
       end_date: endDate,
+      leave_type: values.leave_type,
       created_by: user
     };
 
@@ -75,6 +80,7 @@ const AddHoliday = ({ onClose }) => {
           holiday_name: "",
           start_date: null,
           end_date: null,
+          leave_type: "",
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -95,6 +101,27 @@ const AddHoliday = ({ onClose }) => {
                   {errors.holiday_name && touched.holiday_name && (
                     <div style={{ color: "red", fontSize: "12px" }}>
                       {errors.holiday_name}
+                    </div>
+                  )}
+                </div>
+              </Col>
+
+              <Col span={24}>
+                <div style={{ marginBottom: "16px" }}>
+                  <label className="font-semibold">Leave Type <span className="text-red-500">*</span></label>
+                  <Select
+                    name="leave_type"
+                    placeholder="Select leave type"
+                    className="w-full mt-1"
+                    value={values.leave_type}
+                    onChange={(value) => setFieldValue("leave_type", value)}
+                  >
+                    <Option value="paid">Paid</Option>
+                    <Option value="unpaid">Unpaid</Option>
+                  </Select>
+                  {errors.leave_type && touched.leave_type && (
+                    <div style={{ color: "red", fontSize: "12px" }}>
+                      {errors.leave_type}
                     </div>
                   )}
                 </div>

@@ -25,6 +25,8 @@ const AddTaskcalendar = ({ open, onCancel, selectedDate }) => {
         taskDescription: values.taskDescription,
       };
 
+console.log("dfdfdfgdfdfgdf",taskData);
+
       await dispatch(AddTask(taskData));
       await dispatch(GetTaskdata());
       message.success('Task added successfully');

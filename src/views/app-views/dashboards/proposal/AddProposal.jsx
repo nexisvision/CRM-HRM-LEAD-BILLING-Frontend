@@ -55,11 +55,14 @@ const AddProposal = ({ onClose }) => {
       id: Date.now(),
       item: "",
       quantity: 1,
-      price: "",
-      tax: 0,
+      price: "0",
+      tax: null,
+      tax_name: "",
+      tax_amount: 0,
+      base_amount: 0,
       amount: "0",
       description: "",
-    },
+    }
   ]);
 
   const [selectedCurrencyIcon, setSelectedCurrencyIcon] = useState('₹');
@@ -89,27 +92,46 @@ const AddProposal = ({ onClose }) => {
 
   const handleFinish = async (values) => {
     try {
-      const discountAmount = totals.discount;
-      const proposalData = {
-        lead_title: values.lead_title,
-        valid_till: values.valid_till.format("YYYY-MM-DD"),
-        currency: values.currency,
-        description: "",
-        items: tableData.map((item) => ({
-          item: item.item,
-          quantity: parseFloat(item.quantity),
-          price: parseFloat(item.price),
-          tax_name: selectedTaxDetails[item.id]?.gstName || '',
-          tax: parseFloat(item.tax) || 0,
-          amount: parseFloat(item.amount),
-          description: item.description,
-        })),
-        discount: parseFloat(discountAmount),
-        discountType: discountType,
-        discountValue: parseFloat(discountValue) || 0,
-        tax: totals.totalTax, // Added separate tax field
-        total: totals.finalTotal,
-      };
+        setLoading(true);
+
+        // Calculate all the totals
+        const subtotal = calculateSubTotal();
+        const discountAmount = totals.discount;
+        const totalTax = tableData.reduce((sum, item) => {
+          const quantity = parseFloat(item.quantity) || 0;
+          const price = parseFloat(item.price) || 0;
+          const baseAmount = quantity * price;
+          const tax = item.tax ? parseFloat(item.tax.gstPercentage) : 0;
+          const taxAmount = (baseAmount * tax) / 100;
+          return sum + taxAmount;
+      }, 0);
+      const finalTotal = subtotal - discountAmount;
+
+        // Restructured proposal data to match backend requirements
+        const proposalData = {
+            lead_title: values.lead_title,
+            valid_till: values.valid_till.format("YYYY-MM-DD"),
+            currency: values.currency,
+            description: values.description || "",
+            items: tableData.map((item) => ({
+                item: item.item,
+                quantity: parseFloat(item.quantity) || 0,
+                price: parseFloat(item.price) || 0,
+                tax_name: item.tax?.gstName || '',
+                tax: parseFloat(item.tax?.gstPercentage) || 0,
+                tax_amount: parseFloat(item.tax_amount) || 0,
+                amount: parseFloat(item.amount) || 0,
+                description: item.description || "",
+              })),
+              discount: parseFloat(discountRate) || 0,
+            subtotal: parseFloat(subtotal).toFixed(2), // Add subtotal to the payload
+            discountamount: parseFloat(discountAmount),
+            discountType: discountType,
+            discountValue: parseFloat(discountValue) || 0,
+            discountRate: discountRate,
+            tax: parseFloat(totalTax),
+            total: parseFloat(finalTotal),
+        };
 
       dispatch(addpropos(proposalData))
         .then(() => {
@@ -120,7 +142,8 @@ const AddProposal = ({ onClose }) => {
           console.error("Error during proposal submission:", error);
         });
     } catch (error) {
-      // message.error("Failed to create proposal: " + error.message);
+    } finally {
+        setLoading(false);
     }
   };
 
@@ -150,6 +173,19 @@ const AddProposal = ({ onClose }) => {
   };
 
 
+  // Calculate subtotal (sum of all row amounts before discount)
+  const calculateSubTotal = () => {
+    return tableData.reduce((sum, row) => {
+        const quantity = parseFloat(row.quantity) || 0;
+        const price = parseFloat(row.price) || 0;
+        const baseAmount = quantity * price;
+        const tax = row.tax ? parseFloat(row.tax.gstPercentage) : 0;
+        const taxAmount = (baseAmount * tax) / 100;
+        const totalAmount = baseAmount + taxAmount;
+        return sum + totalAmount;
+    }, 0);
+};
+
   const calculateTotal = (data = tableData, discountVal = discountValue, discType = discountType) => {
     if (!Array.isArray(data)) {
       console.error('Invalid data passed to calculateTotal');
@@ -158,31 +194,32 @@ const AddProposal = ({ onClose }) => {
 
     // Calculate subtotal
     const subtotal = data.reduce((sum, row) => {
-      return sum + (parseFloat(row.amount) || 0);
+      const amount = parseFloat(row.amount) || 0;
+      return sum + amount;
+  }, 0);
+
+    // Calculate total tax amount from all items
+    const totalTax = data.reduce((sum, row) => {
+        const quantity = parseFloat(row.quantity) || 0;
+        const price = parseFloat(row.price) || 0;
+        const baseAmount = quantity * price;
+        const taxPercentage = row.tax?.gstPercentage || 0;
+        const taxAmount = (baseAmount * taxPercentage) / 100;
+        return sum + taxAmount;
     }, 0);
 
-    // Calculate discount amount based on type
+    // Calculate discount
     let discountAmount = 0;
-    if (discountVal !== '') { // Only calculate discount if value is not empty
+    if (discountVal !== '') {
       if (discType === 'percentage') {
         discountAmount = (subtotal * (parseFloat(discountVal) || 0)) / 100;
-      } else { // fixed
+        } else {
         discountAmount = parseFloat(discountVal) || 0;
       }
     }
 
-    // Calculate total tax
-    const totalTax = data.reduce((sum, row) => {
-      const quantity = parseFloat(row.quantity) || 0;
-      const price = parseFloat(row.price) || 0;
-      const tax = (parseFloat(row.tax) || 0);
-      const baseAmount = quantity * price;
-      const taxAmount = (baseAmount * tax) / 100;
-      return sum + taxAmount;
-    }, 0);
-
     // Calculate final total
-    const finalTotal = subtotal - discountAmount + totalTax;
+    const finalTotal = subtotal - discountAmount ;
 
     setTotals({
       subtotal: subtotal.toFixed(2),
@@ -200,38 +237,27 @@ const AddProposal = ({ onClose }) => {
   };
 
   const handleTableDataChange = (id, field, value) => {
-    const updatedData = tableData.map((row) => {
+    const updatedData = tableData.map(row => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
-
-        if (field === 'tax' && taxes?.data) {
-          const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
-          if (selectedTax) {
-            setSelectedTaxDetails(prevDetails => ({
-              ...prevDetails,
-              [id]: {
-                gstName: selectedTax.gstName,
-                gstPercentage: selectedTax.gstPercentage
-              }
-            }));
-          }
-        }
-        // Calculate amount if quantity, price, or tax changes
+        
         if (field === 'quantity' || field === 'price' || field === 'tax') {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
-          const tax = parseFloat(field === 'tax' ? value : row.tax) || 0;
-
+          const tax = field === 'tax' ? 
+            (value ? parseFloat(value.gstPercentage) : 0) : 
+            (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
+          
           const baseAmount = quantity * price;
           const taxAmount = (baseAmount * tax) / 100;
-          const totalAmount = baseAmount + taxAmount;
-
+          const totalAmount = baseAmount + taxAmount; // Item total = base amount + tax amount
+          
           updatedRow.amount = totalAmount.toFixed(2);
         }
-
+        
         return updatedRow;
       }
-      return row;
+        return row;
     });
 
     setTableData(updatedData);
@@ -380,7 +406,7 @@ const AddProposal = ({ onClose }) => {
                   <thead className="bg-gray-100">
                     <tr>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                        Items<span className="text-red-500">*</span>
+                        Item<span className="text-red-500">*</span>
                       </th>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                         Quantity<span className="text-red-500">*</span>
@@ -395,7 +421,7 @@ const AddProposal = ({ onClose }) => {
                         Amount<span className="text-red-500">*</span>
                       </th>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                        Action<span className="text-red-500">*</span>
+                        Action
                       </th>
                     </tr>
                   </thead>
@@ -443,18 +469,29 @@ const AddProposal = ({ onClose }) => {
                             />
                           </td>
                           <td className="px-4 py-2 border-b">
-                            <select
-                              value={row.tax}
-                              onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                              className="w-full p-2 border"
+                            <Select
+                              value={row.tax?.gstPercentage ? `${row.tax.gstName}|${row.tax.gstPercentage}` : '0'}
+                              onChange={(value) => {
+                                if (!value || value === '0') {
+                                  handleTableDataChange(row.id, "tax", null);
+                                  return;
+                                }
+                                const [gstName, gstPercentage] = value.split('|');
+                                handleTableDataChange(row.id, "tax", {
+                                  gstName,
+                                  gstPercentage: parseFloat(gstPercentage) || 0
+                                });
+                              }}
+                              placeholder="Select Tax"
+                              className="w-[150px] p-2"
+                              allowClear
                             >
-                              <option value="0">Nothing Selected</option>
                               {taxes && taxes.data && taxes.data.map(tax => (
-                                <option key={tax.id} value={tax.gstPercentage}>
-                                  {tax.gstName}: {tax.gstPercentage}%
-                                </option>
+                                <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
+                                  {tax.gstName} ({tax.gstPercentage}%)
+                                </Option>
                               ))}
-                            </select>
+                            </Select>
                           </td>
                           <td className="px-4 py-2 border-b text-center">
                             {selectedCurrencyIcon} {row.amount}
@@ -464,6 +501,17 @@ const AddProposal = ({ onClose }) => {
                               <DeleteOutlined />
                             </Button>
                           </td>
+                        </tr>
+                        <tr>
+                                                    <td colSpan={6} className="px-4 py-2 border-b">
+                                                        <textarea
+                                                            rows={2}
+                                                            value={row.description}
+                                                            onChange={(e) => handleTableDataChange(row.id, 'description', e.target.value)}
+                                                            placeholder="Description"
+                                                            className="w-[70%] p-2 border"
+                                                        />
+                                                    </td>
                         </tr>
                       </React.Fragment>
                     ))}
@@ -539,7 +587,7 @@ const AddProposal = ({ onClose }) => {
                   <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                     <td className="font-medium">Total Tax</td>
                     <td className="font-medium px-4 py-2">
-                      {selectedCurrencyIcon} {totals.totalTax}
+                        {selectedCurrencyIcon} {totals.totalTax}
                     </td>
                   </tr>
 

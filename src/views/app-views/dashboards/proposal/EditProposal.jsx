@@ -26,16 +26,13 @@ const EditProposal = ({ id, onClose }) => {
 
   const alldept = useSelector((state) => state.proposal);
 
-  const { data: Leadss } = useSelector((state) => state.Leads.Leads);
+  const { data: fndlead } = useSelector((state) => state.Leads.Leads);
 
-  const Leads = loggeduser && Array.isArray(Leadss)
-    ? Leadss.filter((item) => item?.created_by === loggeduser)
-    : [];
+
 
 
   const allogged = useSelector((state) => state.user.loggedInUser.username);
 
-  const fndlead = Leads.filter((item) => item?.created_by === allogged);
 
   const [form] = Form.useForm();
   const [totals, setTotals] = useState({
@@ -50,7 +47,10 @@ const EditProposal = ({ id, onClose }) => {
   useEffect(() => {
     const empData = alldept?.proposal?.data || [];
     const data = empData.find((item) => item.id === id);
-    console.log("data", data)
+
+    console.log("sdfsdfsd",data);
+    setSingleEmp(data || null);
+
 
     if (data) {
       form.setFieldsValue({
@@ -72,7 +72,10 @@ const EditProposal = ({ id, onClose }) => {
       item: "",
       quantity: 1,
       price: "",
-      tax: 0,
+      tax: null,
+      tax_name: "",
+      tax_amount: 0,
+      base_amount: 0,
       amount: "0",
       description: "",
     }
@@ -112,50 +115,55 @@ const EditProposal = ({ id, onClose }) => {
             description: data.description,
           });
 
+          // Set discount value from data
+          setDiscountValue(Number(data.discount) || 0);
+          // Assuming it's a fixed discount, but you can modify this if needed
+          setDiscountType('fixed');
+
           if (data.items) {
             const parsedItems = JSON.parse(data.items);
             const formattedItems = Array.isArray(parsedItems) ? parsedItems : [parsedItems];
 
             const formattedTableData = formattedItems.map(item => ({
-              id: Date.now() + Math.random(), // Generate unique ID
+              id: Date.now() + Math.random(),
               item: item.item || '',
               quantity: Number(item.quantity) || 0,
               price: Number(item.price) || 0,
+              tax: item.tax_name ? {
+                gstName: item.tax_name,
+                gstPercentage: Number(item.tax)
+              } : null,
               tax_name: item.tax_name || '',
-              tax: Number(item.tax) || 0,
+              tax_amount: Number(item.tax_amount) || 0,
               amount: Number(item.amount) || 0,
               description: item.description || ''
             }));
 
             setTableData(formattedTableData);
 
-            // Set discount rate
-            setDiscountRate(Number(data.discount) || 0);
+            // Set tax details for the selector
+            formattedTableData.forEach(item => {
+              if (item.tax_name && item.tax) {
+                setSelectedTaxDetails(prev => ({
+                  ...prev,
+                  [item.id]: {
+                    gstName: item.tax_name,
+                    gstPercentage: Number(item.tax)
+                  }
+                }));
+              }
+            });
 
             // Calculate and set totals
             const totalsData = {
-              subtotal: formattedTableData.reduce((sum, item) => sum + Number(item.amount), 0),
+              subtotal: Number(data.subtotal) || 0,
               discount: Number(data.discount) || 0,
               totalTax: Number(data.tax) || 0,
               finalTotal: Number(data.total) || 0
             };
 
             setTotals(totalsData);
-
-            // Set tax details if available
-            formattedTableData.forEach(item => {
-              if (item.tax && item.tax_name) {
-                setSelectedTaxDetails(prev => ({
-                  ...prev,
-                  [item.id]: {
-                    gstName: item.tax_name,
-                    gstPercentage: item.tax
-                  }
-                }));
-              }
-            });
           }
-
         } catch (error) {
           console.error("Error setting proposal data:", error);
           message.error("Failed to load proposal details");
@@ -168,18 +176,25 @@ const EditProposal = ({ id, onClose }) => {
 
   const handleFinish = async (values) => {
     try {
-      // Calculate the actual discount amount
+      setLoading(true);
       const subtotal = calculateSubTotal();
-      const discountAmount = (subtotal * discountRate) / 100;
+        // Calculate discount amount based on type
+    let discountAmount = 0;
+    if (discountType === 'percentage') {
+      discountAmount = (subtotal * discountValue) / 100;
+    } else {
+      discountAmount = parseFloat(discountValue) || 0;
+    }
 
+     
 
       const proposalData = {
         lead_title: values.lead_title,
         deal_title: values.deal_title,
         valid_till: values.valid_till.format("YYYY-MM-DD"),
         currency: values.currency,
-        calculatedTax: totals.totalTax, // Use totals.totalTax instead of undefined calculatedTax
-        description: "", // Add description field
+        calculatedTax: totals.totalTax,
+        description: "",
         items: tableData.map((item) => ({
           item: item.item,
           quantity: parseFloat(item.quantity),
@@ -189,20 +204,19 @@ const EditProposal = ({ id, onClose }) => {
           amount: parseFloat(item.amount),
           description: item.description,
         })),
-        discount: discountAmount, // Store the calculated discount amount
-        discountRate: discountRate, // Optionally store the rate 
-        tax: totals.totalTax, // Added separate tax field
+        subtotal:subtotal,
+        discount: discountAmount,
+        discountRate: discountRate,
+        tax: totals.totalTax,
         total: totals.finalTotal,
       };
 
       dispatch(edpropos({ id, proposalData }))
         .then(() => {
-          // message.success("Proposal updated successfully!");
           dispatch(getpropos());
           onClose();
         })
         .catch((error) => {
-          // message.error("Failed to add proposal. Please try again.");
           console.error("Error during proposal submission:", error);
         });
     } catch (error) {
@@ -218,7 +232,10 @@ const EditProposal = ({ id, onClose }) => {
       item: "",
       quantity: 1,
       price: "",
-      tax: 0,
+      tax: null,
+      tax_name: "",
+      tax_amount: 0,
+      base_amount: 0,
       amount: "0",
       description: "",
     };
@@ -230,96 +247,115 @@ const EditProposal = ({ id, onClose }) => {
     if (tableData.length > 1) {
       const updatedData = tableData.filter((row) => row.id !== id);
       setTableData(updatedData);
-      calculateTotal(updatedData, discountRate);
+      calculateTotal(updatedData, discountValue, discountType);
     } else {
       message.warning("At least one item is required");
     }
   };
 
 
-
-  // Calculate subtotal (sum of all row amounts before discount)
-  const calculateSubTotal = () => {
-    return tableData.reduce((sum, row) => {
-      const quantity = parseFloat(row.quantity) || 0;
-      const price = parseFloat(row.price) || 0;
-      return sum + (quantity * price);
-    }, 0);
-  };
+// Calculate subtotal (sum of all row amounts before discount)
+ const calculateSubTotal = () => {
+   return tableData.reduce((sum, row) => {
+       const quantity = parseFloat(row.quantity) || 0;
+       const price = parseFloat(row.price) || 0;
+       const baseAmount = quantity * price;
+       const tax = row.tax ? parseFloat(row.tax.gstPercentage) : 0;
+       const taxAmount = (baseAmount * tax) / 100;
+       const totalAmount = baseAmount + taxAmount;
+       return sum + totalAmount;
+   }, 0);
+};
 
   const calculateTotal = (data = tableData, discountVal = discountValue, discType = discountType) => {
     if (!Array.isArray(data)) {
-      console.error('Invalid data passed to calculateTotal');
-      return;
+        console.error('Invalid data passed to calculateTotal');
+        return;
     }
 
-    // Calculate subtotal
-    const subtotal = data.reduce((sum, row) => {
-      return sum + (parseFloat(row.amount) || 0);
-    }, 0);
-
-    // Calculate discount amount based on type
-    let discountAmount = 0;
-    if (discType === 'percentage') {
-      discountAmount = (subtotal * (parseFloat(discountVal) || 0)) / 100;
-    } else { // fixed
-      discountAmount = parseFloat(discountVal) || 0;
-    }
+   // Calculate subtotal
+   const subtotal = data.reduce((sum, row) => {
+    const amount = parseFloat(row.amount) || 0;
+    return sum + amount;
+}, 0);
 
     // Calculate total tax
     const totalTax = data.reduce((sum, row) => {
-      const quantity = parseFloat(row.quantity) || 0;
-      const price = parseFloat(row.price) || 0;
-      const tax = (parseFloat(row.tax) || 0);
-      const baseAmount = quantity * price;
-      const taxAmount = (baseAmount * tax) / 100;
-      return sum + taxAmount;
+        const quantity = parseFloat(row.quantity) || 0;
+        const price = parseFloat(row.price) || 0;
+        const baseAmount = quantity * price;
+        const taxPercentage = row.tax?.gstPercentage || 0;
+        const taxAmount = (baseAmount * taxPercentage) / 100;
+        return sum + taxAmount;
     }, 0);
+
+    // Calculate discount
+    let discountAmount = 0;
+    if (discountVal !== '') {
+        if (discType === 'percentage') {
+            discountAmount = (subtotal * (parseFloat(discountVal) || 0)) / 100;
+        } else {
+            discountAmount = parseFloat(discountVal) || 0;
+        }
+    }
 
     // Calculate final total
     const finalTotal = subtotal - discountAmount;
 
     setTotals({
-      subtotal: subtotal.toFixed(2),
-      discount: discountAmount.toFixed(2),
-      totalTax: totalTax.toFixed(2),
-      finalTotal: finalTotal.toFixed(2)
+        subtotal: subtotal.toFixed(2),
+        discount: discountAmount.toFixed(2),
+        totalTax: totalTax.toFixed(2),
+        finalTotal: finalTotal.toFixed(2)
     });
+
+    return {
+        subtotal,
+        discount: discountAmount,
+        totalTax,
+        finalTotal
+    };
   };
 
   const handleTableDataChange = (id, field, value) => {
-    const updatedData = tableData.map((row) => {
-      if (row.id === id) {
-        const updatedRow = { ...row, [field]: value };
+    const updatedData = tableData.map(row => {
+        if (row.id === id) {
+            const updatedRow = { ...row };
 
-        if (field === 'tax' && taxes?.data) {
-          const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
-          if (selectedTax) {
-            setSelectedTaxDetails(prevDetails => ({
-              ...prevDetails,
-              [id]: {
-                gstName: selectedTax.gstName,
-                gstPercentage: selectedTax.gstPercentage
-              }
-            }));
-          }
+            if (field === 'tax') {
+                if (!value) {
+                    updatedRow.tax = null;
+                    updatedRow.tax_name = '';
+                    updatedRow.tax_amount = 0;
+                } else {
+                    const quantity = parseFloat(updatedRow.quantity) || 0;
+                    const price = parseFloat(updatedRow.price) || 0;
+                    const baseAmount = quantity * price;
+                    const taxAmount = (baseAmount * value.gstPercentage) / 100;
+                    
+                    updatedRow.tax = value;
+                    updatedRow.tax_name = value.gstName;
+                    updatedRow.tax_amount = taxAmount;
+                }
+            } else {
+                updatedRow[field] = value;
+            }
+
+            // Recalculate amounts
+            const quantity = parseFloat(updatedRow.quantity) || 0;
+            const price = parseFloat(updatedRow.price) || 0;
+            const baseAmount = quantity * price;
+            const taxPercentage = updatedRow.tax?.gstPercentage || 0;
+            const taxAmount = (baseAmount * taxPercentage) / 100;
+            const finalAmount = baseAmount + taxAmount;
+
+            updatedRow.base_amount = baseAmount;
+            updatedRow.tax_amount = taxAmount;
+            updatedRow.amount = finalAmount.toFixed(2);
+
+            return updatedRow;
         }
-        // Calculate amount if quantity, price, or tax changes
-        if (field === 'quantity' || field === 'price' || field === 'tax') {
-          const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
-          const price = parseFloat(field === 'price' ? value : row.price) || 0;
-          const tax = parseFloat(field === 'tax' ? value : row.tax) || 0;
-
-          const baseAmount = quantity * price;
-          const taxAmount = (baseAmount * tax) / 100;
-          const totalAmount = baseAmount + taxAmount;
-
-          updatedRow.amount = totalAmount.toFixed(2);
-        }
-
-        return updatedRow;
-      }
-      return row;
+        return row;
     });
 
     setTableData(updatedData);
@@ -517,18 +553,29 @@ const EditProposal = ({ id, onClose }) => {
                             />
                           </td>
                           <td className="px-4 py-2 border-b">
-                            <select
-                              value={row.tax}
-                              onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                              className="w-full p-2 border"
+                            <Select
+                              value={row.tax ? `${row.tax.gstName}|${row.tax.gstPercentage}` : undefined}
+                              onChange={(value) => {
+                                if (!value || value === '0') {
+                                  handleTableDataChange(row.id, "tax", null);
+                                  return;
+                                }
+                                const [gstName, gstPercentage] = value.split('|');
+                                handleTableDataChange(row.id, "tax", {
+                                  gstName,
+                                  gstPercentage: parseFloat(gstPercentage)
+                                });
+                              }}
+                              placeholder="Select Tax"
+                              className="w-[150px] p-2"
+                              allowClear
                             >
-                              <option value="0">Nothing Selected</option>
                               {taxes && taxes.data && taxes.data.map(tax => (
-                                <option key={tax.id} value={tax.gstPercentage}>
-                                  {tax.gstName}: {tax.gstPercentage}%
-                                </option>
+                                <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
+                                  {tax.gstName} ({tax.gstPercentage}%)
+                                </Option>
                               ))}
-                            </select>
+                            </Select>
                           </td>
                           <td className="px-4 py-2 border-b">
                             <span>{row.amount}</span>
@@ -541,6 +588,17 @@ const EditProposal = ({ id, onClose }) => {
                               <DeleteOutlined />
                             </Button>
                           </td>
+                        </tr>
+                        <tr>
+                                                    <td colSpan={6} className="px-4 py-2 border-b">
+                                                        <textarea
+                                                            rows={2}
+                                                            value={row.description}
+                                                            onChange={(e) => handleTableDataChange(row.id, 'description', e.target.value)}
+                                                            placeholder="Description"
+                                                            className="w-[70%] p-2 border"
+                                                        />
+                                                    </td>
                         </tr>
                       </React.Fragment>
                     ))}

@@ -7,11 +7,14 @@ import {
   Row,
   Col,
   message,
+  Select,
 } from "antd";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { editsholidayss, getsholidayss } from "./AttendanceReducer/holidaySlice";
 import moment from "moment-timezone";
+
+const { Option } = Select;
 
 const EditHoliday = ({ onClose, idd }) => {
   const dispatch = useDispatch();
@@ -19,6 +22,7 @@ const EditHoliday = ({ onClose, idd }) => {
     holiday_name: "",
     start_date: null,
     end_date: null,
+    leave_type: "",
   });
   const enableReinitialize = true;
 
@@ -37,6 +41,7 @@ const EditHoliday = ({ onClose, idd }) => {
           holiday_name: filterdata.holiday_name,
           start_date: moment(filterdata.start_date),
           end_date: moment(filterdata.end_date),
+          leave_type: filterdata.leave_type || '',
         });
       }
     }
@@ -46,7 +51,10 @@ const EditHoliday = ({ onClose, idd }) => {
   const validationSchema = Yup.object().shape({
     holiday_name: Yup.string().required("Holiday name is required"),
     start_date: Yup.date().required("Start Date is required"),
-    end_date: Yup.date().required("End Date is required"),
+    end_date: Yup.date()
+      .required("End Date is required")
+      .min(Yup.ref('start_date'), "End date must be after start date"),
+    leave_type: Yup.string().required("Leave type is required"),
   });
 
   const handleSubmit = (values, { resetForm }) => {
@@ -54,6 +62,7 @@ const EditHoliday = ({ onClose, idd }) => {
       ...values,
       start_date: moment(values.start_date).format("YYYY-MM-DD"),
       end_date: moment(values.end_date).format("YYYY-MM-DD"),
+      leave_type: values.leave_type,
     };
 
     dispatch(editsholidayss({ idd, formattedValues }))
@@ -100,6 +109,27 @@ const EditHoliday = ({ onClose, idd }) => {
                 </div>
               </Col>
 
+              <Col span={24}>
+                <div style={{ marginBottom: "16px" }}>
+                  <label className="font-semibold">Leave Type <span className="text-red-500">*</span></label>
+                  <Select
+                    name="leave_type"
+                    placeholder="Select leave type"
+                    className="w-full mt-1"
+                    value={values.leave_type}
+                    onChange={(value) => setFieldValue("leave_type", value)}
+                  >
+                    <Option value="paid">Paid</Option>
+                    <Option value="unpaid">Unpaid</Option>
+                  </Select>
+                  {errors.leave_type && touched.leave_type && (
+                    <div style={{ color: "red", fontSize: "12px" }}>
+                      {errors.leave_type}
+                    </div>
+                  )}
+                </div>
+              </Col>
+
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
@@ -108,7 +138,12 @@ const EditHoliday = ({ onClose, idd }) => {
                     className="w-full mt-1"
                     placeholder="Select start date"
                     value={values.start_date}
-                    onChange={(date) => setFieldValue("start_date", date)}
+                    onChange={(date) => {
+                      setFieldValue("start_date", date);
+                      if (values.end_date && date && moment(values.end_date).isBefore(date)) {
+                        setFieldValue("end_date", null);
+                      }
+                    }}
                   />
                   {errors.start_date && touched.start_date && (
                     <div style={{ color: "red", fontSize: "12px" }}>
@@ -126,8 +161,10 @@ const EditHoliday = ({ onClose, idd }) => {
                     className="w-full mt-1"
                     placeholder="Select end date"
                     value={values.end_date}
-                    onChange={(date) => setFieldValue(
-                      "end_date", date)}
+                    onChange={(date) => setFieldValue("end_date", date)}
+                    disabledDate={(current) => {
+                      return values.start_date ? current && current < values.start_date.startOf('day') : false;
+                    }}
                   />
                   {errors.end_date && touched.end_date && (
                     <div style={{ color: "red", fontSize: "12px" }}>
@@ -139,6 +176,12 @@ const EditHoliday = ({ onClose, idd }) => {
             </Row>
 
             <div className="text-right">
+              <Button 
+                onClick={onClose} 
+                style={{ marginRight: 8 }}
+              >
+                Cancel
+              </Button>
               <Button type="primary" htmlType="submit">
                 Update Holiday
               </Button>
@@ -146,6 +189,19 @@ const EditHoliday = ({ onClose, idd }) => {
           </FormikForm>
         )}
       </Formik>
+
+      <style jsx="true">{`
+        .ant-select-selector {
+          border-radius: 6px !important;
+        }
+        .ant-select:hover .ant-select-selector {
+          border-color: #40a9ff !important;
+        }
+        .ant-select-focused .ant-select-selector {
+          border-color: #40a9ff !important;
+          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+        }
+      `}</style>
     </div>
   );
 };

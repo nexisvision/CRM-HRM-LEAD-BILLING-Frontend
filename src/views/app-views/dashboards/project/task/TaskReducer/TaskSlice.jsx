@@ -8,9 +8,9 @@ import { message } from "antd";
 
 export const AddTaskk = createAsyncThunk(
   "users/AddTasks",
-  async ({ id, values }, thunkAPI) => {
+  async ({ id, payload }, thunkAPI) => {
     try {
-      const response = await UserService.Addtask(id, values);
+      const response = await UserService.Addtask(id, payload);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);

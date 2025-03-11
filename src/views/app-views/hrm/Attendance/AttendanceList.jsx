@@ -16,6 +16,8 @@ import {
   ClockCircleOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
+import isBetween from 'dayjs/plugin/isBetween';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import UserView from "../../Users/user-list/UserView";
 import AddAttendance from "./AddAttendance";
 import {
@@ -24,6 +26,11 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
 import { GetLeave } from "../Leaves/LeaveReducer/LeaveSlice";
+import { getsholidayss } from "../holiday/AttendanceReducer/holidaySlice";
+
+// Extend dayjs with plugins
+dayjs.extend(isBetween);
+dayjs.extend(customParseFormat);
 
 
 const AttendanceList = () => {
@@ -138,6 +145,8 @@ const AttendanceList = () => {
 
   useEffect(() => {
     dispatch(getAttendances());
+    dispatch(getsholidayss());
+
     dispatch(GetLeave());
   }, [dispatch]);
 
@@ -153,30 +162,32 @@ const AttendanceList = () => {
     setIsAddAttendanceModalVisible(false);
   };
 
-  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-  const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+                                    const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+                                    const roles = useSelector((state) => state.role?.role?.data);
+                                    const roleData = roles?.find(role => role.id === roleId);
+                                 
+                                    const whorole = roleData.role_name;
+                                 
+                                    const parsedPermissions = Array.isArray(roleData?.permissions)
+                                    ? roleData.permissions
+                                    : typeof roleData?.permissions === 'string'
+                                    ? JSON.parse(roleData.permissions)
+                                    : [];
+                                  
+                                    let allpermisson;  
+                                 
+                                    if (parsedPermissions["extra-hrm-role"] && parsedPermissions["extra-hrm-role"][0]?.permissions) {
+                                      allpermisson = parsedPermissions["extra-hrm-role"][0].permissions;
+                                    
+                                    } else {
 
-  const whorole = roleData.role_name;
-
-  const parsedPermissions = Array.isArray(roleData?.permissions)
-    ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
-
-  let allpermisson;
-
-  if (parsedPermissions["extra-hrm-role"] && parsedPermissions["extra-hrm-role"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-role"][0].permissions;
-    console.log('Parsed Permissions:', allpermisson);
-
-  } else {
-    console.log('extra-hrm-role is not available');
-  }
-
-  const canCreateClient = allpermisson?.includes('create');
-  const canViewClient = allpermisson?.includes('view');
+                                    }
+                                    
+                                    const canCreateClient = allpermisson?.includes('create');
+                                    const canEditClient = allpermisson?.includes('edit');
+                                    const canDeleteClient = allpermisson?.includes('delete');
+                                    const canViewClient = allpermisson?.includes('view');
+                                 
 
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
@@ -192,37 +203,89 @@ const AttendanceList = () => {
 
 
 
+  // Add this function to check if a date is a holiday
+  const isHoliday = (date) => {
+    if (!allholidaudata) return null;
+    
+    try {
+      return allholidaudata.find(holiday => {
+        if (!holiday.start_date || !holiday.end_date) return false;
+        
+        const startDate = dayjs(holiday.start_date);
+        const endDate = dayjs(holiday.end_date);
+        const checkDate = dayjs(date);
+
+        // Check if all dates are valid dayjs objects
+        if (!startDate.isValid() || !endDate.isValid() || !checkDate.isValid()) {
+          console.log('Invalid date detected:', { 
+            start: holiday.start_date, 
+            end: holiday.end_date, 
+            check: date.format('YYYY-MM-DD') 
+          });
+          return false;
+        }
+
+        // Check if the date falls within the holiday period
+        return (checkDate.isAfter(startDate, 'day') || checkDate.isSame(startDate, 'day')) && 
+               (checkDate.isBefore(endDate, 'day') || checkDate.isSame(endDate, 'day'));
+      });
+    } catch (error) {
+      console.error('Error in isHoliday:', error);
+      return null;
+    }
+  };
+
   const generateDateColumns = () => {
     const daysInMonth = selectedMonth.daysInMonth();
     const columns = [];
 
     for (let i = 1; i <= daysInMonth; i++) {
-      const date = selectedMonth.date(i);
-      const isSunday = date.day() === 0;
-      columns.push({
-        title: (
-          <div className="text-center">
-            <div>{i}</div>
-            <div>{date.format('ddd')}</div>
-          </div>
-        ),
-        dataIndex: 'attendanceByDay',
-        width: 60,
-        align: 'center',
-        render: (attendanceByDay) => {
-          if (isSunday) return 'WK';
-          const attendance = attendanceByDay[i];
-          if (!attendance) return <Tag color="red" className="m-0">A</Tag>;
-          if (attendance.status === 'L') {
-            return (
-              <Tooltip title={`Leave Type: ${attendance.leaveType}, Remark: ${attendance.remark || 'N/A'}, Status: ${attendance.statusText}`}>
-                <Tag color="orange" className="m-0">L</Tag>
-              </Tooltip>
-            );
-          }
-          return renderAttendanceStatus(attendanceByDay, i);
-        },
-      });
+      try {
+        const currentDate = dayjs(selectedMonth).set('date', i);
+        const isSunday = currentDate.day() === 0;
+        const holiday = isHoliday(currentDate);
+        
+        columns.push({
+          title: (
+            <div className="text-center">
+              <div>{i}</div>
+              <div>{currentDate.format('ddd')}</div>
+            </div>
+          ),
+          dataIndex: 'attendanceByDay',
+          width: 60,
+          align: 'center',
+          render: (attendanceByDay) => {
+            // First check if it's a holiday
+            if (holiday) {
+              return (
+                <Tooltip title={`Holiday: ${holiday.holiday_name} (${holiday.leave_type})`}>
+                  <Tag color={holiday.leave_type === 'paid' ? 'purple' : 'magenta'} className="m-0">
+                    H
+                  </Tag>
+                </Tooltip>
+              );
+            }
+            
+            // Then check if it's Sunday
+            if (isSunday) return 'WK';
+            
+            // Then check attendance
+            const attendance = attendanceByDay[i];
+            if (!attendance) return <Tag color="red" className="m-0">A</Tag>;
+            if (attendance.status === 'L') {
+              return (
+                <Tooltip title={`Leave Type: ${attendance.leaveType}, Remark: ${attendance.remark || 'N/A'}, Status: ${attendance.statusText}`}>
+                  <Tag color="orange" className="m-0">L</Tag>
+                </Tooltip>
+              );
+            }
+            return renderAttendanceStatus(attendanceByDay, i);
+          },
+        });
+      } catch (error) {
+        console.error('Error in generateDateColumns:', error);
+      }
     }
     return columns;
   };
@@ -350,17 +413,27 @@ const AttendanceList = () => {
       </div>
       <div className="overflow-x-auto">
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-          <Table
-            columns={tableColumns}
-            dataSource={getFilteredAttendances()}
-            rowKey="id"
-            pagination={{
-              total: getFilteredAttendances().length,
-              pageSize: 10,
-              showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-            }}
-          />
+          <>
+            <div className="mb-4 flex flex-wrap gap-3">
+              <Tag color="green">P - Present</Tag>
+              <Tag color="red">A - Absent</Tag>
+              <Tag color="orange">L - Leave</Tag>
+              <Tag color="purple">H - Paid Holiday</Tag>
+              <Tag color="magenta">H - Unpaid Holiday</Tag>
+              <Tag>WK - Weekend</Tag>
+            </div>
+            <Table 
+              columns={tableColumns} 
+              dataSource={getFilteredAttendances()} 
+              rowKey="id"
+              pagination={{
+                total: getFilteredAttendances().length,
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              }}
+            />
+          </>
         ) : null}
       </div>
       <UserView
@@ -428,6 +501,28 @@ const styles = `
 
   .table-responsive {
     overflow-x: auto;
+  }
+
+  .ant-tag {
+    margin: 0;
+    min-width: 28px;
+    text-align: center;
+  }
+
+  .legend-container {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding: 8px;
+    background: #f5f5f5;
+    border-radius: 4px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 `;
 

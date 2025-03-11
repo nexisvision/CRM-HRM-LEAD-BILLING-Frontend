@@ -9,6 +9,8 @@ import {
   Col,
   Upload,
   Modal,
+  Tag,
+  Checkbox,
 } from "antd";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
@@ -59,14 +61,16 @@ const AddTask = ({ onClose }) => {
   const initialValues = {
     taskName: "",
     category: "",
-    project: fnddata?.id || "",
+    project: fnddata?.id || "", 
     lead: "",
     startDate: null,
     dueDate: null,
     assignTo: [],
     description: "",
     task_reporter: "",
-    files: []
+    file: [],
+    status: "To Do",
+    priority: "Medium"
   };
 
   const validationSchema = Yup.object({
@@ -171,56 +175,86 @@ const AddTask = ({ onClose }) => {
       setFileList(newFileList);
     },
     beforeUpload: (file) => {
+      // Add additional file metadata
+      file.status = 'done';
       setFileList([...fileList, file]);
-      return false; // Prevent automatic upload
+      return false;
     },
     fileList,
     multiple: true,
+    maxCount: 5,
   };
 
   const onSubmit = async (values, { resetForm }) => {
-    // Create FormData to handle file upload
-    const formData = new FormData();
+    try {
+      // Create assignTo object
+      const assignToObject = {
+        assignedUsers: Array.isArray(values.assignTo)
+          ? values.assignTo.filter(id => id && id.trim() !== '')
+          : []
+      };
 
-    // Append all regular fields
-    Object.keys(values).forEach(key => {
-      if (key !== 'files') {
-        formData.append(key, values[key]);
-      }
-    });
+      // Format task_file data
+      const formattedFiles = fileList.map(file => ({
+        uid: file.uid,
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        status: 'done'
+      }));
 
-    // Append files with the key 'task_file'
-    fileList.forEach((file) => {
-      formData.append('task_file', file);
-    });
+      // Create the main payload object
+      const payload = {
+        taskName: values.taskName,
+        category: values.category,
+        project: values.project,
+        lead: values.lead || "",
+        startDate: values.startDate ? values.startDate.format('YYYY-MM-DD') : null,
+        dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD') : null,
+        assignTo: assignToObject,
+        description: values.description,
+        task_reporter: values.task_reporter,
+        status: values.status,
+        priority: values.priority,
+        file: formattedFiles // Use formatted file data
+      };
 
+      // Log the payload for debugging
+      console.log('Submitting Task with payload:', payload);
 
-    // Dispatch AddTasks with updated values
-    dispatch(AddTaskk({ id, values })).then(() => {
-      // message.success("Task added successfully!");
-      // Fetch updated tasks after successfully adding
-      dispatch(GetTasks(id))
+      // Dispatch AddTaskk with payload
+      dispatch(AddTaskk({ id, payload }))
         .then(() => {
-          resetForm();
-          setFileList([]); // Reset file list
-          onClose();
+          dispatch(GetTasks(id))
+            .then(() => {
+              message.success("Task added successfully!");
+              resetForm();
+              setFileList([]); // Reset file list
+              onClose();
+            })
+            .catch((error) => {
+              console.error("Failed to fetch tasks:", error);
+              message.error("Failed to fetch the latest task data.");
+            });
         })
         .catch((error) => {
-          // message.error("Failed to fetch the latest Task data.");
-          console.error("Task API error:", error);
+          console.error("Failed to add task:", error);
+          message.error("Failed to add task.");
         });
-    })
-      .catch((error) => {
-        message.error("Failed to add Task.");
-        console.error("AddTask API error:", error);
-      });
+    } catch (error) {
+      console.error("Form submission error:", error);
+      message.error("An error occurred while processing the form.");
+    }
   };
 
   return (
     <div className="add-expenses-form">
 
       <Formik
-        initialValues={initialValues}
+        initialValues={{
+          ...initialValues,
+          files: [] // Add files to initial values
+        }}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
@@ -358,43 +392,70 @@ const AddTask = ({ onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">AssignTo <span className="text-red-500">*</span></label>
-                    <Field name="assignTo">
-                      {({ field }) => (
-                        <Select
-                          {...field}
-                          className="w-full mt-1"
-                          mode="multiple"
-                          placeholder="Select AddProjectMember"
-                          onChange={(value) => setFieldValue("assignTo", value)}
-                          value={values.assignTo}
-                          onBlur={() => setFieldTouched("assignTo", true)}
-                        >
-                          {fnduserdatas && fnduserdatas.length > 0 ? (
-                            fnduserdatas.map((client) => (
+               
+
+<Col span={24} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">AssignTo <span className="text-rose-500">*</span></label>
+                  <Field name="assignTo">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        mode="multiple"
+                        placeholder="Select AddProjectMember"
+                        onChange={(value) => {
+                          const arrayValue = Array.isArray(value) ? value : [value];
+                          setFieldValue("assignTo", arrayValue);
+                        }}
+                        value={values.assignTo}
+                        onBlur={() => setFieldTouched("assignTo", true)}
+                        showSearch
+                        optionFilterProp="children"
+                        filterOption={(input, option) => {
+                          if (!option?.children) return false;
+                          return option.children.toLowerCase().includes(input.toLowerCase());
+                        }}
+                      >
+                        {Array.isArray(fnduserdatas) && fnduserdatas.length > 0 ? (
+                          fnduserdatas.map((client) => {
+                            const displayName = client.firstName || client.username || "Unnamed Client";
+                            return (
                               <Option key={client.id} value={client.id}>
-                                {client.firstName ||
-                                  client.username ||
-                                  "Unnamed Client"}
+                                {displayName}
                               </Option>
-                            ))
-                          ) : (
-                            <Option value="" disabled>
-                              No Employee Available
-                            </Option>
-                          )}
-                        </Select>
-                      )}
-                    </Field>
-                    <ErrorMessage
-                      name="assignTo"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
+                            );
+                          })
+                        ) : (
+                          <Option value="" disabled>
+                            No Members Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  {/* Display selected users as tags */}
+                  <div className="mt-2">
+                    {Array.isArray(values.assignTo) && values.assignTo.length > 0 && (
+                      <div className="selected-users">
+                        {values.assignTo.map((userId) => {
+                          const user = fnduserdatas.find(u => u.id === userId);
+                          return user && (
+                            <Tag key={userId} className="mb-1 mr-1">
+                              {user.firstName || user.username || "Unnamed Client"}
+                            </Tag>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                </Col>
+                  <ErrorMessage
+                    name="assignTo"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
@@ -430,81 +491,99 @@ const AddTask = ({ onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={24} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">Status <span className="text-red-500">*</span></label>
-                    <Select
-                      style={{ width: "100%" }}
-                      className="mt-1"
-                      placeholder="Select or add new status"
-                      value={values.status}
-                      onChange={(value) => setFieldValue("status", value)}
-                      dropdownRender={(menu) => (
-                        <div>
-                          {menu}
-                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                            <Button
-                              type="link"
-                              icon={<PlusOutlined />}
-                              className="w-full mt-2"
-                              onClick={() => setIsStatusModalVisible(true)}
-                            >
-                              Add New Status
-                            </Button>
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold mb-2">Status <span className="text-rose-500">*</span></label>
+                  <Field name="status">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        onChange={(value) => setFieldValue("status", value)}
+                        value={values.status}
+                      >
+                        <Option value="Incomplete">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                            Incomplete
                           </div>
-                        </div>
-                      )}
-                    >
-                      {statuses.map((status) => (
-                        <Option key={status.id} value={status.name}>
-                          {status.name}
                         </Option>
-                      ))}
-                    </Select>
-                    <ErrorMessage
-                      name="status"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-
-                <Col span={24} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">Priority <span className="text-red-500">*</span></label>
-                    <Select
-                      style={{ width: "100%" }}
-                      className="mt-1"
-                      placeholder="Select or add new Priority"
-                      value={values.priority}
-                      onChange={(value) => setFieldValue("priority", value)}
-                      dropdownRender={(menu) => (
-                        <div>
-                          {menu}
-                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                            <Button
-                              type="link"
-                              icon={<PlusOutlined />}
-                              className="w-full mt-2"
-                              onClick={() => setIsPriorityModalVisible(true)}
-                            >
-                              Add New priority
-                            </Button>
+                        <Option value="To Do">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
+                            To Do
                           </div>
-                        </div>
-                      )}
-                    >
-                      {priorities.map((priority) => (
-                        <Option key={priority.id} value={priority.name}>
-                          {priority.name}
                         </Option>
-                      ))}
-                    </Select>
-                    <ErrorMessage name="tag" component="div" className="error-message text-red-500 my-1" />
-                  </div>
-                </Col>
+                        <Option value="In Progress">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-orange-500 mr-2"></span>
+                            In Progress
+                          </div>
+                        </Option>
+                        <Option value="Completed">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                            Completed
+                          </div>
+                        </Option>
+                        <Option value="On Hold">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
+                            Waiting Approval
+                          </div>
+                        </Option>
+                      </Select>
+                      // </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="status"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
-
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Priority <span className="text-rose-500">*</span></label>
+                  <Field name="priority">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        onChange={(value) => setFieldValue("priority", value)}
+                        value={values.priority}
+                      >
+                        <Option value="Medium">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
+                            Medium
+                          </div>
+                        </Option>
+                        <Option value="High">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                            High
+                          </div>
+                        </Option>
+                        <Option value="Low">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                            Low
+                          </div>
+                        </Option>
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="priority"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+                
                 <Col span={24} className="mt-4">
                   <div className="form-item">
                     <label className="font-semibold">Description <span className="text-red-500">*</span></label>
@@ -522,17 +601,41 @@ const AddTask = ({ onClose }) => {
                     />
                   </div>
                 </Col>
-                <Col span={24} className="mt-4">
-                  <div className="form-item">
-                    <label className="text-sm font-semibold mb-2 block">Attachments <span className="text-red-500">*</span></label>
-                    <Upload
-                      {...uploadProps}
-                      className="mt-2"
-                    >
-                      <Button icon={<UploadOutlined />} className="hover:bg-gray-50">Click to Upload</Button>
-                    </Upload>
-                  </div>
-                </Col>
+
+                {/* File upload component */}
+                <Col span={24}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Attachment (Optional)
+                  </label>
+                  <Upload
+                    beforeUpload={(file) => {
+                      const isValidFileType = ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type);
+                      const isValidFileSize = file.size / 1024 / 1024 < 5;
+
+                      if (!isValidFileType) {
+                        message.error('You can only upload JPG/PNG/PDF files!');
+                        return Upload.LIST_IGNORE;
+                      }
+                      if (!isValidFileSize) {
+                        message.error('File must be smaller than 5MB!');
+                        return Upload.LIST_IGNORE;
+                      }
+
+                      setFieldValue("file", file);
+                      return false;
+                    }}
+                    maxCount={1}
+                  >
+                    <Button icon={<UploadOutlined />} className="bg-white">
+                      Select File
+                    </Button>
+                    {/* <span className="ml-2 text-gray-500 text-sm">
+                      Supports: JPG, PNG, PDF (Max: 5MB)
+                    </span> */}
+                  </Upload>
+                </div>
+              </Col>
 
               </Row>
 

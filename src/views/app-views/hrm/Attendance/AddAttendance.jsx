@@ -37,45 +37,104 @@ const AddAttendance = ({ onClose }) => {
   }, [dispatch]);
 
   const validationSchema = Yup.object().shape({
-    employee: Yup.string().required("Employee is required"),
-    date: Yup.date().required("Start Date is required"),
-    startTime: Yup.string().required("Start Time is required"),
-    endTime: Yup.string().required("End Time is required"),
-    late: Yup.string().required("Late field is required"),
-    halfDay: Yup.string().required("Half Day selection is required"),
-    comment: Yup.string().optional(),
+    employee: Yup.string()
+      .required("Employee selection is required")
+      .test('valid-employee', 'Please select a valid employee', value => 
+        employeeData.some(emp => emp.id.toString() === value.toString())),
+    
+    date: Yup.date()
+      .required("Date is required")
+      
+      .test('is-weekend', 'Cannot mark attendance for weekends', 
+        value => value ? moment(value).day() !== 0 : true)
+      .typeError("Please enter a valid date"),
+    
+    startTime: Yup.string()
+      .required("Start time is required"),
+      
+    
+    endTime: Yup.string()
+      .required("End time is required"),
+    
+      
+    
+   
+    comment: Yup.string()
+      .trim()
+      .min(3, "Comment must be at least 3 characters")
+      .max(500, "Comment cannot exceed 500 characters")
+      .test('required-if-late', 'Comment is required when marked as late', function(value) {
+        const { late } = this.parent;
+        if (late === 'yes' && (!value || value.length < 3)) {
+          return false;
+        }
+        return true;
+      }),
   });
-  const handleSubmit = (values, { resetForm }) => {
-    if (values.halfDay === "yes") {
-      values.halfDay = true;
-    } else {
-      values.halfDay = false;
-    }
 
+  const handleSubmit = (values, { resetForm }) => {
+    try {
+      // Log raw values before formatting
+    
+
+      // Convert values to proper format
     const formattedValues = {
       ...values,
       startTime: values.startTime.format("HH:mm:ss"),
       endTime: values.endTime.format("HH:mm:ss"),
       halfDay: values.halfDay === "yes",
-    };
+        // Use the date directly as it's already in YYYY-MM-DD format
+        date: values.date,
+        created_by: user
+      };
 
+      // Log the final payload with date verification
+     
 
+      // Validate date
+      if (!formattedValues.date) {
+        message.error("Please select a valid date");
+        return;
+      }
+
+      // Validate working hours
+      const startTime = moment(formattedValues.startTime, "HH:mm:ss");
+      const endTime = moment(formattedValues.endTime, "HH:mm:ss");
+      const hoursWorked = endTime.diff(startTime, 'hours', true);
+
+      if (hoursWorked < 4) {
+        message.error("Working hours must be at least 4 hours");
+        return;
+      }
 
     dispatch(addAttendance(formattedValues))
+    .then(() => {
 
-
-      .then(() => {
-        console.log("formattedValues", formattedValues);
-
+          console.log("Attendance added successfully:", formattedValues);
         dispatch(getAttendances());
         message.success("Attendance added successfully!");
         onClose();
         resetForm();
       })
       .catch((error) => {
+          console.error("Add attendance error:", error);
         message.error("Failed to add attendance.");
-        console.error("Add API error:", error);
-      });
+        });
+    } catch (error) {
+      console.error("Form submission error:", error);
+      message.error("An error occurred while processing the form.");
+    }
+  };
+
+  // Update initial values to handle date properly
+  const initialValues = {
+    employee: "",
+    date: "",
+    startTime: "",
+    endTime: "",
+    late: "",
+    halfDay: "",
+    comment: "",
   };
 
   return (
@@ -83,16 +142,10 @@ const AddAttendance = ({ onClose }) => {
       <div className="mb-3 border-b pb-1 font-medium"></div>
 
       <Formik
-        initialValues={{
-          employee: "",
-          date: "",
-          startTime: "",
-          endTime: "",
-          late: "",
-          halfDay: "",
-          comment: "",
-        }}
+        
         // validationSchema={validationSchema}
+        initialValues={initialValues}
+        validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({ errors, touched, setFieldValue, values }) => (
@@ -125,12 +178,26 @@ const AddAttendance = ({ onClose }) => {
 
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
-                  <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Date <span className="text-red-500">*</span></label>
                   <DatePicker
                     style={{ width: "100%" }}
                     className="w-full mt-1"
                     placeholder="Select date"
-                    onChange={(date) => setFieldValue("date", date)}
+                    format="DD-MM-YYYY"
+                    allowClear={false}
+                    showToday
+                    value={values.date ? moment(values.date) : null}
+                    onChange={(date) => {
+                      const formattedDate = date ? date.format('YYYY-MM-DD') : null;
+                      console.log("Selected Date in DatePicker:", formattedDate);
+                      setFieldValue("date", formattedDate);
+                    }}
+                    disabledDate={(current) => {
+                      return current && (
+                        current > moment().endOf('day') ||
+                        current.day() === 0
+                      );
+                    }}
                   />
                   {errors.date && touched.date && (
                     <div style={{ color: "red", fontSize: "12px" }}>
@@ -144,12 +211,23 @@ const AddAttendance = ({ onClose }) => {
                   <label className="font-semibold">Start Time <span className="text-red-500">*</span></label>
                   <TimePicker
                     style={{ width: "100%" }}
-                    placeholder="Select time"
                     className="w-full mt-1"
-                    defaultValue={moment("09:00", "HH:mm")}
+                    format="HH:mm"
+                    placeholder="Select start time"
+                    minuteStep={5}
+                    showNow={false}
+                    allowClear={false}
                     onChange={(time) => {
+                      console.log("Selected Start Time:", time ? time.format('HH:mm:ss') : null);
                       setFieldValue("startTime", time);
-                      setFieldValue("endTime", null);
+                    }}
+                    hideDisabledOptions
+                    disabledHours={() => {
+                      const hours = [];
+                      for (let i = 0; i < 24; i++) {
+                        if (i < 7 || i > 11) hours.push(i);
+                      }
+                      return hours;
                     }}
                   />
                   {errors.startTime && touched.startTime && (
@@ -165,32 +243,34 @@ const AddAttendance = ({ onClose }) => {
                   <label className="font-semibold">End Time <span className="text-red-500">*</span></label>
                   <TimePicker
                     style={{ width: "100%" }}
-                    placeholder="Select time"
                     className="w-full mt-1"
-                    defaultValue={moment("18:00", "HH:mm")}
-                    onChange={(time) => setFieldValue("endTime", time)}
-                    disabledTime={() => {
-                      const startTime = values.startTime;
-                      if (!startTime) return {};
-
-                      return {
-                        disabledHours: () => {
+                    format="HH:mm"
+                    placeholder="Select end time"
+                    minuteStep={5}
+                    showNow={false}
+                    allowClear={false}
+                    onChange={(time) => {
+                      console.log("Selected End Time:", time ? time.format('HH:mm:ss') : null);
+                      setFieldValue("endTime", time);
+                    }}
+                    hideDisabledOptions
+                    disabledHours={() => {
                           const hours = [];
-                          for (let i = 0; i < startTime.hour(); i++) {
-                            hours.push(i);
+                      for (let i = 0; i < 24; i++) {
+                        if (i < 16 || i > 20) hours.push(i);
                           }
                           return hours;
-                        },
-                        disabledMinutes: (selectedHour) => {
+                    }}
+                    disabledMinutes={(selectedHour) => {
+                      // If start time is selected, disable minutes before it
+                      if (values.startTime && selectedHour === values.startTime.hour()) {
                           const minutes = [];
-                          if (selectedHour === startTime.hour()) {
-                            for (let i = 0; i < startTime.minute(); i++) {
+                        for (let i = 0; i < values.startTime.minute(); i++) {
                               minutes.push(i);
-                            }
                           }
                           return minutes;
                         }
-                      };
+                      return [];
                     }}
                   />
                   {errors.endTime && touched.endTime && (
@@ -201,7 +281,52 @@ const AddAttendance = ({ onClose }) => {
                 </div>
               </Col>
 
+              {/* Late and Half Day Selection */}
+              <Col span={12}>
+                <div style={{ marginBottom: "16px" }}>
+                  <label className="font-semibold">Late <span className="text-red-500">*</span></label>
+                  <Field
+                    as={Select}
+                    name="late"
+                    placeholder="Was the employee late?"
+                    style={{ width: "100%" }}
+                    className="w-full mt-1"
+                    onChange={(value) => setFieldValue("late", value)}
+                  >
+                    <Option value="yes">Yes</Option>
+                    <Option value="no">No</Option>
+                  </Field>
+                  {errors.late && touched.late && (
+                    <div style={{ color: "red", fontSize: "12px" }}>
+                      {errors.late}
+                    </div>
+                  )}
+                </div>
+              </Col>
 
+              <Col span={12}>
+                <div style={{ marginBottom: "16px" }}>
+                  <label className="font-semibold">Half Day <span className="text-red-500">*</span></label>
+                  <Field
+                    as={Select}
+                    name="halfDay"
+                    placeholder="Was it a half day?"
+                    style={{ width: "100%" }}
+                    className="w-full mt-1"
+                    onChange={(value) => setFieldValue("halfDay", value)}
+                  >
+                    <Option value="yes">Yes</Option>
+                    <Option value="no">No</Option>
+                  </Field>
+                  {errors.halfDay && touched.halfDay && (
+                    <div style={{ color: "red", fontSize: "12px" }}>
+                      {errors.halfDay}
+                    </div>
+                  )}
+                </div>
+              </Col>
+
+              {/* Comment Field */}
               <Col span={24}>
                 <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Comment <span className="text-red-500">*</span>  </label>
