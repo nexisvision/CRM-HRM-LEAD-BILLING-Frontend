@@ -300,7 +300,7 @@ const ClientList = () => {
           <div>
             <div className="font-medium text-gray-900">
               {record.username || 'N/A'}
-            </div>
+            </div>     
             <div className="text-gray-500 text-sm">
               {record.email || 'No email'}
             </div>
@@ -318,19 +318,7 @@ const ClientList = () => {
       ),
       sorter: (a, b) => (a.created_by || '').localeCompare(b.created_by || ''),
     },
-    {
-      title: "Status",
-      dataIndex: "status",
-      render: (status) => (
-        <Tag
-          className="text-sm px-3 py-1 rounded-full font-medium"
-          color={getCompanyStatus(status)}
-        >
-          {status}
-        </Tag>
-      ),
-      sorter: (a, b) => (a.status || '').localeCompare(b.status || ''),
-    },
+   
     {
       title: "Created",
       dataIndex: "createdAt",

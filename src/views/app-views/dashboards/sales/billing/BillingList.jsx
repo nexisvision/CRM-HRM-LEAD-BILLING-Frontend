@@ -12,7 +12,6 @@ import {
   DatePicker,
   Dropdown,
 } from "antd";
-import OrderListData from "../../../../../assets/data/order-list.data.json";
 import {
   EyeOutlined,
   FileExcelOutlined,
@@ -35,7 +34,7 @@ import AddBilling from "./AddBilling";
 const { Option } = Select;
 
 export const BillingList = () => {
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [isAddBillingModalVisible, setIsAddBillingModalVisible] =
     useState(false);
   const [isEditBillingModalVisible, setIsEditBillingModalVisible] =

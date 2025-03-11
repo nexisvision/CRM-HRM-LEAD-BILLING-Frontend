@@ -304,7 +304,7 @@ const AddDeal = ({ onClose }) => {
                       )}
                     </Field>
                     <Field name="phoneNumber">
-                      {({ field }) => (
+                      {({ field, form }) => (
                         <Input
                           {...field}
                           className="phone-input"
@@ -314,10 +314,16 @@ const AddDeal = ({ onClose }) => {
                             borderLeft: 0,
                             width: 'calc(100% - 80px)'
                           }}
-                          type="tel"
+                          type="text"
                           placeholder="Enter 10-digit number"
-                          onChange={(e) => handlePhoneNumberChange(e)}
-                          maxLength={15}
+                          onChange={(e) => handlePhoneNumberChange(e, form.setFieldValue)}
+                          onKeyPress={(e) => {
+                            const charCode = e.which ? e.which : e.keyCode;
+                            if (charCode < 48 || charCode > 57) {
+                              e.preventDefault();
+                            }
+                          }}
+                          value={field.value}
                         />
                       )}
                     </Field>
