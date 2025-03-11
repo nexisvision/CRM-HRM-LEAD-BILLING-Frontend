@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PrinterOutlined, DownloadOutlined } from '@ant-design/icons';
-import { Card, Table, Button, Select } from 'antd';
+import { Table, Button, Select } from 'antd';
 import Qr from '../../../../assets/svg/Qr.png';
 import NumberFormat from 'react-number-format';
 import html2pdf from 'html2pdf.js';
@@ -178,7 +178,7 @@ const Invoice = ({ invoiceData = [] }) => {
                     <div className="grid grid-cols-2 gap-8">
                         <div className="flex gap-4">
                             <div className='flex'>
-                                <img src={Qr} alt="Image not show" className='w-28 h-28' />
+                                <img src={Qr} className='w-28 h-28' alt="QR code for payment" />
                             </div>
                             <div>
                                 <h4 className="font-medium mb-2">Payment Info:</h4>

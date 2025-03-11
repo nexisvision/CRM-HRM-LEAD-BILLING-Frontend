@@ -8,7 +8,6 @@ const CommentList = () => {
 
     return (
         <div className="flex flex-col items-start">
-            {/* Add Comment Button */}
             <div className="flex items-center w-full">
                 <button
                     className="flex items-center cursor-pointer"
@@ -20,8 +19,6 @@ const CommentList = () => {
                     </div>
                 </button>
             </div>
-
-            {/* Comment Input Form */}
             {isExpanded && (
                 <div className="mt-4 w-full">
                     <Form.Item name="comment">
@@ -49,8 +46,6 @@ const CommentList = () => {
                     </Form.Item>
                 </div>
             )}
-
-            {/* No Comment Section */}
             {!isExpanded && (
                 <div className="flex flex-col items-center w-full mt-4">
                     <CommentOutlined className="text-lg mb-2" />

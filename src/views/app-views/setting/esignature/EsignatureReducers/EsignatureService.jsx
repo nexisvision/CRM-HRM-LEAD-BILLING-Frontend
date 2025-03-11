@@ -1,12 +1,6 @@
-  import axios from "axios";
+import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
-// const baseUrl = import.meta.env.VITE_BASE_URL;
-// import { getToken } from "../../../configs/axiosConfig"
 
-// const addUser = async (data) => {
-//     const res = await axios.post(`${baseUrl}users/add`, data, getToken());
-//     return res
-// };
 
 const getsignature = async () => {
   const token = localStorage.getItem("auth_token");
@@ -29,10 +23,10 @@ const addesignature = async (payload) => {
   try {
     // Create new instance of FormData if payload isn't already FormData
     const formData = payload instanceof FormData ? payload : new FormData();
-    
+
     const res = await axios({
       method: 'post',
-        url: `${env.API_ENDPOINT_URL}/esignatures/`,
+      url: `${env.API_ENDPOINT_URL}/esignatures/`,
       data: formData,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -59,7 +53,7 @@ const deletesig = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -89,15 +83,12 @@ const editpolicy = async (idd, formData) => {
 
 
 const UserService = {
-  // addUser,
+
   getsignature,
   addesignature,
   deletesig,
   editpolicy,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default UserService;

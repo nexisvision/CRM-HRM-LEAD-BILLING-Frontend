@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, Select } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, EditOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { Card, Table, Menu, Input, message, Button, Modal } from 'antd';
+import { DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import AddHoliday from './AddHoliday';
 import EditHoliday from './EditHoliday';
-import axios from 'axios';
-import utils from 'utils';
 import { deltsholidayss, getsholidayss } from './AttendanceReducer/holidaySlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
-
-const { Option } = Select;
 
 const HolidayList = () => {
   const dispatch = useDispatch();
@@ -26,7 +21,7 @@ const HolidayList = () => {
   useEffect(() => {
     dispatch(getsholidayss());
   }, [dispatch]);
-  
+
   const allholidaudata = useSelector((state) => state.holidays.holidays.data);
 
   useEffect(() => {
@@ -48,7 +43,7 @@ const HolidayList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const filtered = holidays?.filter(holiday => 
+    const filtered = holidays?.filter(holiday =>
       holiday?.holiday_name?.toLowerCase().includes(value.toLowerCase())
     ) || [];
     setFilteredHolidays(filtered);
@@ -57,11 +52,11 @@ const HolidayList = () => {
   const deleteHoliday = async (id) => {
     try {
       await dispatch(deltsholidayss(id))
-        .then(()=>{ 
+        .then(() => {
           message.success('Holiday deleted successfully');
           dispatch(getsholidayss());
         })
-        .catch((error)=>{
+        .catch((error) => {
           message.error('Failed to delete holiday');
         })
     } catch (error) {
@@ -149,10 +144,10 @@ const HolidayList = () => {
     <Card bodyStyle={{ padding: '-3px' }}>
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <div className="mr-md-3 mb-3">
-          <Input 
-            placeholder="Search Holiday" 
-            prefix={<SearchOutlined />} 
-            onChange={onSearch} 
+          <Input
+            placeholder="Search Holiday"
+            prefix={<SearchOutlined />}
+            onChange={onSearch}
           />
         </div>
         <Button type="primary" onClick={openAddHolidayModal}>
@@ -160,7 +155,7 @@ const HolidayList = () => {
           <span>Add Holiday</span>
         </Button>
       </Flex>
-      
+
       <div className="table-responsive">
         <Table
           columns={tableColumns}
@@ -177,9 +172,9 @@ const HolidayList = () => {
         footer={null}
         width={800}
       >
-        <AddHoliday 
-          onClose={closeAddHolidayModal} 
-          onSuccess={handleAddSuccess} 
+        <AddHoliday
+          onClose={closeAddHolidayModal}
+          onSuccess={handleAddSuccess}
         />
       </Modal>
 
@@ -190,11 +185,11 @@ const HolidayList = () => {
         footer={null}
         width={800}
       >
-        <EditHoliday 
+        <EditHoliday
           idd={idd}
-          holiday={selectedHoliday} 
-          onClose={closeEditHolidayModal} 
-          onSuccess={handleEditSuccess} 
+          holiday={selectedHoliday}
+          onClose={closeEditHolidayModal}
+          onSuccess={handleEditSuccess}
         />
       </Modal>
     </Card>

@@ -1,44 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Button, Switch, Row, Col, message, Menu, Dropdown, Select, Modal } from 'antd';
+import { Input, Button, Switch, Row, Col, Menu, Dropdown, Select, Modal } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { CreatePlan, GetPlan } from './PlanReducers/PlanSlice';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
 import { getcurren } from '../setting/currencies/currenciesSlice/currenciesSlice';
 import { PlusOutlined } from '@ant-design/icons';
 import AddCurrencies from '../setting/currencies/AddCurrencies';
 const { Option } = Select;
-const validationSchema = Yup.object().shape({
-  name: Yup.string().required('Please enter the plan name!'),
-  price: Yup.number()
-    .typeError('Price must be a number')
-    .required('Please enter the plan price!')
-    .min(0, 'Price cannot be negative')
-    .test(
-      'decimal',
-      'Price cannot have more than 2 decimal places',
-      (value) => {
-        if (!value) return true;
-        return /^\d*\.?\d{0,2}$/.test(value.toString());
-      }
-    ),
-  max_users: Yup.string().required('Please enter the maximum users!'),
-  max_customers: Yup.string().required('Please enter the maximum customers!'),
-  max_vendors: Yup.string().required('Please enter the maximum vendors!'),
-  max_clients: Yup.string().required('Please enter the maximum clients!'),
-  storage_limit: Yup.string().required('Please enter the storage limit!'),
-  description: Yup.string().required('Please enter a description!'),
-  trial_period: Yup.string().when('trial', {
-    is: true,
-    then: Yup.string()
-      .required('Please enter trial period!')
-      .matches(/^[0-9]+$/, 'Must be a number')
-      .min(1, 'Must be at least 1 day')
-  })
-});
 const AddPlan = ({ onClose }) => {
-  const [isTrialEnabled, setIsTrialEnabled] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [durationType, setDurationType] = useState(null);
@@ -100,7 +70,6 @@ const AddPlan = ({ onClose }) => {
       .then(() => {
         dispatch(GetPlan());
         onClose();
-        setIsTrialEnabled(false);
         resetForm();
         navigate('/app/superadmin/plan');
       })
@@ -108,13 +77,10 @@ const AddPlan = ({ onClose }) => {
         console.error('Add API error:', error);
       });
   };
-  const handleTrialToggle = (checked) => {
-    setIsTrialEnabled(checked);
-  };
 
   return (
     <div>
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         enableReinitialize={true}
@@ -172,19 +138,6 @@ const AddPlan = ({ onClose }) => {
               </Menu.SubMenu>
             </Menu>
           );
-
-          const handleMonthlySelect = ({ key }) => {
-            setDurationType('Monthly');
-            setSelectedMonth(key);
-            setFieldValue('duration', 'Monthly');
-            setFieldValue('monthCount', key);
-          };
-          const handleYearlyInputChange = ({ key }) => {
-            setDurationType('Yearly');
-            setSelectedYear(key);
-            setFieldValue('duration', 'Yearly');
-            setFieldValue('yearCount', key);
-          };
           return (
             <Form>
               <div className="bg-white p-6 rounded-lg">

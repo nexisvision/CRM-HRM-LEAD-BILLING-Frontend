@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-const Flex = styled.div(({justifyContent, alignItems, flexDirection, gap, padding, margin}) => {
+const Flex = styled.div(({ justifyContent, alignItems, flexDirection, gap, padding, margin }) => {
 
 	const baseStyle = {
 		display: 'flex',
@@ -21,7 +21,7 @@ const Flex = styled.div(({justifyContent, alignItems, flexDirection, gap, paddin
 		baseStyle.margin = margin
 	}
 
-	return {...baseStyle}
+	return { ...baseStyle }
 })
 
 export default Flex

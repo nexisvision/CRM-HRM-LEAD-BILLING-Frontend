@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
-import { Card, Table, Menu, Tag, Input, message, Button, Modal } from 'antd';
+import { Card, Table, Menu, Input, message, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import UserView from '../../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-
-import AvatarStatus from 'components/shared-components/AvatarStatus';
 import AddPermission from './AddPermisssion';
 import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
@@ -17,9 +14,9 @@ export class PermissionList extends Component {
     users: userData,
     userProfileVisible: false,
     selectedUser: null,
-    list: OrderListData, // Initialize with OrderListData
+    list: OrderListData,
     selectedRowKeys: [],
-    isAddEmployeeModalVisible: false, // State to toggle Add Employee Modal
+    isAddEmployeeModalVisible: false,
   };
 
   openAddPermissionModal = () => {
@@ -64,56 +61,56 @@ export class PermissionList extends Component {
 
 
     const dropdownMenu = elm => (
-        <Menu>
-            
-            <Menu.Item>
-                <Flex alignItems="center">
-                    {/* <EyeOutlined />
+      <Menu>
+
+        <Menu.Item>
+          <Flex alignItems="center">
+            {/* <EyeOutlined />
                     <span className="ml-2">View Details</span> */}
-                 
-                <Button type="" className="" icon={<EyeOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
-                <span className="">View Details</span>
-                </Button>
-                </Flex>
-            </Menu.Item>
-            <Menu.Item>
-                <Flex alignItems="center">
-                    {/* <EyeOutlined />
+
+            <Button type="" className="" icon={<EyeOutlined />} onClick={() => { this.showUserProfile(elm) }} size="small">
+              <span className="">View Details</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+        <Menu.Item>
+          <Flex alignItems="center">
+            {/* <EyeOutlined />
                     <span className="ml-2">View Details</span> */}
-                 
-                 <Button type="" className="" icon={<MailOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
-                <span className="">Send Mail</span>
-                </Button>
-                </Flex>
-            </Menu.Item>
-            <Menu.Item>
-                <Flex alignItems="center">
-                    {/* <EyeOutlined />
+
+            <Button type="" className="" icon={<MailOutlined />} onClick={() => { this.showUserProfile(elm) }} size="small">
+              <span className="">Send Mail</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+        <Menu.Item>
+          <Flex alignItems="center">
+            {/* <EyeOutlined />
                     <span className="ml-2">View Details</span> */}
-                 
-                 <Button type="" className="" icon={<PushpinOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
-                <span className="ml-2">Pin</span>
-                </Button>
-                </Flex>
-            </Menu.Item>
-            <Menu.Item>
-                <Flex alignItems="center">
-                    {/* <DeleteOutlined />
+
+            <Button type="" className="" icon={<PushpinOutlined />} onClick={() => { this.showUserProfile(elm) }} size="small">
+              <span className="ml-2">Pin</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+        <Menu.Item>
+          <Flex alignItems="center">
+            {/* <DeleteOutlined />
                     <span className="ml-2">Delete</span> */}
-                
-    <Button type="" className="" icon={<DeleteOutlined />} onClick={() => {this.deleteUser(elm.id)}} size="small"> 
-    <span className="">Delete</span>
-    </Button>
-    
-    
-                </Flex>
-            </Menu.Item>	
-        </Menu>
+
+            <Button type="" className="" icon={<DeleteOutlined />} onClick={() => { this.deleteUser(elm.id) }} size="small">
+              <span className="">Delete</span>
+            </Button>
+
+
+          </Flex>
+        </Menu.Item>
+      </Menu>
     );
 
 
     const tableColumns = [
-   
+
       {
         title: 'Permission',
         dataIndex: 'permission',
@@ -121,17 +118,16 @@ export class PermissionList extends Component {
           compare: (a, b) => a.permission.length - b.permission.length,
         },
       },
-    
+
       {
         title: 'Action',
         dataIndex: 'actions',
         render: (_, elm) => (
-            <div className="text-center">
-                <EllipsisDropdown menu={dropdownMenu(elm)}/>
-            </div>
+          <div className="text-center">
+            <EllipsisDropdown menu={dropdownMenu(elm)} />
+          </div>
         )
-    },
-    
+      },
     ];
 
     return (

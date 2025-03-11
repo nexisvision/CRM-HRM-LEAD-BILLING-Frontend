@@ -2,28 +2,23 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Menu,
-  Row,
-  Col,
   Input,
   Button,
   Modal,
   message,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   PlusOutlined,
   SearchOutlined,
-  FileExcelOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AddAllowance from "./AddAllowance";
 import employeeSalaryData from "assets/data/employee-salary.data.json";
 import utils from "utils";
 import { useDispatch, useSelector } from "react-redux";
-import { FaUserInjured } from "react-icons/fa";
 import { deleteallowan, getallowan } from "./AllowancwReducer/AllowanceSlice";
 
 const AllowanceList = ({ id, onClose }) => {
@@ -34,18 +29,18 @@ const AllowanceList = ({ id, onClose }) => {
 
   useEffect(() => {
     dispatch(getallowan());
-  }, []);
+  }, [dispatch]);
 
   const alladata = useSelector((state) => state.allowance);
   const fndcdata = alladata.allowance.data;
 
-  const fnddatasss = fndcdata?.filter((item)=>item?.employeeId === id)
+  const fnddatasss = fndcdata?.filter((item) => item?.employeeId === id)
 
   useEffect(() => {
     if (fnddatasss) {
       setSalaryData(fnddatasss);
     }
-  }, [fndcdata,fnddatasss]);
+  }, [fndcdata, fnddatasss]);
 
   const openModal = () => {
     setIsModalVisible(true);
@@ -70,24 +65,19 @@ const AllowanceList = ({ id, onClose }) => {
     });
   };
 
-  const dropdownMenu = (record) => (
-    <Menu>
-
-      <Menu.Item>
-        <Button
-          type="text"
-          icon={<DeleteOutlined />}
-          size="small"
-          onClick={() => deleteSalaryEntry(record.id)}
-        >
-          Delete
-        </Button>
-      </Menu.Item>
-    </Menu>
-  );
+  const getDropdownItems = (record) => {
+    return [
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteSalaryEntry(record.id),
+        danger: true
+      }
+    ];
+  };
 
   const tableColumns = [
-   
     {
       title: "Allowance Option",
       dataIndex: "allowanceOption",
@@ -102,16 +92,31 @@ const AllowanceList = ({ id, onClose }) => {
       title: "Type",
       dataIndex: "type",
       sorter: (a, b) => a.type.localeCompare(b.type),
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
       sorter: (a, b) => a.amount.localeCompare(b.amount),
     },
     {
       title: "Action",
       dataIndex: "actions",
-      render: (_, record) => <EllipsisDropdown menu={dropdownMenu(record)} />,
+      render: (_, record) => (
+        <div className="text-center">
+          <Dropdown
+            menu={{ items: getDropdownItems(record) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
+        </div>
+      ),
     },
   ];
 
@@ -135,13 +140,14 @@ const AllowanceList = ({ id, onClose }) => {
             placeholder="Search"
             prefix={<SearchOutlined />}
             onChange={(e) => onSearch(e)}
+            className="search-input"
           />
         </div>
         <Flex gap="7px">
           <Button type="primary" onClick={openModal}>
             <PlusOutlined />
           </Button>
-         
+
         </Flex>
       </Flex>
       <div className="table-responsive mt-3">
@@ -169,4 +175,73 @@ const AllowanceList = ({ id, onClose }) => {
   );
 };
 
-export default AllowanceList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 250px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
+  }
+
+  .ant-btn-text:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .ant-btn-text:active {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  @media (max-width: 768px) {
+    .search-input {
+      width: 100%;
+      min-width: unset;
+    }
+    
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const AllowanceListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <AllowanceList />
+  </>
+);
+
+export default AllowanceListWithStyles;

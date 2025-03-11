@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
-import { Input, Button, Row, Col, Select, message, Modal } from "antd";
+import { Input, Button, Row, Col, Select, Modal } from "antd";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AddDes, getDes } from "./DesignationReducers/DesignationSlice";
 import { getBranch } from "../Branch/BranchReducer/BranchSlice";
@@ -11,7 +10,6 @@ import AddBranch from "../Branch/AddBranch";
 const { Option } = Select;
 
 const AddDesignation = ({ onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.user.loggedInUser.username);

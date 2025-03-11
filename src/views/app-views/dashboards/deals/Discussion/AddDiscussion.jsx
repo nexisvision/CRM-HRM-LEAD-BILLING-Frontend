@@ -1,28 +1,17 @@
-import React, { useState } from 'react';
-import { Modal, Button, Form, Input, message } from 'antd';
+import React from 'react';
+import { Button, Form, Input, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 const AddDiscussion = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const navigate = useNavigate();
 
   const [form] = Form.useForm();
-
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    form.resetFields();
-  };
 
   const handleCreate = () => {
     form
       .validateFields()
       .then((values) => {
         message.success(`Discussion added successfully!`);
-        setIsModalVisible(false);
         form.resetFields();
       })
       .catch((error) => {

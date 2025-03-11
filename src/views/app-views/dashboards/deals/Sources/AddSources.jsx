@@ -1,66 +1,19 @@
-import React, { useState } from "react";
-import { Modal, Button, Checkbox, Form, message } from "antd";
+import React from "react";
+import { Button, Checkbox, Form } from "antd";
 import { useNavigate } from "react-router-dom";
 
 const AddSources = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedSources, setSelectedSources] = useState([]);
   const navigate = useNavigate();
 
   const sources = ["Websites", "Facebook", "Naukri.com", "Phone", "LinkedIn"];
 
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setSelectedSources([]);
-  };
-
-  const handleCreate = () => {
-    message.success(`Selected Sources: ${selectedSources.join(", ")}`);
-    setIsModalVisible(false);
-  };
-
-  const onChange = (checkedValues) => {
-    setSelectedSources(checkedValues);
-  };
 
   return (
     <div>
-      {/* <Button
-        type="primary"
-        style={{ background: '#39d039', borderColor: '#39d039' }}
-        onClick={showModal}
-      >
-        Add Source
-      </Button>
-
-      <Modal
-        title="Add Source"
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        footer={[
-          <Button key="cancel" onClick={handleCancel} style={{ background: '#707070', color: 'white' }}>
-            Cancel
-          </Button>,
-          <Button
-            key="create"
-            type="primary"
-            onClick={handleCreate}
-            style={{ background: '#39d039', borderColor: '#39d039' }}
-          >
-            Create
-          </Button>,
-        ]}
-      > */}
       <Form layout="vertical">
-
-
         <Checkbox.Group
           options={sources}
-          onChange={onChange}
           style={{ display: "flex", flexDirection: "column", gap: "8px" }}
         />
       </Form>
@@ -79,7 +32,6 @@ const AddSources = () => {
           </Button>
         </div>
       </Form.Item>
-      {/* </Modal> */}
     </div>
   );
 };

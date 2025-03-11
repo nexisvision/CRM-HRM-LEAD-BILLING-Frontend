@@ -1,7 +1,5 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
-
-
 const getNotes = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -50,7 +48,7 @@ const DeleteNotes = async (userId) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -78,7 +76,9 @@ const Editnote = async (idd, values) => {
 };
 
 
+
 const UserService = {
+
   getNotes,
   AddNotes,
   DeleteNotes,

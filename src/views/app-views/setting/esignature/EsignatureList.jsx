@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import SignatureCanvas from "react-signature-canvas";
-import { UndoOutlined, RedoOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { UndoOutlined, RedoOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Input, Table, Modal, notification, Popconfirm, Button } from 'antd';
-import { addesig, deletesigssss, getsignaturesss } from "./EsignatureReducers/EsignatureSlice";
+import { deletesigssss, getsignaturesss } from "./EsignatureReducers/EsignatureSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const ESignaturePage = () => {
@@ -17,7 +17,6 @@ const ESignaturePage = () => {
   const [savedSignatures, setSavedSignatures] = useState([]);
   const [tempSignature, setTempSignature] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editingSignature, setEditingSignature] = useState(null);
 
   const handleBeginStroke = () => {
     setIsDrawing(true);
@@ -36,11 +35,11 @@ const ESignaturePage = () => {
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(getsignaturesss())
-  },[dispatch])
+  }, [dispatch])
 
-  const alldatass = useSelector((state)=>state.esignature.esignature.data)
+  const alldatass = useSelector((state) => state.esignature.esignature.data)
 
   useEffect(() => {
     if (alldatass) {
@@ -93,7 +92,6 @@ const ESignaturePage = () => {
       width: '200px',
       render: (_, record) => (
         <div className="flex gap-2">
-         
           <Popconfirm
             title="Delete Signature"
             description="Are you sure you want to delete this signature?"
@@ -123,7 +121,7 @@ const ESignaturePage = () => {
         // Remove the last stroke
         const lastStroke = currentData[currentData.length - 1];
         const newData = currentData.slice(0, -1);
-        
+
         // Update the canvas
         sigPadRef.current.clear();
         if (newData.length > 0) {
@@ -147,7 +145,7 @@ const ESignaturePage = () => {
     if (redoStack.length > 0) {
       const currentData = sigPadRef.current.toData() || [];
       const strokeToRedo = redoStack[redoStack.length - 1];
-      
+
       // Add the stroke back
       const newData = [...currentData, strokeToRedo];
       sigPadRef.current.fromData(newData);
@@ -159,57 +157,15 @@ const ESignaturePage = () => {
     }
   };
 
-  // Handle edit signature
-  const handleEdit = (record) => {
-    setEditingSignature(record);
-    setSignatureName(record.name);
-    setIsEditMode(true);
-    
-    // Clear existing stacks
-    setUndoStack([]);
-    setRedoStack([]);
-    
-    // Load the signature into the canvas for editing
-    if (sigPadRef.current) {
-      sigPadRef.current.clear();
-      const img = new Image();
-      img.src = record.signature;
-      img.onload = () => {
-        const canvas = sigPadRef.current._canvas;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        setHasDrawing(true);
-      };
-    }
-  };
 
-  // Clear the signature pad
+
+
   const clearSignature = () => {
     sigPadRef.current.clear();
     setUndoStack([]);
     setRedoStack([]);
     setHasDrawing(false);
   };
-
-  const saveSignature = async (name, signatureFile) => {
-    try {
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('signature', signatureFile); // This should be a File/Blob object
-
-        const response = await fetch('/api/signature/save', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error saving signature:', error);
-        throw error;
-    }
-};
-
   const handleSave = () => {
     if (sigPadRef.current.isEmpty()) {
       notification.error({
@@ -237,7 +193,7 @@ const ESignaturePage = () => {
     try {
       // Get token from localStorage
       const token = localStorage.getItem('auth_token');
-      
+
       if (!token) {
         throw new Error('Authentication token not found');
       }
@@ -250,7 +206,7 @@ const ESignaturePage = () => {
         array[i] = binaryData.charCodeAt(i);
       }
       const blob = new Blob([array], { type: 'image/png' });
-      
+
       // Create file object from blob
       const file = new File([blob], `${signatureName.trim()}.png`, { type: 'image/png' });
 
@@ -264,7 +220,7 @@ const ESignaturePage = () => {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
-       
+
         },
         body: formData,
       });
@@ -292,19 +248,8 @@ const ESignaturePage = () => {
       setSignatureName("");
       setIsModalVisible(false);
       setIsEditMode(false);
-      setEditingSignature(null);
-
-      // notification.success({
-      //   message: 'Success',
-      //   description: 'Signature saved successfully!',
-      // });
-
     } catch (error) {
       console.error('Error saving signature:', error);
-      // notification.error({
-      //   message: 'Error',
-      //   description: error.message || 'Failed to save signature.',
-      // });
     }
   };
 
@@ -319,19 +264,10 @@ const ESignaturePage = () => {
         key: index + 1
       }));
 
-     
+
     });
-    
- 
   };
 
-  // Modified save button text based on mode
-  const getSaveButtonText = () => {
-    if (isEditMode) {
-      return 'Update';
-    }
-    return 'Save';
-  };
 
   return (
     <div className="p-4">
@@ -386,8 +322,8 @@ const ESignaturePage = () => {
           <Button danger onClick={clearSignature}>
             Clear
           </Button>
-          <Button 
-            type="primary" 
+          <Button
+            type="primary"
             onClick={handleSave}
             className="bg-blue-500"
           >
@@ -400,8 +336,8 @@ const ESignaturePage = () => {
       {savedSignatures.length > 0 && (
         <div className="bg-white p-6 rounded-lg shadow-lg mt-6">
           <h2 className="text-xl font-semibold mb-4">Saved Signatures</h2>
-          <Table 
-            columns={columns} 
+          <Table
+            columns={columns}
             dataSource={savedSignatures}
             pagination={false}
             className="border rounded-lg"
@@ -418,7 +354,6 @@ const ESignaturePage = () => {
           setIsModalVisible(false);
           setSignatureName("");
           setIsEditMode(false);
-          setEditingSignature(null);
         }}
         okText={isEditMode ? "Update" : "Save"}
       >

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, Select, DatePicker } from 'antd';
+import { Card, Table, Menu, Input, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, EditOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import UserView from '../../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import { useNavigate } from 'react-router-dom';
@@ -10,97 +9,56 @@ import AddTransfer from './AddTransfer';
 import EditTransfer from './EditTransfer';
 import { transferdatas, transferdeltess } from './transferReducers/transferSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAccounts } from '../account/AccountReducer/AccountSlice';
-
-const { Option } = Select;
 
 const TransferList = () => {
-  const [users, setUsers] = useState([]);
   const [list, setList] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false);
-  const [isEditJobModalVisible, setIsEditJobModalVisible] = useState(false);
-  const [isAddAccountModalVisible, setIsAddAccountModalVisible] = useState(false);
-  const [isEditAccountModalVisible, setIsEditAccountModalVisible] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [selectedAccount, setSelectedAccount] = useState(null);
+  const dispatch = useDispatch()
   const [accountType, setAccountType] = useState('All');
   const [isAddTransferModalVisible, setIsAddTransferModalVisible] = useState(false);
   const [isEditTransferModalVisible, setIsEditTransferModalVisible] = useState(false);
   const [selectedTransfer, setSelectedTransfer] = useState(null);
   const [idd, setIdd] = useState("");
-  const [accountsList, setAccountsList] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(transferdatas())
-    dispatch(getAccounts())
-  },[dispatch])
+  }, [dispatch])
 
-  // Open Add Job Modal
-  const openAddJobModal = () => {
-    setIsAddJobModalVisible(true);
-  };
-  // Close Add Job Modal
-  const closeAddJobModal = () => {
-    setIsAddJobModalVisible(false);
-  };
   const handleJob = () => {
-    navigate('/app/hrm/jobs/viewjob', { state: { user: selectedUser } }); 
-  };
-   // Open Add Job Modal
-   const openEditJobModal = () => {
-    setIsEditJobModalVisible(true);
-  };
-  // Close Add Job Modal
-  const closeEditJobModal = () => {
-    setIsEditJobModalVisible(false);
-  };
-  // Handle account type filter
-  const handleAccountTypeFilter = value => {
-    setAccountType(value);
-    if (value !== 'All') {
-      const filteredData = list.filter(item => 
-        item.accounttype && item.accounttype.toLowerCase() === value.toLowerCase()
-      );
-      setList(filteredData);
-    }
+    navigate('/app/hrm/jobs/viewjob', { state: { user: selectedUser } });
   };
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const searchArray = list;
     let data = utils.wildCardSearch(searchArray, value);
-    
+
     if (accountType !== 'All') {
-      data = data.filter(item => 
+      data = data.filter(item =>
         item.accounttype && item.accounttype.toLowerCase() === accountType.toLowerCase()
       );
     }
-    
+
     setList(data);
-    setSelectedRowKeys([]);
   };
   const deleteUser = (userId) => {
     dispatch(transferdeltess(userId))
-      .then(()=>{
+      .then(() => {
         dispatch(transferdatas())
         setList(list.filter((item) => item.id !== userId));
       })
   };
 
-  const loggeddata = useSelector((state)=>state.user.loggedInUser.username);
-
-  const alltransferdata = useSelector((state)=>state?.transfer?.transfer?.data);
+  const alltransferdata = useSelector((state) => state?.transfer?.transfer?.data);
 
 
-  useEffect(()=>{
-    if(alltransferdata){
+
+  useEffect(() => {
+    if (alltransferdata) {
       setList(alltransferdata)
     }
-},[alltransferdata])
+  }, [alltransferdata])
 
   const showUserProfile = (userInfo) => {
     setSelectedUser(userInfo);
@@ -111,27 +69,62 @@ const TransferList = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);
   };
-  const getjobStatus = status => {
-    if (status === 'active') {
-      return 'blue'
-    }
-    if (status === 'blocked') {
-      return 'cyan'
-    }
-    return ''
-  }
-  
-  
-  
-  const jobStatusList = ['active', 'blocked']
-
-  const stripHtmlTags = (html) => {
-    if (!html) return '';
-    const temp = document.createElement('div');
-    temp.innerHTML = html;
-    return temp.textContent || temp.innerText || '';
-  };
-
+  const dropdownMenu = (record) => (
+    <Menu>
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className=""
+            icon={<EyeOutlined />}
+            onClick={handleJob}
+            size="small"
+          >
+            <span className="">View Details</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className=""
+            icon={<MailOutlined />}
+            onClick={() => showUserProfile(record)}
+            size="small"
+          >
+            <span className="">Send Mail</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className=""
+            icon={<EditOutlined />}
+            onClick={() => openEditTransferModal(record)}
+            size="small"
+          >
+            <span className="ml-2">Edit</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className=""
+            icon={<DeleteOutlined />}
+            onClick={() => deleteUser(record.id)}
+            size="small"
+          >
+            <span className="">Delete</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
+    </Menu>
+  );
   const tableColumns = [
     {
       title: 'Date',
@@ -186,37 +179,10 @@ const TransferList = () => {
         compare: (a, b) => stripHtmlTags(a.description).localeCompare(stripHtmlTags(b.description)),
       },
     },
-   
+
   ];
-  const openAddAccountModal = () => {
-    setIsAddAccountModalVisible(true);
-  };
 
-  const closeAddAccountModal = () => {
-    setIsAddAccountModalVisible(false);
-  };
 
-  const openEditAccountModal = (account) => {
-    setSelectedAccount(account);
-    setIsEditAccountModalVisible(true);
-  };
-
-  const closeEditAccountModal = () => {
-    setIsEditAccountModalVisible(false);
-  };
-
-  const getAccountTypeColor = type => {
-    switch (type?.toLowerCase()) {
-      case 'salary':
-        return 'green';
-      case 'savings':
-        return 'blue';
-      case 'current':
-        return 'purple';
-      default:
-        return 'default';
-    }
-  };
 
   const openAddTransferModal = () => {
     setIsAddTransferModalVisible(true);
@@ -250,7 +216,7 @@ const TransferList = () => {
     setSelectedDate(date);
     if (date) {
       const formattedDate = dayjs(date).format('YYYY-MM-DD');
-      const filteredData = alltransferdata.filter(item => 
+      const filteredData = alltransferdata.filter(item =>
         dayjs(item.date).format('YYYY-MM-DD') === formattedDate
       );
       setList(filteredData);
@@ -262,18 +228,18 @@ const TransferList = () => {
 
   return (
     <Card bodyStyle={{ padding: '-3px' }}>
-     
+
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input 
-              placeholder="Search" 
-              prefix={<SearchOutlined />} 
-              onChange={(e) => onSearch(e)} 
+            <Input
+              placeholder="Search"
+              prefix={<SearchOutlined />}
+              onChange={(e) => onSearch(e)}
             />
           </div>
           <div className="mr-md-3 mb-3">
-            <DatePicker 
+            <DatePicker
               placeholder="Select Date"
               onChange={handleDateChange}
               value={selectedDate}
@@ -319,9 +285,10 @@ const TransferList = () => {
         footer={null}
         width={1000}
         className='mt-[-70px]'
+      // height={1000}
       >
-        <EditTransfer 
-          onClose={closeEditTransferModal} 
+        <EditTransfer
+          onClose={closeEditTransferModal}
           transferData={selectedTransfer}
           idd={idd}
         />

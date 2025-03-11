@@ -1,22 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
- 
   Row,
   Col,
- 
   Input,
   message,
   Button,
- 
   Select,
- 
+
 } from "antd";
-
 import "react-quill/dist/quill.snow.css";
-import ReactQuill from "react-quill";
-import OrderListData from "assets/data/order-list.data.json";
-
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,19 +21,14 @@ import { GetPip } from "../Pipeline/PiplineReducer/piplineSlice";
 const { Option } = Select;
 
 const AddLabels = ({ onClose }) => {
-
   const dispatch = useDispatch();
-
   const loggeduser = useSelector((state) => state.user.loggedInUser.username);
-  
   const allpipline = useSelector((state) => state.Piplines);
   const fndpipp = allpipline.Piplines.data;
-
-  const fndpip = fndpipp.filter((item)=>item.created_by === loggeduser)
-
+  const fndpip = fndpipp.filter((item) => item.created_by === loggeduser)
   useEffect(() => {
     dispatch(GetPip());
-  }, []);
+  }, [dispatch]);
 
   const onSubmit = (values, { resetForm }) => {
     const payload = { ...values, stageType: "lable" };
@@ -67,7 +54,7 @@ const AddLabels = ({ onClose }) => {
     <>
       <div>
         <div className="">
-          <h2 className="mb-1 border-b font-medium"></h2>
+          <hr className="mb-1 border-b font-medium"></hr>
 
           <div className="">
             <div className="">

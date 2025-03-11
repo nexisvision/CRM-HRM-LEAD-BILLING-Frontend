@@ -49,7 +49,6 @@ const deletereve = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -76,13 +75,11 @@ const editreve = async (idd, values) => {
   }
 };
 
-
 const UserService = {
   getreve,
   addreve,
   deletereve,
   editreve,
-
 };
 
 export default UserService;

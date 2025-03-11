@@ -24,8 +24,9 @@ const Files = () => {
   };
 
   return (
-    <Card>    
-        <h1 className='mb-3 font-bold text-lg'>Files</h1>
+    // <div style={{ padding: 20 }}>
+    <Card>
+      <h1 className='mb-3 font-bold text-lg'>Files</h1>
       <Upload.Dragger
         multiple={false}
         beforeUpload={() => false} // Prevent automatic upload
@@ -64,7 +65,7 @@ const Files = () => {
           )}
         />
       </div>
-      </Card>
+    </Card>
 
   );
 };

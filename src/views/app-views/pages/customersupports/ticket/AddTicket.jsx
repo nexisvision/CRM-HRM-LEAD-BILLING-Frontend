@@ -10,27 +10,24 @@ import {
   message,
   Upload,
 } from "antd";
-import { Formik, Field, Form as FormikForm, ErrorMessage } from "formik";
+import { Formik, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
 import { UploadOutlined } from "@ant-design/icons";
 import { AddTickets, getAllTicket } from "./TicketReducer/TicketSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 const { Option } = Select;
 const { TextArea } = Input;
 
 const AddTicket = ({ onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(GetUsers());
-  }, []);
+  }, [dispatch]);
 
- 
+
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
   const loggedInUser = useSelector((state) => state.user.loggedInUser);
@@ -44,8 +41,6 @@ const AddTicket = ({ onClose }) => {
       return emp.client_id === loggedInUser.client_id;
     }
   });
-
-
   const initialValues = {
     ticketSubject: "",
     requestor: "",
@@ -93,7 +88,7 @@ const AddTicket = ({ onClose }) => {
   return (
     <div className="">
       <div className="border-b border-gray-200 mb-2"></div>
-      
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -110,9 +105,9 @@ const AddTicket = ({ onClose }) => {
                   </label>
                   <Field name="ticketSubject">
                     {({ field }) => (
-                      <Input 
-                        {...field} 
-                        placeholder="Enter subject" 
+                      <Input
+                        {...field}
+                        placeholder="Enter subject"
                         className="w-full rounded-md"
                       />
                     )}
@@ -285,7 +280,7 @@ const AddTicket = ({ onClose }) => {
                     <Button icon={<UploadOutlined />} className="bg-white">
                       Select File
                     </Button>
-                   
+
                   </Upload>
                 </div>
               </Col>
@@ -293,14 +288,14 @@ const AddTicket = ({ onClose }) => {
 
             {/* Form Actions */}
             <div className="flex justify-end space-x-2 mt-6">
-              <Button 
+              <Button
                 onClick={onClose}
                 className="bg-gray-100 hover:bg-gray-200"
               >
                 Cancel
               </Button>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 htmlType="submit"
                 loading={isSubmitting}
                 className="bg-blue-600 hover:bg-blue-700"

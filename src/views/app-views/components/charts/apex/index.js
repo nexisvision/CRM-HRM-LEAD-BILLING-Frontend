@@ -28,7 +28,7 @@ export class Apex extends Component {
 	render() {
 		return (
 			<React.Fragment>
-        <Row gutter={16} type="flex">
+				<Row gutter={16} type="flex">
 					<Col sm={24} md={24} lg={12}>
 						<DemoCard code={BasicLineMd}><BasicLine /></DemoCard>
 						<DemoCard code={BasicAreaMd}><BasicArea /></DemoCard>
@@ -43,9 +43,9 @@ export class Apex extends Component {
 						<DemoCard code={GroupedBarMd}><GroupedBar /></DemoCard>
 						<DemoCard code={DonutMd}><Donut /></DemoCard>
 					</Col>
-        </Row>
-        <ApiContainer code={IndexMd} />
-      </React.Fragment>
+				</Row>
+				<ApiContainer code={IndexMd} />
+			</React.Fragment>
 		)
 	}
 }

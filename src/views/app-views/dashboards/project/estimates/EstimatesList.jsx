@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
-import { Card, Table, Select, Input, Row, Col, Button, Badge, Menu, Tag, Modal, message } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { Card, Table, Select, Input, Button, Menu, Modal } from 'antd';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import Flex from 'components/shared-components/Flex'
 import NumberFormat from 'react-number-format';
@@ -15,8 +15,10 @@ import EditEstimates from './EditEstimates';
 import ViewEstimates from './ViewEstimates';
 import { GetLeads } from '../../leads/LeadReducers/LeadSlice'
 
+
+
 const EstimatesList = () => {
-    const [idd, setIdd] = useState("");
+	const [idd, setIdd] = useState("");
 
 	const { estimates } = useSelector((state) => state.estimate);
 	const leadsState = useSelector((state) => state.Lead?.Lead) || {};  // Safely access Lead state
@@ -40,10 +42,10 @@ const EstimatesList = () => {
 	}, [dispatch, id]);
 
 	useEffect(() => {
-		if(estimates){
-		setList(estimates);
+		if (estimates) {
+			setList(estimates);
 		}
-	  }, [estimates]);
+	}, [estimates]);
 
 	const openAddEstimatesModal = () => {
 		setIsAddEstimatesModalVisible(true);
@@ -56,12 +58,12 @@ const EstimatesList = () => {
 
 	// Open Add Job Modal
 	const openEditEstimatesModal = () => {
-        setIsEditEstimatesModalVisible(true);
-    };
-    // Close Add Job Modal
-    const closeEditEstimatesModal = () => {
-        setIsEditEstimatesModalVisible(false);
-    };
+		setIsEditEstimatesModalVisible(true);
+	};
+	// Close Add Job Modal
+	const closeEditEstimatesModal = () => {
+		setIsEditEstimatesModalVisible(false);
+	};
 
 	const openviewEstimatesModal = () => {
 		setIsViewEstimatesModalVisible(true);
@@ -72,45 +74,64 @@ const EstimatesList = () => {
 	};
 
 	const EditFun = (exid) => {
-        openEditEstimatesModal();
-        setIdd(exid);
-    };
+		openEditEstimatesModal();
+		setIdd(exid);
+	};
 
-	const delfun = (idd)=>{
+	const delfun = (idd) => {
 		dispatch(deleteestimate(idd))
-			.then(()=>{
+			.then(() => {
 				setList(list.filter((item) => item.id !== idd));
 				dispatch(getallestimate(id))
 			})
 	}
 
-	const dropdownMenu = row => ({
-
-		items: [
-            {
-                key: 'view',
-                icon: <EyeOutlined />,
-                label: 'View Details',
-				onClick: () => {
-					setSelectedEstimateId(row.id);
-					openviewEstimatesModal();
-				}
-            },
-            {
-                key: 'edit',
-                icon: <EditOutlined />,
-                label: 'Edit',
-                onClick: () => EditFun(row.id)	
-            },
-            {
-                key: 'delete',
-                icon: <DeleteOutlined />,
-                label: 'Delete',
-                onClick: () => delfun(row.id)
-            }
-        ]
-	});
-	
+	const dropdownMenu = row => (
+		<Menu>
+			<Menu.Item>
+				<Flex alignItems="center">
+					<Button
+						type=""
+						className=""
+						icon={<EyeOutlined />}
+						onClick={() => {
+							setSelectedEstimateId(row.id);
+							openviewEstimatesModal();
+						}}
+						size="small"
+					>
+						<span className="">View Details</span>
+					</Button>
+				</Flex>
+			</Menu.Item>
+			<Menu.Item>
+				<Flex alignItems="center">
+					<Button
+						type=""
+						className=""
+						icon={<EditOutlined />}
+						onClick={() => EditFun(row.id)}
+						size="small"
+					>
+						<span className="">Edit</span>
+					</Button>
+				</Flex>
+			</Menu.Item>
+			<Menu.Item>
+				<Flex alignItems="center">
+					<Button
+						type=""
+						className=""
+						icon={<DeleteOutlined />}
+						onClick={() => delfun(row.id)}
+						size="small"
+					>
+						<span className="">Delete</span>
+					</Button>
+				</Flex>
+			</Menu.Item>
+		</Menu>
+	);
 
 	const tableColumns = [
 		{
@@ -155,7 +176,6 @@ const EstimatesList = () => {
 				return leadNameA.localeCompare(leadNameB);
 			},
 		},
-		
 		{
 			title: 'Currency',
 			dataIndex: 'currency',
@@ -177,7 +197,6 @@ const EstimatesList = () => {
 			),
 			sorter: (a, b) => utils.antdTableSorter(a, b, 'total')
 		},
-		
 		{
 			title: 'Action',
 			dataIndex: 'actions',
@@ -192,15 +211,15 @@ const EstimatesList = () => {
 	const onSearch = (e) => {
 		const value = e.target.value.toLowerCase();
 		setSearchText(value);
-		
+
 		if (!value) {
 			setList(estimates);
 			return;
 		}
-		
+
 		const filtered = estimates.filter(estimate => {
 			const leadName = leads.find(l => l.id === estimate.lead)?.lead_name || '';
-			
+
 			return (
 				estimate.quotationNumber?.toLowerCase().includes(value) ||
 				estimate.client?.toLowerCase().includes(value) ||
@@ -209,17 +228,17 @@ const EstimatesList = () => {
 				estimate.total?.toString().includes(value)
 			);
 		});
-		
+
 		setList(filtered);
 	};
 
 	const getFilteredEstimates = () => {
 		if (!list) return [];
-		
+
 		let filtered = list;
 
 		if (searchText) {
-			filtered = filtered.filter(estimate => 
+			filtered = filtered.filter(estimate =>
 				estimate.quotationNumber?.toLowerCase().includes(searchText.toLowerCase())
 			);
 		}
@@ -263,43 +282,43 @@ const EstimatesList = () => {
 					/>
 				</div>
 			</Card>
-			
-				<Modal
-					title="Add Estimate"
-					visible={isAddEstimatesModalVisible}
-					onCancel={closeAddEstimatesModal}
-					footer={null}
-					width={1000}
-					className='mt-[-70px]'
 
-				>
-					<AddEstimates onClose={closeAddEstimatesModal} />
-				</Modal>
+			<Modal
+				title="Add Estimate"
+				visible={isAddEstimatesModalVisible}
+				onCancel={closeAddEstimatesModal}
+				footer={null}
+				width={1000}
+				className='mt-[-70px]'
 
-				<Modal
-					title="Edit Estimate"
-					visible={isEditEstimatesModalVisible}
-					onCancel={closeEditEstimatesModal}
-					footer={null}
-					width={1000}
-					className='mt-[-70px]'
+			>
+				<AddEstimates onClose={closeAddEstimatesModal} />
+			</Modal>
 
-				>
-					<EditEstimates onClose={closeEditEstimatesModal} idd={idd}/>
-				</Modal>
+			<Modal
+				title="Edit Estimate"
+				visible={isEditEstimatesModalVisible}
+				onCancel={closeEditEstimatesModal}
+				footer={null}
+				width={1000}
+				className='mt-[-70px]'
 
-				<Modal
-					title={<h2 className="text-2xl font-medium">View Estimate</h2>}
-					visible={isViewEstimatesModalVisible}
-					onCancel={closeViewEstimatesModal}
-					footer={null}
-					width={1000}
-					className='mt-[-70px]'
+			>
+				<EditEstimates onClose={closeEditEstimatesModal} idd={idd} />
+			</Modal>
 
-				>
-					<ViewEstimates estimateId={selectedEstimateId} />
-				</Modal>
-		
+			<Modal
+				title={<h2 className="text-2xl font-medium">View Estimate</h2>}
+				visible={isViewEstimatesModalVisible}
+				onCancel={closeViewEstimatesModal}
+				footer={null}
+				width={1000}
+				className='mt-[-70px]'
+
+			>
+				<ViewEstimates estimateId={selectedEstimateId} />
+			</Modal>
+
 		</>
 	)
 }

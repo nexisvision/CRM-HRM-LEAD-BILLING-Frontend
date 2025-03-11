@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./ContractService";
-import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
 export const AddCon = createAsyncThunk(
@@ -78,15 +76,7 @@ export const Editcon = createAsyncThunk(
 );
 
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const ContractSlice = createSlice({
   name: "Contract",
@@ -190,5 +180,5 @@ const ContractSlice = createSlice({
 });
 
 export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-ContractSlice.actions;
+  ContractSlice.actions;
 export default ContractSlice.reducer;

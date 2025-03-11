@@ -1,23 +1,20 @@
 import React, { useState } from 'react';
-import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import {DeleteOutlined} from '@ant-design/icons';
+import { Card, Table, Menu, Col, message, Button } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import userData from '../../../../../../assets/data/user-list.data.json';
 import OrderListData from '../../../../../../assets/data/order-list.data.json';
 
 
 
 function PaymentSummaryList() {
     const [list, setList] = useState(OrderListData);
-    const [userProfileVisible, setUserProfileVisible] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
 
+    // Delete user
     const deleteUser = (userId) => {
         setList(list.filter((item) => item.id !== userId));
         message.success({ content: `Deleted list ${userId}`, duration: 2 });
     };
-
 
     const dropdownMenu = (elm) => (
         <Menu>
@@ -30,14 +27,11 @@ function PaymentSummaryList() {
                         onClick={() => deleteUser(elm.id)}
                         size="small"
                     >
-                        {/* <span className="">Delete</span> */}
                     </Button>
                 </Flex>
             </Menu.Item>
         </Menu>
     );
-
-
     const tableColumns = [
         {
             title: 'Payment Receipt',
@@ -121,7 +115,7 @@ function PaymentSummaryList() {
                         scroll={{ x: 1200 }}
                     />
                 </div>
-               
+
             </Card>
 
         </>

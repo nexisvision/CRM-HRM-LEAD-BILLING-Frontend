@@ -5,16 +5,12 @@ import {
   Button,
   DatePicker,
   Select,
-  Upload,
   message,
   Row,
   Col,
 } from "antd";
-import { useNavigate } from "react-router-dom";
 import { ReloadOutlined } from "@ant-design/icons";
-import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import axios from "axios";
 import { addEmp, empdata } from "./EmployeeReducers/EmployeeSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,13 +25,12 @@ import AddDesignation from '../Designation/AddDesignation';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 import { env } from "configs/EnvironmentConfig";
-import { AddSalaryss, getSalaryss } from "../PayRoll/Salary/SalaryReducers/SalarySlice";
+import { AddSalaryss } from "../PayRoll/Salary/SalaryReducers/SalarySlice";
 import AddCountries from "views/app-views/setting/countries/AddCountries";
 
 const { Option } = Select;
 
 const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -44,30 +39,22 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
   const [salary, setSalary] = useState(false);
   const [formValues, setFormValues] = useState({});
   const [formValues2, setFormValues2] = useState({});
-
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
-
   const loggedusername = useSelector((state) => state.user.loggedInUser.username);
-
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
   const fndbranchdata = branchData.filter((item) => item.created_by === loggedusername);
-
   const fnddepart = departmentData.filter((item) => item.created_by === loggedusername);
   const fnddesi = designationData.filter((item) => item.created_by === loggedusername);
-
   const [selectedBranch, setSelectedBranch] = useState(null);
-
   const filteredDepartments = fnddepart.filter((dept) => dept.branch === selectedBranch);
   const filteredDesignations = fnddesi.filter((des) => des.branch === selectedBranch);
-
   const countries = useSelector((state) => state.countries.countries);
-
   const { currencies } = useSelector((state) => state.currencies);
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(empdata());
-  },[dispatch])
+  }, [dispatch])
   const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
 
   const getInitialCountry = () => {
@@ -82,7 +69,6 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     const length = 8;
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let password = "";
-
     for (let i = 0; i < length; i++) {
       password += charset[Math.floor(Math.random() * charset.length)];
     }
@@ -177,7 +163,8 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
       if (response.payload?.data?.employeeId) {
         updatedFormValues.employeeId = response.payload.data.employeeId;
         setFormValues(updatedFormValues); // Set formValues here
-        
+
+        // Only reset form and close modal after successful employee creation
         if (!response.payload?.data?.sessionToken) {
           resetForm();
           onClose();
@@ -196,9 +183,6 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     console.error("Form submission failed:", errorInfo);
   };
 
-  const onOpenOtpModal = () => {
-    setShowOtpModal(true);
-  };
   const onCloseOtpModal = () => {
     setShowOtpModal(false);
   };
@@ -228,39 +212,6 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     status: "",
     currency: "",
   };
-
-  const validationSchema = Yup.object({
-    firstName: Yup.string().required("Please enter a first name."),
-    lastName: Yup.string().required("Please enter a last name."),
-    username: Yup.string().required("Please enter a username."),
-    password: Yup.string()
-      .min(8, "Password must be at least 8 characters")
-      .matches(/\d/, "Password must have at least one number")
-      .required("Password is required"),
-    email: Yup.string()
-      .email("Please enter a valid email address.")
-      .required("Please enter an email"),
-    phone: Yup.string()
-      .matches(/^\d{10}$/, "Phone number must be 10 digits.")
-      .required("Please enter a phone number."),
-    address: Yup.string().required("Please enter an address."),
-    branch: Yup.string().required("Please select a branch."),
-    joiningDate: Yup.date().nullable().required("Joining date is required."),
-    leaveDate: Yup.date().nullable().required("Leave date is required."),
-    department: Yup.string().required("Please select a department."),
-    designation: Yup.string().required("Please select a designation."),
-    salary: Yup.string().required("Please enter a salary."),
-    accountholder: Yup.string().optional(),
-    accountnumber: Yup.string().optional(),
-    bankname: Yup.string().optional(),
-    ifsc: Yup.string().optional(),
-    banklocation: Yup.string().optional(),
-    payroll: Yup.string().optional(),
-    bankAccount: Yup.string().optional(),
-    netSalary: Yup.string().optional(),
-    status: Yup.string().optional(),
-    currency: Yup.string().optional(),
-  });
 
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
@@ -315,7 +266,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
             onSubmit={handleSubmit}
             onFinishFailed={onFinishFailed}
           >
-           
+
             <h1 className="text-lg font-bold mb-4">Personal Details</h1>
             <Row gutter={16}>
               <Col span={12}>
@@ -355,7 +306,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                       className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
                       onClick={() => setFieldValue("password", generatePassword())}
                     >
-                     <ReloadOutlined/>
+                      <ReloadOutlined />
                     </Button>
                   </div>
                   <ErrorMessage
@@ -440,7 +391,13 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                           type="number"
                           placeholder="Enter phone number"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                          
+                        // prefix={
+                        //   values.phoneCode && (
+                        //     <span className="text-gray-600 font-medium mr-1">
+                        //       {values.phoneCode}
+                        //     </span>
+                        //   )
+                        // }
                         />
                       )}
                     </Field>
@@ -459,7 +416,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                    <label className="font-semibold">Joining Date <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Joining Date <span className="text-red-500">*</span></label>
                   <Field name="joiningDate">
                     {({ field }) => (
                       <DatePicker
@@ -633,7 +590,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                    <label className="font-semibold">Bank Location   </label>
+                  <label className="font-semibold">Bank Location   </label>
                   <Field name="banklocation" as={Input} placeholder="Bank Location" className="mt-1" />
                   <ErrorMessage name="banklocation" component="div" className="text-red-500" />
                 </div>

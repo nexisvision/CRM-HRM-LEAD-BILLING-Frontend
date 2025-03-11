@@ -1,13 +1,9 @@
 import React, { useState } from 'react';
-import { Modal, Form, Input, Button, message } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 
 const ResetPassword = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
 
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -22,7 +18,6 @@ const ResetPassword = () => {
           message.error('Passwords do not match');
           return;
         }
-        // Logic for resetting the password goes here
         message.success('Password reset successfully!');
         setIsModalVisible(false);
         form.resetFields();
@@ -34,17 +29,6 @@ const ResetPassword = () => {
 
   return (
     <div>
-      {/* <Button type="primary" onClick={showModal}>
-        Reset Password
-      </Button> */}
-      {/* 
-      <Modal
-        title="Reset Password"
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        footer={null}
-        centered
-      > */}
       <Form
         form={form}
         layout="vertical"
@@ -83,14 +67,12 @@ const ResetPassword = () => {
             <Button
               type="primary"
               onClick={handleReset}
-            // style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
             >
               Reset
             </Button>
           </div>
         </Form.Item>
       </Form>
-      {/* </Modal> */}
     </div>
   );
 };

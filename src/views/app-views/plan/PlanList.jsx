@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, Button, Modal, message, Switch, Tag, Row, Col, Typography, Empty, Dropdown } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, UserOutlined, CloudUploadOutlined, TeamOutlined, CalendarOutlined, CrownOutlined, MoreOutlined, InfoCircleOutlined, EyeOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined, UserOutlined, CloudUploadOutlined, TeamOutlined, CalendarOutlined, CrownOutlined, MoreOutlined, InfoCircleOutlined, EyeOutlined } from "@ant-design/icons";
 import AddPlan from "./AddPlan";
 import EditPlan from "./EditPlan";
 import ViewPlanModal from "./ViewPlanModal";
@@ -34,9 +34,6 @@ const PlanList = () => {
   const roleidd = role.find((item) => item.id === roleid);
   const isAdmin = roleidd?.role_name === 'super-admin';
 
-  const filteredPlans = isAdmin ? allPlans : [];
-
-
   const userid = useSelector((state) => state.user.loggedInUser.id);
 
   const allempdatass = useSelector((state) => state.currencies);
@@ -60,11 +57,11 @@ const PlanList = () => {
 
   useEffect(() => {
     dispatch(getcurren())
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
     dispatch(getsubplandata());
-  }, []);
+  }, [dispatch]);
 
 
   useEffect(() => {
@@ -165,7 +162,7 @@ const PlanList = () => {
           dispatch(getsubplandata());
           onCancel();
         });
-      
+
       } catch (error) {
         console.error('Purchase error:', error);
       } finally {

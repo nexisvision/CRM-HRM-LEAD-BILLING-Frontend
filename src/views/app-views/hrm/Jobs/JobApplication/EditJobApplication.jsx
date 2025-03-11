@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, Select, Radio, message, Row, Col, Upload,Modal } from "antd";
+import { Input, Button, Select, Radio, message, Row, Col, Upload, Modal } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import ReactQuill from "react-quill";
@@ -10,7 +10,7 @@ import {
 } from "./JobapplicationReducer/JobapplicationSlice";
 import { GetJobdata } from "../JobReducer/JobSlice";
 import { getallcountries } from "../../../setting/countries/countriesreducer/countriesSlice";
-import { UploadOutlined,PlusOutlined } from "@ant-design/icons";
+import { UploadOutlined, PlusOutlined } from "@ant-design/icons";
 import AddCountries from "views/app-views/setting/countries/AddCountries";
 
 const { Option } = Select;
@@ -21,11 +21,9 @@ const EditJobApplication = ({ idd, onClose }) => {
 
   const alldata = useSelector((state) => state.jobapplications);
   const fnddaa = alldata.jobapplications.data || [];
-
-  // const fnddtaa = fnddaa.filter((item) => item.created_by === user);
   const fnd = fnddaa.find((item) => item.id === idd);
 
-   const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
+  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
 
   const getInitialCountry = () => {
     if (countries?.length > 0) {
@@ -36,8 +34,8 @@ const EditJobApplication = ({ idd, onClose }) => {
   };
 
   useEffect(() => {
-    dispatch(GetJobdata());    
-  }, []);
+    dispatch(GetJobdata());
+  }, [dispatch]);
 
   const countries = useSelector((state) => state.countries.countries);
 
@@ -60,7 +58,7 @@ const EditJobApplication = ({ idd, onClose }) => {
 
   useEffect(() => {
     dispatch(getjobapplication());
-  }, []);
+  }, [dispatch]);
 
   const onSubmit = async (values, { resetForm }) => {
     try {
@@ -126,7 +124,7 @@ const EditJobApplication = ({ idd, onClose }) => {
   });
   return (
     <div>
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -211,80 +209,86 @@ const EditJobApplication = ({ idd, onClose }) => {
                 </Col>
                 {/* Phone */}
                 <Col span={12}>
-                <div className="form-group">
-                  <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
-                  <div className="flex gap-0">
-                    <Field name="phoneCode">
-                      {({ field }) => (
-                        <Select
-                          {...field}
-                          className="phone-code-select"
-                          style={{
-                            width: '80px',
-                            borderTopRightRadius: 0,
-                            borderBottomRightRadius: 0,
-                            borderRight: 0,
-                            backgroundColor: '#f8fafc',
-                          }}
-                          placeholder={<span className="text-gray-400">+91</span>}
-                          // defaultValue={getInitialPhoneCode()}
-                          onChange={(value) => {
-                            if (value === 'add_new') {
-                              setIsAddPhoneCodeModalVisible(true);
-                            } else {
-                              setFieldValue('phoneCode', value);
-                            }
-                          }}
-                          value={values.phoneCode}
-                          dropdownStyle={{ minWidth: '180px' }}
-                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                          dropdownRender={menu => (
-                            <div>
-                              <div
-                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
-                              >
-                                <PlusOutlined className="mr-2" />
-                                <span className="text-sm">Add New</span>
+                  <div className="form-group">
+                    <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
+                    <div className="flex gap-0">
+                      <Field name="phoneCode">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className="phone-code-select"
+                            style={{
+                              width: '80px',
+                              borderTopRightRadius: 0,
+                              borderBottomRightRadius: 0,
+                              borderRight: 0,
+                              backgroundColor: '#f8fafc',
+                            }}
+                            placeholder={<span className="text-gray-400">+91</span>}
+                            // defaultValue={getInitialPhoneCode()}
+                            onChange={(value) => {
+                              if (value === 'add_new') {
+                                setIsAddPhoneCodeModalVisible(true);
+                              } else {
+                                setFieldValue('phoneCode', value);
+                              }
+                            }}
+                            value={values.phoneCode}
+                            dropdownStyle={{ minWidth: '180px' }}
+                            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                            dropdownRender={menu => (
+                              <div>
+                                <div
+                                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                  onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                                >
+                                  <PlusOutlined className="mr-2" />
+                                  <span className="text-sm">Add New</span>
+                                </div>
+                                {menu}
                               </div>
-                              {menu}
-                            </div>
-                          )}
-                        >
-                          {countries?.map((country) => (
-                            <Option key={country.id} value={country.phoneCode}>
-                              <div className="flex items-center w-full px-1">
-                                <span className="text-base min-w-[40px]">{country.phoneCode}</span>
-                                <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
-                                <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
-                              </div>
-                            </Option>
-                          ))}
-                        </Select>
-                      )}
-                    </Field>
-                    <Field name="phone">
-                      {({ field }) => (
-                        <Input
-                          {...field}
-                          className="phone-input"
-                          style={{
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                            borderLeft: '1px solid #d9d9d9',
-                            width: 'calc(100% - 80px)'
-                          }}
-                          type="number"
-                          placeholder="Enter phone number"
-                          onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                          
-                        />
-                      )}
-                    </Field>
+                            )}
+                          >
+                            {countries?.map((country) => (
+                              <Option key={country.id} value={country.phoneCode}>
+                                <div className="flex items-center w-full px-1">
+                                  <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                  <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                  <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                                </div>
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                      <Field name="phone">
+                        {({ field }) => (
+                          <Input
+                            {...field}
+                            className="phone-input"
+                            style={{
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              borderLeft: '1px solid #d9d9d9',
+                              width: 'calc(100% - 80px)'
+                            }}
+                            type="number"
+                            placeholder="Enter phone number"
+                            onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                          // prefix={
+                          //   values.phoneCode && (
+                          //     <span className="text-gray-600 font-medium mr-1">
+                          //       {values.phoneCode}
+                          //     </span>
+                          //   )
+                          // }
+                          />
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage name="phone" component="div" className="text-red-500 mt-1 text-sm" />
                   </div>
-                  <ErrorMessage name="phone" component="div" className="text-red-500 mt-1 text-sm" />
-                </div>
-              </Col>
+                </Col>
                 {/* Location */}
                 <Col span={12} className="mt-3">
                   <div className="form-item">

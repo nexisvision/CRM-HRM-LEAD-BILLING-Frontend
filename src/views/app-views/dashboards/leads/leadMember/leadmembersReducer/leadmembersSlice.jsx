@@ -12,7 +12,7 @@ export const createestimate = createAsyncThunk(
       return rejectWithValue(error.message || 'Failed to create estimate');
     }
   }
-);    
+);
 
 export const getallestimate = createAsyncThunk(
   'estimate/getAllEstimate',
@@ -117,7 +117,8 @@ const estimateSlice = createSlice({
         state.error = action.payload;
       })
 
-       .addCase(getestimateById.pending, (state) => {
+      // Fetch single invoice
+      .addCase(getestimateById.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -130,7 +131,8 @@ const estimateSlice = createSlice({
         state.error = action.payload;
       })
 
-       .addCase(updateestimate.pending, (state) => {
+      // Update estimate
+      .addCase(updateestimate.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -152,8 +154,9 @@ const estimateSlice = createSlice({
         message.error(action.payload?.message);
 
       })
-      
-        .addCase(deleteestimate.pending, (state) => {
+
+      // Delete estimate
+      .addCase(deleteestimate.pending, (state) => {
         state.loading = true;
         state.error = null;
       })

@@ -1,17 +1,15 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Row, Col, message } from "antd";
-import { useNavigate } from "react-router-dom";
 import { PlusOutlined } from "@ant-design/icons";
 import { RxCross2 } from "react-icons/rx";
 import * as Yup from "yup";
-import { Formik, Field, ErrorMessage } from "formik";
+import { Formik, ErrorMessage } from "formik";
 import { useDispatch } from "react-redux";
 import { AddTrainng, GetallTrainng } from "./TrainingReducer/TrainingSlice";
 
 const AddTrainingSetup = ({ onClose }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [rows, setRows] = useState([
     {
       id: Date.now(),

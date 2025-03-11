@@ -9,7 +9,6 @@ import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 import AddBranch from "../Branch/AddBranch";
 
 const { Option } = Select;
-
 const validationSchema = Yup.object().shape({
   department_name: Yup.string()
     .required("Department Name is required")
@@ -67,7 +66,7 @@ const EditDepartment = ({ comnyid, onClose }) => {
 
   return (
     <div className="edit-department">
-        <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
 
       <Formik
         initialValues={{

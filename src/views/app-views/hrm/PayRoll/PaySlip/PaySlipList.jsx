@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, Select,message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, DollarOutlined, FileExcelOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
+import { Card, Table, Menu, Tag, Input, Select, message, Button, Modal } from 'antd';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, PlusOutlined, PushpinOutlined, DollarOutlined } from '@ant-design/icons';
 import { AiOutlineContainer } from "react-icons/ai";
 import UserView from '../../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import StatisticWidget from 'components/shared-components/StatisticWidget';
-import { AnnualStatisticData } from '../../../dashboards/default/DefaultDashboardData';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
 import AddPaySlip from './AddPaySlip';
 import userData from '../../../../../assets/data/user-list.data.json';
 import OrderListData from '../../../../../assets/data/order-list.data.json';
@@ -20,24 +16,15 @@ const { Option } = Select
 
 const { MonthPicker } = DatePicker;
 
-const PaySlipList = () => { 
+const PaySlipList = () => {
   const [users, setUsers] = useState(userData);
   const [list, setList] = useState(OrderListData);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddPaySlipModalVisible, setIsAddPaySlipModalVisible] = useState(false);
   const [isEditPaySlipModalVisible, setIsEditPaySlipModalVisible] = useState(false);
 
-  const [annualStatisticData] = useState(AnnualStatisticData);
-  const [selectedDate, setSelectedDate] = useState(dayjs());
 
-
-
-  const onDateChange = (date) => {
-    setSelectedDate(date);
-    // Add logic to filter data based on the selected date
-  };
   // Open Add Job Modal
   const openAddPaySlipModal = () => {
     setIsAddPaySlipModalVisible(true);
@@ -63,7 +50,6 @@ const PaySlipList = () => {
     const searchArray = value ? list : OrderListData;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
-    setSelectedRowKeys([]);
   };
 
   // Delete user
@@ -165,16 +151,16 @@ const PaySlipList = () => {
   }
 
   const handleShowStatus = value => {
-		if (value !== 'All') {
-			const key = 'status'
-			const data = utils.filterArray(userData, key, value)
-			setUsers(data)
-		} else {
-			setUsers(userData)
-		}
-	}
+    if (value !== 'All') {
+      const key = 'status'
+      const data = utils.filterArray(userData, key, value)
+      setUsers(data)
+    } else {
+      setUsers(userData)
+    }
+  }
 
-  const payslipStatusList = ['active','blocked']
+  const payslipStatusList = ['active', 'blocked']
 
   const tableColumns = [
     {
@@ -215,8 +201,8 @@ const PaySlipList = () => {
     {
       title: 'Status',
       dataIndex: 'status',
-      render: (_,record) => (
-        <Tag  color={getpayslipStatus(record.status)}>
+      render: (_, record) => (
+        <Tag color={getpayslipStatus(record.status)}>
           {record.status}
         </Tag>
       ),
@@ -224,7 +210,7 @@ const PaySlipList = () => {
         compare: (a, b) => a.status.length - b.status.length,
       },
     },
-   
+
     {
       title: 'Action',
       dataIndex: 'actions',
@@ -238,50 +224,34 @@ const PaySlipList = () => {
 
   return (
     <Card bodyStyle={{ padding: '-3px' }}>
-      {/* <Row gutter={16}>
-        {annualStatisticData.map((elm, i) => (
-          <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-            <StatisticWidget
-              title={elm.title}
-              value={elm.value}
-              status={elm.status}
-              subtitle={elm.subtitle}
-            />
-          </Col>
-        ))}
-      </Row> */}
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => onSearch(e)} />
           </div>
           <div className="w-full md:w-48">
-							<Select
-								defaultValue="All"
-								className="w-full"
-								style={{ minWidth: 180 }}
-								onChange={handleShowStatus}
-								placeholder="method"
-							>
-								<Option value="All">All method </Option>
-								{payslipStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
-							</Select>
-						</div>
+            <Select
+              defaultValue="All"
+              className="w-full"
+              style={{ minWidth: 180 }}
+              onChange={handleShowStatus}
+              placeholder="method"
+            >
+              <Option value="All">All method </Option>
+              {payslipStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
+            </Select>
+          </div>
         </Flex>
         <Flex gap="7px">
-        <MonthPicker
+          <MonthPicker
             placeholder="Select Month"
             format="MMM YYYY"
-            onChange={onDateChange}
             className="ml-2 w-[230px]"
           />
           <Button type="primary" className="ml-2" onClick={openAddPaySlipModal}>
             <PlusOutlined />
             <span>New</span>
           </Button>
-          {/* <Button type="primary" className="" icon={<FileExcelOutlined />} block>
-            Export All
-          </Button> */}
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">

@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { Modal, Input, Select, Button, Form, Row, Col, message } from 'antd';
-import { AiOutlineRobot } from 'react-icons/ai';
+import React from 'react';
+import { Input, Select, Button, Form, Row, Col, message } from 'antd';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -20,7 +19,6 @@ const AddCalls = ({ visible, onClose }) => {
   };
 
   return (
-  
     <Form layout="vertical" form={form} onFinish={onSubmit}>
 
 

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker, Modal } from 'antd';
-import { DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
+import { Form, Row, Col, Input, message, Button, Select, DatePicker } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import { useSelector, useDispatch } from 'react-redux';
 import dayjs from 'dayjs';
 import { getestimateById, updateestimate } from './estimatesReducer/EstimatesSlice';
 import { getcurren } from 'views/app-views/setting/currencies/currenciesSlice/currenciesSlice';
-import * as Yup from 'yup';
 import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
 import { getAllTaxes } from 'views/app-views/setting/tax/taxreducer/taxSlice';
 
@@ -15,45 +14,27 @@ const { Option } = Select;
 
 const EditEstimates = ({ idd, onClose }) => {
     const { id } = useParams();
-    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [form] = Form.useForm();
-
     const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
-
-
     const user = useSelector((state) => state.user.loggedInUser.username);
-
-
     const currentEstimatee = useSelector((state) => state.estimate.estimates || []);
-
-
     const currentEstimate = currentEstimatee.find((item) => item.id === idd);
-
-
     const { currencies } = useSelector((state) => state.currencies);
     const condata = currencies.data || [];
-
     const { taxes } = useSelector((state) => state.tax);
-
-    const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads || []);
-
-    const allleads = useSelector((state) => state.Leads);
-    const fndrewduxxdaa = allleads.Leads.data
-    const fnddata = fndrewduxxdaa?.find((lead) => lead?.id === id);
- const allLeads = useSelector((state) => state.Leads);
- const leadsData = allLeads.Leads.data || [];
- const selectedLead = leadsData?.find((lead) => lead?.id === id);
-
-  const leadTitle = selectedLead?.leadTitle || 'N/A'
-
+    const { data: Leads } = useSelector((state) => state.Leads.Leads || []);
+    const allLeads = useSelector((state) => state.Leads);
+    const leadsData = allLeads.Leads.data || [];
+    const selectedLead = leadsData?.find((lead) => lead?.id === id);
+    const leadTitle = selectedLead?.leadTitle || 'N/A'
     const lead = Leads?.filter((item) => item.created_by === user) || [];
     const leadDetails = lead?.find((lead) => lead.id === currentEstimate?.lead);
 
     const handleAddRow = () => {
         const newRow = {
-            id: Date.now(), 
+            id: Date.now(),
             item: "",
             quantity: 1,
             price: "",
@@ -79,7 +60,7 @@ const EditEstimates = ({ idd, onClose }) => {
         }
     ]);
 
-    
+
 
     const [discountRate, setDiscountRate] = useState(10);
     const [totals, setTotals] = useState({
@@ -94,7 +75,7 @@ const EditEstimates = ({ idd, onClose }) => {
         if (id) {
             dispatch(getestimateById(id));
         }
-    }, [dispatch]);
+    }, [dispatch, id]);
 
 
     useEffect(() => {
@@ -119,13 +100,16 @@ const EditEstimates = ({ idd, onClose }) => {
                     if (currentEstimate.items) {
                         let parsedItems;
                         try {
-                            parsedItems = typeof currentEstimate.items === 'string' 
+                            // Parse items if it's a string
+                            parsedItems = typeof currentEstimate.items === 'string'
                                 ? JSON.parse(currentEstimate.items)
                                 : currentEstimate.items;
-                            
 
-                            const itemsArray = Array.isArray(parsedItems) 
-                                ? parsedItems 
+                            console.log("Parsed Items:", parsedItems);
+
+                            // Convert items object to array if needed
+                            const itemsArray = Array.isArray(parsedItems)
+                                ? parsedItems
                                 : Object.values(parsedItems);
 
                             const formattedItems = itemsArray.map(item => ({
@@ -157,10 +141,11 @@ const EditEstimates = ({ idd, onClose }) => {
                                 }
                             });
 
-                            const subtotal = formattedItems.reduce((sum, item) => 
+                            // Calculate and set totals
+                            const subtotal = formattedItems.reduce((sum, item) =>
                                 sum + (Number(item.base_amount) || 0), 0);
-                            
-                            const totalTax = formattedItems.reduce((sum, item) => 
+
+                            const totalTax = formattedItems.reduce((sum, item) =>
                                 sum + (Number(item.tax_amount) || 0), 0);
 
                             setTotals({
@@ -186,7 +171,7 @@ const EditEstimates = ({ idd, onClose }) => {
         };
 
         fetchAndSetEstimateData();
-    }, [currentEstimate, form, leadDetails,leadTitle,id]);
+    }, [currentEstimate, form, leadDetails, leadTitle, id]);
 
     useEffect(() => {
     }, [tableData]);
@@ -239,7 +224,6 @@ const EditEstimates = ({ idd, onClose }) => {
 
     const handleFinish = async (values) => {
         try {
-            setLoading(true);
 
             const formattedItems = tableData.reduce((acc, item, index) => {
                 acc[index] = {
@@ -282,8 +266,6 @@ const EditEstimates = ({ idd, onClose }) => {
             onClose();
         } catch (error) {
             message.error('Failed to update estimate: ' + (error.message || 'Unknown error'));
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -296,9 +278,6 @@ const EditEstimates = ({ idd, onClose }) => {
             message.warning('At least one item is required');
         }
     };
-
-    const itemsArray = Object.values(currentEstimate.items || {});
-
 
     const handleTableDataChange = (id, field, value) => {
         const updatedData = tableData.map((row) => {
@@ -342,7 +321,7 @@ const EditEstimates = ({ idd, onClose }) => {
         <>
             <div>
                 <div className=' ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4'>
-                    <h2 className="mb-4 border-b pb-[30px] font-medium"></h2>
+                    <hr className="mb-4 border-b  font-medium"></hr>
                     <Form
                         form={form}
                         layout="vertical"
@@ -355,27 +334,27 @@ const EditEstimates = ({ idd, onClose }) => {
                             <div className=" p-2">
 
                                 <Row gutter={16}>
-                                <Col span={12}>
-                                         <Form.Item
+                                    <Col span={12}>
+                                        <Form.Item
                                             name="leadTitle"
                                             label="Lead Title"
                                             rules={[{ required: true, message: "Lead title is required" }]}
                                         >
-                                            <Input 
+                                            <Input
                                                 placeholder="Lead Title"
-                                                disabled 
+                                                disabled
                                                 value={leadTitle}
                                             />
                                         </Form.Item>
-                                        <Form.Item 
-                                            name="lead" 
+                                        <Form.Item
+                                            name="lead"
                                             hidden
                                         >
                                             <Input type="hidden" />
                                         </Form.Item>
                                     </Col>
 
-                                  
+
 
                                     <Col span={12}>
                                         <Form.Item

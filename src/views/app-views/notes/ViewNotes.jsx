@@ -1,40 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Card,
-  Table,
-  Menu,
-  Row,
-  Col,
-  Tag,
-  Input,
-  message,
   Button,
   Modal,
   Tooltip,
   Avatar,
   Divider,
+  Tag,
 } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
   UserOutlined,
   CalendarOutlined,
-  TagOutlined,
   ClockCircleOutlined,
-  PushpinOutlined,
-  ShareAltOutlined,
-  BookOutlined,
   StarOutlined,
-  BellOutlined,
   TeamOutlined,
   FileTextOutlined,
-  CheckCircleOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import Flex from "components/shared-components/Flex";
 import EditNotes from "../notes/EditNotes";
-import userData from "assets/data/user-list.data.json";
 import { useDispatch, useSelector } from "react-redux";
 import { delnotess, getnotess } from "./notesReducer/notesSlice";
 
@@ -54,7 +39,7 @@ function ViewNotes() {
   }, [dispatch, id]);
 
   const allnotedata = useSelector((state) => state.notes);
-  const fnddata = allnotedata?.notes?.data || []; // Add fallback empty array
+  const fnddata = useMemo(() => allnotedata?.notes?.data || [], [allnotedata?.notes?.data]);
 
   useEffect(() => {
     if (fnddata) {
@@ -76,22 +61,6 @@ function ViewNotes() {
     setIdd(idd);
   };
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => editfunc(elm.id)}>
-          <EditOutlined />
-          <span className="ml-2">Edit</span>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => deleteUser(elm.id)}>
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
   const deleteUser = (userId) => {
     dispatch(delnotess(userId)).then(() => {
       dispatch(getnotess(id));
@@ -101,22 +70,22 @@ function ViewNotes() {
 
   const renderNoteCard = (note) => {
     return (
-      <Card 
-        key={note.id} 
+      <Card
+        key={note.id}
         className="notification-card relative"
         bordered={false}
         data-type={note.notetype}
         data-priority={note.priority}
       >
         <div className="absolute top-4 right-4 flex gap-2">
-          <Button 
-            type="text" 
+          <Button
+            type="text"
             icon={<EditOutlined />}
             onClick={() => editfunc(note.id)}
             className="action-btn edit hover:bg-blue-50 hover:text-blue-600"
           />
-          <Button 
-            type="text" 
+          <Button
+            type="text"
             icon={<DeleteOutlined />}
             onClick={() => deleteUser(note.id)}
             className="action-btn delete hover:bg-red-50 hover:text-red-600"
@@ -161,7 +130,7 @@ function ViewNotes() {
 
           {/* Note Content */}
           <div className="note-content pl-13 mb-4">
-            <div 
+            <div
               className="text-gray-600 prose prose-sm max-w-none"
               dangerouslySetInnerHTML={{ __html: note.description }}
             />
@@ -172,8 +141,8 @@ function ViewNotes() {
           {/* Author Info */}
           <div className="flex items-center justify-between pl-13">
             <div className="flex items-center gap-3">
-              <Avatar 
-                icon={<UserOutlined />} 
+              <Avatar
+                icon={<UserOutlined />}
                 className="bg-gradient-to-r from-blue-400 to-blue-600"
               />
               <div>
@@ -205,7 +174,7 @@ function ViewNotes() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {JSON.parse(note.employees).employee.map((emp, index) => (
-                  <Tag 
+                  <Tag
                     key={index}
                     icon={<UserOutlined />}
                     className="rounded-full px-3 py-1 bg-blue-50 text-blue-600 border-blue-100"
@@ -219,15 +188,15 @@ function ViewNotes() {
 
           {/* Action Buttons */}
           <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity text-black">
-            <Button 
-              type="text" 
+            <Button
+              type="text"
               icon={<EditOutlined />}
               onClick={() => editfunc(note.id)}
               // className="action-btn edit"
-               className="action-btn edit hover:bg-blue-50 hover:text-blue-600"
+              className="action-btn edit hover:bg-blue-50 hover:text-blue-600"
             />
-            <Button 
-              type="text" 
+            <Button
+              type="text"
               icon={<DeleteOutlined />}
               onClick={() => deleteUser(note.id)}
               className="action-btn delete"

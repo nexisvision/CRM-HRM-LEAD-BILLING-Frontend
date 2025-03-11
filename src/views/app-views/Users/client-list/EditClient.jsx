@@ -8,9 +8,7 @@ import {
   Select,
   Modal,
 } from "antd";
-import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import { ClientData, Editclient } from "./CompanyReducers/CompanySlice";
 import Upload from "antd/es/upload/Upload";
@@ -22,12 +20,11 @@ import AddCountries from "views/app-views/setting/countries/AddCountries";
 const { Option } = Select;
 
 const EditClient = ({ comnyid, onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(ClientData());
-  }, []);
+  }, [dispatch]);
 
   const AllSubClient = useSelector((state) => state.SubClient);
   const fnddatas = AllSubClient.SubClient.data;
@@ -69,7 +66,7 @@ const EditClient = ({ comnyid, onClose }) => {
         profilePic: clientData.profilePic || "",
       });
     }
-  }, [fnddatas]);
+  }, [fnddatas, comnyid]);
 
   const onSubmit = async (values, { resetForm }) => {
     const formData = new FormData();
@@ -136,56 +133,6 @@ const EditClient = ({ comnyid, onClose }) => {
     }
   };
 
-  const validationSchema = Yup.object().shape({
-    // Personal Information
-    firstName: Yup.string()
-      .required("Please enter a First Name.")
-      .min(2, "First Name must be at least 2 characters long."),
-    lastName: Yup.string()
-      .required("Please enter a Last Name.")
-      .min(2, "Last Name must be at least 2 characters long."),
-    username: Yup.string()
-      .required("Please enter a username")
-      .min(3, "Username must be at least 3 characters long"),
-    gender: Yup.string()
-      .oneOf(['male', 'female', 'other'], "Please select a valid gender"),
-    phoneCode: Yup.string(),
-    phone: Yup.string()
-      .matches(/^\d{10}$/, "Phone number must be 10 digits"),
-
-    // Bank Details
-    bankname: Yup.string()
-      .required("Please enter a Bank Name.")
-      .min(3, "Bank Name must be at least 3 characters long."),
-    ifsc: Yup.string()
-      .required("Please enter an IFSC."),
-    banklocation: Yup.string()
-      .required("Please enter a Bank Location."),
-    accountholder: Yup.string()
-      .required("Please enter an Account Holder."),
-    accountnumber: Yup.string()
-      .required("Please enter an Account Number."),
-    accounttype: Yup.string(),
-
-    // Business Information
-    website: Yup.string()
-      .url("Please enter a valid URL"),
-    gstIn: Yup.string()
-      .required("Please enter a GSTIN."),
-    e_signature: Yup.string(),
-
-    // Address Information
-    address: Yup.string()
-      .required("Please enter an Address."),
-    city: Yup.string()
-      .required("Please enter a City."),
-    state: Yup.string()
-      .required("Please enter a State."),
-    country: Yup.string()
-      .required("Please enter a Country."),
-    zipcode: Yup.string()
-      .required("Please enter a Zipcode."),
-  });
 
   return (
     <div className="add-job-form">

@@ -10,7 +10,7 @@ export const initialState = {
 	token: localStorage.getItem(AUTH_TOKEN) || null
 }
 
-export const signIn = createAsyncThunk('auth/signIn',async (data, { rejectWithValue }) => {
+export const signIn = createAsyncThunk('auth/signIn', async (data, { rejectWithValue }) => {
 	const { email, password } = data
 	try {
 		const response = await FirebaseService.signInEmailRequest(email, password)
@@ -26,7 +26,7 @@ export const signIn = createAsyncThunk('auth/signIn',async (data, { rejectWithVa
 	}
 })
 
-export const signUp = createAsyncThunk('auth/signUp',async (data, { rejectWithValue }) => {
+export const signUp = createAsyncThunk('auth/signUp', async (data, { rejectWithValue }) => {
 	const { email, password } = data
 	try {
 		const response = await FirebaseService.signUpEmailRequest(email, password)
@@ -42,14 +42,14 @@ export const signUp = createAsyncThunk('auth/signUp',async (data, { rejectWithVa
 	}
 })
 
-export const signOut = createAsyncThunk('auth/signOut',async () => {
-    const response = await FirebaseService.signOutRequest()
+export const signOut = createAsyncThunk('auth/signOut', async () => {
+	const response = await FirebaseService.signOutRequest()
 	localStorage.removeItem(AUTH_TOKEN);
-    return response.data
+	return response.data
 })
 
 export const signInWithGoogle = createAsyncThunk('auth/signInWithGoogle', async (_, { rejectWithValue }) => {
-    const response = await FirebaseService.signInGoogleRequest()
+	const response = await FirebaseService.signInGoogleRequest()
 	if (response.user) {
 		const token = response.user.refreshToken;
 		localStorage.setItem(AUTH_TOKEN, response.user.refreshToken);
@@ -60,7 +60,7 @@ export const signInWithGoogle = createAsyncThunk('auth/signInWithGoogle', async 
 })
 
 export const signInWithFacebook = createAsyncThunk('auth/signInWithFacebook', async (_, { rejectWithValue }) => {
-    const response = await FirebaseService.signInFacebookRequest()
+	const response = await FirebaseService.signInFacebookRequest()
 	if (response.user) {
 		const token = response.user.refreshToken;
 		localStorage.setItem(AUTH_TOKEN, response.user.refreshToken);
@@ -169,7 +169,7 @@ export const authSlice = createSlice({
 	},
 })
 
-export const { 
+export const {
 	authenticated,
 	showAuthMessage,
 	hideAuthMessage,

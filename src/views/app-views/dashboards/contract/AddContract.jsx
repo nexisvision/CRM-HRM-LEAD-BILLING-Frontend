@@ -30,7 +30,7 @@ const { Option } = Select;
 const AddContract = ({ onClose }) => {
   const dispatch = useDispatch();
 
-  const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
+  const allloggeduser = useSelector((state) => state.user.loggedInUser.username)
 
   const countries = useSelector((state) => state.countries?.countries);
 
@@ -38,7 +38,7 @@ const AddContract = ({ onClose }) => {
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
   const curr = currencies?.data || [];
-  
+
   const user = useSelector((state) => state.user.loggedInUser.username);
 
   const [contractTypes, setContractTypes] = useState([]);
@@ -66,7 +66,7 @@ const AddContract = ({ onClose }) => {
     return "+91";
   };
 
- 
+
 
   useEffect(() => {
     dispatch(getcurren());
@@ -88,7 +88,7 @@ const AddContract = ({ onClose }) => {
     client: "",
     project: "",
     type: "",
-      currency: getInitialCurrency(),
+    currency: getInitialCurrency(),
     phoneCode: getInitialCountry(),
     phone: "",
     address: "",
@@ -123,7 +123,7 @@ const AddContract = ({ onClose }) => {
     startDate: Yup.date()
       .required("Start date is required.")
       .nullable()
-      .test("startDate", "Start date cannot be in the past", function(value) {
+      .test("startDate", "Start date cannot be in the past", function (value) {
         if (!value) return true;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -133,12 +133,12 @@ const AddContract = ({ onClose }) => {
     endDate: Yup.date()
       .required("End date is required.")
       .nullable()
-      .test("endDate", "End date must be after start date", function(value) {
+      .test("endDate", "End date must be after start date", function (value) {
         const { startDate } = this.parent;
         if (!startDate || !value) return true;
         return moment(value).isAfter(moment(startDate), 'day');
       })
-      .test("endDate", "End date cannot be in the past", function(value) {
+      .test("endDate", "End date cannot be in the past", function (value) {
         if (!value) return true;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -226,7 +226,7 @@ const AddContract = ({ onClose }) => {
       message.success(`${lableType} added successfully.`);
       setter("");
       modalSetter(false);
-      
+
       await fetchLables(lableType, setContractTypes);
       if (setFieldValueRef.current) {
         setFieldValueRef.current("type", newValue.trim());
@@ -255,14 +255,14 @@ const AddContract = ({ onClose }) => {
 
   return (
     <div className="add-contract-form">
-       <h2 className="mb-4 border-b pb-2 font-medium"></h2>
+      <h2 className="mb-4 border-b pb-2 font-medium"></h2>
 
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
-        {({ handleSubmit, setFieldValue, values,setFieldTouched }) => {
+        {({ handleSubmit, setFieldValue, values, setFieldTouched }) => {
           setFieldValueRef.current = setFieldValue;
 
           return (
@@ -351,7 +351,7 @@ const AddContract = ({ onClose }) => {
                             type="number"
                             placeholder="Enter phone number"
                             onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                            
+
                           />
                         )}
                       </Field>
@@ -361,16 +361,16 @@ const AddContract = ({ onClose }) => {
                 </Col>
 
                 <Col span={24} className="mt-4">
-                    <div className="form-item">
-                      <label className="font-semibold">Address <span className="text-red-500">*</span></label>
-                      <Field name="address" className="mt-1" as={Input} placeholder="Enter Address" />
-                      <ErrorMessage
-                        name="address"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col>
+                  <div className="form-item">
+                    <label className="font-semibold">Address <span className="text-red-500">*</span></label>
+                    <Field name="address" className="mt-1" as={Input} placeholder="Enter Address" />
+                    <ErrorMessage
+                      name="address"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
                 <Col span={12} className="mt-4">
                   <div className="form-item">
@@ -393,7 +393,7 @@ const AddContract = ({ onClose }) => {
                   <div className="form-item">
                     <label className="font-semibold">Country <span className="text-red-500">*</span></label>
                     <Select
-                     
+
                       className="w-full mt-1"
                       placeholder="Select Country"
                       name="country"
@@ -483,7 +483,7 @@ const AddContract = ({ onClose }) => {
                   </div>
                 </Col>
 
-               
+
 
                 <Col span={12} className="mt-4">
                   <div className="form-item">
@@ -557,103 +557,103 @@ const AddContract = ({ onClose }) => {
                   </div>
                 </Col>
 
-                 <Col span={12} className="mt-4">
-                        <div className="form-group">
-                          <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
-                          <div className="flex gap-0">
-                            <Field name="currency">
-                              {({ field }) => (
-                                <Select
-                                  {...field}
-                                  className="currency-select"
-                                  style={{
-                                    width: '80px',
-                                    borderTopRightRadius: 0,
-                                    borderBottomRightRadius: 0,
-                                    borderRight: 0,
-                                    backgroundColor: '#f8fafc',
-                                  }}
-                                  placeholder={<span className="text-gray-400">$</span>}
-                                  onChange={(value) => {
-                                    if (value === 'add_new') {
-                                      setIsAddCurrencyModalVisible(true);
-                                    } else {
-                                      setFieldValue("currency", value);
-                                    }
-                                  }}
-                                  value={values.currency}
-                                  dropdownStyle={{ minWidth: '180px' }}
-                                  suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                                  loading={!fnddatass}
-                                  dropdownRender={menu => (
-                                    <div>
-                                      <div
-                                        className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                        onClick={() => setIsAddCurrencyModalVisible(true)}
-                                      >
-                                        <PlusOutlined className="mr-2" />
-                                        <span className="text-sm">Add New</span>
-                                      </div>
-                                      {menu}
-                                    </div>
-                                  )}
+                <Col span={12} className="mt-4">
+                  <div className="form-group">
+                    <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
+                    <div className="flex gap-0">
+                      <Field name="currency">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className="currency-select"
+                            style={{
+                              width: '80px',
+                              borderTopRightRadius: 0,
+                              borderBottomRightRadius: 0,
+                              borderRight: 0,
+                              backgroundColor: '#f8fafc',
+                            }}
+                            placeholder={<span className="text-gray-400">$</span>}
+                            onChange={(value) => {
+                              if (value === 'add_new') {
+                                setIsAddCurrencyModalVisible(true);
+                              } else {
+                                setFieldValue("currency", value);
+                              }
+                            }}
+                            value={values.currency}
+                            dropdownStyle={{ minWidth: '180px' }}
+                            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                            loading={!fnddatass}
+                            dropdownRender={menu => (
+                              <div>
+                                <div
+                                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                  onClick={() => setIsAddCurrencyModalVisible(true)}
                                 >
-                                  {fnddatass?.map((currency) => (
-                                    <Option key={currency.id} value={currency.id}>
-                                      <div className="flex items-center w-full px-1">
-                                        <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
-                                        <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
-                                        <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
-                                      </div>
-                                    </Option>
-                                  ))}
-                                </Select>
-                              )}
-                            </Field>
-                            <Field name="value">
-                              {({ field, form }) => (
-                                <Input
-                                  {...field}
-                                  className="price-input"
-                                  style={{
-                                    borderTopLeftRadius: 0,
-                                    borderBottomLeftRadius: 0,
-                                    borderLeft: '1px solid #d9d9d9',
-                                    width: 'calc(100% - 80px)'
-                                  }}
-                                  type="number"
-                                  min="0"
-                                  step="0.01"
-                                  placeholder="0.00"
-                                  onChange={(e) => {
-                                    const value = e.target.value;
-                                    if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                                      form.setFieldValue('value', value);
-                                    }
-                                  }}
-                                  onKeyPress={(e) => {
-                                    const charCode = e.which ? e.which : e.keyCode;
-                                    if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-                                      e.preventDefault();
-                                    }
-                                    if (charCode === 46 && field.value.includes('.')) {
-                                      e.preventDefault();
-                                    }
-                                  }}
-                                  prefix={
-                                    values.currency && (
-                                      <span className="text-gray-600 font-medium mr-1">
-                                        {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
-                                      </span>
-                                    )
-                                  }
-                                />
-                              )}
-                            </Field>
-                          </div>
-                          <ErrorMessage name="value" component="div" className="text-red-500 mt-1 text-sm" />
-                        </div>
-                      </Col>
+                                  <PlusOutlined className="mr-2" />
+                                  <span className="text-sm">Add New</span>
+                                </div>
+                                {menu}
+                              </div>
+                            )}
+                          >
+                            {fnddatass?.map((currency) => (
+                              <Option key={currency.id} value={currency.id}>
+                                <div className="flex items-center w-full px-1">
+                                  <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                  <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                  <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                </div>
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                      <Field name="value">
+                        {({ field, form }) => (
+                          <Input
+                            {...field}
+                            className="price-input"
+                            style={{
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              borderLeft: '1px solid #d9d9d9',
+                              width: 'calc(100% - 80px)'
+                            }}
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                form.setFieldValue('value', value);
+                              }
+                            }}
+                            onKeyPress={(e) => {
+                              const charCode = e.which ? e.which : e.keyCode;
+                              if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                e.preventDefault();
+                              }
+                              if (charCode === 46 && field.value.includes('.')) {
+                                e.preventDefault();
+                              }
+                            }}
+                            prefix={
+                              values.currency && (
+                                <span className="text-gray-600 font-medium mr-1">
+                                  {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                                </span>
+                              )
+                            }
+                          />
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage name="value" component="div" className="text-red-500 mt-1 text-sm" />
+                  </div>
+                </Col>
 
                 <Col span={12} className="mt-4">
                   <div className="form-item">
@@ -715,29 +715,29 @@ const AddContract = ({ onClose }) => {
                     />
                   </div>
                 </Col>
-                      
+
                 <Col span={24} className="mt-4">
-                    <div className="form-item">
-                      <label className="font-semibold">Notes <span className="text-red-500">*</span></label>
-                      <Field name="notes">
-                        {({ field }) => (
-                          <ReactQuill
-                            {...field}
-                            className="mt-1"
-                            value={values.notes}
-                            onChange={(value) =>
-                              setFieldValue("notes", value)
-                            }
-                          />
-                        )}
-                      </Field>
-                      <ErrorMessage
-                        name="notes"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col>
+                  <div className="form-item">
+                    <label className="font-semibold">Notes <span className="text-red-500">*</span></label>
+                    <Field name="notes">
+                      {({ field }) => (
+                        <ReactQuill
+                          {...field}
+                          className="mt-1"
+                          value={values.notes}
+                          onChange={(value) =>
+                            setFieldValue("notes", value)
+                          }
+                        />
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="notes"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
               </Row>
 
               <div className="form-buttons text-right mt-4">

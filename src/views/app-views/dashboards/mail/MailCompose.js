@@ -172,7 +172,8 @@ const MailCompose = () => {
 		setSelectedTemplate(templateName);
 		setPlaceholders(templates[templateName].placeholders);
 		setCurrentTemplate(templates[templateName].emailMessage || '');
-		
+
+		// Update the message with default placeholder values
 		const updatedMessage = replacePlaceholders(
 			templates[templateName].emailMessage || '',
 			templates[templateName].placeholders
@@ -265,9 +266,9 @@ const MailCompose = () => {
 								<Row gutter={[16, 8]}>
 									{Object.entries(placeholders).map(([key, value]) => (
 										<Col xs={24} sm={12} md={8} key={key}>
-											<Form.Item 
-												label={key} 
-												name={['placeholders', key]} 
+											<Form.Item
+												label={key}
+												name={['placeholders', key]}
 												initialValue={value}
 											>
 												<Input

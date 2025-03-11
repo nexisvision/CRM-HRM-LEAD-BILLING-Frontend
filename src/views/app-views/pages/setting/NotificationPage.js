@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GetAllNotifications } from './NotificationReducer/NotificationSlice';
-import { Badge, Tabs, Timeline, Card, Avatar, Tooltip, Button, Modal } from 'antd';
+import { Badge, Tabs, Card, Tooltip, Button, Modal } from 'antd';
 import {
   BellOutlined,
   ClockCircleOutlined,
-  CheckCircleOutlined,
   WarningOutlined,
   InfoCircleOutlined,
-  DeleteOutlined,
   PushpinOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -74,7 +72,7 @@ const EmptyState = ({ type }) => (
 const NotificationPage = () => {
   const dispatch = useDispatch();
   const allnoidata = useSelector((state) => state.Notifications);
-  const fnddata = allnoidata?.Notifications?.data || [];
+  const fnddata = useMemo(() => allnoidata?.Notifications?.data || [], [allnoidata]);
   const [list, setList] = useState([]);
   const [pinnedNotifications, setPinnedNotifications] = useState([]);
   const [selectedNotification, setSelectedNotification] = useState(null);
@@ -409,10 +407,10 @@ const NotificationPage = () => {
         className="mt-[-70px]"
       >
         {selectedTask && (
-          <ViewTask 
-            filterdatass={noti} 
-            notificationData={selectedTask.notificationData} 
-            onClose={handleTaskModalClose} 
+          <ViewTask
+            filterdatass={noti}
+            notificationData={selectedTask.notificationData}
+            onClose={handleTaskModalClose}
           />
         )}
       </Modal>
@@ -423,87 +421,14 @@ const NotificationPage = () => {
         plan={selectedPlan}
         currencyData={[]} // Add your currency data here
         isAdmin={false} // Set based on user role
-        onEdit={(id) => {/* Handle edit */}}
-        onDelete={(id) => {/* Handle delete */}}
-        onBuy={(plan) => {/* Handle buy */}}
+        onEdit={(id) => {/* Handle edit */ }}
+        onDelete={(id) => {/* Handle delete */ }}
+        onBuy={(plan) => {/* Handle buy */ }}
       />
     </div>
   );
 };
 
-const styles = `
-  .custom-tabs .ant-tabs-nav {
-    margin-bottom: 12px !important;
-  }
-
-  .custom-tabs .ant-tabs-tab {
-    padding: 8px 16px;
-    transition: all 0.3s;
-    border-radius: 6px;
-    margin-right: 6px;
-    font-size: 13px;
-  }
-
-  .custom-tabs .ant-tabs-tab-active {
-    background-color: #e6f7ff;
-  }
-
-  .custom-tabs .ant-tabs-ink-bar {
-    background: #1890ff;
-    height: 2px;
-    border-radius: 2px;
-  }
-
-  .custom-scrollbar {
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #d9d9d9;
-      border-radius: 2px;
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-      background: #bfbfbf;
-    }
-  }
-`;
-
-// Add these styles to your existing styles
-const additionalStyles = `
-  .empty-state {
-    animation: fadeIn 0.3s ease-in-out;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.5;
-    }
-  }
-`;
 
 export default NotificationPage;
 

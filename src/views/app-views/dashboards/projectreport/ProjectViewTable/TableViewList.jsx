@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-// import { DealStatisticViewData } from '../../../dashboards/default/DefaultDashboardData';
-import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, CopyOutlined, EditOutlined, LinkOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { Card, Table, Tag, Input, Button } from 'antd';
+import { SearchOutlined, FileExcelOutlined } from '@ant-design/icons';
 import userData from 'assets/data/user-list.data.json';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
 import Flex from 'components/shared-components/Flex';
@@ -13,8 +12,7 @@ import utils from 'utils';
 
 function TableViewList() {
     const [list, setList] = useState(OrderListData);
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-    const [users, setUsers] = useState(userData);
+    const users = userData;
 
     const getProjectReportPriority = status => {
         if (status === 'High') {
@@ -48,7 +46,6 @@ function TableViewList() {
         const searchArray = value ? list : OrderListData;
         const data = utils.wildCardSearch(searchArray, value);
         setList(data);
-        setSelectedRowKeys([]);
     };
 
 
@@ -120,8 +117,6 @@ function TableViewList() {
                 compare: (a, b) => a.title.length - b.title.length,
             },
         },
-
-      
     ];
 
 

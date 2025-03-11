@@ -4,8 +4,6 @@ import { Row, Col, Button, Select, Modal, Input } from 'antd';
 
 import { Formik, Field, ErrorMessage } from 'formik';
 
-import * as Yup from 'yup';
-
 import axios from 'axios';
 
 import { message } from 'antd';
@@ -37,23 +35,13 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
     const logged = loggedInUser?.username;
 
-
-
-    const clients = [
-
-        { id: 1, name: 'Client 1', email: 'client1@example.com' },
-
-        { id: 2, name: 'Client 2', email: 'client2@example.com' },
-
-    ];
-
     const [clientdata, setClientdata] = useState([]);
 
     const alldatas = useSelector((state) => state.SubClient.SubClient.data);
 
-    useEffect(()=>{
+    useEffect(() => {
         setClientdata(alldatas);
-    },[alldatas])
+    }, [alldatas])
 
 
 
@@ -65,9 +53,9 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
 
 
-    const StagesLeadsDeals = logged && Array.isArray(StagesLeadsDealss) 
+    const StagesLeadsDeals = logged && Array.isArray(StagesLeadsDealss)
 
-        ? StagesLeadsDealss.filter((item) => 
+        ? StagesLeadsDealss.filter((item) =>
 
             item?.created_by === logged && item?.stageType === "deal"
 
@@ -120,49 +108,6 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
     }, [dispatch]);
 
-
-
-    const validationSchema = Yup.object().shape({
-
-        dealName: Yup.string().required('Deal name is required'),
-
-        price: Yup.number().min(0, 'Price must be positive').required('Price is required'),
-
-        clientType: Yup.string().required('Please select client type'),
-
-        clientId: Yup.string().when('clientType', {
-
-            is: 'existing',
-
-            then: Yup.string().required('Please select a client')
-
-        }),
-
-        clientName: Yup.string().when('clientType', {
-
-            is: 'new',
-
-            then: Yup.string().required('Client name is required')
-
-        }),
-
-        clientEmail: Yup.string().when('clientType', {
-
-            is: 'new',
-
-            then: Yup.string().email('Invalid email').required('Client email is required')
-
-        }),
-
-        clientPassword: Yup.string().when('clientType', {
-
-            is: 'new',
-
-            then: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required')
-
-        })
-
-    });
 
 
 
@@ -276,7 +221,7 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
             });
 
-            
+
 
             if (response.data.success) {
 
@@ -374,7 +319,7 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
                     <form onSubmit={handleSubmit}>
 
-                        <h1 className='border-b border-gray-200'></h1>
+                        <hr className='border-b border-gray-200'></hr>
 
                         <Row gutter={16}>
 
@@ -716,11 +661,11 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
                     </Button>,
 
-                    <Button 
+                    <Button
 
-                        key="submit" 
+                        key="submit"
 
-                        type="primary" 
+                        type="primary"
 
                         onClick={handleOtpSubmit}
 
@@ -740,7 +685,7 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
                     <p className="mb-4">
 
-                        Please enter the 6-digit OTP sent to your email address: 
+                        Please enter the 6-digit OTP sent to your email address:
 
                         <span className="font-semibold ml-1">{formValues?.clientEmail}</span>
 
@@ -760,7 +705,7 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
                     />
 
-                    <Button 
+                    <Button
                         type="primary"
                         onClick={handleOtpSubmit}
                         disabled={otp.length !== 6}

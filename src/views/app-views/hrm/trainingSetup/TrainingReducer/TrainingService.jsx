@@ -76,7 +76,9 @@ const Edittrainag = async (idd, payload) => {
 };
 
 
+
 const UserService = {
+
   Gettrainning,
   Createtraiuning,
   Deletetraing,

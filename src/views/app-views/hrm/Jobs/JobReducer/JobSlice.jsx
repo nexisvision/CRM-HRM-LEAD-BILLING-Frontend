@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./JobService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
-import { message } from "antd";
-
 
 export const AddJobs = createAsyncThunk(
   "users/addUser",
@@ -79,15 +76,7 @@ export const EditJobs = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const JobSlice = createSlice({
   name: "Jobs",
@@ -151,7 +140,7 @@ const JobSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-   
+
       .addCase(Deletejobs.pending, (state) => {
         state.isLoading = true;
       })
@@ -167,7 +156,7 @@ const JobSlice = createSlice({
       })
       .addCase(EditJobs.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; 
+        state.editItem = action.payload;
       })
       .addCase(EditJobs.rejected, (state, action) => {
         state.isLoading = false;

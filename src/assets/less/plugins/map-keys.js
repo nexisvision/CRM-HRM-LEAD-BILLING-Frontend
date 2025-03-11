@@ -3,7 +3,7 @@ functions.add('map-keys', function ({ ruleset: { rules } } = { ruleset: { rules:
 
 	rules.forEach(rule => {
 		// Not exactly sure how to handle other types (or if they should be handled at all).
-		if (! (rule instanceof tree.Declaration))
+		if (!(rule instanceof tree.Declaration))
 			return
 
 		const { name: key } = rule.eval(this.context)

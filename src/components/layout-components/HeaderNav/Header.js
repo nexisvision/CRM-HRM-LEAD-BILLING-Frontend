@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { TEMPLATE } from 'constants/ThemeConstant';
 
-const Header = styled.div(({headerNavColor, isDarkTheme}) => ({
+const Header = styled.div(({ headerNavColor, isDarkTheme }) => ({
 	position: 'fixed',
 	width: '100%',
 	left: 0,

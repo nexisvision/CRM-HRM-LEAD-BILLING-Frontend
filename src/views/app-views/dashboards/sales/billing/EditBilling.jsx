@@ -15,10 +15,8 @@ import Flex from 'components/shared-components/Flex';
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { ErrorMessage, Field } from "formik";
-import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
-import { addbil, eidtebil, getbil } from "./billing2Reducer/billing2Slice";
+import { eidtebil, getbil } from "./billing2Reducer/billing2Slice";
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice";
 import moment from "moment";
 import { vendordataedata } from "../../Purchase/vendor/vendorReducers/vendorSlice";
@@ -31,28 +29,21 @@ const { Option } = Select;
 const EditBilling = ({ idd, onClose }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
-  const [newTag, setNewTag] = useState("");
   const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
   const [newStatus, setNewStatus] = useState("");
   const [statuses, setStatuses] = useState([]);
 
   const { taxes } = useSelector((state) => state.tax);
-  const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
-
-  const [tags, setTags] = useState([]);
   const AllLoggeddtaa = useSelector((state) => state.user);
   const lid = AllLoggeddtaa.loggedInUser.id;
-  const Tagsdetail = useSelector((state) => state.Lable);
-
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [showTax, setShowTax] = useState(false);
   const [discountType, setDiscountType] = useState('fixed');
   const [discountValue, setDiscountValue] = useState(0);
-    // Get products directly from Redux store
-    const productsData = useSelector((state) => state.Product.Product);
+  // Get products directly from Redux store
+  const productsData = useSelector((state) => state.Product.Product);
 
   const [totals, setTotals] = useState({
     subtotal: "0.00",
@@ -87,76 +78,76 @@ const EditBilling = ({ idd, onClose }) => {
     dispatch(vendordataedata());
     fetchTags();
     fetchLables("status", setStatuses);
-  }, []);
+  }, [dispatch, fetchLables, lid]);
 
 
   const currentBill = fnsdatas?.find((item) => item.id === idd);
 
 
- useEffect(() => {
-  
-  if (currentBill) {
-    try {
-      // Parse items from JSON string
-      const parsedItems = JSON.parse(currentBill.items || '[]');
-      
-      // Set basic form fields
-      form.setFieldsValue({
-        vendor: currentBill.vendor || '',
-        billDate: currentBill.billDate ? moment(currentBill.billDate) : null,
-        status: currentBill.status || '',
-        billNumber: currentBill.billNumber || '',
-        note: currentBill.note || '',
-        description: JSON.parse(currentBill.discription || '""') // Parse description JSON
-      });
+  useEffect(() => {
 
-      // Set tax and discount states
-      setShowTax(currentBill.tax > 0);
-      setDiscountValue(currentBill.discount || 0);
+    if (currentBill) {
+      try {
+        // Parse items from JSON string
+        const parsedItems = JSON.parse(currentBill.items || '[]');
 
-      // Format items data for table
-      if (parsedItems.length > 0) {
-        const formattedItems = parsedItems.map(item => ({
-          id: Date.now() + Math.random(),
-          item: item.item || '', // Changed from item.name to item.item
-          quantity: Number(item.quantity) || 0,
-          price: Number(item.price) || 0, // Changed from item.unitPrice to item.price
-          tax: item.tax_percentage > 0 ? { // Changed tax structure
-            gstName: item.tax_name || '',
-            gstPercentage: Number(item.tax_percentage)
-          } : null,
-          amount: Number(item.amount) || 0,
-          description: item.discription || '' // Changed from description to discription
-        }));
+        // Set basic form fields
+        form.setFieldsValue({
+          vendor: currentBill.vendor || '',
+          billDate: currentBill.billDate ? moment(currentBill.billDate) : null,
+          status: currentBill.status || '',
+          billNumber: currentBill.billNumber || '',
+          note: currentBill.note || '',
+          description: JSON.parse(currentBill.discription || '""') // Parse description JSON
+        });
 
-        setTableData(formattedItems);
-      } else {
-        // Set default empty row if no items
-        setTableData([{
-          id: Date.now(),
-          item: '',
-          quantity: 1,
-          price: 0,
-          tax: null,
-          amount: 0,
-          description: ''
-        }]);
+        // Set tax and discount states
+        setShowTax(currentBill.tax > 0);
+        setDiscountValue(currentBill.discount || 0);
+
+        // Format items data for table
+        if (parsedItems.length > 0) {
+          const formattedItems = parsedItems.map(item => ({
+            id: Date.now() + Math.random(),
+            item: item.item || '', // Changed from item.name to item.item
+            quantity: Number(item.quantity) || 0,
+            price: Number(item.price) || 0, // Changed from item.unitPrice to item.price
+            tax: item.tax_percentage > 0 ? { // Changed tax structure
+              gstName: item.tax_name || '',
+              gstPercentage: Number(item.tax_percentage)
+            } : null,
+            amount: Number(item.amount) || 0,
+            description: item.discription || '' // Changed from description to discription
+          }));
+
+          setTableData(formattedItems);
+        } else {
+          // Set default empty row if no items
+          setTableData([{
+            id: Date.now(),
+            item: '',
+            quantity: 1,
+            price: 0,
+            tax: null,
+            amount: 0,
+            description: ''
+          }]);
+        }
+
+        // Set totals
+        setTotals({
+          subtotal: currentBill.subtotal.toFixed(2),
+          discount: currentBill.discount.toFixed(2),
+          totalTax: currentBill.tax.toFixed(2),
+          finalTotal: currentBill.total.toFixed(2)
+        });
+
+      } catch (error) {
+        console.error('Error setting bill data:', error);
+        message.error('Error loading bill data');
       }
-
-      // Set totals
-      setTotals({
-        subtotal: currentBill.subtotal.toFixed(2),
-        discount: currentBill.discount.toFixed(2),
-        totalTax: currentBill.tax.toFixed(2),
-        finalTotal: currentBill.total.toFixed(2)
-      });
-
-    } catch (error) {
-      console.error('Error setting bill data:', error);
-      message.error('Error loading bill data');
     }
-  }
-}, [fnsdatas, idd, form]);
+  }, [fnsdatas, idd, form]);
 
   useEffect(() => {
     dispatch(getAllTaxes());
@@ -167,7 +158,7 @@ const EditBilling = ({ idd, onClose }) => {
     const fetchProducts = async () => {
       try {
         const response = await dispatch(GetAllProdu());
-        
+
         if (response?.payload?.data) {
           setProducts(response.payload.data);
         }
@@ -242,7 +233,7 @@ const EditBilling = ({ idd, onClose }) => {
   const handleProductChange = (productId) => {
     if (productId) {
       const selectedProd = productsData?.data?.find(p => p.id === productId);
-      
+
       if (selectedProd) {
         const price = parseFloat(selectedProd.price) || 0;
         const quantity = 1;
@@ -275,17 +266,17 @@ const EditBilling = ({ idd, onClose }) => {
     const updatedData = tableData.map(row => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
-        
+
         if (field === 'quantity' || field === 'price' || field === 'tax') {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
-          const taxPercentage = field === 'tax' ? 
-            (value ? parseFloat(value.gstPercentage) : 0) : 
+          const taxPercentage = field === 'tax' ?
+            (value ? parseFloat(value.gstPercentage) : 0) :
             (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
-          
+
           updatedRow.amount = calculateRowAmount(quantity, price, taxPercentage);
         }
-        
+
         return updatedRow;
       }
       return row;
@@ -321,11 +312,11 @@ const EditBilling = ({ idd, onClose }) => {
       .validateFields()
       .then((values) => {
         // Validate items
-        const hasInvalidItems = tableData.some(row => 
-          !row.item || 
-          !row.quantity || 
-          row.quantity <= 0 || 
-          !row.price || 
+        const hasInvalidItems = tableData.some(row =>
+          !row.item ||
+          !row.quantity ||
+          row.quantity <= 0 ||
+          !row.price ||
           row.price <= 0
         );
 
@@ -387,7 +378,7 @@ const EditBilling = ({ idd, onClose }) => {
     try {
       const response = await dispatch(GetLable(lid));
       if (response.payload && response.payload.data) {
-        const uniqueTags = response.payload.data
+        response.payload.data
           .filter((label) => label && label.name)
           .map((label) => ({
             id: label.id,
@@ -397,7 +388,6 @@ const EditBilling = ({ idd, onClose }) => {
             (label, index, self) =>
               index === self.findIndex((t) => t.name === label.name)
           );
-        setTags(uniqueTags);
       }
     } catch (error) {
       console.error("Failed to fetch tags:", error);
@@ -436,7 +426,7 @@ const EditBilling = ({ idd, onClose }) => {
       message.success("Status added successfully");
       setNewStatus("");
       setIsStatusModalVisible(false);
-      
+
       // Fetch updated statuses
       const response = await dispatch(GetLable(lid));
       if (response.payload && response.payload.data) {
@@ -486,8 +476,8 @@ const EditBilling = ({ idd, onClose }) => {
       >
         <option value="0">Select Tax</option>
         {taxes?.data?.map((tax) => (
-          <option 
-            key={tax.id} 
+          <option
+            key={tax.id}
             value={`${tax.gstName}|${tax.gstPercentage}`}
             title={`${tax.gstName}: ${tax.gstPercentage}%`}
           >
@@ -501,7 +491,7 @@ const EditBilling = ({ idd, onClose }) => {
   return (
     <div>
       <Form form={form} layout="vertical">
-      <h2 className="mb-2 border-b font-medium"></h2>
+        <h2 className="mb-2 border-b font-medium"></h2>
         <Card className="border-0">
           <Row gutter={16}>
             <Col span={12} className="mt-1">
@@ -609,7 +599,7 @@ const EditBilling = ({ idd, onClose }) => {
               </Form.Item>
             </Col>
 
-            
+
           </Row>
         </Card>
 
@@ -637,7 +627,7 @@ const EditBilling = ({ idd, onClose }) => {
           </div>
 
           <div>
-          <Flex alignItems="center" mobileFlex={false} className='flex mb-4 gap-4'>
+            <Flex alignItems="center" mobileFlex={false} className='flex mb-4 gap-4'>
               <Flex className="flex" mobileFlex={false}>
                 <div className="w-full flex gap-4">
                   <div>
@@ -665,7 +655,7 @@ const EditBilling = ({ idd, onClose }) => {
 
               </Flex>
             </Flex>
-           
+
             <div className="overflow-x-auto">
               <table className="w-full border border-gray-200 bg-white">
                 <thead className="bg-gray-100">
@@ -775,25 +765,25 @@ const EditBilling = ({ idd, onClose }) => {
                         </td>
                       </tr>
                       <tr>
-                      <td colSpan={8} className="px-2 py-2 border-b">
-                        <textarea
+                        <td colSpan={8} className="px-2 py-2 border-b">
+                          <textarea
                             rows={2}
                             value={row.description ? row.description.replace(/<[^>]*>/g, '') : ''} // Remove HTML tags
                             onChange={(e) => handleTableDataChange(row.id, "description", e.target.value)}
                             placeholder="Description"
                             className="w-[70%] p-2 border"
-                        />
-                    </td>
+                          />
+                        </td>
                       </tr>
                     </React.Fragment>
                   ))}
                 </tbody>
               </table>
               <div className="form-buttons text-left mt-2 mb-2">
-              <Button type="primary" onClick={handleAddRow}>
-                <PlusOutlined /> Add Items
-              </Button>
-            </div>
+                <Button type="primary" onClick={handleAddRow}>
+                  <PlusOutlined /> Add Items
+                </Button>
+              </div>
             </div>
           </div>
 

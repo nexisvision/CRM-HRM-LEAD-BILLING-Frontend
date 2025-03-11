@@ -19,12 +19,12 @@ const RegisterOne = props => {
 						<Card>
 							<div className="my-2">
 								<div className="text-center">
-								<img className="img-fluid" src={`/img/${theme === 'light' ? 'logo.png': 'logo-white.png'}`} alt="" />
+									<img className="img-fluid" src={`/img/${theme === 'light' ? 'logo.png' : 'logo-white.png'}`} alt="" />
 									<p className="text-muted">Create a new account:</p>
 								</div>
 								<Row justify="center">
 									<Col xs={24} sm={24} md={20} lg={20}>
-										<RegisterForm {...props}/>
+										<RegisterForm {...props} />
 									</Col>
 								</Row>
 							</div>

@@ -2,11 +2,12 @@
 	@{parent} {
 		color: @color !important;
 	}
-	& when not (@emphasized-link-hover-darken-percentage = 0) {
+
+	& when not (@emphasized-link-hover-darken-percentage =0) {
 		a@{parent} {
 			#hover-focus({
 				color: darken(@color, @emphasized-link-hover-darken-percentage) !important;
 			});
-		}
 	}
+}
 }

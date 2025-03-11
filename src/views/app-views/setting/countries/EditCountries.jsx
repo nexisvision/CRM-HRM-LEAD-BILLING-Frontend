@@ -18,7 +18,6 @@ const EditCountries = ({ idd, onClose }) => {
 
     const alladats = useSelector((state) => state.countries.countries);
 
-
     useEffect(() => {
         dispatch(getallcountries());
     }, [dispatch]);
@@ -58,7 +57,7 @@ const EditCountries = ({ idd, onClose }) => {
 
     return (
         <div>
-            <h2 className="mb-1 border-b font-medium"></h2>
+            <hr className="mb-1 border-b font-medium"></hr>
 
             <div className="p-2">
                 <Formik
@@ -70,7 +69,7 @@ const EditCountries = ({ idd, onClose }) => {
                     {({ values, handleSubmit }) => (
                         <Form className="formik-form" onSubmit={handleSubmit}>
                             <Row gutter={16}>
-                                <Col span={24} className="mt-2"> 
+                                <Col span={24} className="mt-2">
                                     <div className="form-item">
                                         <label className="font-semibold">Name</label>
                                         <Field

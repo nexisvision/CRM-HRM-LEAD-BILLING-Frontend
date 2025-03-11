@@ -2,12 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { Card, Button, Upload, message, Row, Col, Avatar, Input } from 'antd';
-import { DeleteOutlined, QuestionCircleOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
+import { DeleteOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { creategenaralsett, deletesettingss, getgeneralsettings } from './generalReducer/generalSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import useSelection from 'antd/es/table/hooks/useSelection';
 
 const validationSchema = Yup.object().shape({
   companyName: Yup.string().required('Company name is required'),
@@ -16,8 +15,6 @@ const validationSchema = Yup.object().shape({
 });
 
 const GeneralList = () => {
-  const [imageUrl, setImageUrl] = useState('');
-  const [faviconUrl, setFaviconUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedFavicon, setSelectedFavicon] = useState(null);
@@ -35,18 +32,11 @@ const GeneralList = () => {
 
   const alldata = useSelector((state) => state.generalsetting.generalsetting.data);
 
-  useEffect(() => {
-    if (alldata && alldata.length > 0) {
-      setImageUrl(alldata[0].companylogo);
-      initialValues.description = alldata[0].termsandconditions;
-    }
-  }, [alldata]);
-
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       setLoading(true);
       const formData = new FormData();
-      
+
       if (selectedFile) {
         formData.append('companylogo', selectedFile);
       }
@@ -101,28 +91,28 @@ const GeneralList = () => {
           </h1>
         </Col>
       </Row>
-      
+
       {alldata && alldata.length > 0 ? (
         <div className="mb-6">
           <Row gutter={[24, 24]}>
             <Col span={24}>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-medium">Current Settings</h2>
-                <Button 
+                <Button
                   // type="primary" 
                   danger
                   onClick={handleDelete}
                   loading={loading}
                   className="px-4 py-1"
                 >
-                  <DeleteOutlined/>
+                  <DeleteOutlined />
                 </Button>
               </div>
               <div className="flex items-start gap-6">
                 <div>
                   <h3 className="font-medium mb-2">Company Logo</h3>
-                  <Avatar 
-                    size={100} 
+                  <Avatar
+                    size={100}
                     src={alldata[0].companylogo}
                     icon={!alldata[0].companylogo && <UserOutlined />}
                   />
@@ -135,143 +125,143 @@ const GeneralList = () => {
             </Col>
           </Row>
         </div>
-      ) :  <Formik
-      initialValues={initialValues}
-      validationSchema={validationSchema}
-      onSubmit={handleSubmit}
-      enableReinitialize
-    >
-      {({ values, setFieldValue, handleSubmit, isSubmitting, errors, touched }) => (
-        <Form className="formik-form" onSubmit={handleSubmit}>
-          <Card className="mb-4">
-            <Row gutter={[24, 24]}>
-              {/* Company Name */}
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="block  font-medium text-gray-700 mb-2">
-                    Company Name <span className="text-red-500">*</span>
-                  </label>
-                  <Field
-                    name="companyName"
-                    as={Input}
-                    placeholder="Enter company name"
-                    className="w-full"
-                  />
-                  {errors.companyName && touched.companyName && (
-                    <div className="text-red-500 text-sm mt-1">{errors.companyName}</div>
-                  )}
-                </div>
-              </Col>
+      ) : <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+        enableReinitialize
+      >
+        {({ values, setFieldValue, handleSubmit, isSubmitting, errors, touched }) => (
+          <Form className="formik-form" onSubmit={handleSubmit}>
+            <Card className="mb-4">
+              <Row gutter={[24, 24]}>
+                {/* Company Name */}
+                <Col span={12}>
+                  <div className="form-item">
+                    <label className="block  font-medium text-gray-700 mb-2">
+                      Company Name <span className="text-red-500">*</span>
+                    </label>
+                    <Field
+                      name="companyName"
+                      as={Input}
+                      placeholder="Enter company name"
+                      className="w-full"
+                    />
+                    {errors.companyName && touched.companyName && (
+                      <div className="text-red-500 text-sm mt-1">{errors.companyName}</div>
+                    )}
+                  </div>
+                </Col>
 
-              {/* Site Title */}
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="block  font-medium text-gray-700 mb-2">
-                    Site Title <span className="text-red-500">*</span>    
-                  </label>
-                  <Field
-                    name="title"
-                    as={Input}
-                    placeholder="Enter site title"
-                    className="w-full"
-                  />
-                  {errors.title && touched.title && (
-                    <div className="text-red-500 text-sm mt-1">{errors.title}</div>
-                  )}
-                </div>
-              </Col>
+                {/* Site Title */}
+                <Col span={12}>
+                  <div className="form-item">
+                    <label className="block  font-medium text-gray-700 mb-2">
+                      Site Title <span className="text-red-500">*</span>
+                    </label>
+                    <Field
+                      name="title"
+                      as={Input}
+                      placeholder="Enter site title"
+                      className="w-full"
+                    />
+                    {errors.title && touched.title && (
+                      <div className="text-red-500 text-sm mt-1">{errors.title}</div>
+                    )}
+                  </div>
+                </Col>
 
-              {/* Company Logo */}
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="block  font-medium text-gray-700 mb-2">
-                    Company Logo <span className="text-red-500">*</span>
-                  </label>
-                  <Upload
-                    accept="image/*"
-                    beforeUpload={(file) => {
-                      handleFileChange({ file }, 'logo');
-                      return false;
-                    }}
-                    showUploadList={false}
-                  >
-                    <Button icon={<UploadOutlined />}>Upload Logo</Button>
-                  </Upload>
-                  {selectedFile && <p className="mt-2 text-sm text-gray-500">{selectedFile.name}</p>}
-                </div>
-              </Col>
+                {/* Company Logo */}
+                <Col span={12}>
+                  <div className="form-item">
+                    <label className="block  font-medium text-gray-700 mb-2">
+                      Company Logo <span className="text-red-500">*</span>
+                    </label>
+                    <Upload
+                      accept="image/*"
+                      beforeUpload={(file) => {
+                        handleFileChange({ file }, 'logo');
+                        return false;
+                      }}
+                      showUploadList={false}
+                    >
+                      <Button icon={<UploadOutlined />}>Upload Logo</Button>
+                    </Upload>
+                    {selectedFile && <p className="mt-2 text-sm text-gray-500">{selectedFile.name}</p>}
+                  </div>
+                </Col>
 
-              {/* Favicon */}
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="block  font-medium text-gray-700 mb-2">
-                    Favicon Icon <span className="text-red-500">*</span>
-                  </label>
-                  <Upload
-                    accept=".ico,.png"
-                    beforeUpload={(file) => {
-                      handleFileChange({ file }, 'favicon');
-                      return false;
-                    }}
-                    showUploadList={false}
-                  >
-                    <Button icon={<UploadOutlined />}>Upload Favicon</Button>
-                  </Upload>
-                  {selectedFavicon && <p className="mt-2 text-sm text-gray-500">{selectedFavicon.name}</p>}
-                </div>
-              </Col>
+                {/* Favicon */}
+                <Col span={12}>
+                  <div className="form-item">
+                    <label className="block  font-medium text-gray-700 mb-2">
+                      Favicon Icon <span className="text-red-500">*</span>
+                    </label>
+                    <Upload
+                      accept=".ico,.png"
+                      beforeUpload={(file) => {
+                        handleFileChange({ file }, 'favicon');
+                        return false;
+                      }}
+                      showUploadList={false}
+                    >
+                      <Button icon={<UploadOutlined />}>Upload Favicon</Button>
+                    </Upload>
+                    {selectedFavicon && <p className="mt-2 text-sm text-gray-500">{selectedFavicon.name}</p>}
+                  </div>
+                </Col>
 
-              {/* Description */}
+                {/* Description */}
+                <Col span={24}>
+                  <div className="form-item">
+                    <label className="block  font-medium text-gray-700 mb-2">
+                      Description <span className="text-red-500">*</span>
+                    </label>
+                    <ReactQuill
+                      theme="snow"
+                      value={values.description}
+                      onChange={(content) => setFieldValue('description', content)}
+                      modules={{
+                        toolbar: [
+                          ['bold', 'italic', 'underline'],
+                          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                          ['link'],
+                          ['clean']
+                        ]
+                      }}
+                    />
+                  </div>
+                </Col>
+              </Row>
+            </Card>
+
+            {/* Buttons */}
+            <Row>
               <Col span={24}>
-                <div className="form-item">
-                  <label className="block  font-medium text-gray-700 mb-2">
-                    Description <span className="text-red-500">*</span>
-                  </label>
-                  <ReactQuill
-                    theme="snow"
-                    value={values.description}
-                    onChange={(content) => setFieldValue('description', content)}
-                    modules={{
-                      toolbar: [
-                        ['bold', 'italic', 'underline'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        ['link'],
-                        ['clean']
-                      ]
-                    }}
-                  />
+                <div className="flex justify-end space-x-4 mt-6">
+                  <Button
+                    type="default"
+                    className="px-6 py-2 hover:bg-gray-50"
+                    onClick={() => window.location.reload()}
+                  >
+                    Discard
+                  </Button>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={isSubmitting}
+                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Save
+                  </Button>
                 </div>
               </Col>
             </Row>
-          </Card>
+          </Form>
+        )}
+      </Formik>}
 
-          {/* Buttons */}
-          <Row>
-            <Col span={24}>
-              <div className="flex justify-end space-x-4 mt-6">
-                <Button 
-                  type="default"
-                  className="px-6 py-2 hover:bg-gray-50"
-                  onClick={() => window.location.reload()}
-                >
-                  Discard
-                </Button>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={isSubmitting}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Save
-                </Button>
-              </div>
-            </Col>
-          </Row>
-        </Form>
-      )}
-    </Formik>}
 
-     
     </div>
   );
 };

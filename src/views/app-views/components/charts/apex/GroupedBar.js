@@ -43,7 +43,7 @@ export class GroupedBar extends Component {
 			<Chart
 				options={this.state.options}
 				series={this.state.series}
-				height= {300}
+				height={300}
 				type="bar"
 			/>
 		)

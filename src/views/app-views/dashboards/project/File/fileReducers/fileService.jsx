@@ -1,7 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
-
 const getfiless = async () => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -17,7 +16,7 @@ const getfiless = async () => {
   }
 };
 
-const addfiless = async (id,values) => {
+const addfiless = async (id, values) => {
   const token = localStorage.getItem("auth_token");
 
   try {
@@ -30,7 +29,6 @@ const addfiless = async (id,values) => {
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -50,7 +48,6 @@ const DeletePro = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -78,17 +75,11 @@ const EditPro = async (id, values) => {
 };
 
 
-
 const UserService = {
-  // addUser,
   getfiless,
   addfiless,
   DeletePro,
   EditPro,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
 };
 
 export default UserService;

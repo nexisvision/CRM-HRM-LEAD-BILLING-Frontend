@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Menu,
   Input,
   message,
   Button,
   Modal,
   Select,
   Space,
+  Dropdown,
 } from "antd";
 import {
   DeleteOutlined,
@@ -16,25 +16,23 @@ import {
   PlusOutlined,
   FileExcelOutlined,
   EditOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import { utils, writeFile } from "xlsx";
-import { useDispatch, useSelector } from "react-redux";
-import AddInquiry from "./AddInquiry";
-import EditInquiry from "./EditInquiry";
 import { deleteinqu, getinqu } from "./inquiryReducer/inquirySlice";
 import { debounce } from 'lodash';
+import { useDispatch, useSelector } from "react-redux";
+import { writeFile } from "xlsx";
+import utils from "utils";
+import EditInquiry from "./EditInquiry";
+import AddInquiry from "./AddInquiry";
+
 
 const { Option } = Select;
 
 const InquiryList = () => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
-  const [userProfileVisible, setUserProfileVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddinquiryModalVisible, setIsAddinquiryModalVisible] =
     useState(false);
 
@@ -44,7 +42,7 @@ const InquiryList = () => {
 
   useEffect(() => {
     dispatch(getinqu());
-  }, []);
+  }, [dispatch]);
 
   const allbranch = useSelector((state) => state.inquiry);
   const fndbranch = allbranch.inquiry.data;
@@ -58,8 +56,6 @@ const InquiryList = () => {
   const [isEditinquiryModalVisible, setIsEditinquiryModalVisible] =
     useState(false);
 
-  const alldata = useSelector((state) => state.jobapplications);
-  const fnddta = alldata.jobapplications.data;
   const openAddinquiryModal = () => {
     setIsAddinquiryModalVisible(true);
   };
@@ -78,26 +74,26 @@ const InquiryList = () => {
 
   const exportToExcel = () => {
     try {
-      const ws = utils.json_to_sheet(users); // Convert JSON data to a sheet
-      const wb = utils.book_new(); // Create a new workbook
-      utils.book_append_sheet(wb, ws, "Inquiry"); // Append the sheet to the workbook
+      const ws = utils.json_to_sheet(users);
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, ws, "Inquiry");
 
-      writeFile(wb, "InquiryData.xlsx"); // Save the file as ProposalData.xlsx
-      message.success("Data exported successfully!"); // Show success message
+      writeFile(wb, "InquiryData.xlsx");
+      message.success("Data exported successfully!");
     } catch (error) {
       console.error("Error exporting to Excel:", error);
-      message.error("Failed to export data. Please try again."); // Show error message
+      message.error("Failed to export data. Please try again.");
     }
   };
 
   // Create debounced version of search
   const debouncedSearch = debounce((value, data, setUsers) => {
     setIsSearching(true);
-    
+
     const searchValue = value.toLowerCase();
-    
+
     if (!searchValue) {
-      setUsers(fndbranch || []); // Reset to original data
+      setUsers(fndbranch || []);
       setIsSearching(false);
       return;
     }
@@ -129,26 +125,6 @@ const InquiryList = () => {
     });
   };
 
-  const showUserProfile = (userInfo) => {
-    setUserProfileVisible(true);
-    setSelectedUser(userInfo);
-  };
-
-  const closeUserProfile = () => {
-    setUserProfileVisible(false);
-    setSelectedUser(null);
-  };
-
-
-  const getjobStatus = (status) => {
-    if (status === "active") {
-      return "blue";
-    }
-    if (status === "blocked") {
-      return "cyan";
-    }
-    return "";
-  };
 
   const handleShowStatus = (value) => {
     if (value !== "All") {
@@ -167,22 +143,23 @@ const InquiryList = () => {
     setIdd(idd);
   };
 
-  const dropdownMenu = (elm) => ({
-    items: [
+  const getDropdownItems = (record) => {
+    return [
       {
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
-        onClick: () => eidtfun(elm.id)
+        onClick: () => eidtfun(record.id)
       },
       {
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
+        onClick: () => deleteUser(record.id),
+        danger: true
       }
-    ]
-  });
+    ];
+  };
 
   const tableColumns = [
     {
@@ -217,30 +194,44 @@ const InquiryList = () => {
         record.name
           ? record.name.toString().toLowerCase().includes(value.toLowerCase())
           : '',
-      sorter: (a, b) => a.name.length - b.name.length,
+      sorter: (a, b) => a.name?.length - b.name?.length,
     },
     {
       title: "Email",
       dataIndex: "email",
-      sorter: (a, b) => a.email.length - b.email.length,
+      sorter: (a, b) => a.email?.length - b.email?.length,
     },
     {
       title: "message",
       dataIndex: "message",
-      sorter: (a, b) => a.message.length - b.message.length,
+      sorter: (a, b) => a.message?.length - b.message?.length,
     },
     {
       title: "subject",
       dataIndex: "subject",
-      sorter: (a, b) => a.subject.length - b.subject.length,
+      sorter: (a, b) => a.subject?.length - b.subject?.length,
     },
-
     {
       title: "Action",
       dataIndex: "actions",
-      render: (_, elm) => (
+      render: (_, record) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            menu={{ items: getDropdownItems(record) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -346,4 +337,73 @@ const InquiryList = () => {
   );
 };
 
-export default InquiryList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 250px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
+  }
+
+  .ant-btn-text:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .ant-btn-text:active {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  @media (max-width: 768px) {
+    .search-input {
+      width: 100%;
+      min-width: unset;
+    }
+    
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const InquiryListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <InquiryList />
+  </>
+);
+
+export default InquiryListWithStyles;

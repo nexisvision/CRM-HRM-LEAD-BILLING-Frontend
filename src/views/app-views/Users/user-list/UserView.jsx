@@ -1,17 +1,15 @@
 import React from 'react';
-import { Modal, Avatar, Card, Tag, Row, Col, Typography, Divider } from 'antd';
+import { Modal, Avatar, Tag, Row, Col, Typography, Divider } from 'antd';
 import {
     UserOutlined,
     BankOutlined,
     IdcardOutlined,
     MailOutlined,
     PhoneOutlined,
-    TeamOutlined,
     CalendarOutlined,
     DollarOutlined,
     SafetyCertificateOutlined,
     NumberOutlined,
-    GlobalOutlined,
     ApartmentOutlined,
     CreditCardOutlined,
     BranchesOutlined,

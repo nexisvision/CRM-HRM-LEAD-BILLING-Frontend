@@ -1,7 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
-
 const getAttendances = async () => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -33,7 +32,6 @@ const addAttendance = async (values) => {
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -53,7 +51,7 @@ const deleteAttendance = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -83,15 +81,12 @@ const editAttendance = async (id, values) => {
 
 
 const AttendanceService = {
-  // addUser,
+
   getAttendances,
   addAttendance,
   deleteAttendance,
   editAttendance,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default AttendanceService;

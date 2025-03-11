@@ -3,7 +3,7 @@ import LeadCards from './LeadCards';
 
 const LeadCardss = () => (
   <div className="mail">
-    <LeadCards/>
+    <LeadCards />
   </div>
 );
 

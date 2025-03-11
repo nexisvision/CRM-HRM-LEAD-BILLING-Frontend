@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { IoAddCircleOutline } from "react-icons/io5";
 import { FileOutlined } from '@ant-design/icons';
@@ -15,6 +14,7 @@ function FileList() {
 
   const allprojectdata = useSelector((state) => state.Project.Project.data);
 
+  // Update local files state whenever allprojectdata changes
   useEffect(() => {
     if (allprojectdata) {
       const fnddata = allprojectdata.find((item) => item.id === id);
@@ -23,7 +23,6 @@ function FileList() {
     }
   }, [allprojectdata, id]);
 
-  // Initial data fetch
   useEffect(() => {
     dispatch(GetProject());
   }, [dispatch]);
@@ -31,25 +30,24 @@ function FileList() {
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     setSelectedFile(file);
     const formData = new FormData();
     formData.append('project_files', file);
-    
+
     try {
       const response = await dispatch(fileadd({ id, values: formData })).unwrap();
       if (response && response.data) {
-        // Immediately update the local state with the new file
         const newFile = {
           filename: file.name,
-          url: URL.createObjectURL(file) // Create temporary URL for immediate display
+          url: URL.createObjectURL(file)
         };
         setFiles(prevFiles => [...prevFiles, newFile]);
       }
-      
+
       // Fetch fresh data from server
       await dispatch(GetProject());
-      
+
       // Reset states
       setSelectedFile(null);
       event.target.value = '';
@@ -62,27 +60,27 @@ function FileList() {
     <div className="bg-white p-4 rounded-lg">
       <h2 className="text-lg font-semibold mb-4">Files</h2>
       <label htmlFor="fileInput" className="flex items-center cursor-pointer">
-        <IoAddCircleOutline className="w-6 h-6 text-blue-500"/>
+        <IoAddCircleOutline className="w-6 h-6 text-blue-500" />
         <span className="ml-2 text-blue-500">Upload File</span>
-        <input 
-          type="file" 
-          id="fileInput" 
-          onChange={handleFileChange} 
-          hidden 
+        <input
+          type="file"
+          id="fileInput"
+          onChange={handleFileChange}
+          hidden
         />
       </label>
-      
+
       {selectedFile && (
         <div className="mt-4">
           <p>Selected File: {selectedFile.name}</p>
         </div>
       )}
-      
+
       {files.length > 0 ? (
         <div className="mt-4 grid gap-4">
           {files.map((file, index) => (
             <div key={index} className="flex items-center p-3 border rounded-lg">
-              <FileOutlined className="text-lg text-blue-500 mr-2"/>
+              <FileOutlined className="text-lg text-blue-500 mr-2" />
               <span className="mr-2">{file.filename}</span>
               <Avatar src={file.url} />
             </div>
@@ -90,7 +88,7 @@ function FileList() {
         </div>
       ) : (
         <div className="mt-4 text-gray-500 text-center">
-          <span><FileOutlined className='flex justify-center text-lg'/></span>
+          <span><FileOutlined className='flex justify-center text-lg' /></span>
           <p className="mt-2">- No file uploaded -</p>
         </div>
       )}

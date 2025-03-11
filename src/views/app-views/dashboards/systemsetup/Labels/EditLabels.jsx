@@ -1,56 +1,24 @@
 import React, { useEffect, useState } from "react";
 import {
-  Card,
-  Table,
-  Menu,
   Row,
   Col,
-  Tag,
   Input,
   message,
   Button,
-  Modal,
   Select,
-  DatePicker,
 } from "antd";
-import {
-  EyeOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-  MailOutlined,
-  PlusOutlined,
-  PushpinOutlined,
-  FileExcelOutlined,
-  CopyOutlined,
-  EditOutlined,
-  LinkOutlined,
-} from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import "react-quill/dist/quill.snow.css";
-import ReactQuill from "react-quill";
-import OrderListData from "assets/data/order-list.data.json";
-import Flex from "components/shared-components/Flex";
-import utils from "utils";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-import userData from "assets/data/user-list.data.json";
-import dayjs from "dayjs";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  Addstages,
   Editstages,
   getstages,
 } from "../LeadStages/LeadsReducer/LeadsstageSlice";
 import { GetPip } from "../Pipeline/PiplineReducer/piplineSlice";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 const { Option } = Select;
 
 const EditLabels = ({ idd, onClose }) => {
-  const [users, setUsers] = useState(userData);
-
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const allpipline = useSelector((state) => state.StagesLeadsDeals);
@@ -61,7 +29,7 @@ const EditLabels = ({ idd, onClose }) => {
 
   useEffect(() => {
     dispatch(GetPip());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (fndpip && idd) {
@@ -77,7 +45,7 @@ const EditLabels = ({ idd, onClose }) => {
         });
       }
     }
-  }, [fndpip, idd]);
+  }, [fndpip, idd, fndpips]);
 
   const onSubmit = (values, { resetForm }) => {
     const payload = { ...values, stageType: "lable" };
@@ -101,8 +69,8 @@ const EditLabels = ({ idd, onClose }) => {
   return (
     <div>
       <div className="">
-        <h2 className="mb-1 border-b font-medium"></h2>
-        <div className="">
+        <hr className="mb-1 border-b font-medium"></hr>
+        <div className="p-2">
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
@@ -114,11 +82,9 @@ const EditLabels = ({ idd, onClose }) => {
               setFieldValue,
               handleSubmit,
               setFieldTouched,
-              resetForm,
             }) => (
               <Form className="formik-form" onSubmit={handleSubmit}>
                 <Row gutter={16}>
-                  {/* Editable Stage Name Field */}
                   <Col span={24} className="mt-2">
                     <div className="form-item">
                       <label className="font-semibold">Label Name <span className="text-rose-500">*</span></label>
@@ -127,10 +93,10 @@ const EditLabels = ({ idd, onClose }) => {
                         as={Input}
                         className="w-full mt-1"
                         placeholder="Enter Lead Stage Name"
-                        value={values.stageName} // Controlled by Formik
+                        value={values.stageName}
                         onChange={(e) =>
                           setFieldValue("stageName", e.target.value)
-                        } 
+                        }
                       />
                       <ErrorMessage
                         name="stageName"
@@ -140,7 +106,6 @@ const EditLabels = ({ idd, onClose }) => {
                     </div>
                   </Col>
 
-                  {/* Editable Pipeline Field */}
                   <Col span={24} className="mt-2">
                     <div className="form-item">
                       <label className="font-semibold">Pipeline <span className="text-rose-500">*</span></label>
@@ -150,10 +115,10 @@ const EditLabels = ({ idd, onClose }) => {
                             {...field}
                             className="w-full mt-1"
                             placeholder="Select Pipeline"
-                            value={values.pipeline} // Controlled by Formik
+                            value={values.pipeline}
                             onChange={(value) =>
                               setFieldValue("pipeline", value)
-                            } 
+                            }
                             onBlur={() => setFieldTouched("pipeline", true)}
                           >
                             {fndpips && fndpips.length > 0 ? (

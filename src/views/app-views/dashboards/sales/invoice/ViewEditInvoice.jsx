@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
-import { DealStatisticViewData } from '../../../dashboards/default/DefaultDashboardData';
-import { Form, Input, Button, DatePicker, Select, message, Row, Col, Checkbox,Card } from 'antd';
+import React from 'react';
+import { Form, Input, Button, DatePicker, message, Row, Col, Card } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
 
-const { Option } = Select;
 
 
 function ViewEditInvoice() {
@@ -15,8 +13,8 @@ function ViewEditInvoice() {
     const onFinish = (values) => {
         message.success('Job added successfully!');
         navigate('/app/hrm/jobs');
-      };
-    
+    };
+
 
     return (
         <>

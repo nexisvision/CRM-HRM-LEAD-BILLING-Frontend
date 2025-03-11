@@ -29,10 +29,10 @@ const DesignationList = () => {
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Designation);
 
-  const [id,setId]=useState("");
+  const [id, setId] = useState("");
   const [searchText, setSearchText] = useState('');
   const [selectedBranch, setSelectedBranch] = useState('all');
-  
+
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
 
   const userBranches = branchData.filter(branch => branch.created_by === user);
@@ -42,7 +42,7 @@ const DesignationList = () => {
     dispatch(getBranch());
   }, [dispatch]);
 
-                        
+
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find(role => role.id === roleId);
@@ -52,17 +52,17 @@ const DesignationList = () => {
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === 'string'
-    ? JSON.parse(roleData.permissions)
-    : [];
-  
-  let allpermisson;  
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+  let allpermisson;
 
   if (parsedPermissions["extra-hrm-designation"] && parsedPermissions["extra-hrm-designation"][0]?.permissions) {
     allpermisson = parsedPermissions["extra-hrm-designation"][0].permissions;
-  
+
   } else {
   }
-  
+
   const canCreateClient = allpermisson?.includes('create');
   const canEditClient = allpermisson?.includes('edit');
   const canDeleteClient = allpermisson?.includes('delete');
@@ -108,17 +108,17 @@ const DesignationList = () => {
 
   const getFilteredDesignations = () => {
     if (!users) return [];
-    
+
     let filtered = users;
 
     if (searchText) {
-      filtered = filtered.filter(designation => 
+      filtered = filtered.filter(designation =>
         designation.designation_name?.toLowerCase().includes(searchText.toLowerCase())
       );
     }
 
     if (selectedBranch !== 'all') {
-      filtered = filtered.filter(designation => 
+      filtered = filtered.filter(designation =>
         designation.branch === selectedBranch
       );
     }
@@ -165,10 +165,10 @@ const DesignationList = () => {
     setSelectedUser(null);
   };
 
-  const editfun = (id) =>{
+  const editfun = (id) => {
     openEditDesignationModal();
     setId(id)
-  } 
+  }
 
   const dropdownMenu = (elm) => ({
     items: [
@@ -178,7 +178,7 @@ const DesignationList = () => {
         label: 'Edit',
         onClick: () => editfun(elm.id)
       }] : []),
-      
+
       ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'delete',
         icon: <DeleteOutlined />,
@@ -269,9 +269,9 @@ const DesignationList = () => {
       </Flex>
       <div className="table-responsive mt-2">
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-          <Table 
-            columns={tableColumns} 
-            dataSource={getFilteredDesignations()} 
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredDesignations()}
             rowKey="id"
             pagination={{
               total: getFilteredDesignations().length,
@@ -295,14 +295,14 @@ const DesignationList = () => {
       </Modal>
 
 
- <Modal
+      <Modal
         title="Edit Designation"
         visible={isEditDesignationModalVisible}
         onCancel={closeEditDesignationModal}
         footer={null}
         width={800}
       >
-        <EditDesignation onClose={closeEditDesignationModal} id={id}/>
+        <EditDesignation onClose={closeEditDesignationModal} id={id} />
       </Modal>
 
     </Card>

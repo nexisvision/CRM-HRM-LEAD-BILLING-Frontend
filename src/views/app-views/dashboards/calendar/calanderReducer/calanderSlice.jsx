@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./calanderService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
-
 
 export const addcalends = createAsyncThunk(
   "users/addcalends",
@@ -53,7 +51,7 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const deletecalends = createAsyncThunk(
   "users/deletecalends",
   async (userId, thunkAPI) => {
@@ -79,15 +77,7 @@ export const editcalends = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const RoleAndPermissionSlice = createSlice({
   name: "calendar",

@@ -1,13 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import EventService from './EventSetupService';
-// import { AUTH_TOKEN } from 'constants/AuthConstant';
 
 export const fetchEventsData = createAsyncThunk(
   'events/fetchEvents',
   async (_, { rejectWithValue }) => {
     try {
       const response = await EventService.fetchEvents();
-      return response.data; // Assuming the data is nested under 'data' in the response
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch events');
     }
@@ -40,9 +39,9 @@ export const getEventById = createAsyncThunk(
 
 export const UpdateEventsetUp = createAsyncThunk(
   'events/updateEventsetUp',
-  async ({ id, eventData  }, thunkAPI) => {
+  async ({ id, eventData }, thunkAPI) => {
     try {
-      const response = await EventService.updateEventsetUp(id, eventData );
+      const response = await EventService.updateEventsetUp(id, eventData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -54,12 +53,12 @@ export const UpdateEventsetUp = createAsyncThunk(
 export const deleteEventData = createAsyncThunk(
   'events/deleteEvent',
   async (id, thunkAPI) => {
-      try {
-          const response = await EventService.deleteEvent(id);
-          return response;
-      } catch (error) {
-          return thunkAPI.rejectWithValue(error);
-      }
+    try {
+      const response = await EventService.deleteEvent(id);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
   }
 );
 
@@ -75,7 +74,6 @@ const eventSlice = createSlice({
     error: null,
     success: false,
     message: '',
-    // AUTH_TOKEN:"",
   },
   reducers: {
     setSelectedEvent: (state, action) => {
@@ -89,7 +87,6 @@ const eventSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch Events
       .addCase(fetchEventsData.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -112,7 +109,6 @@ const eventSlice = createSlice({
       .addCase(createEventData.rejected, (state, action) => {
         state.error = action.payload;
       })
-     
       .addCase(getEventById.pending, (state) => {
         state.loading = true;
       })

@@ -1,63 +1,40 @@
 import React, { useEffect, useState } from "react";
-import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Card,
-  Table,
   Menu,
   Tag,
-  Input,
   message,
   Button,
   Modal,
-  Select,
-  Form,
   Avatar,
   Dropdown,
   Tooltip,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
-  SearchOutlined,
   MailOutlined,
-  PlusOutlined,
-  PushpinOutlined,
   LoginOutlined,
-  FileExcelOutlined,
   EditOutlined,
   UserOutlined,
   MoreOutlined,
   PhoneOutlined,
-  BankOutlined,
   RocketOutlined,
-  GlobalOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
 import EditCompany from "./EditCompany";
-import { ClientData, deleteClient } from "./CompanyReducers/CompanySlice";
+import { ClientData } from "./CompanyReducers/CompanySlice";
 import { getsubplandata } from "../subscribeduserplans/subplanReducer/subplanSlice";
-import AddUpgradePlan from "./AddUpgradePlan";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineEmail } from "react-icons/md";
-import EmailVerification from './EmailVerification';
-import { navigate } from "react-big-calendar/lib/utils/constants";
 
 const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) => {
-  const [userProfileVisible, setUserProfileVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [isEditCompanyCardModalVisible, setIsEditCompanyCardModalVisible] =
-    useState(false);
-  const [isAddUpgradePlanModalVisible, setIsAddUpgradePlanModalVisible] =
     useState(false);
   const [comnyid, setCompnyid] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [idd, setIdd] = useState("");
-  const [emails, setEmail] = useState("");
-  const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
 
   const subscribedPlans = useSelector((state) => state.subplan?.subplan?.data || []);
 
@@ -65,38 +42,10 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
     plan => plan.client_id === company.id && plan.status !== 'inactive'
   );
 
-  const showUserProfile = (idd) => {
-    setIdd(idd);
-    navigate("/app/users/client-list", {
-      state: {
-        idd,
-      },
-    });
-  };
-
   const handleEdit = () => {
     setIsEditCompanyCardModalVisible(true);
-    setSelectedUser(company);
     setCompnyid(company.id);
   };
-
-  const addfun = (idd) => {
-    setIsAddUpgradePlanModalVisible(true);
-    setCompnyid(idd);
-  };
-
-  const deleteUser = async (elmId) => {
-    try {
-      await dispatch(deleteClient(elmId)).then(() => {
-        dispatch(ClientData());
-      });
-      message.success({ content: 'Plan deleted successfully', duration: 2 });
-    } catch (error) {
-      message.error({ content: 'Failed to delete plan', duration: 2 });
-      console.error('Error deleting plan:', error);
-    }
-  };
-
   useEffect(() => {
     dispatch(ClientData());
   }, [dispatch]);
@@ -435,10 +384,6 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
       )}
     </>
   );
-};
-
-const handleCompanyClick = (id) => {
-  navigate(`/app/company/${id}`);
 };
 
 export default CompanyCard;

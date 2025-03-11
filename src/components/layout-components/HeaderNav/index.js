@@ -8,13 +8,8 @@ import NavNotification from '../NavNotification';
 import NavProfile from '../NavProfile';
 import NavSearch from '../NavSearch';
 import SearchInput from '../NavSearch/SearchInput';
-import Header from './Header';
-import HeaderWrapper from './HeaderWrapper';
-import Nav from './Nav'
-import NavEdge from './NavEdge';
-import NavItem from '../NavItem';
 import { toggleCollapsedNav, onMobileNavToggle } from 'store/slices/themeSlice';
-import { NAV_TYPE_TOP, SIDE_NAV_COLLAPSED_WIDTH, SIDE_NAV_WIDTH } from 'constants/ThemeConstant';
+import { NAV_TYPE_TOP } from 'constants/ThemeConstant';
 import utils from 'utils'
 import styled from '@emotion/styled';
 

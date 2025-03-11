@@ -1,21 +1,17 @@
-
-
 import React, { useState, useEffect } from "react";
 import {
   Input,
   Button,
-  DatePicker,
   Select,
   message,
   Row,
   Col,
-  Switch,
   Upload,
   Modal,
   Space,
 } from "antd";
-import { CloudUploadOutlined, QuestionCircleOutlined, PlusOutlined, UploadOutlined } from "@ant-design/icons";
-import { useNavigate, useParams } from "react-router-dom";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import { useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -28,25 +24,16 @@ import { AddLable, GetLable } from "../../sales/LableReducer/LableSlice";
 const { Option } = Select;
 
 const EditProduct = ({ idd, onClose }) => {
-  const navigate = useNavigate();
 
   const { id } = useParams();
-  const [showReceiptUpload, setShowReceiptUpload] = useState(false);
-
+  const dispatch = useDispatch();
   const CustomInput = ({ field, form, ...props }) => <Input {...field} {...props} />;
-
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
-
   const AllLoggedData = useSelector((state) => state.user);
-
   const [fileList, setFileList] = useState([]);
-
-
-  const lid = AllLoggedData.loggedInUser.id;
-
-  const fetchLables = async (lableType, setter) => {
+  const fetchLables = React.useCallback(async (lableType, setter) => {
     try {
       const lid = AllLoggedData.loggedInUser.id;
       const response = await dispatch(GetLable(lid));
@@ -69,11 +56,11 @@ const EditProduct = ({ idd, onClose }) => {
       console.error("Failed to fetch categories:", error);
       message.error("Failed to load categories");
     }
-  };
+  }, [AllLoggedData.loggedInUser.id, dispatch]);
 
   useEffect(() => {
     fetchLables("category", setCategories);
-  }, []);
+  }, [fetchLables]);
 
   const handleAddNewCategory = async () => {
     if (!newCategory.trim()) {
@@ -100,7 +87,6 @@ const EditProduct = ({ idd, onClose }) => {
     }
   };
 
-  const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getcurren());

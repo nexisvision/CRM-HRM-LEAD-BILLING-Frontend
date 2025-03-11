@@ -9,13 +9,10 @@ import {
   Row,
   Col,
 } from "antd";
-import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import { empdata, updateEmp } from "./EmployeeReducers/EmployeeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { PlusOutlined } from "@ant-design/icons";
-// import { useNavigate } from "react-router-dom";
 import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
 import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
@@ -30,13 +27,10 @@ import AddCountries from "views/app-views/setting/countries/AddCountries";
 const { Option } = Select;
 
 const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [salary, setSalary] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [employeeData, setEmployeeData] = useState(null);
-
-
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
   const loggedusername = useSelector((state) => state.user.loggedInUser.username);
@@ -49,10 +43,9 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
   const filteredDesignations = fnddesi.filter((des) => des.branch === selectedBranch);
   const countries = useSelector((state) => state.countries.countries);
   const { currencies } = useSelector((state) => state.currencies);
-
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(empdata());
-  },[dispatch])
+  }, [dispatch])
   const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
 
   const getInitialCountry = () => {
@@ -77,11 +70,6 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
       try {
         const [
           empResponse,
-          countriesResponse,
-          deptResponse,
-          desResponse,
-          branchResponse,
-          currencyResponse
         ] = await Promise.all([
           dispatch(empdata()),
           dispatch(getallcountries()),
@@ -131,20 +119,6 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
     currency: employeeData?.currency || "",
   };
 
-  const validationSchema = Yup.object({
-    firstName: Yup.string().required("Please enter a first name."),
-    lastName: Yup.string().required("Please enter a last name."),
-    phone: Yup.string()
-      .matches(/^\d{10}$/, "Phone number must be 10 digits.")
-      .required("Please enter a phone number."),
-    address: Yup.string().required("Please enter an address."),
-    branch: Yup.string().required("Please select a branch."),
-    joiningDate: Yup.date().nullable().required("Joining date is required."),
-    leaveDate: Yup.date().nullable().required("Leave date is required."),
-    department: Yup.string().required("Please select a department."),
-    designation: Yup.string().required("Please select a designation."),
-    salary: Yup.string().required("Please enter a salary."),
-  });
 
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
   const [isAddDepartmentModalVisible, setIsAddDepartmentModalVisible] = useState(false);
@@ -233,7 +207,7 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
               </Col>
             </Row>
             <Row gutter={16} className="mt-4">
-            <Col span={12}>
+              <Col span={12}>
                 <div className="form-group">
                   <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
                   <div className="flex gap-0">
@@ -300,7 +274,13 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
                           type="number"
                           placeholder="Enter phone number"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                          
+                        // prefix={
+                        //   values.phoneCode && (
+                        //     <span className="text-gray-600 font-medium mr-1">
+                        //       {values.phoneCode}
+                        //     </span>
+                        //   )
+                        // }
                         />
                       )}
                     </Field>

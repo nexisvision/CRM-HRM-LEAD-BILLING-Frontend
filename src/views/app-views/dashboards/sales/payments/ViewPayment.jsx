@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
+import React from 'react';
+import { Card } from 'antd';
 
 
 function ViewPayment() {
     return (
         <>
-         <h2 className="border-b pb-[5px] font-medium"></h2>
+            <hr className="border-b font-medium"></hr>
             <Card className='border-0'>
                 <table class="table table-bordered w-full">
                     <tbody>

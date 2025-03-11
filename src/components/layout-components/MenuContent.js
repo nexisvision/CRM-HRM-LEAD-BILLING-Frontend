@@ -28,7 +28,7 @@ const setDefaultOpen = (key) => {
 	return keyList;
 };
 
-const MenuItem = ({title, icon, path}) => {
+const MenuItem = ({ title, icon, path }) => {
 
 	const dispatch = useDispatch();
 
@@ -36,13 +36,13 @@ const MenuItem = ({title, icon, path}) => {
 
 	const closeMobileNav = () => {
 		if (isMobile) {
-			dispatch(onMobileNavToggle(false))	 
+			dispatch(onMobileNavToggle(false))
 		}
 	}
 
 	return (
 		<>
-			{icon && <Icon type={icon} /> }
+			{icon && <Icon type={icon} />}
 			<span>{setLocale(title)}</span>
 			{path && <Link onClick={closeMobileNav} to={path} />}
 		</>
@@ -52,17 +52,17 @@ const MenuItem = ({title, icon, path}) => {
 const getSideNavMenuItem = (navItem) => navItem.map(nav => {
 	return {
 		key: nav.key,
-		label: <MenuItem title={nav.title} {...(nav.isGroupTitle ? {} : {path: nav.path, icon: nav.icon})} />,
-		...(nav.isGroupTitle ? {type: 'group'} : {}),
-		...(nav.submenu.length > 0 ? {children: getSideNavMenuItem(nav.submenu)} : {})
+		label: <MenuItem title={nav.title} {...(nav.isGroupTitle ? {} : { path: nav.path, icon: nav.icon })} />,
+		...(nav.isGroupTitle ? { type: 'group' } : {}),
+		...(nav.submenu.length > 0 ? { children: getSideNavMenuItem(nav.submenu) } : {})
 	}
 })
 
 const getTopNavMenuItem = (navItem) => navItem.map(nav => {
 	return {
 		key: nav.key,
-		label: <MenuItem title={nav.title} icon={nav.icon} {...(nav.isGroupTitle ? {} : {path: nav.path})} />,
-		...(nav.submenu.length > 0 ? {children: getTopNavMenuItem(nav.submenu)} : {})
+		label: <MenuItem title={nav.title} icon={nav.icon} {...(nav.isGroupTitle ? {} : { path: nav.path })} />,
+		...(nav.submenu.length > 0 ? { children: getTopNavMenuItem(nav.submenu) } : {})
 	}
 })
 
@@ -74,14 +74,15 @@ const SideNavContent = (props) => {
 	const roles = useSelector((state) => state.role?.role?.data);
 	const roleData = roles?.find(role => role.id === roleId);
 	const isSuperAdmin = roleData?.role_name === 'client';
- 
+
 	const isSuper = roleData?.role_name === 'super-admin';
 	const menuItems = useMemo(() => {
-		const parsedPermissions = typeof roleData?.permissions === 'string' 
-			? JSON.parse(roleData?.permissions) 
+		// Parse permissions if it's a string
+		const parsedPermissions = typeof roleData?.permissions === 'string'
+			? JSON.parse(roleData?.permissions)
 			: roleData?.permissions;
 
-		
+
 
 		if (isSuper) {
 			return getSideNavMenuItem(extraNavvvTree);
@@ -132,14 +133,26 @@ const SideNavContent = (props) => {
 		};
 
 		const filteredNavigation = filterNavItems(navigationConfig);
-		
+
+		// console.log('Final Filtered Navigation:', {
+		// 	itemCount: filteredNavigation.length,
+		// 	items: filteredNavigation.map(item => ({
+		// 		key: item.key,
+		// 		title: item.title,
+		// 		submenuCount: item.submenu?.length || 0
+		// 	}))
+		// });
+
 		const relevantNavigation = filteredNavigation.filter(navItem => {
-			return navItem.key.startsWith('extra-hrm') || navItem.key.startsWith('dashboards') || 
+			// Check if the navItem key starts with 'extra-hrm' or 'dashboards'
+			return navItem.key.startsWith('extra-hrm') || navItem.key.startsWith('dashboards') ||
 				navItem.submenu.some(sub => sub.key.startsWith('extra-hrm') || sub.key.startsWith('dashboards'));
 		});
-	
+
+		// Create an array of titles for the relevant navigation items
 		const relevantTitles = relevantNavigation.map(navItem => navItem.title);
-	
+
+		// Include titles from submenus that start with 'extra-hrm' and check permissions
 		relevantNavigation.forEach(navItem => {
 			if (navItem.submenu) {
 				navItem.submenu.forEach(sub => {
@@ -152,14 +165,15 @@ const SideNavContent = (props) => {
 				});
 			}
 		});
-	
+
+		// console.log('Relevant HRM Titles:', relevantTitles);
 		return getSideNavMenuItem(relevantNavigation);
-	
+
 
 	}, [isSuper, isSuperAdmin, roleId, roleData]);
 
-	
-	
+
+
 
 
 
@@ -184,8 +198,8 @@ const TopNavContent = () => {
 	const menuItems = useMemo(() => getTopNavMenuItem(navigationConfig), [])
 
 	return (
-		<Menu 
-			mode="horizontal" 
+		<Menu
+			mode="horizontal"
 			style={{ backgroundColor: topNavColor }}
 			items={menuItems}
 		/>

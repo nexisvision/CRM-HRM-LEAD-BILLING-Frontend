@@ -4,7 +4,7 @@ const FileList = () => {
     return (
         <div className='flex items-center justify-center'>
             <div className=''>
-                <span ><FileOutlined className='flex justify-center text-lg'/></span>
+                <span ><FileOutlined className='flex justify-center text-lg' /></span>
                 <p className='mt-3'>- No file uploaded. -</p>
             </div>
         </div>

@@ -2,50 +2,40 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Menu,
   Tag,
   Input,
   message,
   Button,
   Modal,
   Select,
-  DatePicker,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
   FileExcelOutlined,
   EditOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
 import UserView from "../../../Users/user-list/UserView";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddJobApplication from "./AddJobApplication";
 import EditJobApplication from "./EditJobApplication";
-import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import {
   deletejobapplication,
   getjobapplication,
 } from "./JobapplicationReducer/JobapplicationSlice";
-
 const { Option } = Select;
 
 const JobApplicationList = () => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
-  const [list, setList] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddJobApplicationModalVisible, setIsAddJobApplicationModalVisible] =
     useState(false);
 
@@ -58,7 +48,7 @@ const JobApplicationList = () => {
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const alldata = useSelector((state) => state.jobapplications);
-  const fnddta = alldata.jobapplications.data || [];
+  const fnddta = React.useMemo(() => alldata.jobapplications.data || [], [alldata.jobapplications.data]);
 
   const fnddtaa = fnddta.filter((item) => item.created_by === user);
 
@@ -68,7 +58,7 @@ const JobApplicationList = () => {
 
   useEffect(() => {
     dispatch(getjobapplication());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (fnddta) {
@@ -76,7 +66,7 @@ const JobApplicationList = () => {
       const statuses = ['All', ...new Set(fnddtaa.map(item => item.status).filter(Boolean))];
       setUniqueStatuses(statuses);
     }
-  }, [fnddta]);
+  }, [fnddtaa, fnddta]);
 
   const openAddJobApplicationModal = () => {
     setIsAddJobApplicationModalVisible(true);
@@ -101,7 +91,7 @@ const JobApplicationList = () => {
 
   const getFilteredApplications = () => {
     if (!users) return [];
-    
+
     let filtered = [...users];
 
     if (searchText) {
@@ -115,7 +105,7 @@ const JobApplicationList = () => {
     }
 
     if (selectedStatus && selectedStatus !== 'All') {
-      filtered = filtered.filter(application => 
+      filtered = filtered.filter(application =>
         application.status?.toLowerCase() === selectedStatus.toLowerCase()
       );
     }
@@ -127,43 +117,42 @@ const JobApplicationList = () => {
     message.success('Search completed');
   };
 
-                                      
-                        const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                        const roles = useSelector((state) => state.role?.role?.data);
-                        const roleData = roles?.find(role => role.id === roleId);
-                     
-                        const whorole = roleData.role_name;
-                     
-                        const parsedPermissions = Array.isArray(roleData?.permissions)
-                        ? roleData.permissions
-                        : typeof roleData?.permissions === 'string'
-                        ? JSON.parse(roleData.permissions)
-                        : [];
-                      
-                        let allpermisson;  
-                     
-                        if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
-                          allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
-                        
-                        } else {
-                        }
-                        
-                        const canCreateClient = allpermisson?.includes('create');
-                        const canEditClient = allpermisson?.includes('edit');
-                        const canDeleteClient = allpermisson?.includes('delete');
-                        const canViewClient = allpermisson?.includes('view');
-                     
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+
+
   const exportToExcel = () => {
     try {
-      const ws = utils.json_to_sheet(users); // Convert JSON data to a sheet
-      const wb = utils.book_new(); // Create a new workbook
-      utils.book_append_sheet(wb, ws, "JobApplication"); // Append the sheet to the workbook
+      const ws = utils.json_to_sheet(users);
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, ws, "JobApplication");
 
-      writeFile(wb, "JobApplicationData.xlsx"); // Save the file as ProposalData.xlsx
-      message.success("Data exported successfully!"); // Show success message
+      writeFile(wb, "JobApplicationData.xlsx");
+      message.success("Data exported successfully!");
     } catch (error) {
       console.error("Error exporting to Excel:", error);
-      message.error("Failed to export data. Please try again."); // Show error message
+      message.error("Failed to export data. Please try again.");
     }
   };
   const deleteUser = (userId) => {
@@ -174,10 +163,6 @@ const JobApplicationList = () => {
     });
   };
 
-  const showUserProfile = (userInfo) => {
-    setUserProfileVisible(true);
-    setSelectedUser(userInfo);
-  };
 
   const closeUserProfile = () => {
     setUserProfileVisible(false);
@@ -194,41 +179,36 @@ const JobApplicationList = () => {
     return "";
   };
 
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "status";
-      const data = utils.filterArray(users, key, value);
-      setUsers(data);
-    } else {
-      setUsers(fnddtaa);
-    }
-  };
-
-  const jobStatusList = ["active", "blocked"];
 
   const eidtfun = (idd) => {
     openEditJobApplicationModal();
     setIdd(idd);
   };
 
-  const dropdownMenu = (elm) => ({
-    items: [
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+  const getDropdownItems = (row) => {
+    const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
-        onClick: () => eidtfun(elm.id)
-      }] : []),
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        onClick: () => eidtfun(row.id)
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(row.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -287,7 +267,22 @@ const JobApplicationList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            menu={{ items: getDropdownItems(elm) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -334,45 +329,45 @@ const JobApplicationList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-         
 
-            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                  <Button
-                                                                                                                  type="primary"
-                                                                                                                  className="ml-2"
-                                                                                                                  onClick={openAddJobApplicationModal}
-                                                                                                                >
-                                                                                                                  <PlusOutlined />
-                                                                                                                  <span>New</span>
-                                                                                                                </Button>                                                                                                                         
-                                                                                                                                                                                                                                                
-                                                                                                                              ) : null}
+
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddJobApplicationModal}
+            >
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+
+          ) : null}
           <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel} // Call export function when the button is clicked
+            block
+          >
+            Export All
+          </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
 
-         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                           <Table
-                                                           columns={tableColumns}
-                                                           dataSource={getFilteredApplications()}
-                                                           rowKey="id"
-                                                           pagination={{
-                                                             total: getFilteredApplications().length,
-                                                             pageSize: 10,
-                                                             showSizeChanger: true,
-                                                             showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                                                           }}
-                                                         />
-                                                             ) : null}
-       
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredApplications()}
+            rowKey="id"
+            pagination={{
+              total: getFilteredApplications().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
+          />
+        ) : null}
+
       </div>
       <UserView
         data={selectedUser}
@@ -443,6 +438,32 @@ const styles = `
     width: 90px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
   }
 
   @media (max-width: 768px) {

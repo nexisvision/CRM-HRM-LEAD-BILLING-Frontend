@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Form, Input, Select, Button } from 'antd';
+import { Form, Input, Select, Button } from 'antd';
 
 const { Option } = Select;
 

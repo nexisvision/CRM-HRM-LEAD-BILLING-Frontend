@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, DatePicker, Select, Row, Col, message } from 'antd';
+import React, { useState } from 'react';
+import { Input, Button, DatePicker, Row, Col, message } from 'antd';
 import { Formik, Field, Form as FormikForm } from 'formik';
 import * as Yup from 'yup';
 import moment from 'moment';
@@ -39,7 +39,7 @@ const EditDebitnote = ({ onClose, debitnoteData }) => {
 
   return (
     <div className="edit-debitnote-form">
-      <h1 className="border-b-2 border-gray-300"></h1>
+      <hr className="border-b-2 border-gray-300"></hr>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -56,9 +56,9 @@ const EditDebitnote = ({ onClose, debitnoteData }) => {
                   </label>
                   <Field name="bill">
                     {({ field }) => (
-                      <Input 
-                        {...field} 
-                        placeholder="Enter bill" 
+                      <Input
+                        {...field}
+                        placeholder="Enter bill"
                         className={`w-full mt-1 ${errors.bill && touched.bill ? 'border-red-500' : ''}`}
                       />
                     )}

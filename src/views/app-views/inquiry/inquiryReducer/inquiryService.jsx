@@ -75,7 +75,10 @@ const editinq = async (idd, values) => {
   }
 };
 
+
+
 const UserService = {
+
   getinq,
   addinq,
   delinq,

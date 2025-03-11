@@ -29,11 +29,11 @@ const GetAllCountries = async () => {
     }
 };
 
-const updateCountries = async (id,values) => {
+const updateCountries = async (id, values) => {
     const token = localStorage.getItem("auth_token");
     try {
         const res = await axios.put(`${env.API_ENDPOINT_URL}/countries/${id}`,
-         values,{
+            values, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -48,26 +48,26 @@ const updateCountries = async (id,values) => {
 
 const deleteCountries = async (id) => {
     const token = localStorage.getItem("auth_token");
-  
+
     try {
-      const res = await axios.delete(
-        `${env.API_ENDPOINT_URL}/countries/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      //   dispatch(empdata());
-      return res.data;
+        const res = await axios.delete(
+            `${env.API_ENDPOINT_URL}/countries/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        return res.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
+        console.error("Error fetching data:", error);
+        throw error;
     }
-  };
+};
 
 
-const UserAddCountries ={
+const UserAddCountries = {
     GetAllCountries,
     AddCountries,
     updateCountries,

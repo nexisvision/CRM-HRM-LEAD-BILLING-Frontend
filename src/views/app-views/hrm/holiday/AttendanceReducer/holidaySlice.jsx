@@ -1,9 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./holidayService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 
-// Async thunk for adding user
+
 
 export const addsholidayss = createAsyncThunk(
   "users/addsholidaysss",
@@ -29,6 +28,10 @@ export const getsholidayss = createAsyncThunk(
     }
   }
 );
+
+
+
+
 
 export const getAttendanceById = createAsyncThunk(
   "users/getAttendanceById",
@@ -67,15 +70,7 @@ export const editsholidayss = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const AttendanceSlice = createSlice({
   name: "holidays",

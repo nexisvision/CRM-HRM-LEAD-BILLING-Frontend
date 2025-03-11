@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Input, Button, DatePicker, Select, message, Row, Col, Modal } from "antd";
-import { useNavigate } from "react-router-dom";
-
 import { PlusOutlined } from "@ant-design/icons";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import axios from "axios"; // Import axios for API requests
 import {
   AddJobonBoarding,
   getJobonBoarding,
@@ -16,7 +13,7 @@ import { AddLable, GetLable } from "../../../dashboards/sales/LableReducer/Lable
 const { Option } = Select;
 
 const AddJobOnBoarding = ({ onClose }) => {
-  const navigate = useNavigate();
+
   const dispatch = useDispatch();
 
   // status start
@@ -26,8 +23,7 @@ const AddJobOnBoarding = ({ onClose }) => {
 
   const AllLoggedData = useSelector((state) => state.user);
 
-  const lid = AllLoggedData.loggedInUser.id;
-  const fetchLables = async (lableType, setter) => {
+  const fetchLables = React.useCallback(async (lableType, setter) => {
     try {
       const lid = AllLoggedData.loggedInUser.id;
       const response = await dispatch(GetLable(lid));
@@ -50,11 +46,11 @@ const AddJobOnBoarding = ({ onClose }) => {
       console.error(`Failed to fetch ${lableType}:`, error);
       message.error(`Failed to load ${lableType}`);
     }
-  };
+  }, [AllLoggedData.loggedInUser.id, dispatch]);
 
   useEffect(() => {
     fetchLables("job-on-bording-status", setStatuses);
-  }, []);
+  }, [fetchLables]);
 
   const handleAddNewStatus = async (newValue, setter, modalSetter, setFieldValue) => {
     if (!newValue.trim()) {

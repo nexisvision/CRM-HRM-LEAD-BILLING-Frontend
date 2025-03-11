@@ -1,32 +1,24 @@
 import React, { useEffect, useState } from "react";
 import "react-circular-progressbar/dist/styles.css";
-import { FaCoins } from "react-icons/fa";
-import { IoLayers } from "react-icons/io5";
 import {
-    EyeOutlined,
-    DeleteOutlined,
-    CopyOutlined,
-    EditOutlined,
     FundProjectionScreenOutlined,
     RiseOutlined,
     CopyrightOutlined,
     FormOutlined,
-  } from "@ant-design/icons";
-  import dayjs from "dayjs";
-  import {Table} from "antd";
-  import userData from "../../../../assets/data/user-list.data.json";
-  import OrderListData from "assets/data/order-list.data.json";
-  import { utils } from "xlsx";
-  
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import { Table } from "antd";
+import userData from "../../../../assets/data/user-list.data.json";
+import { utils } from "xlsx";
+
 import { ContaractData } from "../contract/ContractReducers/ContractSlice";
-  import { GetProject } from "../project/project-list/projectReducer/ProjectSlice";
-  import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
-  import { useDispatch, useSelector } from "react-redux";
+import { GetProject } from "../project/project-list/projectReducer/ProjectSlice";
+import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
+import { useDispatch, useSelector } from "react-redux";
 
 
 const DashboardList = () => {
     const [users, setUsers] = useState(userData);
-    const [list, setList] = useState(OrderListData);
     const dispatch = useDispatch();
 
     const tabledata = useSelector((state) => state.Contract);
@@ -75,9 +67,6 @@ const DashboardList = () => {
     } else {
     }
 
-    const canCreateClient = allpermisson?.includes('create');
-    const canEditClient = allpermisson?.includes('edit');
-    const canDeleteClient = allpermisson?.includes('delete');
     const canViewClient = allpermisson?.includes('view');
 
     const tableColumns = [
@@ -165,67 +154,67 @@ const DashboardList = () => {
                     {/* Client Section */}
                     <div className="bg-white p-6 rounded-lg shadow">
                         <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-blue-500 p-2 pb-0 rounded-lg ">
-                                <FundProjectionScreenOutlined className="text-white text-2xl" />
+                            <div className="flex items-center gap-2">
+                                <div className="bg-blue-500 p-2 pb-0 rounded-lg ">
+                                    <FundProjectionScreenOutlined className="text-white text-2xl" />
+                                </div>
+                                <div>
+                                    <p className="text-gray-600 text-base font-medium">
+                                        Total
+                                    </p>
+                                    <h3 className="text-gray-600 mb-2 text-base font-medium">
+                                        Project
+                                    </h3>
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-gray-600 text-base font-medium">
-                                    Total
-                                </p>
-                                <h3 className="text-gray-600 mb-2 text-base font-medium">
-                                    Project
-                                </h3>
+                            <div className="flex items-center gap-2">
+                                <p className="text-gray-600 text-base font-semibold ">20</p>
                             </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <p className="text-gray-600 text-base font-semibold ">20</p>
-                        </div>
                         </div>
                     </div>
 
 
                     <div className="bg-white p-6 rounded-lg shadow">
                         <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-blue-500 p-2 pb-0 rounded-lg ">
-                                <FormOutlined  className="text-white text-2xl" />
-                            </div>
-                            <div>
-                                <p className="text-gray-600 text-base  font-medium">
-                                    Total
-                                </p>
-                                <h3 className="text-gray-600 mb-2 text-base  font-medium">
+                            <div className="flex items-center gap-2">
+                                <div className="bg-blue-500 p-2 pb-0 rounded-lg ">
+                                    <FormOutlined className="text-white text-2xl" />
+                                </div>
+                                <div>
+                                    <p className="text-gray-600 text-base  font-medium">
+                                        Total
+                                    </p>
+                                    <h3 className="text-gray-600 mb-2 text-base  font-medium">
 
-                                    Task
-                                </h3>
+                                        Task
+                                    </h3>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <p className="text-gray-600 text-base font-semibold ">35</p>
-                        </div>
+                            <div className="flex items-center gap-2">
+                                <p className="text-gray-600 text-base font-semibold ">35</p>
+                            </div>
                         </div>
                     </div>
                     <div className="bg-white p-6 rounded-lg shadow">
                         <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-blue-500 p-2 pb-0 rounded-lg ">
-                                <FundProjectionScreenOutlined className="text-white text-2xl" />
-                            </div>
-                            <div>
-                                <p className="text-gray-600 text-base  font-medium">
-                                    Total
-                                </p>
-                                <h3 className="text-gray-600 mb-2 text-base  font-medium">
+                            <div className="flex items-center gap-2">
+                                <div className="bg-blue-500 p-2 pb-0 rounded-lg ">
+                                    <FundProjectionScreenOutlined className="text-white text-2xl" />
+                                </div>
+                                <div>
+                                    <p className="text-gray-600 text-base  font-medium">
+                                        Total
+                                    </p>
+                                    <h3 className="text-gray-600 mb-2 text-base  font-medium">
 
-                                    Expense
-                                </h3>
+                                        Expense
+                                    </h3>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="flex items-center gap-2">
-                            <p className="text-gray-600 text-base font-semibold ">10</p>
-                        </div>
+                            <div className="flex items-center gap-2">
+                                <p className="text-gray-600 text-base font-semibold ">10</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -236,70 +225,70 @@ const DashboardList = () => {
                     {/* Client Section */}
                     <div className="bg-white p-6 rounded-lg shadow">
                         <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-blue-500 p-2 pb-0 rounded-lg ">
-                                <RiseOutlined  className="text-white text-2xl" />
-                            </div>
-                            <div>
-                                <p className="text-gray-600 text-base  font-medium">
-                                    Total
-                                </p>
+                            <div className="flex items-center gap-2">
+                                <div className="bg-blue-500 p-2 pb-0 rounded-lg ">
+                                    <RiseOutlined className="text-white text-2xl" />
+                                </div>
+                                <div>
+                                    <p className="text-gray-600 text-base  font-medium">
+                                        Total
+                                    </p>
 
-                                <h3 className="text-gray-600 mb-2 text-base font-medium">
-                                    Lead
-                                </h3>
+                                    <h3 className="text-gray-600 mb-2 text-base font-medium">
+                                        Lead
+                                    </h3>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="flex items-center gap-2">
-                            <p className="text-gray-600 text-base font-semibold ">40</p>
-                        </div>
+                            <div className="flex items-center gap-2">
+                                <p className="text-gray-600 text-base font-semibold ">40</p>
+                            </div>
                         </div>
                     </div>
 
 
                     <div className="bg-white p-6 rounded-lg shadow">
                         <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-blue-500 p-2 pb-0 rounded-lg ">
-                                <FundProjectionScreenOutlined className="text-white text-2xl" />
-                            </div>
-                            <div>
-                                <p className="text-gray-600 text-base font-medium">
-                                    Total
-                                </p>
-                                <h3 className="text-gray-600 mb-2 text-base font-medium">
+                            <div className="flex items-center gap-2">
+                                <div className="bg-blue-500 p-2 pb-0 rounded-lg ">
+                                    <FundProjectionScreenOutlined className="text-white text-2xl" />
+                                </div>
+                                <div>
+                                    <p className="text-gray-600 text-base font-medium">
+                                        Total
+                                    </p>
+                                    <h3 className="text-gray-600 mb-2 text-base font-medium">
 
-                                    Deal
-                                </h3>
+                                        Deal
+                                    </h3>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="flex items-center gap-2">
-                            <p className="text-gray-600 text-base font-semibold ">56</p>
-                        </div>
+                            <div className="flex items-center gap-2">
+                                <p className="text-gray-600 text-base font-semibold ">56</p>
+                            </div>
                         </div>
                     </div>
                     <div className="bg-white p-6 rounded-lg shadow">
                         <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-blue-500 p-2 pb-0 rounded-lg ">
-                                <CopyrightOutlined  className="text-white text-2xl" />
-                            </div>
-                            <div>
-                                <p className="text-gray-600 text-base  font-medium">
+                            <div className="flex items-center gap-2">
+                                <div className="bg-blue-500 p-2 pb-0 rounded-lg ">
+                                    <CopyrightOutlined className="text-white text-2xl" />
+                                </div>
+                                <div>
+                                    <p className="text-gray-600 text-base  font-medium">
 
-                                    Total
-                                </p>
-                                <h3 className="text-gray-600 mb-2 text-base  font-medium">
-                                    Contract
-                                </h3>
+                                        Total
+                                    </p>
+                                    <h3 className="text-gray-600 mb-2 text-base  font-medium">
+                                        Contract
+                                    </h3>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="flex items-center gap-2">
-                            <p className="text-gray-600 text-base font-semibold ">65</p>
-                        </div>
+                            <div className="flex items-center gap-2">
+                                <p className="text-gray-600 text-base font-semibold ">65</p>
+                            </div>
                         </div>
                     </div>
                 </div>

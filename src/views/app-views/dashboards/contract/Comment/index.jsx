@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input, List, Button, Avatar, Typography, Space, Col,Card } from "antd";
+import { Input, List, Button, Avatar, Typography, Space, Col, Card } from "antd";
 import { DeleteOutlined, SendOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
@@ -42,62 +42,62 @@ const Comment = () => {
   return (
     <div>
       <Col span={24}>
-          <Card className="bg-white">
+        <Card className="bg-white">
           <div className="font-semibold text-lg mb-2">Contract Comment</div>
-      {/* Input Box */}
-      <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
-        <Input
-          placeholder="Add a comment..."
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          onPressEnter={handleAddComment}
-          style={{
-            flex: 1,
-            borderTopRightRadius: 0,
-            borderBottomRightRadius: 0,
-          }}
-        />
-        <Button
-          type="primary"
-          icon={<SendOutlined />}
-          onClick={handleAddComment}
-          style={{
-            borderTopLeftRadius: 0,
-            borderBottomLeftRadius: 0,
-          }}
-        />
-      </div>
-
-      {/* Comments List */}
-      <List
-        itemLayout="horizontal"
-        dataSource={comments}
-        renderItem={(comment) => (
-          <List.Item
-            actions={[
-              <Button
-                type="text"
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() => handleDeleteComment(comment.id)}
-              />,
-            ]}
-          >
-            <List.Item.Meta
-              avatar={<Avatar src={comment.avatar} />}
-              title={
-                <Space direction="vertical" size={0}>
-                  <Text>{comment.text}</Text>
-                  <Text type="secondary" style={{ fontSize: "12px" }}>
-                    {comment.time}
-                  </Text>
-                </Space>
-              }
+          {/* Input Box */}
+          <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
+            <Input
+              placeholder="Add a comment..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              onPressEnter={handleAddComment}
+              style={{
+                flex: 1,
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
+              }}
             />
-          </List.Item>
-        )}
-      />
-      </Card>
+            <Button
+              type="primary"
+              icon={<SendOutlined />}
+              onClick={handleAddComment}
+              style={{
+                borderTopLeftRadius: 0,
+                borderBottomLeftRadius: 0,
+              }}
+            />
+          </div>
+
+          {/* Comments List */}
+          <List
+            itemLayout="horizontal"
+            dataSource={comments}
+            renderItem={(comment) => (
+              <List.Item
+                actions={[
+                  <Button
+                    type="text"
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => handleDeleteComment(comment.id)}
+                  />,
+                ]}
+              >
+                <List.Item.Meta
+                  avatar={<Avatar src={comment.avatar} />}
+                  title={
+                    <Space direction="vertical" size={0}>
+                      <Text>{comment.text}</Text>
+                      <Text type="secondary" style={{ fontSize: "12px" }}>
+                        {comment.time}
+                      </Text>
+                    </Space>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        </Card>
       </Col>
     </div>
   );

@@ -26,8 +26,8 @@ const GeneralList = () => {
               key={tab.id}
               onClick={() => setSelectedSection(tab.id)}
               className={`px-4 py-3 text-sm font-medium transition-colors
-                ${selectedSection === tab.id 
-                  ? 'bg-rose-500 text-white' 
+                ${selectedSection === tab.id
+                  ? 'bg-rose-500 text-white'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
             >

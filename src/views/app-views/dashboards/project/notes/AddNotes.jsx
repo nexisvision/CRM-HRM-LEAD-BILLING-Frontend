@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Input, Button, Select, message, Row, Col } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { AddNote, GetNote } from "./NotesReducer/NotesSlice";
-import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 const { Option } = Select;
@@ -29,11 +28,12 @@ const AddNotes = ({ onClose }) => {
     }
   });
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     dispatch(GetUsers());
-  }, []);
+  }, [dispatch]);
+
+
+
 
   const initialValues = {
     note_title: "",
@@ -70,7 +70,7 @@ const AddNotes = ({ onClose }) => {
 
   return (
     <div className="add-notes-form">
- <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
+      <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

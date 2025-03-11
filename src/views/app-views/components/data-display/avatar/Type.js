@@ -20,7 +20,7 @@ export class Type extends Component {
           U
         </Avatar>
         <Avatar
-          className="mr-3"  
+          className="mr-3"
           style={{
             backgroundColor: '#87d068',
           }}

@@ -2,23 +2,19 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Menu,
-  Row,
-  Col,
   Input,
   Button,
   Modal,
   message,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   PlusOutlined,
   SearchOutlined,
-  FileExcelOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AddOvertime from "./AddOvertime";
 import employeeSalaryData from "assets/data/employee-salary.data.json";
 import utils from "utils";
@@ -37,19 +33,19 @@ const OvertimeList = ({ id, onClose }) => {
 
   useEffect(() => {
     dispatch(getovertimess());
-  }, []);
+  }, [dispatch]);
 
   const alldata = useSelector((state) => state.overtime);
   const fnddata = alldata.overtime.data;
 
-  const fnddatasss = fnddata?.filter((item)=>item?.employeeId === id)
+  const fnddatasss = fnddata?.filter((item) => item?.employeeId === id)
 
 
   useEffect(() => {
     if (fnddatasss) {
       setSalaryData(fnddatasss);
     }
-  }, [fnddata,fnddatasss]);
+  }, [fnddata, fnddatasss]);
 
   const openModal = () => {
     setIsModalVisible(true);
@@ -74,50 +70,62 @@ const OvertimeList = ({ id, onClose }) => {
     });
   };
 
-  const dropdownMenu = (record) => (
-    <Menu>
-      <Menu.Item>
-        <Button
-          type="text"
-          icon={<DeleteOutlined />}
-          size="small"
-          onClick={() => deleteSalaryEntry(record.id)}
-        >
-          Delete
-        </Button>
-      </Menu.Item>
-    </Menu>
-  );
+  const getDropdownItems = (record) => {
+    return [
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteSalaryEntry(record.id),
+        danger: true
+      }
+    ];
+  };
 
   const tableColumns = [
     {
       title: "Hours",
       dataIndex: "Hours",
-      sorter: (a, b) => (a.Hours || 0) - (b.Hours || 0), // Use fallback if data is missing
+      sorter: (a, b) => (a.Hours || 0) - (b.Hours || 0),
     },
-
     {
       title: "days",
       dataIndex: "days",
-      sorter: (a, b) => (a.days || 0) - (b.days || 0), // Use fallback if data is missing
+      sorter: (a, b) => (a.days || 0) - (b.days || 0),
     },
-
     {
       title: "rate",
       dataIndex: "rate",
-      sorter: (a, b) => (a.rate || 0) - (b.rate || 0), // Use fallback if data is missing
+      sorter: (a, b) => (a.rate || 0) - (b.rate || 0),
     },
-
     {
       title: "title",
       dataIndex: "title",
       sorter: (a, b) => a.title - b.title,
     },
-
     {
       title: "Action",
       dataIndex: "actions",
-      render: (_, record) => <EllipsisDropdown menu={dropdownMenu(record)} />,
+      render: (_, record) => (
+        <div className="text-center">
+          <Dropdown
+            menu={{ items: getDropdownItems(record) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
+        </div>
+      ),
     },
   ];
 
@@ -141,6 +149,7 @@ const OvertimeList = ({ id, onClose }) => {
             placeholder="Search"
             prefix={<SearchOutlined />}
             onChange={(e) => onSearch(e)}
+            className="search-input"
           />
         </div>
         <Flex gap="7px">
@@ -174,4 +183,73 @@ const OvertimeList = ({ id, onClose }) => {
   );
 };
 
-export default OvertimeList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 250px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
+  }
+
+  .ant-btn-text:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .ant-btn-text:active {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  @media (max-width: 768px) {
+    .search-input {
+      width: 100%;
+      min-width: unset;
+    }
+    
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const OvertimeListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <OvertimeList />
+  </>
+);
+
+export default OvertimeListWithStyles;

@@ -8,7 +8,6 @@ import {
   FileTextOutlined,
   TeamOutlined,
   MailOutlined,
-  FolderOutlined,
 } from '@ant-design/icons';
 
 const General = () => {

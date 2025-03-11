@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
 
-const HeaderWrapper = styled.div(({isNavTop}) => ({
+const HeaderWrapper = styled.div(({ isNavTop }) => ({
 	width: '100%',
 	display: 'flex',
-	...isNavTop ? {maxWidth: isNavTop, margin: 'auto'} : {}
+	...isNavTop ? { maxWidth: isNavTop, margin: 'auto' } : {}
 }))
 
 

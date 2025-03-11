@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import { Card, Table, Select, Input, Button, Badge, Menu, Tag } from 'antd';
 import OrderListData from "assets/data/order-list.data.json"
 import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined } from '@ant-design/icons';
@@ -7,30 +7,30 @@ import AvatarStatus from 'components/shared-components/AvatarStatus';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import Flex from 'components/shared-components/Flex'
 import NumberFormat from 'react-number-format';
-import dayjs from 'dayjs'; 
+import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils'
 
 const { Option } = Select
 
 const getPaymentStatus = status => {
-	if(status === 'Paid') {
+	if (status === 'Paid') {
 		return 'success'
 	}
-	if(status === 'Pending') {
+	if (status === 'Pending') {
 		return 'warning'
 	}
-	if(status === 'Expired') {
+	if (status === 'Expired') {
 		return 'error'
 	}
 	return ''
 }
 
 const getShippingStatus = status => {
-	if(status === 'Ready') {
+	if (status === 'Ready') {
 		return 'blue'
 	}
-	if(status === 'Shipped') {
+	if (status === 'Shipped') {
 		return 'cyan'
 	}
 	return ''
@@ -45,7 +45,7 @@ const Orders = () => {
 	const [selectedRowKeys, setSelectedRowKeys] = useState([])
 
 	const handleShowStatus = value => {
-		if(value !== 'All') {
+		if (value !== 'All') {
 			const key = 'paymentStatus'
 			const data = utils.filterArray(OrderListData, key, value)
 			setList(data)
@@ -81,7 +81,7 @@ const Orders = () => {
 			dataIndex: 'name',
 			render: (_, record) => (
 				<div className="d-flex">
-					<AvatarStatus size={30} src={record.image} name={record.name}/>
+					<AvatarStatus size={30} src={record.image} name={record.name} />
 				</div>
 			),
 			sorter: (a, b) => utils.antdTableSorter(a, b, 'name')
@@ -116,10 +116,10 @@ const Orders = () => {
 			render: (_, record) => (
 				<span className="font-weight-semibold">
 					<NumberFormat
-						displayType={'text'} 
-						value={(Math.round(record.amount * 100) / 100).toFixed(2)} 
-						prefix={'$'} 
-						thousandSeparator={true} 
+						displayType={'text'}
+						value={(Math.round(record.amount * 100) / 100).toFixed(2)}
+						prefix={'$'}
+						thousandSeparator={true}
 					/>
 				</span>
 			),
@@ -130,12 +130,12 @@ const Orders = () => {
 			dataIndex: 'actions',
 			render: (_, elm) => (
 				<div className="text-right">
-					<EllipsisDropdown menu={dropdownMenu(elm)}/>
+					<EllipsisDropdown menu={dropdownMenu(elm)} />
 				</div>
 			)
 		}
 	];
-	
+
 	const rowSelection = {
 		onChange: (key, rows) => {
 			setSelectedRows(rows)
@@ -145,7 +145,7 @@ const Orders = () => {
 
 	const onSearch = e => {
 		const value = e.currentTarget.value
-		const searchArray = e.currentTarget.value? list : OrderListData
+		const searchArray = e.currentTarget.value ? list : OrderListData
 		const data = utils.wildCardSearch(searchArray, value)
 		setList(data)
 		setSelectedRowKeys([])
@@ -156,14 +156,14 @@ const Orders = () => {
 			<Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
 				<Flex className="mb-1" mobileFlex={false}>
 					<div className="mr-md-3 mb-3">
-						<Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)}/>
+						<Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
 					</div>
 					<div className="mb-3">
-						<Select 
-							defaultValue="All" 
-							className="w-100" 
-							style={{ minWidth: 180 }} 
-							onChange={handleShowStatus} 
+						<Select
+							defaultValue="All"
+							className="w-100"
+							style={{ minWidth: 180 }}
+							onChange={handleShowStatus}
 							placeholder="Status"
 						>
 							<Option value="All">All payment </Option>
@@ -176,10 +176,10 @@ const Orders = () => {
 				</div>
 			</Flex>
 			<div className="table-responsive">
-				<Table 
-					columns={tableColumns} 
-					dataSource={list} 
-					rowKey='id' 
+				<Table
+					columns={tableColumns}
+					dataSource={list}
+					rowKey='id'
 					rowSelection={{
 						selectedRowKeys: selectedRowKeys,
 						type: 'checkbox',

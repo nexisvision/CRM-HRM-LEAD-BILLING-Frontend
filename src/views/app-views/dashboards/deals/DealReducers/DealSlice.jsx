@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./DealService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
+
 import { message } from "antd";
 
 export const AddDeals = createAsyncThunk(
@@ -24,6 +24,8 @@ export const GetDeals = createAsyncThunk("emp/GetDeals", async (thunkAPI) => {
     return thunkAPI.rejectWithValue(error.response.data);
   }
 });
+
+
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -35,6 +37,8 @@ export const getAllUsers = createAsyncThunk(
     }
   }
 );
+
+
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -73,15 +77,7 @@ export const EditDeals = createAsyncThunk(
 );
 
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const DealSlice = createSlice({
   name: "Deals",
@@ -149,8 +145,8 @@ const DealSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-      
-     
+
+
       //delete
       .addCase(DeleteDeals.pending, (state) => {
         state.isLoading = true;

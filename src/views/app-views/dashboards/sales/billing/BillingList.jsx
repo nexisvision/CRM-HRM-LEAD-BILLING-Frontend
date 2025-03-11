@@ -1,43 +1,36 @@
-import React, { Component, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
-import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import {
-  Row,
   Card,
-  Col,
   Table,
   Select,
   Input,
   Button,
-  Badge,
   Menu,
   Modal,
-  Tag,
   message,
   DatePicker,
+  Dropdown,
 } from "antd";
 import OrderListData from "../../../../../assets/data/order-list.data.json";
 import {
   EyeOutlined,
   FileExcelOutlined,
   SearchOutlined,
-  PlusCircleOutlined,
   EditOutlined,
   PlusOutlined,
   DeleteOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import Flex from "components/shared-components/Flex";
-import dayjs from "dayjs";
-import { utils, writeFile } from "xlsx";
-import AddBilling from "./AddBilling";
 import EditBilling from "./EditBilling";
 import ViewBilling from "./ViewBilling";
-import { getInvoice } from "../invoice/InvoiceReducer/InvoiceSlice";
 import { useDispatch, useSelector } from "react-redux";
-
 import { deltebil, getbil } from "./billing2Reducer/billing2Slice";
-
+import { writeFile } from "xlsx";
+import utils from "utils";
+import dayjs from "dayjs";
+import Flex from "components/shared-components/Flex";
+import AddBilling from "./AddBilling";
 
 const { Option } = Select;
 
@@ -50,24 +43,19 @@ export const BillingList = () => {
   const [isViewBillingModalVisible, setIsViewBillingModalVisible] =
     useState(false);
   const dispatch = useDispatch();
-
   const AllLoggeddtaa = useSelector((state) => state.user);
   const lid = AllLoggeddtaa.loggedInUser.id;
   const [idd, setIdd] = useState("");
-
   const alldata = useSelector((state) => state.salesbilling);
   const fnddata = alldata.salesbilling.data;
-
   const [selectedBillingId, setSelectedBillingId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [statusOptions, setStatusOptions] = useState(['All']);
   const [searchText, setSearchText] = useState('');
   const [selectedDate, setSelectedDate] = useState(null);
-
   useEffect(() => {
     dispatch(getbil(lid));
-  }, []);
-
+  }, [dispatch, lid]);
 
   useEffect(() => {
     if (fnddata) {
@@ -132,60 +120,73 @@ export const BillingList = () => {
     setIdd(idd);
   };
 
-            const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-            const roles = useSelector((state) => state.role?.role?.data);
-            const roleData = roles?.find(role => role.id === roleId);
-        
-            const whorole = roleData.role_name;
-        
-            const parsedPermissions = Array.isArray(roleData?.permissions)
-            ? roleData.permissions
-            : typeof roleData?.permissions === 'string'
-            ? JSON.parse(roleData.permissions)
-            : [];
-          
-          
-            let allpermisson;  
-        
-            if (parsedPermissions["dashboards-sales-billing"] && parsedPermissions["dashboards-sales-billing"][0]?.permissions) {
-              allpermisson = parsedPermissions["dashboards-sales-billing"][0].permissions;
-            
-            } else {
-            }
-            
-            const canCreateClient = allpermisson?.includes('create');
-            const canEditClient = allpermisson?.includes('edit');
-            const canDeleteClient = allpermisson?.includes('delete');
-            const canViewClient = allpermisson?.includes('view');
-  
 
-  const dropdownMenu = (row) => ({
-    items: [
-      {
-        key: 'view',
-        icon: <EyeOutlined />,
-        label: 'View Details',
-        onClick: () => {
-          setSelectedBillingId(row.id);
-          openViewBillingModal();
-        }
-      },
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+
+  let allpermisson;
+
+  if (parsedPermissions["dashboards-sales-billing"] && parsedPermissions["dashboards-sales-billing"][0]?.permissions) {
+    allpermisson = parsedPermissions["dashboards-sales-billing"][0].permissions;
+    console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    console.log('dashboards-sales-billing is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
+
+
+
+  const getDropdownItems = (row) => {
+    const items = [];
+
+    items.push({
+      key: 'view',
+      icon: <EyeOutlined />,
+      label: 'View Details',
+      onClick: () => {
+        setSelectedBillingId(row.id);
+        openViewBillingModal();
+      }
+    });
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
         onClick: () => editfun(row.id)
-      }] : []),
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => delfun(row.id)
-      }] : [])
-    ]
-  });
+        onClick: () => delfun(row.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -244,7 +245,22 @@ export const BillingList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -256,7 +272,7 @@ export const BillingList = () => {
     let filtered = [...fnddata];
 
     if (text) {
-      filtered = filtered.filter(bill => 
+      filtered = filtered.filter(bill =>
         bill.billNumber?.toLowerCase().includes(text.toLowerCase())
       );
     }
@@ -271,7 +287,7 @@ export const BillingList = () => {
     }
 
     if (status && status !== 'All') {
-      filtered = filtered.filter(bill => 
+      filtered = filtered.filter(bill =>
         bill.status === status
       );
     }
@@ -351,46 +367,46 @@ export const BillingList = () => {
             </div>
           </Flex>
           <Flex gap="7px" className="flex">
-            
 
-             {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                <Button
-                                                type="primary"
-                                                className="flex items-center"
-                                                onClick={openAddBillingModal}
-                                              >
-                                                <PlusOutlined />
-                                                <span className="ml-2">New</span>
-                                              </Button>
-                                                ) : null}
+
+            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+              <Button
+                type="primary"
+                className="flex items-center"
+                onClick={openAddBillingModal}
+              >
+                <PlusOutlined />
+                <span className="ml-2">New</span>
+              </Button>
+            ) : null}
 
             <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+              type="primary"
+              icon={<FileExcelOutlined />}
+              onClick={exportToExcel} // Call export function when the button is clicked
+              block
+            >
+              Export All
+            </Button>
           </Flex>
         </Flex>
         <div className="table-responsive">
 
 
-           {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                           <Table
-                                           columns={tableColumns}
-                                           dataSource={getFilteredBillings()}
-                                           rowKey="id"
-                                           scroll={{ x: 1200 }}
-                                           pagination={{
-                                             total: getFilteredBillings().length,
-                                             pageSize: 10,
-                                             showSizeChanger: true,
-                                             showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                                           }}
-                                         />
-                                          ) : null}
+          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Table
+              columns={tableColumns}
+              dataSource={getFilteredBillings()}
+              rowKey="id"
+              scroll={{ x: 1200 }}
+              pagination={{
+                total: getFilteredBillings().length,
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              }}
+            />
+          ) : null}
         </div>
 
         <Modal
@@ -421,40 +437,100 @@ export const BillingList = () => {
           width={1000}
           className="mt-[-70px]"
         >
-          <ViewBilling 
-            onClose={closeViewBillingModal} 
-            billingId={selectedBillingId} 
+          <ViewBilling
+            onClose={closeViewBillingModal}
+            billingId={selectedBillingId}
           />
         </Modal>
       </Card>
+      <style>{`
+        .search-input {
+          transition: all 0.3s;
+          min-width: 200px;
+        }
+        
+        .search-input:hover,
+        .search-input:focus {
+          border-color: #40a9ff;
+          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+          .search-input {
+            width: 100%;
+            margin-bottom: 1rem;
+          }
+        }
+
+        .ant-dropdown-menu {
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          padding: 4px;
+        }
+        .ant-dropdown-menu-item {
+          padding: 8px 16px;
+          border-radius: 4px;
+          margin: 2px 0;
+          transition: all 0.3s;
+        }
+        .ant-dropdown-menu-item:hover {
+          background-color: #f5f5f5;
+        }
+        .ant-dropdown-menu-item-danger:hover {
+          background-color: #fff1f0;
+        }
+        .ant-dropdown-menu-item .anticon {
+          font-size: 16px;
+          margin-right: 8px;
+        }
+      `}</style>
     </div>
   );
 };
 
-// Add styles
-const styles = `
-  .search-input {
-    transition: all 0.3s;
-    min-width: 200px;
-  }
-
-  .search-input:hover,
-  .search-input:focus {
-    border-color: #40a9ff;
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
-  }
-
-  @media (max-width: 768px) {
-    .search-input {
-      width: 100%;
-      margin-bottom: 1rem;
-    }
-  }
-`;
-
 const BillingListWithStyles = () => (
   <>
-    <style>{styles}</style>
+    <style>{`
+      .search-input {
+        transition: all 0.3s;
+        min-width: 200px;
+      }
+      
+      .search-input:hover,
+      .search-input:focus {
+        border-color: #40a9ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+      }
+      
+      @media (max-width: 768px) {
+        .search-input {
+          width: 100%;
+          margin-bottom: 1rem;
+        }
+      }
+
+      .ant-dropdown-menu {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        padding: 4px;
+      }
+      .ant-dropdown-menu-item {
+        padding: 8px 16px;
+        border-radius: 4px;
+        margin: 2px 0;
+        transition: all 0.3s;
+      }
+      .ant-dropdown-menu-item:hover {
+        background-color: #f5f5f5;
+      }
+      .ant-dropdown-menu-item-danger:hover {
+        background-color: #fff1f0;
+      }
+      .ant-dropdown-menu-item .anticon {
+        font-size: 16px;
+        margin-right: 8px;
+      }
+    `}</style>
     <BillingList />
   </>
 );

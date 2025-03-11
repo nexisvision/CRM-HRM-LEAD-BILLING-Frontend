@@ -1,8 +1,10 @@
 @positions: static, relative, absolute, fixed, sticky;
 
 each(@positions, #(@position) {
-	.position-@{position} { position: @position !important; }
-});
+		.position-@{position} {
+			position: @position !important;
+		}
+	});
 
 // Shorthand
 

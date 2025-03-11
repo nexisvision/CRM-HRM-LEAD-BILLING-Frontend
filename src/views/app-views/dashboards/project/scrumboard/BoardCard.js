@@ -12,7 +12,7 @@ const InnerCardList = props => {
       {
         props.contents?.map((item, index) => (
           <Draggable key={item.id} draggableId={item.id} index={index}>
-            {( dragProvided, dragSnapshot) => (
+            {(dragProvided, dragSnapshot) => (
               <div
                 className='mb-3'
                 key={item.id}
@@ -20,14 +20,14 @@ const InnerCardList = props => {
                 {...dragProvided.draggableProps}
                 {...dragProvided.dragHandleProps}
               >
-                <Card 
-                  hoverable 
+                <Card
+                  hoverable
                   className='board-card'
-                  cover={null} 
+                  cover={null}
                   onClick={() => props.cardData(item, props.listId)}
                 >
-                  {item.cover ? <img src={item.cover} className="rounded img-fluid" alt="cover"/> : null}
-                  {item.labels.map(label => 
+                  {item.cover ? <img src={item.cover} className="rounded img-fluid" alt="cover" /> : null}
+                  {item.labels.map(label =>
                     <Tooltip title={label} key={label}>
                       <div className={`board-label ${getLabelsColor(label)}`}></div>
                     </Tooltip>
@@ -35,20 +35,20 @@ const InnerCardList = props => {
                   <h4 className="mb-2">{item.name}</h4>
                   <div className="d-flex justify-content-between align-items-center">
                     <div className="d-flex align-items-center">
-                      {item.dueDate?
-                        <Tag> 
+                      {item.dueDate ?
+                        <Tag>
                           <CalendarOutlined />
                           <span className="ml-1 font-weight-semibold">{dayjs(item.dueDate).format('DD MMMM')}</span>
                         </Tag>
                         :
                         null
                       }
-                      <SubIndicator counts={item.comments.length} icon={<CommentOutlined />}/>
-                      <SubIndicator counts={item.attachments.length} icon={<PaperClipOutlined />}/>
+                      <SubIndicator counts={item.comments.length} icon={<CommentOutlined />} />
+                      <SubIndicator counts={item.attachments.length} icon={<PaperClipOutlined />} />
                     </div>
                     <div className="d-flex">
                       {item.members.map(member =>
-                        <AssigneeAvatar key={member} id={member} size={25} chain/>
+                        <AssigneeAvatar key={member} id={member} size={25} chain />
                       )}
                     </div>
                   </div>
@@ -67,14 +67,14 @@ function InnerList(props) {
 
   return (
     <div className="board-dropzone" ref={dropProvided.innerRef}>
-      <InnerCardList cardData={cardData} contents={contents} listId={listId}/>
+      <InnerCardList cardData={cardData} contents={contents} listId={listId} />
       {dropProvided.placeholder}
     </div>
   );
 }
 
 function SubIndicator(props) {
-  if(props.counts) {
+  if (props.counts) {
     return (
       <p className="mb-0 mr-2">
         {props.icon}
@@ -86,7 +86,7 @@ function SubIndicator(props) {
 }
 
 export default function BoardCard(props) {
-	const {
+  const {
     ignoreContainerClipping,
     internalScroll,
     scrollContainerStyle,
@@ -99,7 +99,7 @@ export default function BoardCard(props) {
     useClone,
     cardData
   } = props;
-	return (
+  return (
     <>
       <Droppable
         droppableId={listId}

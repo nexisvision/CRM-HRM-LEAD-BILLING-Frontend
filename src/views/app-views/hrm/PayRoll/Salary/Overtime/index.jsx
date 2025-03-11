@@ -4,11 +4,11 @@ import OvertimeList from './OvertimeList';
 
 const Overtime = ({ id, onClose }) => (
 
-<div className="mail">
+    <div className="mail">
 
-<OvertimeList id={id} onClose={onClose} />
- 
-</div>
+        <OvertimeList id={id} onClose={onClose} />
+
+    </div>
 
 );
 

@@ -1,10 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./EmployeeService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
-import { message } from "antd";
 
-// Async thunk for adding user
+
+
 export const addEmp = createAsyncThunk(
     "users/addUser",
     async (userData, thunkAPI) => {
@@ -17,7 +16,7 @@ export const addEmp = createAsyncThunk(
     }
 );
 
-// Async thunk for user login
+
 
 
 export const empdata = createAsyncThunk(
@@ -32,7 +31,7 @@ export const empdata = createAsyncThunk(
     }
 );
 
-// Async thunk for getting all users
+
 export const getAllUsers = createAsyncThunk(
     "users/getAllUsers",
     async (thunkAPI) => {
@@ -45,7 +44,7 @@ export const getAllUsers = createAsyncThunk(
     }
 );
 
-// Async thunk for getting user by id
+
 export const getUserById = createAsyncThunk(
     "users/getUserById",
     async (userId, thunkAPI) => {
@@ -58,7 +57,7 @@ export const getUserById = createAsyncThunk(
     }
 );
 
-// Async thunk for deleting a user
+
 export const deleteEmp = createAsyncThunk(
     "users/deleteUser",
     async (userId, thunkAPI) => {
@@ -73,33 +72,24 @@ export const deleteEmp = createAsyncThunk(
 export const updateEmp = createAsyncThunk(
     "users/updateEmployee",
     async ({ idd, updatedFormValues }, thunkAPI) => {
-      try {
-        const response = await UserService.EditEmp(idd, updatedFormValues);
-        return response; // Return the updated data
-      } catch (error) {
-        return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
-      }
+        try {
+            const response = await UserService.EditEmp(idd, updatedFormValues);
+            return response; // Return the updated data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
+        }
     }
-  );
+);
 
 
 
 
 
-const initialUser = () => {
-    const item = window.localStorage.getItem("USER");
-    return item ? JSON.parse(item) : null;
-};
-
-const initialIsAuth = () => {
-    const item = window.localStorage.getItem("isAuth");
-    return item ? JSON.parse(item) : false;
-};
 
 const EmployeeSlice = createSlice({
     name: "employee",
     initialState: {
-        employee:[],
+        employee: [],
         editItem: {},
         isLoading: false,
         addModel: false,
@@ -162,7 +152,7 @@ const EmployeeSlice = createSlice({
                 state.isLoading = false;
                 toast.error(action.payload?.message);
             })
-           
+
             //delete
             .addCase(deleteEmp.pending, (state) => {
                 state.isLoading = true;
@@ -179,16 +169,18 @@ const EmployeeSlice = createSlice({
             .addCase(updateEmp.pending, (state) => {
                 state.isLoading = false;
                 state.error = null;
-              })
-              .addCase(updateEmp.fulfilled, (state, action) => {
+            })
+            .addCase(updateEmp.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload; // Update the state with the updated employee data
-              })
+                // message.success(action.payload?.message);
+            })
 
-              .addCase(updateEmp.rejected, (state, action) => {
+            .addCase(updateEmp.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-              });
+                // message.error(action.payload?.message);
+            });
 
     },
 });

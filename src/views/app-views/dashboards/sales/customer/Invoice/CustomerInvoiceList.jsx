@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import { Card,Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
-// import ViewCustomer from '../customer/ViewCustomer'
+import { Card, Table, Menu, Col, Tag, Input, message, Button, Modal } from 'antd';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons'
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
 import userData from 'assets/data/user-list.data.json';
 import OrderListData from 'assets/data/order-list.data.json';
-import { IoCopyOutline } from "react-icons/io5";
 import utils from 'utils';
 import ViewInvoice from '../../invoice/ViewInvoice';
 import AddInvoice from '../../invoice/AddInvoice';
@@ -16,13 +13,8 @@ import AddInvoice from '../../invoice/AddInvoice';
 function CustomerInvoiceList() {
    const [users, setUsers] = useState(userData);
    const [list, setList] = useState(OrderListData);
-   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-   const [userProfileVisible, setUserProfileVisible] = useState(false);
-   //   const [customerVisible,setCustomerVisible] = useState(false)
-   const [selectedUser, setSelectedUser] = useState(null);
    const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] = useState(false);
    const [isViewCustomerModalVisible, setIsViewCustomerModalVisible] = useState(false);
-   const [isEditCustomerModalVisible, setIsEditCustomerModalVisible] = useState(false);
 
 
    // Open Add Job Modal
@@ -45,25 +37,12 @@ function CustomerInvoiceList() {
       setIsViewCustomerModalVisible(false);
    };
 
-   
-   const openEditCustomerModal = () => {
-      setIsEditCustomerModalVisible(true);
-   };
-
-   // Close Add Job Modal
-   const closeEditCustomerModal = () => {
-      setIsEditCustomerModalVisible(false);
-   };
-
-
-
    // Search functionality
    const onSearch = (e) => {
       const value = e.currentTarget.value;
       const searchArray = value ? list : OrderListData;
       const data = utils.wildCardSearch(searchArray, value);
       setList(data);
-      setSelectedRowKeys([]);
    };
 
    // Delete user
@@ -72,23 +51,11 @@ function CustomerInvoiceList() {
       message.success({ content: `Deleted user ${userId}`, duration: 2 });
    };
 
-   // Show user profile
-   const showUserProfile = (userInfo) => {
-      setSelectedUser(userInfo);
-      setUserProfileVisible(true);
-   };
-
-
-   const closeUserProfile = () => {
-      setSelectedUser(null);
-      setUserProfileVisible(false);
-   };
-
    const getViewStatus = status => {
-      if(status === 'Draft') {
+      if (status === 'Draft') {
          return 'blue'
       }
-      if(status === 'Open') {
+      if (status === 'Open') {
          return 'cyan'
       }
       return ''
@@ -102,7 +69,6 @@ function CustomerInvoiceList() {
                   type=""
                   className=""
                   icon={<LinkOutlined />}
-                  onClick={() => showUserProfile(elm)}
                   size="small"
                >
                   <span className="">Copy Invoice</span>
@@ -115,7 +81,6 @@ function CustomerInvoiceList() {
                   type=""
                   className=""
                   icon={<CopyOutlined />}
-                  onClick={() => showUserProfile(elm)}
                   size="small"
                >
                   <span className="">Duplicate Invoice</span>
@@ -141,26 +106,12 @@ function CustomerInvoiceList() {
                   type=""
                   className=""
                   icon={<EditOutlined />}
-                  onClick={() => openEditCustomerModal(elm)}
                   size="small"
                >
                   <span className="">Edit</span>
                </Button>
             </Flex>
          </Menu.Item>
-         {/* <Menu.Item>
-       <Flex alignItems="center">
-         <Button
-           type=""
-           className=""
-           icon={<PushpinOutlined />}
-           onClick={() => showUserProfile(elm)}
-           size="small"
-         >
-           <span className="ml-2">Pin</span>
-         </Button>
-       </Flex>
-     </Menu.Item> */}
          <Menu.Item>
             <Flex alignItems="center">
                <Button
@@ -208,13 +159,13 @@ function CustomerInvoiceList() {
          },
       },
       {
-			title: 'Status',
-			dataIndex: 'status',
-			render: (_, record) => (
-				<><Tag color={getViewStatus(record.orderStatus)}>{record.orderStatus}</Tag></>
-			),
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'status')
-		},
+         title: 'Status',
+         dataIndex: 'status',
+         render: (_, record) => (
+            <><Tag color={getViewStatus(record.orderStatus)}>{record.orderStatus}</Tag></>
+         ),
+         sorter: (a, b) => utils.antdTableSorter(a, b, 'status')
+      },
       {
          title: 'Action',
          dataIndex: 'actions',
@@ -230,7 +181,7 @@ function CustomerInvoiceList() {
    return (
       <>
 
-         <Card bodyStyle={{ padding: '-3px'}}>
+         <Card bodyStyle={{ padding: '-3px' }}>
             <Col span={24}>
                <h4 className='font-medium'>Invoice</h4>
             </Col>
@@ -258,8 +209,6 @@ function CustomerInvoiceList() {
                   scroll={{ x: 1200 }}
                />
             </div>
-
-            {/* Add Job Modal */}
             <Modal
                title=""
                visible={isAddCustomerModalVisible}

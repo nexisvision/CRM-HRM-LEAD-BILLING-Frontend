@@ -1,9 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./RoleAndPermissionService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 
-// Async thunk for adding user
+
 export const addNewUser = createAsyncThunk(
   "users/addUser",
   async (userData, thunkAPI) => {
@@ -16,7 +15,7 @@ export const addNewUser = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
+
 
 export const roledata = createAsyncThunk("role/getrole", async (thunkAPI) => {
   try {
@@ -27,7 +26,7 @@ export const roledata = createAsyncThunk("role/getrole", async (thunkAPI) => {
   }
 });
 
-// Async thunk for getting all users
+
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -40,7 +39,7 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
+
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -53,7 +52,7 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const deleteUser = createAsyncThunk(
   "users/deleteUser",
   async (userId, thunkAPI) => {
@@ -77,7 +76,7 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-// Async thunk for adding user
+
 
 export const addRole = createAsyncThunk(
   "users/AddRole",
@@ -91,7 +90,7 @@ export const addRole = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
+
 
 export const getRoles = createAsyncThunk("emp/getRoles", async (thunkAPI) => {
   try {
@@ -102,7 +101,7 @@ export const getRoles = createAsyncThunk("emp/getRoles", async (thunkAPI) => {
   }
 });
 
-// Async thunk for getting all users
+
 export const getAllRoles = createAsyncThunk(
   "users/getAllRoles",
   async (thunkAPI) => {
@@ -115,7 +114,7 @@ export const getAllRoles = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
+
 export const getRoleById = createAsyncThunk(
   "users/getRoleById",
   async (userId, thunkAPI) => {
@@ -128,7 +127,7 @@ export const getRoleById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const deleteRole = createAsyncThunk(
   "users/deleteRole",
   async (userId, thunkAPI) => {
@@ -156,15 +155,7 @@ export const editRole = createAsyncThunk(
 
 // Async thunk for updating a user
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const RoleAndPermissionSlice = createSlice({
   name: "role",

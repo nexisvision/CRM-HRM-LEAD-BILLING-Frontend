@@ -46,8 +46,8 @@ const CustomIconDemo = () => {
 		<div>
 			<h2>CustomIcon</h2>
 			<div className="mt-4">
-				<ComponentIntro name="Location" desc="src/components/util-components/CustomIcon.js"/>
-				<ComponentIntro name="Description" desc="Custom allow you to use custom icon in this template"/>
+				<ComponentIntro name="Location" desc="src/components/util-components/CustomIcon.js" />
+				<ComponentIntro name="Description" desc="Custom allow you to use custom icon in this template" />
 			</div>
 			<div className="mt-4">
 				<Card title="Example">

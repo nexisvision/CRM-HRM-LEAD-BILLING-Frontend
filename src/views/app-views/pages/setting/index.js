@@ -1,25 +1,10 @@
 import React, { Component } from 'react'
-import { UserOutlined, LockOutlined, CreditCardOutlined, BellOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
-import { Link, Route, Navigate, useLocation, Routes } from 'react-router-dom';
+import { Route, Navigate, useLocation, Routes } from 'react-router-dom';
 import InnerAppLayout from 'layouts/inner-app-layout';
-import EditProfile from './EditProfile';
-import ChangePassword from './ChangePassword';
-import Billing from './Billing';
 import Notification from './Notification';
 
-const url = '/app/pages/setting'
 
-const MenuItem = ({icon, path, label}) => {
-
-	return (
-		<>
-			{icon}
-			<span>{label}</span>
-			<Link to={`${url}/${path}`} />
-		</>
-	)
-}
 
 const SettingOption = () => {
 
@@ -54,12 +39,12 @@ const SettingContent = () => {
 export class Setting extends Component {
 	render() {
 		return (
-			<InnerAppLayout 
+			<InnerAppLayout
 				sideContentWidth={320}
 				sideContent={<SettingOption />}
 				mainContent={<SettingContent />}
 			/>
-    	);
+		);
 	}
 }
 

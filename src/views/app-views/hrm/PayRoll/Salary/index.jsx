@@ -3,10 +3,10 @@ import SalaryList from './SalaryList';
 
 const salary = () => (
 
-<div className="mail">
 
-<SalaryList />
-</div>
+	<div className="mail">
+		<SalaryList />
+	</div>
 
 );
 

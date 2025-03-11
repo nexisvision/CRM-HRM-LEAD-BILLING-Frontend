@@ -13,18 +13,18 @@ const Demo = () => {
 			color: '#3e82f7',
 			name: 'United States of America',
 			value: '37.61%'
-			},
-			{
+		},
+		{
 			color: '#04d182',
 			name: 'Brazil',
 			value: '16.79%'
-			},
-			{
+		},
+		{
 			color: '#ffc542',
 			name: 'India',
 			value: '12.42%'
-		 },
-			{
+		},
+		{
 			color: '#fa8c16',
 			name: 'China',
 			value: '9.85%'
@@ -41,7 +41,7 @@ const Demo = () => {
 		}
 	]
 	return (
-		<RegiondataWidget 
+		<RegiondataWidget
 			title="Entrance by region"
 			data={regionData}
 			content={
@@ -56,7 +56,7 @@ const Demo = () => {
 	)
 }
 
-const  usageStr = `import React, { useState } from 'react'
+const usageStr = `import React, { useState } from 'react'
 import RegiondataWidget from 'components/shared-components/RegiondataWidget'
 import Flex from 'components/shared-components/Flex'
 
@@ -115,8 +115,8 @@ const RegiondataWidgetDemo = () => {
 		<div>
 			<h2>RegiondataWidget</h2>
 			<div className="mt-4">
-				<ComponentIntro name="Location" desc="src/components/shared-components/RegiondataWidget.js"/>
-				<ComponentIntro name="Description" desc="Widget for display regions & data"/>
+				<ComponentIntro name="Location" desc="src/components/shared-components/RegiondataWidget.js" />
+				<ComponentIntro name="Description" desc="Widget for display regions & data" />
 				<div className="mt-4">
 					<Card title="Example">
 						<Demo />

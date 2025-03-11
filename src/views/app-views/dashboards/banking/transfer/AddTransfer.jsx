@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, DatePicker, Select, Row, Col, Checkbox, message, Modal } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Input, Button, Select, Row, Col, message, Modal } from 'antd';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
 import { Formik, Field, Form as FormikForm, ErrorMessage } from 'formik';
@@ -13,7 +12,6 @@ import AddAccount from '../account/AddAccount';
 const { Option } = Select;
 
 const AddTransfer = ({ onClose }) => {
-    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [isAddAccountModalVisible, setIsAddAccountModalVisible] = useState(false);
 
@@ -148,7 +146,7 @@ const AddTransfer = ({ onClose }) => {
                             </Col>
 
                             <Col span={12}>
-                                <div className="form-group mt-3">
+                                <div className="form-group">
                                     <label className="font-semibold">To Account <span className="text-red-500">*</span></label>
                                     <Field name="toAccount">
                                         {({ field }) => (
@@ -207,25 +205,6 @@ const AddTransfer = ({ onClose }) => {
                                     />
                                 </div>
                             </Col>
-
-
-
-                            {/* <Col span={24}>
-                                <div className="form-group mt-2">
-                                    <label className="font-semibold">Bank Address <span className="text-red-500">*</span></label>
-                                    <Field
-                                        name="bankaddress"
-                                        as={Input}
-                                        placeholder="Enter bank address"
-                                        className="w-full mt-1"
-                                    />
-                                    <ErrorMessage
-                                        name="bankaddress"
-                                        component="div"
-                                        className="text-red-500 mt-1"
-                                    />
-                                </div>
-                            </Col> */}
 
                             <Col span={24} className="">
                                 <div className="form-item mt-3">

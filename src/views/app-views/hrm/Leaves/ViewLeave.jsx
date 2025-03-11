@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Button, Typography, Row, Col, Divider, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { GetLeave, EditLeaveAction, EditLeave } from "./LeaveReducer/LeaveSlice";
+import { GetLeave, EditLeave } from "./LeaveReducer/LeaveSlice";
 import { useNavigate } from "react-router-dom";
 
 const { Text } = Typography;

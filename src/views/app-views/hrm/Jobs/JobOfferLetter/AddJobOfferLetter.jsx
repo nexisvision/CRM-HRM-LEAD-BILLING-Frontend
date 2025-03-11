@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Input,
   Button,
@@ -8,7 +8,6 @@ import {
   Row,
   Col,
   Upload,
-  Form as AntForm,
 } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -20,7 +19,7 @@ import {
   Addjobofferss,
   getjobofferss,
 } from "./jobOfferletterReducer/jobofferlateerSlice";
-import { QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined } from "@ant-design/icons";
 import moment from 'moment';
 
 const { Option } = Select;
@@ -63,16 +62,12 @@ const AddJobOfferLetter = ({ onClose }) => {
     description: Yup.string().required("Please enter a description"),
   });
 
-  const [fileList, setFileList] = useState([]);
-
-  const handleFileChange = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
-  };
 
   const onSubmit = async (values, { resetForm }) => {
     try {
       const formData = new FormData();
-      
+
+      // Format dates
       const formattedValues = {
         ...values,
         offer_expiry: values.offer_expiry ? moment(values.offer_expiry).format('YYYY-MM-DD') : null,
@@ -110,7 +105,7 @@ const AddJobOfferLetter = ({ onClose }) => {
 
   return (
     <div>
-     <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -277,7 +272,7 @@ const AddJobOfferLetter = ({ onClose }) => {
                     value={values.description}
                     onChange={(value) => setFieldValue("description", value)}
                     onBlur={() => setFieldTouched("description", true)}
-                      placeholder="Enter Description"
+                    placeholder="Enter Description"
                   />
                   <ErrorMessage
                     name="description"
@@ -290,7 +285,7 @@ const AddJobOfferLetter = ({ onClose }) => {
               <Col span={24}>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Attachment 
+                    Attachment
                   </label>
                   <Upload
                     beforeUpload={(file) => {

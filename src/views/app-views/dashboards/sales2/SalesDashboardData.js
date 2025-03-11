@@ -2,19 +2,19 @@ import { COLORS } from 'constants/ChartConstant';
 
 export const weeklyRevenueData = {
 	series: [
-	  {
-		name: 'Earning',
-		data: [45, 52, 38, 24, 33, 26, 21]
-	  }
+		{
+			name: 'Earning',
+			data: [45, 52, 38, 24, 33, 26, 21]
+		}
 	],
-	categories:[
-	  '08 Jul', 
-	  '09 Jul', 
-	  '10 Jul', 
-	  '11 Jul', 
-	  '12 Jul', 
-	  '13 Jul', 
-	  '14 Jul'
+	categories: [
+		'08 Jul',
+		'09 Jul',
+		'10 Jul',
+		'11 Jul',
+		'12 Jul',
+		'13 Jul',
+		'14 Jul'
 	]
 }
 

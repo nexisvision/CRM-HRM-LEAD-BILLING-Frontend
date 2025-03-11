@@ -90,7 +90,7 @@ const ProjectListData = [
 				name: 'Ron Vargas',
 				img: "/img/avatars/thumb-3.jpg",
 				avatarColor: ""
-			},{
+			}, {
 				name: 'Ron Vargas',
 				img: "/img/avatars/thumb-3.jpg",
 				avatarColor: ""

@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useRef } from 'react';
-import { 
+import {
 	DashboardOutlined,
 	AppstoreOutlined,
 	AntDesignOutlined,
@@ -21,23 +21,23 @@ const SearchResultIcon = styled.div(() => ({
 	marginRight: '1rem'
 }));
 
-const SearchResultTitle = styled.div(({mode}) => ({
+const SearchResultTitle = styled.div(({ mode }) => ({
 	color: mode === 'light' ? DARK_MODE.HEADING_COLOR : GRAY_SCALE.GRAY_DARK,
 	fontWeight: '500'
 }));
 
 
-function getOptionList (navigationTree, optionTree) {
+function getOptionList(navigationTree, optionTree) {
 	optionTree = optionTree ? optionTree : [];
-	for ( const navItem of navigationTree ) {
-		if(navItem.submenu.length === 0) {
+	for (const navItem of navigationTree) {
+		if (navItem.submenu.length === 0) {
 			optionTree.push(navItem)
 		}
-		if(navItem.submenu.length > 0) {
+		if (navItem.submenu.length > 0) {
 			getOptionList(navItem.submenu, optionTree);
 		}
 	}
-	return optionTree 
+	return optionTree
 }
 
 const optionList = getOptionList(navigationConfig)
@@ -45,13 +45,13 @@ const optionList = getOptionList(navigationConfig)
 const getCategoryIcon = category => {
 	switch (category) {
 		case 'dashboards':
-			return <DashboardOutlined className="text-success"/>;
+			return <DashboardOutlined className="text-success" />;
 		case 'apps':
-			return <AppstoreOutlined className="text-danger"/>;
+			return <AppstoreOutlined className="text-danger" />;
 		case 'components':
-			return <AntDesignOutlined className="text-primary"/>;
+			return <AntDesignOutlined className="text-primary" />;
 		case 'extra':
-			return <FileTextOutlined className="text-warning"/>;
+			return <FileTextOutlined className="text-warning" />;
 		default:
 			return null;
 	}
@@ -88,27 +88,27 @@ const SearchInput = props => {
 	const onSelect = () => {
 		setValue('')
 		setOptions([])
-		if(close) {
+		if (close) {
 			close()
 		}
-  };
+	};
 
 	const onSearch = searchText => {
 		setValue(searchText)
 		setOptions(!searchText ? [] : searchResult(mode))
 	};
-	
+
 	const autofocus = () => {
 		inputRef.current.focus();
 	}
 
-	if(active) {
+	if (active) {
 		autofocus()
 	}
 
 	return (
 		<AutoComplete
-			ref={inputRef} 
+			ref={inputRef}
 			css={css`
 				${!isMobile ? `
 					min-width: 300px;
@@ -132,11 +132,11 @@ const SearchInput = props => {
 			onSelect={onSelect}
 			onSearch={onSearch}
 			value={value}
-			filterOption={(inputValue, option) => 
+			filterOption={(inputValue, option) =>
 				option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
 			}
 		>
-			<Input placeholder="Search..."  prefix={<SearchOutlined className="mr-0" />} />
+			<Input placeholder="Search..." prefix={<SearchOutlined className="mr-0" />} />
 		</AutoComplete>
 	)
 }

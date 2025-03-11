@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Input, Button, DatePicker, Select, message, Row, Col, Modal } from "antd";
-import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { PlusOutlined } from "@ant-design/icons";
-import axios from "axios"; // Import axios for API requests
 import { editJobonBoardingss, getJobonBoarding } from "./JobOnBoardingReducer/jobonboardingSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AddLable, GetLable } from "../../../dashboards/sales/LableReducer/LableSlice";
@@ -13,20 +11,14 @@ import moment from "moment/moment";
 const { Option } = Select;
 
 const EditJobOnBording = ({ idd, onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [singleEmp, setSingleEmp] = useState(null);
-
-
   const alldata = useSelector((state) => state.jobonboarding);
   const fnddtaa = alldata.jobonboarding.data || [];
-
   const fnd = fnddtaa.find((item) => item.id === idd);
-
 
   useEffect(() => {
     dispatch(getJobonBoarding());
-  }, []);
+  }, [dispatch]);
 
   // status start
   const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
@@ -34,10 +26,7 @@ const EditJobOnBording = ({ idd, onClose }) => {
   const [statuses, setStatuses] = useState([]);
 
   const AllLoggedData = useSelector((state) => state.user);
-
-  const lid = AllLoggedData.loggedInUser.id;
-
-  const fetchLables = async (lableType, setter) => {
+  const fetchLables = React.useCallback(async (lableType, setter) => {
     try {
       const lid = AllLoggedData.loggedInUser.id;
       const response = await dispatch(GetLable(lid));
@@ -60,11 +49,11 @@ const EditJobOnBording = ({ idd, onClose }) => {
       console.error("Failed to fetch statuses:", error);
       message.error("Failed to load statuses");
     }
-  };
+  }, [AllLoggedData.loggedInUser.id, dispatch]);
 
   useEffect(() => {
     fetchLables("status", setStatuses);
-  }, []);
+  }, [fetchLables]);
 
   const handleAddNewStatus = async () => {
     if (!newStatus.trim()) {
@@ -162,7 +151,7 @@ const EditJobOnBording = ({ idd, onClose }) => {
 
   return (
     <div className="add-job-form">
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

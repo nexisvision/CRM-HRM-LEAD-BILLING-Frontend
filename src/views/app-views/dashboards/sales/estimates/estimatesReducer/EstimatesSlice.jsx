@@ -25,7 +25,7 @@ export const getquotationsById = createAsyncThunk(
 );
 export const createquotations = createAsyncThunk(
   'quotation/createQuotations',
-  async (quotationData , { rejectWithValue }) => {
+  async (quotationData, { rejectWithValue }) => {
     try {
       const response = await QuotationsService.createQuotations(quotationData);
       return response.data;
@@ -58,13 +58,13 @@ export const deletequotations = createAsyncThunk(
 );
 // Slice
 const initialState = {
-    salesquotations: [],
-    currentQuotation: null,  // Add this for single quotation
-    loading: false,
-    error: null,
-    success: false,
-    addModel: false,
-    editModal: false,
+  salesquotations: [],
+  currentQuotation: null,  // Add this for single quotation
+  loading: false,
+  error: null,
+  success: false,
+  addModel: false,
+  editModal: false,
 };
 
 const quotationsSlice = createSlice({
@@ -121,30 +121,30 @@ const quotationsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-    .addCase(createquotations.fulfilled, (state, action) => {
-      state.loading = false;
-      state.salesquotations.push(action.payload);
-      state.success = true;
-    })
-    .addCase(createquotations.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    })
-  // Update invoice
-    .addCase(updatequotation.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(updatequotation.fulfilled, (state, action) => {
-      state.loading = false;
-      state.success = true;
-      state.editItem = action.payload;
-  })
-    .addCase(updatequotation.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    })
-//delete
+      .addCase(createquotations.fulfilled, (state, action) => {
+        state.loading = false;
+        state.salesquotations.push(action.payload);
+        state.success = true;
+      })
+      .addCase(createquotations.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Update invoice
+      .addCase(updatequotation.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updatequotation.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.editItem = action.payload;
+      })
+      .addCase(updatequotation.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      //delete
       .addCase(deletequotations.pending, (state) => {
         state.loading = true;
       })
@@ -156,8 +156,11 @@ const quotationsSlice = createSlice({
         state.loading = false;
         state.error(action.payload?.response?.data?.message);
       })
-},
+  },
 });
-export const { clearError, clearSuccess, resetEstimateState,toggleEditModal } = quotationsSlice.actions;
+export const { clearError, clearSuccess, resetEstimateState, toggleEditModal } = quotationsSlice.actions;
 export default quotationsSlice.reducer;
+
+
+
 

@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app"
 import { getFirestore } from 'firebase/firestore/lite';
-import { 
-	getAuth, 
+import {
+	getAuth,
 	signInWithEmailAndPassword,
 	createUserWithEmailAndPassword,
 	signOut,

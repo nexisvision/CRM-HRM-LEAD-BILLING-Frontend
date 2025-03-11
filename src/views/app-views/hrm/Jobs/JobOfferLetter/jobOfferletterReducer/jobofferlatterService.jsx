@@ -30,7 +30,7 @@ const addoffer = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -50,7 +50,7 @@ const deldetoffer = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);

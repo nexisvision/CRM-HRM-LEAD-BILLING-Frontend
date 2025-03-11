@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Input, Button, message, Row, Col, Select, Modal } from "antd";
-import { useNavigate } from "react-router-dom";
-import "react-quill/dist/quill.snow.css";
 import { PlusOutlined } from "@ant-design/icons";
-import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,7 +12,6 @@ import AddCountries from "views/app-views/setting/countries/AddCountries";
 const { Option } = Select;
 
 const AddCustomer = ({ onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const countries = useSelector((state) => state.countries.countries);
@@ -46,7 +42,6 @@ const AddCustomer = ({ onClose }) => {
     billing_name: "",
     billing_phone: "",
     billing_address: "",
-    
     billing_city: "",
     billing_state: "",
     billing_country: "",
@@ -58,9 +53,6 @@ const AddCustomer = ({ onClose }) => {
     shipping_state: "",
     shipping_country: "",
     shipping_zipcode: "",
-    country_code: "",
-    // billing_country_code: "",
-    // shipping_country_code: "",
   };
 
   const validationSchema = Yup.object({
@@ -101,7 +93,6 @@ const AddCustomer = ({ onClose }) => {
 
   const handlePhoneNumberChange = (e, setFieldValue, fieldName) => {
     const value = e.target.value;
-    // Only allow numbers and limit length to 10 digits
     if (/^\d*$/.test(value) && value.length <= 10) {
       setFieldValue(fieldName, value);
     }
@@ -135,7 +126,6 @@ const AddCustomer = ({ onClose }) => {
         dispatch(Getcus());
         onClose();
         resetForm();
-        // message.success("Customer added successfully!");
       })
       .catch((error) => {
         console.error("Error adding customer:", error);
@@ -146,7 +136,7 @@ const AddCustomer = ({ onClose }) => {
   return (
     <div className="add-job-form">
       <div className=" ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4">
-        <h1 className="mb-4 border-b pb-4 font-medium"></h1>
+        <hr className="mb-4 border-b pb-4 font-medium"></hr>
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
@@ -156,8 +146,6 @@ const AddCustomer = ({ onClose }) => {
             values,
             setFieldValue,
             handleSubmit,
-            setFieldTouched,
-            resetForm,
           }) => (
             <Form className="formik-form" onSubmit={handleSubmit}>
               <Row gutter={16} className="mt-4">
@@ -230,7 +218,7 @@ const AddCustomer = ({ onClose }) => {
                         )}
                       </Field>
                       <Field name="contact">
-                        {({ field, form }) => (
+                        {({ field }) => (
                           <Input
                             {...field}
                             className="phone-input mt-1"
@@ -366,9 +354,6 @@ const AddCustomer = ({ onClose }) => {
                     />
                   </div>
                 </Col>
-
-              
-
                 <Col span={12} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Phone </label>
@@ -742,7 +727,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Zip Code      </label>
+                    <label className="font-semibold">Zip Code</label>
                     <Field
                       name="shipping_zipcode"
                       as={Input}

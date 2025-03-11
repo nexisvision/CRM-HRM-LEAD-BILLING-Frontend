@@ -22,7 +22,7 @@ const Redux = () => {
 				<h4>Code Splitting</h4>
 				<p class="mt-1">We have implemented reducer injection approaches in our code base for a code splitting strategy, it can dynamically add reducers to the store when needed. Here is some example code for reducers registry:</p>
 				<SyntaxHighlighter className="hl-code" language="javascript" style={atomDark}>
-                            {`// store/index.js 
+					{`// store/index.js 
 import { combineReducers } from '@reduxjs/toolkit'
 import yourSlice from './yourSlice'
 import anyOtherSlice from './anyOtherSlice'
@@ -36,7 +36,7 @@ export default reducer`}
 				</SyntaxHighlighter>
 				<p>And then you can expose them to your components (we prefer the entry of your view component)</p>
 				<SyntaxHighlighter className="hl-code" language="javascript" style={atomDark}>
-                            {`import reducer from './store'
+					{`import reducer from './store'
 import { injectReducer } from 'store/index'
 import { useDispatch, useSelector } from 'react-redux'
 import { someActionFromYourSlice } from './store/yourSlice'
@@ -64,7 +64,7 @@ const YourComponent = () => {
 				<h4>Creating New Slice</h4>
 				<p class="mt-1">Slice is a collection of reducer logic and actions for a single feature, hence we sugguest to place slice file under your features module folder for better logic scoping. Here is a basic example of a slice.</p>
 				<SyntaxHighlighter className="hl-code" language="javascript" style={atomDark}>
-                            {`import { createSlice } from '@reduxjs/toolkit'
+					{`import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   	someState: ''
@@ -83,7 +83,7 @@ export default yourSlice.reducer`}
 				<h4>Creating a reducer</h4>
 				<p class="mt-1">You can define your reducers in slice as following code:</p>
 				<SyntaxHighlighter className="hl-code" language="javascript" style={atomDark}>
-                            {`import { createSlice } from '@reduxjs/toolkit'
+					{`import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   someState: ''
@@ -108,7 +108,7 @@ export default yourSlice.reducer`}
 				<h4>Async Requests with createAsyncThunk</h4>
 				<p class="mt-1">You can also make an API request with <code>createAsyncThunk</code> via extraReducers</p>
 				<SyntaxHighlighter className="hl-code" language="javascript" style={atomDark}>
-                            {`import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+					{`import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { someService } from 'services/SomeService'
 
 export const getApiData = createAsyncThunk('sliceName/getApiData',async (data) => {
@@ -150,7 +150,7 @@ export default yourSlice.reducer`}
 				</SyntaxHighlighter>
 				<p>Here's also another example for <code>extrareducers</code> as an object:</p>
 				<SyntaxHighlighter className="hl-code" language="javascript" style={atomDark}>
-                            {`const yourSlice = createSlice({
+					{`const yourSlice = createSlice({
   		...,
 	  extraReducers: {
 		[getApiData.fulfilled]: (state, action) => {

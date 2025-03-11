@@ -8,11 +8,9 @@ import {
   Avatar,
   Timeline,
   Button,
-  Tooltip,
   Divider,
   Space,
   Progress,
-  Badge
 } from 'antd';
 import {
   CalendarOutlined,
@@ -20,10 +18,8 @@ import {
   FileOutlined,
   UserOutlined,
   CheckCircleOutlined,
-  MessageOutlined,
   PaperClipOutlined,
   FlagOutlined,
-  EditOutlined,
   TeamOutlined,
   InfoCircleOutlined,
   HistoryOutlined
@@ -31,34 +27,17 @@ import {
 import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
 import { GetTasks } from '../project/task/TaskReducer/TaskSlice';
-
-const { Title, Text, Paragraph } = Typography;
-
-const ViewTask = ({ filterdatass, onClose }) => {
-
+const { Title, Text } = Typography;
+const ViewTask = ({ filterdatass }) => {
   const dispatch = useDispatch()
-
   const alllogedata = useSelector((state) => state.user.loggedInUser.id)
-
   useEffect(() => {
     dispatch(GetTasks(alllogedata))
-  }, [dispatch])
-
+  }, [dispatch, alllogedata])
   const alldatas = useSelector((state) => state.Tasks.Tasks.data)
-
-  let task = null;
-  if (alldatas?.length) {
-    if (filterdatass?.related_id) {
-      task = alldatas.find((item) => item?.id === filterdatass.related_id);
-    } else if (filterdatass?.id) {
-      task = alldatas.find((item) => item?.id === filterdatass.id);
-    }
-  }
-  task = task || filterdatass || null;
-
+  const task = alldatas?.find((item) => item?.id === filterdatass?.related_id)
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'Completed': return { color: '#52c41a', bgColor: '#f6ffed', borderColor: '#b7eb8f' };
@@ -260,7 +239,7 @@ const ViewTask = ({ filterdatass, onClose }) => {
                       target="_blank"
                       icon={<FileOutlined />}
                     >
-                      View File 
+                      View File
                     </Button>
                   </div>
                 </div>

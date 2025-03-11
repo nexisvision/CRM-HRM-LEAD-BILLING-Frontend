@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./AttendanceService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
-
-// Async thunk for adding user
 
 export const addAttendance = createAsyncThunk(
   "users/addAttendances",
@@ -17,7 +14,7 @@ export const addAttendance = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
+
 
 export const getAttendances = createAsyncThunk(
   "emp/getAttendances",
@@ -31,10 +28,10 @@ export const getAttendances = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
 
 
-// Async thunk for getting user by id
+
+
 export const getAttendanceById = createAsyncThunk(
   "users/getAttendanceById",
   async (userId, thunkAPI) => {
@@ -47,7 +44,7 @@ export const getAttendanceById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const deleteAttendance = createAsyncThunk(
   "users/deleteAttendance",
   async (userId, thunkAPI) => {
@@ -73,15 +70,7 @@ export const editAttendance = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const AttendanceSlice = createSlice({
   name: "Attendance",

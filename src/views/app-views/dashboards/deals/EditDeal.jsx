@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, Select, message, Row, Col, DatePicker, Modal } from "antd";
-import { useNavigate } from "react-router-dom";
-import ReactQuill from "react-quill";
+import { Input, Button, Select, Row, Col, DatePicker, Modal } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector } from "react-redux";
@@ -12,7 +10,7 @@ import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlic
 import { GetLeads } from "../leads/LeadReducers/LeadSlice";
 import { GetProject } from "../project/project-list/projectReducer/ProjectSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
-import {getallcountries} from "../../setting/countries/countriesreducer/countriesSlice";
+import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
 import AddDealStages from "../systemsetup/DealStages/AddDealStages";
 import { PlusOutlined } from "@ant-design/icons";
 import AddPipeLine from "../systemsetup/Pipeline/AddPipeLine";
@@ -23,10 +21,8 @@ import AddCountries from "views/app-views/setting/countries/AddCountries";
 import dayjs from "dayjs";
 const { Option } = Select;
 const EditDeal = ({ onClose, id }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { currencies } = useSelector((state) => state.currencies);
-  const { data: Piplines, isLoading } = useSelector((state) => state.Piplines.Piplines);
+  const { data: Piplines } = useSelector((state) => state.Piplines.Piplines);
   const { data: StagesLeadsDeals } = useSelector((state) => state.StagesLeadsDeals.StagesLeadsDeals);
   const { data: Leads } = useSelector((state) => state.Leads.Leads);
   const { data: Project } = useSelector((state) => state.Project.Project);
@@ -46,14 +42,13 @@ const EditDeal = ({ onClose, id }) => {
   };
 
   const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
-
-  const getInitialCountry = () => {
+  const getInitialCountry = React.useCallback(() => {
     if (countries?.length > 0) {
       const indiaCode = countries.find(c => c.countryCode === 'IN');
       return indiaCode?.phoneCode || "+91";
     }
     return "+91";
-  };
+  }, [countries]);
 
   const handlePhoneNumberChange = (e, setFieldValue) => {
     const value = e.target.value.replace(/\D/g, '');
@@ -96,7 +91,7 @@ const EditDeal = ({ onClose, id }) => {
         project: dealData.project || "",
       });
     }
-  }, [id, datac]);
+  }, [id, datac, getInitialCountry]);
   const validationSchema = Yup.object({
     dealName: Yup.string().optional("Please enter a Deal Name."),
     phoneNumber: Yup.string()
@@ -161,7 +156,7 @@ const EditDeal = ({ onClose, id }) => {
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        enableReinitialize={true} 
+        enableReinitialize={true}
         onSubmit={onSubmit}
       >
         {({
@@ -172,6 +167,7 @@ const EditDeal = ({ onClose, id }) => {
           setFieldTouched,
         }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
+            <hr className="mb-4 border-b pb-2 font-medium"></hr>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
@@ -256,7 +252,13 @@ const EditDeal = ({ onClose, id }) => {
                           type="number"
                           placeholder="Enter phone number"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                         
+                        // prefix={
+                        //   values.phoneCode && (
+                        //     <span className="text-gray-600 font-medium mr-1">
+                        //       {values.phoneCode}
+                        //     </span>
+                        //   )
+                        // }
                         />
                       )}
                     </Field>
@@ -579,7 +581,7 @@ const EditDeal = ({ onClose, id }) => {
                       {({ field, form }) => (
                         <Select
                           {...field}
-                            className="w-full mt-1"
+                          className="w-full mt-1"
                           placeholder="Select Project"
                           onChange={(value) => {
                             const selectedProject =

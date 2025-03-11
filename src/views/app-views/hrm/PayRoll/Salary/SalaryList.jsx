@@ -1,91 +1,89 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Menu, Input, message, Button, Modal, Space, Badge, Switch } from "antd";
+import { Card, Table, Input, message, Button, Modal, Space, Badge, Switch, Dropdown } from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
   PlusOutlined,
-  EditOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AddSalary from "./AddSalary";
 import SetSalary from "./SetSalary";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteSalaryss, getSalaryss, editSalaryss } from "./SalaryReducers/SalarySlice";
 import { empdata } from "../../Employee/EmployeeReducers/EmployeeSlice";
-import { useNavigate } from "react-router-dom";
 
 const SalaryList = () => {
+  const dispatch = useDispatch();
   const [list, setList] = useState([]);
   const [id, setId] = useState(null);
-  const [userId, setUserId] = useState(null);
-  const dispatch = useDispatch();
-  const [userProfileVisible, setUserProfileVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [isAddSalaryModalVisible, setIsAddSalaryModalVisible] = useState(false);
   const [isSetSalaryModalVisible, setIsSetSalaryModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
-
-  const navigate = useNavigate();
-  const openSetSalaryModal = () => setIsSetSalaryModalVisible(true);
-  const closeSetSalaryModal = () => setIsSetSalaryModalVisible(false);
+  const salaryState = useSelector((state) => state.salary);
+  const [salaryData, setSalaryData] = useState([]);
 
   useEffect(() => {
-    dispatch(getSalaryss());
-  }, []);
+    setSalaryData(salaryState?.salary?.data || []);
+  }, [salaryState?.salary?.data]);
+  const isLoading = salaryState?.isLoading || false;
 
-  const user = useSelector((state) => state.user.loggedInUser.username);
+  const userData = useSelector((state) => state.user?.loggedInUser);
+  const user = userData?.username;
+  const roleId = userData?.role_id;
 
-  const alldata = useSelector((state) => state.salary);
-  const dfnddataa = alldata.salary.data || [];
-
-  const dfnddata = dfnddataa.filter((item) => item.created_by === user);
-
-  useEffect(() => {
-    if (dfnddata) {
-      setList(dfnddata);
-    }
-  }, [dfnddata]);
+  const roles = useSelector((state) => state.role?.role?.data || []);
+  const roleData = roles.find(role => role.id === roleId) || {};
+  const whorole = roleData.role_name || '';
 
   useEffect(() => {
-    dispatch(empdata());
+    const fetchData = async () => {
+      try {
+        await dispatch(getSalaryss()).unwrap();
+        await dispatch(empdata()).unwrap();
+      } catch (error) {
+        message.error('Failed to fetch data');
+      }
+    };
+    fetchData();
   }, [dispatch]);
 
-  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-  const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  useEffect(() => {
+    if (salaryData && user) {
+      const userSalaries = salaryData.filter((item) => item.created_by === user);
+      setList(userSalaries);
+    }
+  }, [salaryData, user]);
 
-  const whorole = roleData.role_name;
+  const parsedPermissions = (() => {
+    try {
+      if (Array.isArray(roleData?.permissions)) {
+        return roleData.permissions;
+      }
+      if (typeof roleData?.permissions === 'string') {
+        return JSON.parse(roleData.permissions);
+      }
+      return [];
+    } catch {
+      return [];
+    }
+  })();
 
-  const parsedPermissions = Array.isArray(roleData?.permissions)
-    ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+  const allpermisson = parsedPermissions["extra-hrm-payroll-salary"]?.[0]?.permissions || [];
 
-  let allpermisson;
+  const canCreateClient = allpermisson.includes('create');
+  const canEditClient = allpermisson.includes('edit');
+  const canDeleteClient = allpermisson.includes('delete');
+  const canViewClient = allpermisson.includes('view');
 
-  if (parsedPermissions["extra-hrm-payroll-salary"] && parsedPermissions["extra-hrm-payroll-salary"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-payroll-salary"][0].permissions;
-  } else {
-  }
-
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
-
-  const openAddSalaryModal = () => {
-    setIsAddSalaryModalVisible(true);
-  };
+  const openSetSalaryModal = () => setIsSetSalaryModalVisible(true);
+  const closeSetSalaryModal = () => setIsSetSalaryModalVisible(false);
+  const openAddSalaryModal = () => setIsAddSalaryModalVisible(true);
+  const closeAddSalaryModal = () => setIsAddSalaryModalVisible(false);
 
   const openSetSalaryModall = (id) => {
     setId(id);
     openSetSalaryModal();
-  };
-
-  const closeAddSalaryModal = () => {
-    setIsAddSalaryModalVisible(false);
   };
 
   const onSearch = (e) => {
@@ -95,7 +93,6 @@ const SalaryList = () => {
 
   const getFilteredSalaries = () => {
     if (!list) return [];
-
     if (!searchText) return list;
 
     return list.filter(salary => {
@@ -110,10 +107,15 @@ const SalaryList = () => {
   };
 
   const deleteUser = (userId) => {
-    dispatch(deleteSalaryss(userId)).then(() => {
-      dispatch(getSalaryss());
-      setList(list.filter((item) => item.id !== userId));
-    });
+    dispatch(deleteSalaryss(userId))
+      .unwrap()
+      .then(() => {
+        dispatch(getSalaryss());
+        setList(prev => prev.filter(item => item.id !== userId));
+      })
+      .catch((error) => {
+        message.error(error?.message || "Failed to delete salary");
+      });
   };
 
   const handleStatusChange = (record, checked) => {
@@ -124,42 +126,51 @@ const SalaryList = () => {
       });
   };
 
-  const dropdownMenu = (record) => (
-    <Menu>
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) && (
-        <Menu.Item>
-          <span onClick={() => openSetSalaryModall(record.employeeId)}>
-            <EyeOutlined /> Set Salary
-          </span>
-        </Menu.Item>
-      )}
-      
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) && (
-        <Menu.Item>
-          <span onClick={() => deleteUser(record.id)}>
-            <DeleteOutlined /> Delete
-          </span>
-        </Menu.Item>
-      )}
-    </Menu>
-  );
+  const dropdownMenu = (record) => {
+    const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
+        key: 'setSalary',
+        icon: <EyeOutlined />,
+        label: 'Set Salary',
+        onClick: () => record?.employeeId && openSetSalaryModall(record.employeeId)
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => record?.id && deleteUser(record.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
       title: "Salary Per Month",
       dataIndex: "salary",
+      render: (salary) => salary || 'N/A',
     },
     {
       title: "PayRoll Type",
       dataIndex: "payslipType",
+      render: (type) => type || 'N/A',
     },
     {
       title: "Yearly Package",
       dataIndex: "netSalary",
+      render: (salary) => salary || 'N/A',
     },
     {
       title: "bankAccount",
       dataIndex: "bankAccount",
+      render: (account) => account || 'N/A',
     },
     {
       title: "Status",
@@ -184,15 +195,29 @@ const SalaryList = () => {
       title: "Action",
       key: "actions",
       width: 100,
-      render: (_, record) => (
-        <div className="text-center">
-          <EllipsisDropdown
-            menu={dropdownMenu(record)}
-            placement="bottomRight"
-            trigger={["click"]}
-          />
-        </div>
-      ),
+      render: (_, record) => {
+        const items = dropdownMenu(record);
+        return items.length > 0 ? (
+          <div className="text-center">
+            <Dropdown
+              menu={{ items }}
+              trigger={['click']}
+              placement="bottomRight"
+            >
+              <Button
+                type="text"
+                className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+                style={{
+                  borderRadius: '10px',
+                  padding: 0
+                }}
+              >
+                <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              </Button>
+            </Dropdown>
+          </div>
+        ) : null;
+      },
     },
   ];
 
@@ -216,39 +241,45 @@ const SalaryList = () => {
         ) : null}
       </Space>
 
-      {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Table
-          columns={tableColumns}
-          dataSource={getFilteredSalaries()}
-          rowKey="id"
-          pagination={{
-            total: getFilteredSalaries().length,
-            pageSize: 10,
-            showSizeChanger: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-          }}
-        />
-      ) : null}
+      {isLoading ? (
+        <div className="text-center p-4">Loading...</div>
+      ) : (
+        <>
+          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Table
+              columns={tableColumns}
+              dataSource={getFilteredSalaries()}
+              rowKey="id"
+              pagination={{
+                total: getFilteredSalaries().length,
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              }}
+            />
+          ) : null}
 
-      <Modal
-        title="Add Salary"
-        visible={isAddSalaryModalVisible}
-        onCancel={closeAddSalaryModal}
-        width={1000}
-        footer={null}
-      >
-        <AddSalary onClose={closeAddSalaryModal} />
-      </Modal>
-      <Modal
-        className="mt-[-70px]"
-        title="Set Salary"
-        visible={isSetSalaryModalVisible}
-        onCancel={closeSetSalaryModal}
-        footer={null}
-        width={1900}
-      >
-        <SetSalary id={id} onClose={closeSetSalaryModal} />
-      </Modal>
+          <Modal
+            title="Add Salary"
+            visible={isAddSalaryModalVisible}
+            onCancel={closeAddSalaryModal}
+            width={1000}
+            footer={null}
+          >
+            <AddSalary onClose={closeAddSalaryModal} />
+          </Modal>
+          <Modal
+            className="mt-[-70px]"
+            title="Set Salary"
+            visible={isSetSalaryModalVisible}
+            onCancel={closeSetSalaryModal}
+            footer={null}
+            width={1900}
+          >
+            <SetSalary id={id} onClose={closeSetSalaryModal} />
+          </Modal>
+        </>
+      )}
     </Card>
   );
 };
@@ -287,6 +318,40 @@ const styles = `
     .ant-space > * {
       width: 100% !important;
     }
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
+  }
+
+  .ant-btn-text:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .ant-btn-text:active {
+    background-color: rgba(0, 0, 0, 0.08);
   }
 `;
 

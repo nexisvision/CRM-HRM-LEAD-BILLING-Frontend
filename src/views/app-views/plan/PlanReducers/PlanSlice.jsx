@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./PlanService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
 
@@ -18,7 +17,7 @@ export const planbutus = createAsyncThunk(
 );
 
 
-// Async thunk for adding user
+
 export const CreatePlan = createAsyncThunk(
     "users/addplan",
     async (userData, thunkAPI) => {
@@ -31,7 +30,7 @@ export const CreatePlan = createAsyncThunk(
     }
 );
 
-// Async thunk for user login
+
 
 
 export const GetPlan = createAsyncThunk(
@@ -46,7 +45,7 @@ export const GetPlan = createAsyncThunk(
     }
 );
 
-// Async thunk for getting all users
+
 export const getAllUsers = createAsyncThunk(
     "users/getAllUsers",
     async (thunkAPI) => {
@@ -59,7 +58,7 @@ export const getAllUsers = createAsyncThunk(
     }
 );
 
-// Async thunk for getting user by id
+
 export const getUserById = createAsyncThunk(
     "users/getUserById",
     async (userId, thunkAPI) => {
@@ -72,7 +71,7 @@ export const getUserById = createAsyncThunk(
     }
 );
 
-// Async thunk for deleting a user
+
 export const DeleteP = createAsyncThunk(
     "users/deleteUser",
     async (userId, thunkAPI) => {
@@ -87,35 +86,25 @@ export const DeleteP = createAsyncThunk(
 export const Editplan = createAsyncThunk(
     "users/updateEmployee",
     async ({ id, values }, thunkAPI) => {
-      try {
-        const response = await UserService.EditP(id, values);
-        return response; // Return the updated data
-      } catch (error) {
-        return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
-      }
+        try {
+            console.log("idinslice", id)
+            const response = await UserService.EditP(id, values);
+            return response; // Return the updated data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
+        }
     }
-  );
+);
 
 
 
 
 
-// Async thunk for updating a user
-
-const initialUser = () => {
-    const item = window.localStorage.getItem("USER");
-    return item ? JSON.parse(item) : null;
-};
-
-const initialIsAuth = () => {
-    const item = window.localStorage.getItem("isAuth");
-    return item ? JSON.parse(item) : false;
-};
 
 const PlanSlice = createSlice({
     name: "Plan",
     initialState: {
-        Plan:[],
+        Plan: [],
         editItem: {},
         isLoading: false,
         addModel: false,
@@ -153,17 +142,17 @@ const PlanSlice = createSlice({
     extraReducers: (builder) => {
         builder
 
-        .addCase(planbutus.pending, (state) => {
-            state.isLoading = true;
-        })
-        .addCase(planbutus.fulfilled, (state, action) => {
-            state.isLoading = false;
-            message.success(action.payload?.message);
-        })
-        .addCase(planbutus.rejected, (state, action) => {
-            state.isLoading = false;
-            message.error(action.payload?.message);
-        })
+            .addCase(planbutus.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(planbutus.fulfilled, (state, action) => {
+                state.isLoading = false;
+                message.success(action.payload?.message);
+            })
+            .addCase(planbutus.rejected, (state, action) => {
+                state.isLoading = false;
+                message.error(action.payload?.message);
+            })
 
 
             //add
@@ -192,33 +181,33 @@ const PlanSlice = createSlice({
                 state.isLoading = false;
                 toast.error(action.payload?.message);
             })
-           
+
             //update
             .addCase(Editplan.pending, (state) => {
                 state.isLoading = false;
                 state.error = null;
-              })
-              .addCase(Editplan.fulfilled, (state, action) => {
+            })
+            .addCase(Editplan.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
                 message.success(action.payload?.message);
             })
-              .addCase(Editplan.rejected, (state, action) => {
+            .addCase(Editplan.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
                 message.error(action.payload?.message);
-              })
-              .addCase(DeleteP.pending, (state) => {
+            })
+            .addCase(DeleteP.pending, (state) => {
                 state.isLoading = true;
-              })
-              .addCase(DeleteP.fulfilled, (state, action) => {
+            })
+            .addCase(DeleteP.fulfilled, (state, action) => {
                 state.isLoading = false;
                 message.success(action.payload?.message);
-              })
-              .addCase(DeleteP.rejected, (state, action) => {
+            })
+            .addCase(DeleteP.rejected, (state, action) => {
                 state.isLoading = false;
                 message.error(action.payload?.message);
-              });
+            });
 
     },
 });

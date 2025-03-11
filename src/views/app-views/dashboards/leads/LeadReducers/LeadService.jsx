@@ -71,13 +71,11 @@ const EditLeads = async (id, formData) => {
   }
 };
 
-
 const UserService = {
   GetLeads,
   AddLeads,
   DeleteLeads,
   EditLeads,
-
 };
 
 export default UserService;

@@ -1,26 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table, Menu, Input, message, Button, Modal, DatePicker } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
 import AddAnnouncement from './AddAnnouncement';
 import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import { useDispatch, useSelector } from 'react-redux';
 import { DeleteAnn, GetAnn } from './AnnouncementReducer/AnnouncementSlice';
 import { useNavigate } from 'react-router-dom';
-import { getBranch } from '../Branch/BranchReducer/BranchSlice';
 
 const AnnouncementList = () => {
   const [users, setUsers] = useState(userData);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddAnnouncementModalVisible, setIsAddAnnouncementModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [searchDate, setSearchDate] = useState(null);
@@ -28,7 +23,7 @@ const AnnouncementList = () => {
   const navigate = useNavigate();
 
   const user = useSelector((state) => state.user.loggedInUser.username);
-    const tabledata = useSelector((state) => state.Announce);  
+  const tabledata = useSelector((state) => state.Announce);
 
   const dispatch = useDispatch();
 
@@ -53,13 +48,13 @@ const AnnouncementList = () => {
 
   const getFilteredAnnouncements = () => {
     if (!users) return [];
-    
+
     return users.filter(announcement => {
-      const matchesText = !searchText || 
+      const matchesText = !searchText ||
         announcement.title?.toLowerCase().includes(searchText.toLowerCase()) ||
         stripHtmlTags(announcement.description)?.toLowerCase().includes(searchText.toLowerCase());
 
-      const matchesDate = !searchDate || 
+      const matchesDate = !searchDate ||
         dayjs(announcement.date).format('YYYY-MM-DD') === searchDate.format('YYYY-MM-DD');
 
       return matchesText && matchesDate;
@@ -71,21 +66,16 @@ const AnnouncementList = () => {
   };
 
   const deleteUser = (userId) => {
-          dispatch(DeleteAnn( userId ))
-                .then(() => {
-                  dispatch(GetAnn());
-                  setUsers(prevUsers => prevUsers.filter(item => item.id !== userId));
-                  navigate('/app/hrm/announcement');
-                })
-                .catch((error) => {
-                  console.error('Edit API error:', error);
-                });
-  };
-
-  const showUserProfile = (userInfo) => {
-    setUserProfileVisible(true);
-    setSelectedUser(userInfo);
-  };
+    dispatch(DeleteAnn(userId))
+      .then(() => {
+        dispatch(GetAnn());
+        setUsers(prevUsers => prevUsers.filter(item => item.id !== userId));
+        navigate('/app/hrm/announcement');
+      })
+      .catch((error) => {
+        console.error('Edit API error:', error);
+      });
+  }
 
   const closeUserProfile = () => {
     setUserProfileVisible(false);
@@ -106,45 +96,46 @@ const AnnouncementList = () => {
     }
   };
 
-    useEffect(()=>{
-      dispatch(GetAnn())
-    },[dispatch]);
+  useEffect(() => {
+    dispatch(GetAnn())
+  }, [dispatch]);
 
-                                    
-                      const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                      const roles = useSelector((state) => state.role?.role?.data);
-                      const roleData = roles?.find(role => role.id === roleId);
-                   
-                      const whorole = roleData.role_name;
-                   
-                      const parsedPermissions = Array.isArray(roleData?.permissions)
-                      ? roleData.permissions
-                      : typeof roleData?.permissions === 'string'
-                      ? JSON.parse(roleData.permissions)
-                      : [];
-                    
-                      let allpermisson;  
-                   
-                      if (parsedPermissions["extra-hrm-announcement"] && parsedPermissions["extra-hrm-announcement"][0]?.permissions) {
-                        allpermisson = parsedPermissions["extra-hrm-announcement"][0].permissions;
-                      
-                      } else {
-                      }
-                      
-                      const canCreateClient = allpermisson?.includes('create');
-                      const canEditClient = allpermisson?.includes('edit');
-                      const canDeleteClient = allpermisson?.includes('delete');
-                      const canViewClient = allpermisson?.includes('view');
-                   
 
-  
-      useEffect(() => {
-        if
-         (tabledata && tabledata.Announce && tabledata.Announce.data) {
-          const filteredData = tabledata.Announce.data.filter((item) => item.created_by === user);
-          setUsers(filteredData);
-        }
-      }, [tabledata]);
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-announcement"] && parsedPermissions["extra-hrm-announcement"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-announcement"][0].permissions;
+    console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    console.log('extra-hrm-announcement is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+
+
+  useEffect(() => {
+    if
+      (tabledata && tabledata.Announce && tabledata.Announce.data) {
+      const filteredData = tabledata.Announce.data.filter((item) => item.created_by === user);
+      setUsers(filteredData);
+    }
+  }, [tabledata, user]);
 
   const stripHtmlTags = (html) => {
     if (!html) return '';
@@ -153,16 +144,60 @@ const AnnouncementList = () => {
     return tmp.textContent || tmp.innerText || '';
   };
 
-  const dropdownMenu = (elm) => ({
-    items: [
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
-        key: 'delete',
-        icon: <DeleteOutlined />,
-        label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+  // Convert dropdownMenu to a regular function
+  const dropdownMenu = (elm) => (
+    <Menu>
+      {/* <Menu.Item>
+        <Flex alignItems="center">
+          <Button type="" className="" icon={<EyeOutlined />} onClick={() => showUserProfile(elm)} size="small">
+            <span className="">View Details</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button type="" className="" icon={<MailOutlined />} onClick={() => showUserProfile(elm)} size="small">
+            <span className="">Send Mail</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button type="" className="" icon={<PushpinOutlined />} onClick={() => showUserProfile(elm)} size="small">
+            <span className="ml-2">Pin</span>
+          </Button>
+        </Flex>
+      </Menu.Item> */}
+
+
+      {/* {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                   <Menu.Item>
+                                   <Flex alignItems="center">
+                                     <Button
+                                       type=""
+                                       className=""
+                                       icon={<EditOutlined />}
+                                       onClick={() => EditMeet(elm.id)}
+                                       size="small"
+                                     >
+                                       <span className="">Edit</span>
+                                     </Button>
+                                   </Flex>
+                                 </Menu.Item>
+                                ) : null} */}
+
+
+      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button type="" className="" icon={<DeleteOutlined />} onClick={() => deleteUser(elm.id)} size="small">
+              <span className="">Delete</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
+    </Menu>
+  );
 
   const tableColumns = [
     {
@@ -201,21 +236,23 @@ const AnnouncementList = () => {
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="search-container mr-md-3 mb-3 flex gap-3">
-              <Input
-                placeholder="Search announcement title"
-                prefix={<SearchOutlined />}
-                onChange={onSearch}
-                value={searchText}
-                className="search-input"
-                onPressEnter={handleSearch}
-              />
-              <DatePicker 
-                placeholder="Search by date"
-                onChange={onDateSearch}
-                value={searchDate}
-                className="date-search-input"
-                format="DD-MM-YYYY"
-              />
+            {/* <Input.Group compact className="search-group"> */}
+            <Input
+              placeholder="Search announcement title"
+              prefix={<SearchOutlined />}
+              onChange={onSearch}
+              value={searchText}
+              className="search-input"
+              onPressEnter={handleSearch}
+            />
+            <DatePicker
+              placeholder="Search by date"
+              onChange={onDateSearch}
+              value={searchDate}
+              className="date-search-input"
+              format="DD-MM-YYYY"
+            />
+            {/* </Input.Group> */}
           </div>
         </Flex>
         <Flex gap="7px">
@@ -237,9 +274,9 @@ const AnnouncementList = () => {
       </Flex>
       <div className="table-responsive mt-2">
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-          <Table 
-            columns={tableColumns} 
-            dataSource={getFilteredAnnouncements()} 
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredAnnouncements()}
             rowKey="id"
             pagination={{
               total: getFilteredAnnouncements().length,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Input, Button, Select, message, Row, Col } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
@@ -32,7 +32,7 @@ const EditNotes = ({ idd, onClose }) => {
 
   useEffect(() => {
     dispatch(GetUsers());
-  }, []);
+  }, [dispatch]);
 
   const [initialValues, setInitialValues] = useState({
     note_title: "",
@@ -48,7 +48,7 @@ const EditNotes = ({ idd, onClose }) => {
   });
 
   const allempdata = useSelector((state) => state.Notes);
-  const Expensedata = allempdata?.Notes?.data || [];
+  const Expensedata = useMemo(() => allempdata?.Notes?.data || [], [allempdata?.Notes?.data]);
 
   useEffect(() => {
     if (!Expensedata.length || !idd) {
@@ -78,7 +78,6 @@ const EditNotes = ({ idd, onClose }) => {
         ...values,
         employees: employeesObject
       };
-
       const result = await dispatch(EditeNotes({ idd, values: payload })).unwrap();
       message.success("Note updated successfully!");
       dispatch(GetNote(id));

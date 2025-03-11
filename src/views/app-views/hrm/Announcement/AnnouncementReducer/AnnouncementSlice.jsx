@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./AnnouncementService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
 export const addAnnounce = createAsyncThunk(
@@ -15,8 +14,6 @@ export const addAnnounce = createAsyncThunk(
         }
     }
 );
-
-
 
 export const GetAnn = createAsyncThunk(
     "emp/GetAnn",
@@ -68,30 +65,25 @@ export const DeleteAnn = createAsyncThunk(
 export const EditDept = createAsyncThunk(
     "users/updateEmployee",
     async ({ comnyid, values }, thunkAPI) => {
-      try {
-        const response = await UserService.EditDept(comnyid, values);
-        return response; // Return the updated data
-      } catch (error) {
-        return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
-      }
+        try {
+            console.log("idinslice", comnyid)
+            const response = await UserService.EditDept(comnyid, values);
+            return response; // Return the updated data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
+        }
     }
-  );
+);
 
 
-const initialUser = () => {
-    const item = window.localStorage.getItem("USER");
-    return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-    const item = window.localStorage.getItem("isAuth");
-    return item ? JSON.parse(item) : false;
-};
+
+
 
 const AnnouncementSlice = createSlice({
     name: "Announce",
     initialState: {
-        Announce:[],
+        Announce: [],
         editItem: {},
         isLoading: false,
         addModel: false,
@@ -152,8 +144,8 @@ const AnnouncementSlice = createSlice({
                 state.isLoading = false;
                 toast.error(action.payload?.message);
             })
-           
-         
+
+
             //delete
             .addCase(DeleteAnn.pending, (state) => {
                 state.isLoading = true;
@@ -170,17 +162,17 @@ const AnnouncementSlice = createSlice({
             .addCase(EditDept.pending, (state) => {
                 state.isLoading = false;
                 state.error = null;
-              })
-              .addCase(EditDept.fulfilled, (state, action) => {
+            })
+            .addCase(EditDept.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
                 message.success(action.payload?.message);
-              })
-              .addCase(EditDept.rejected, (state, action) => {
+            })
+            .addCase(EditDept.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
                 message.error(action.payload?.message);
-              });
+            });
     },
 });
 

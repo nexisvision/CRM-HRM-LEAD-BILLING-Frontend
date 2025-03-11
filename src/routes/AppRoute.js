@@ -10,8 +10,8 @@ const AppRoute = ({ component: Component, routeKey, blankLayout, ...props }) => 
 		const isBlank = blankLayout ? true : false
 		dispatch(onBlankLayout(isBlank))
 
-	}, [blankLayout])
-	
+	}, [blankLayout, dispatch])
+
 	return (
 		<Component {...props} />
 	)

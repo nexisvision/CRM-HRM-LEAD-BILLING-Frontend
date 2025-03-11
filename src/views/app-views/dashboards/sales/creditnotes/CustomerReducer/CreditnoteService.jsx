@@ -51,7 +51,6 @@ const deletecredit = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -78,13 +77,11 @@ const editcredit = async (idd, values) => {
   }
 };
 
-
 const UserService = {
   getcreditn,
   createcredit,
   deletecredit,
   editcredit,
-
 };
 
 export default UserService;

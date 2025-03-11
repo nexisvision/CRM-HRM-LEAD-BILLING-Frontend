@@ -2,7 +2,7 @@ import React from 'react';
 import EstimatesList from './EstimatesList';
 
 <div className="mail">
-<EstimatesList />
+	<EstimatesList />
 </div>
 
 );

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Radar} from 'react-chartjs-2';
+import { Radar } from 'react-chartjs-2';
 import { COLOR_1, COLOR_1_LIGHT, COLOR_2, COLOR_2_LIGHT, COLOR_AXES } from 'constants/ChartConstant';
 
 export class RadarChart extends Component {
@@ -29,21 +29,21 @@ export class RadarChart extends Component {
 			responsive: true,
 			scale: {
 				ticks: {
-					max: 100,                            
+					max: 100,
 					stepSize: 25,
 				},
 				gridLines: {
 					color: COLOR_AXES
-				},  
+				},
 				angleLines: {
 					color: COLOR_AXES
-				}   
-			} 
+				}
+			}
 		}
 
 		return (
 			<div>
-				<Radar data={data} options={option}/>
+				<Radar data={data} options={option} />
 			</div>
 		)
 	}

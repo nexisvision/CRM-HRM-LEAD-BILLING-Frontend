@@ -1,17 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Card } from 'antd';
-import { 
-    ShoppingOutlined,
-    DollarOutlined,
-    ProjectOutlined,
-    UserOutlined,
-    CalendarOutlined,
-    FileTextOutlined,
-    BankOutlined,
-    GlobalOutlined,
-    FileOutlined,
-    IdcardOutlined
-} from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
 
@@ -31,7 +18,6 @@ function ViewPayment({ data }) {
                 setProjectName(project.project_name);
             }
         }
-
         if (data?.invoice && invoicesData) {
             const invoice = invoicesData.find(i => i.id === data.invoice);
             if (invoice) {
@@ -48,150 +34,68 @@ function ViewPayment({ data }) {
     }, [data, projectsData, invoicesData, allClients]);
 
     return (
-        <div className="bg-white p-6">
-            <div className="overflow-hidden rounded-lg border border-gray-200">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <tbody className="divide-y divide-gray-200 bg-white">
-                        {/* Invoice Number Row */}
-                        <tr className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-3 whitespace-nowrap w-1/3">
-                                <div className="flex items-center">
-                                    <FileTextOutlined className="text-indigo-500 text-lg mr-3" />
-                                    <span className="text-sm font-medium text-gray-600">Invoice Number</span>
-                                </div>
+        <div className='bg-gray-50 ml-[-51px] mr-[-24px] mt-[-52px] mb-[-30px] rounded-t-lg rounded-b-lg p-10'>
+            <hr className="mb-6 border-b pb-[25px] font-medium"></hr>
+            <div className="bg-white shadow rounded-lg p-6 space-y-4 w-full">
+                <table className="table">
+                    <tbody>
+                        <tr className='text-base grid grid-cols-2'>
+                            <td className='text-[#99a5b5] font-semibold p-2'>Invoice Number</td>
+                            <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
+                                {invoiceNumber}
                             </td>
-                            <td className="px-6 py-3 whitespace-nowrap">
-                                <span className="text-sm text-gray-900">
-                                    {invoiceNumber}
-                                </span>
+                        </tr>
+                        <tr className='text-base grid grid-cols-2'>
+                            <td className='text-[#99a5b5] font-semibold p-2'>Project Name</td>
+                            <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
+                                {projectName}
+                            </td>
+                        </tr>
+                        <tr className='text-base grid grid-cols-2'>
+                            <td className='text-[#99a5b5] font-semibold p-2'>Amount</td>
+                            <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
+                                ${data?.amount || '--'}
+                            </td>
+                        </tr>
+                        <tr className='text-base grid grid-cols-2'>
+                            <td className='text-[#99a5b5] font-semibold p-2'>Payment Date</td>
+                            <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
+                                {data?.paidOn ? dayjs(data.paidOn).format('DD-MM-YYYY') : '--'}
                             </td>
                         </tr>
 
-                        {/* Project Name Row */}
-                        <tr className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-3 whitespace-nowrap w-1/3">
-                                <div className="flex items-center">
-                                    <ProjectOutlined className="text-cyan-500 text-lg mr-3" />
-                                    <span className="text-sm font-medium text-gray-600">Project Name</span>
-                                </div>
-                            </td>
-                            <td className="px-6 py-3 whitespace-nowrap">
-                                <span className="text-sm text-gray-900">
-                                    {projectName}
-                                </span>
+                        <tr className='text-base grid grid-cols-2'>
+                            <td className='text-[#99a5b5] font-semibold p-2'>Currency</td>
+                            <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
+                                {data?.currency || '--'}
                             </td>
                         </tr>
-
-                        {/* Client Name Row */}
-                        <tr className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-3 whitespace-nowrap w-1/3">
-                                <div className="flex items-center">
-                                    <IdcardOutlined className="text-indigo-500 text-lg mr-3" />
-                                    <span className="text-sm font-medium text-gray-600">Client</span>
-                                </div>
-                            </td>
-                            <td className="px-6 py-3 whitespace-nowrap">
-                                <div className="flex items-center space-x-2">
-                                    <span className="text-sm text-gray-900">{clientName}</span>
-                                </div>
+                        <tr className='text-base grid grid-cols-2'>
+                            <td className='text-[#99a5b5] font-semibold p-2'>Transaction ID</td>
+                            <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
+                                {data?.transactionId || '--'}
                             </td>
                         </tr>
-
-                        {/* Transaction ID Row */}
-                        <tr className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-3 whitespace-nowrap w-1/3">
-                                <div className="flex items-center">
-                                    <BankOutlined className="text-blue-500 text-lg mr-3" />
-                                    <span className="text-sm font-medium text-gray-600">Transaction ID</span>
-                                </div>
-                            </td>
-                            <td className="px-6 py-3 whitespace-nowrap">
-                                <span className="text-sm text-gray-900">
-                                    {data?.transactionId || '--'}
-                                </span>
+                        <tr className='text-base grid grid-cols-2'>
+                            <td className='text-[#99a5b5] font-semibold p-2'>Payment Method</td>
+                            <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
+                                {data?.paymentMethod || '--'}
                             </td>
                         </tr>
-
-                        {/* Amount Row */}
-                        <tr className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-3 whitespace-nowrap w-1/3">
-                                <div className="flex items-center">
-                                    <DollarOutlined className="text-yellow-500 text-lg mr-3" />
-                                    <span className="text-sm font-medium text-gray-600">Amount</span>
-                                </div>
-                            </td>
-                            <td className="px-6 py-3 whitespace-nowrap">
-                                <span className="text-sm text-gray-900">
-                                  {data?.amount || '--'}
-                                </span>
-                            </td>
-                        </tr>
-
-                        {/* Payment Method Row */}
-                        <tr className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-3 whitespace-nowrap w-1/3">
-                                <div className="flex items-center">
-                                    <BankOutlined className="text-purple-500 text-lg mr-3" />
-                                    <span className="text-sm font-medium text-gray-600">Payment Method</span>
-                                </div>
-                            </td>
-                            <td className="px-6 py-3 whitespace-nowrap">
-                                <span className="text-sm text-gray-900">
-                                    {data?.paymentMethod?.toUpperCase() || '--'}
-                                </span>
-                            </td>
-                        </tr>
-
-                        {/* Payment Date Row */}
-                        <tr className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-3 whitespace-nowrap w-1/3">
-                                <div className="flex items-center">
-                                    <CalendarOutlined className="text-red-500 text-lg mr-3" />
-                                    <span className="text-sm font-medium text-gray-600">Payment Date</span>
-                                </div>
-                            </td>
-                            <td className="px-6 py-3 whitespace-nowrap">
-                                <span className="text-sm text-gray-900">
-                                    {data?.paidOn ? dayjs(data.paidOn).format('DD-MM-YYYY') : '--'}
-                                </span>
-                            </td>
-                        </tr>
-
-                        {/* Receipt Row */}
-                        <tr className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-3 whitespace-nowrap w-1/3">
-                                <div className="flex items-center">
-                                    <FileOutlined className="text-blue-500 text-lg mr-3" />
-                                    <span className="text-sm font-medium text-gray-600">Receipt</span>
-                                </div>
-                            </td>
-                            <td className="px-6 py-3 whitespace-nowrap">
+                        <tr className='text-base grid grid-cols-2'>
+                            <td className='text-[#99a5b5] font-semibold p-2'>Receipt</td>
+                            <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
                                 {data?.receipt ? (
-                                    <a 
-                                        href={data.receipt} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer" 
-                                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                    >
-                                        <FileOutlined className="mr-2" />
+                                    <a href={data.receipt} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                                         View Receipt
                                     </a>
                                 ) : '--'}
                             </td>
                         </tr>
-
-                        {/* Remark Row */}
-                        <tr className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-3 w-1/3">
-                                <div className="flex items-center">
-                                    <FileTextOutlined className="text-teal-500 text-lg mr-3" />
-                                    <span className="text-sm font-medium text-gray-600">Remark</span>
-                                </div>
-                            </td>
-                            <td className="px-6 py-3">
-                                <div className="text-sm text-gray-900 prose max-w-none">
-                                    <div dangerouslySetInnerHTML={{ __html: data?.remark || '--' }} />
-                                </div>
+                        <tr className='text-base grid grid-cols-2'>
+                            <td className='text-[#99a5b5] font-semibold p-2'>Remark</td>
+                            <td className='text-[#5b676d] font-medium p-2'>
+                                <div dangerouslySetInnerHTML={{ __html: data?.remark || '--' }} />
                             </td>
                         </tr>
                     </tbody>

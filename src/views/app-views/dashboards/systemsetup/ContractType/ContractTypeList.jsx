@@ -3,81 +3,43 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Select,
-  Input,
   Button,
-  Badge,
-  Menu,
-  Tag,
   Modal,
-  Row,
-  Col,
   message,
 } from "antd";
 import OrderListData from "../../../../../assets/data/order-list.data.json";
 import {
-  EyeOutlined,
-  FileExcelOutlined,
-  SearchOutlined,
-  PlusCircleOutlined,
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-
 import utils from "utils";
-// import { PaymentStatisticData } from "../../../dashboards/default/DefaultDashboardData";
-
 import {
-  DeleteLabless,
   Deletemins,
   GetLable,
 } from "../../project/milestone/LableReducer/LableSlice";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-
 import EditContractType from "./EditContractType";
 import AddContractType from "./AddContractType";
-
-const { Option } = Select;
-
-const paymentStatusList = ["paypal"];
 
 const ContractTypeList = () => {
   const [list, setList] = useState(OrderListData);
   const dispatch = useDispatch();
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddSourcesModalVisible, setIsAddSourcesModalVisible] =
     useState(false);
   const [isEditSourcesModalVisible, setIsEditSourcesModalVisible] =
     useState(false);
-  const [isViewSourcesModalVisible, setIsViewSourcesModalVisible] =
-    useState(false);
-  // const [paymentStatisticData] = useState(PaymentStatisticData);
 
   const [idd, setIdd] = useState("");
 
   const allloggeddata = useSelector((state) => state.user);
   const userdata = allloggeddata.loggedInUser;
-
   const lid = userdata.id;
-
-  
-  const user = userdata.username;
-
-
-  
   const alltagdata = useSelector((state) => state.Lable);
-
   const fndddata = alltagdata.Lable.data || [];
-
-
-
-
-  const datas = fndddata?.filter(item => item.lableType === "contract");  
+  const datas = fndddata?.filter(item => item.lableType === "contract");
 
   const openAddSourcesModal = () => {
     setIsAddSourcesModalVisible(true);
@@ -95,17 +57,9 @@ const ContractTypeList = () => {
     setIsEditSourcesModalVisible(false);
   };
 
-  const openViewSourcesModal = () => {
-    setIsViewSourcesModalVisible(true);
-  };
-
-  const closeViewSourcesModal = () => {
-    setIsViewSourcesModalVisible(false);
-  };
-
   useEffect(() => {
     dispatch(GetLable(lid));
-  }, []);
+  }, [dispatch, lid]);
 
   useEffect(() => {
     if (datas) {
@@ -127,23 +81,6 @@ const ContractTypeList = () => {
     openEditSourcesModal();
     setIdd(idd);
   };
-
-  const dropdownMenu = (row) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={openEditSourcesModal}>
-          <EditOutlined />
-          <span className="ml-2">Edit</span>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
 
   const tableColumns = [
     {
@@ -170,18 +107,9 @@ const ContractTypeList = () => {
             <DeleteOutlined className="text-xl" />
           </button>
         </div>
-      
       ),
     },
   ];
-
-  const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
-  };
 
   return (
     <>
@@ -213,19 +141,17 @@ const ContractTypeList = () => {
             className="flex flex-wrap gap-4 mb-4 md:mb-0"
             mobileFlex={false}
           >
-           
+
           </Flex>
-         
-        </Flex>
+        </Flex >
         <div className="table-responsive">
           <Table
             columns={tableColumns}
             dataSource={list}
             rowKey="id"
-           
           />
         </div>
-      </Card>
+      </Card >
 
       <Modal
         title="Add Contract Type"
@@ -233,7 +159,6 @@ const ContractTypeList = () => {
         onCancel={closeAddSourcesModal}
         footer={null}
         width={700}
-        // className='mt-[-70px]'
       >
         <AddContractType onClose={closeAddSourcesModal} />
       </Modal>
@@ -243,7 +168,6 @@ const ContractTypeList = () => {
         onCancel={closeEditSourcesModal}
         footer={null}
         width={700}
-        // className='mt-[-70px]'
       >
         <EditContractType onClose={closeEditSourcesModal} idd={idd} />
       </Modal>
@@ -252,8 +176,3 @@ const ContractTypeList = () => {
 };
 
 export default ContractTypeList;
-
-// GetLable,
-// AddLable,
-// Deletemins,
-// EditMin,

@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Card,
   Table,
-  Menu,
-  Row,
-  Col,
   Tag,
   Input,
   message,
@@ -12,29 +9,23 @@ import {
   Modal,
   Select,
   DatePicker,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
   EditOutlined,
   PlusOutlined,
-  FilePdfOutlined,
   FileExcelOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import UserView from "../../../Users/user-list/UserView";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import StatisticWidget from "components/shared-components/StatisticWidget";
-import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddJobOnBording from "./AddJobOnBording";
 import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
 import utils from "utils";
 import EditJobOnBording from "./EditJobOnBording";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   deleteJobonBoarding,
@@ -45,16 +36,13 @@ const { Option } = Select;
 const JobOnBordingList = () => {
   const [users, setUsers] = useState(userData);
   const dispatch = useDispatch();
-  const [list, setList] = useState(OrderListData);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddJobOnBordingModalVisible, setIsAddJobOnBordingModalVisible] =
     useState(false);
   const [isEditJobOnBordingModalVisible, setIsEditJobOnBordingModalVisible] =
     useState(false);
-    const [idd, setIdd] = useState("");
-  const navigate = useNavigate();
+  const [idd, setIdd] = useState("");
   const [searchText, setSearchText] = useState('');
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState('All');
@@ -63,13 +51,13 @@ const JobOnBordingList = () => {
   const user = useSelector((state) => state.user.loggedInUser.username);
 
   const alldata = useSelector((state) => state.jobonboarding);
-  const fnddata = alldata.jobonboarding.data || [];
+  const fnddata = useMemo(() => alldata.jobonboarding.data || [], [alldata.jobonboarding.data]);
 
   const filteredData = fnddata.filter((item) => item.created_by === user);
 
   useEffect(() => {
     dispatch(getJobonBoarding());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (fnddata) {
@@ -79,9 +67,6 @@ const JobOnBordingList = () => {
     }
   }, [fnddata, filteredData]);
 
-  const [annualStatisticData] = useState(AnnualStatisticData);
-
-  // Open Add Job Modal
   const openAddJobOnBordingModal = () => {
     setIsAddJobOnBordingModalVisible(true);
   };
@@ -109,7 +94,7 @@ const JobOnBordingList = () => {
   // Update the getFilteredOnboarding function to include status filtering
   const getFilteredOnboarding = () => {
     if (!filteredData) return [];
-    
+
     let filtered = [...filteredData];
 
     // Text search filter
@@ -125,7 +110,7 @@ const JobOnBordingList = () => {
 
     // Status filter from dropdown
     if (selectedStatus && selectedStatus !== 'All') {
-      filtered = filtered.filter(onboarding => 
+      filtered = filtered.filter(onboarding =>
         onboarding.Status?.toLowerCase() === selectedStatus.toLowerCase()
       );
     }
@@ -149,32 +134,36 @@ const JobOnBordingList = () => {
     message.success('Search completed');
   };
 
-                                    
-                      const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                      const roles = useSelector((state) => state.role?.role?.data);
-                      const roleData = roles?.find(role => role.id === roleId);
-                   
-                      const whorole = roleData.role_name;
-                   
-                      const parsedPermissions = Array.isArray(roleData?.permissions)
-                      ? roleData.permissions
-                      : typeof roleData?.permissions === 'string'
-                      ? JSON.parse(roleData.permissions)
-                      : [];
-                    
-                      let allpermisson;  
-                   
-                      if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
-                        allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
-                      
-                      } else {
-                      }
-                      
-                      const canCreateClient = allpermisson?.includes('create');
-                      const canEditClient = allpermisson?.includes('edit');
-                      const canDeleteClient = allpermisson?.includes('delete');
-                      const canViewClient = allpermisson?.includes('view');
-                   
+  //// permission
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
+    // console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    // console.log('extra-hrm-jobs-jobonbording is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
 
 
 
@@ -183,18 +172,6 @@ const JobOnBordingList = () => {
       dispatch(getJobonBoarding());
       setUsers(users.filter((item) => item.id !== userId));
     });
-  };
-
-  const openViewJobOnBordingModal = () => {
-    navigate("/app/hrm/jobs/viewjobonbording", {
-      state: { user: selectedUser },
-    }); // Pass user data as state if needed
-  };
-
-  // Show user profile
-  const showUserProfile = (userInfo) => {
-    setSelectedUser(userInfo);
-    setUserProfileVisible(true);
   };
 
   // Close user profile
@@ -213,37 +190,30 @@ const JobOnBordingList = () => {
     return "";
   };
 
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "status";
-      const data = utils.filterArray(userData, key, value);
-      setUsers(data);
-    } else {
-      setUsers(userData);
-    }
-  };
+  const getDropdownItems = (row) => {
+    const items = [];
 
-  const jobStatusList = ["active", "blocked"];
-
-  const dropdownMenu = (elm) => ({
-    items: [
-      
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
-        onClick: () => editfunction(elm.id)
-      }] : []),
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        onClick: () => editfunction(row.id)
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(row.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -305,7 +275,22 @@ const JobOnBordingList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            menu={{ items: getDropdownItems(elm) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -318,18 +303,6 @@ const JobOnBordingList = () => {
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
-      {/* <Row gutter={16}>
-        {annualStatisticData.map((elm, i) => (
-          <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-            <StatisticWidget
-              title={elm.title}
-              value={elm.value}
-              status={elm.status}
-              subtitle={elm.subtitle}
-            />
-          </Col>
-        ))}
-      </Row> */}
       <Flex
         alignItems="center"
         justifyContent="space-between"
@@ -375,19 +348,19 @@ const JobOnBordingList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-        
 
-             {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                        <Button
-                                                                                                        type="primary"
-                                                                                                        className="ml-2"
-                                                                                                        onClick={openAddJobOnBordingModal}
-                                                                                                      >
-                                                                                                        <PlusOutlined />
-                                                                                                        <span>New</span>
-                                                                                                      </Button>                                                                                                                              
-                                                                                                                                                                                                                                      
-                                                                                                                    ) : null}
+
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddJobOnBordingModal}
+            >
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+
+          ) : null}
 
 
           <Button type="primary" icon={<FileExcelOutlined />} block>
@@ -397,22 +370,22 @@ const JobOnBordingList = () => {
       </Flex>
       <div className="table-responsive mt-2">
 
-           {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                   <Table
-                                                   columns={tableColumns}
-                                                   dataSource={getFilteredOnboarding()}
-                                                   rowKey="id"
-                                                   pagination={{
-                                                     total: getFilteredOnboarding().length,
-                                                     pageSize: 10,
-                                                     showSizeChanger: true,
-                                                     showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                                                   }}
-                                                 />
-                                                     ) : null}
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredOnboarding()}
+            rowKey="id"
+            pagination={{
+              total: getFilteredOnboarding().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
+          />
+        ) : null}
 
 
-       
+
       </div>
       <UserView
         data={selectedUser}
@@ -437,7 +410,7 @@ const JobOnBordingList = () => {
         footer={null}
         width={1000}
       >
-        <EditJobOnBording onClose={closeEditJobOnBordingModal} idd={idd}/>
+        <EditJobOnBording onClose={closeEditJobOnBordingModal} idd={idd} />
       </Modal>
     </Card>
   );
@@ -471,6 +444,32 @@ const styles = `
     width: 90px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
   }
 
   @media (max-width: 768px) {

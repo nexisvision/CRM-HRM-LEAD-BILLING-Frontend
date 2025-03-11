@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Input, Button, DatePicker, Select, message, Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
-import utils from 'utils';
-import OrderListData from "assets/data/order-list.data.json"
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
@@ -25,14 +23,14 @@ const EditProjectReport = () => {
     };
 
     const validationSchema = Yup.object({
-      subject: Yup.string().required('Please enter a Subject Name.'),
-      client: Yup.string().required('Please select Client.'),
-      projects: Yup.mixed().required('Please select Projects.'),
-      contractValue: Yup.number().required('Please enter Contract Value .').positive('Contract Value must be positive.'),
-      startdate: Yup.date().nullable().required('Start date is required.'),
-      enddate: Yup.date().nullable().required('End date is required.'),
-      skills: Yup.number().required('Please enter a Skills.'),
-      jobDescription: Yup.string().required('Please enter a Job Description.'),
+        subject: Yup.string().required('Please enter a Subject Name.'),
+        client: Yup.string().required('Please select Client.'),
+        projects: Yup.mixed().required('Please select Projects.'),
+        contractValue: Yup.number().required('Please enter Contract Value .').positive('Contract Value must be positive.'),
+        startdate: Yup.date().nullable().required('Start date is required.'),
+        enddate: Yup.date().nullable().required('End date is required.'),
+        skills: Yup.number().required('Please enter a Skills.'),
+        jobDescription: Yup.string().required('Please enter a Job Description.'),
     });
 
 
@@ -50,7 +48,7 @@ const EditProjectReport = () => {
             >
                 {({ values, setFieldValue, handleSubmit, handleChange, }) => (
                     <Form className="formik-form" onSubmit={handleSubmit}>
-                        <h2 className="mb-4 border-b pb-2 font-medium"></h2>
+                        <hr className="mb-4 border-b pb-2 font-medium"></hr>
 
                         <Row gutter={16}>
                             <Col span={12}>
@@ -136,12 +134,12 @@ const EditProjectReport = () => {
                                     />
                                     <ErrorMessage name="enddate" component="div" className="error-message text-red-500 my-1" />
                                 </div>
-                            </Col>                            
+                            </Col>
 
                             <Col span={24} className='mt-4'>
                                 <div className="form-item">
                                     <label className='font-semibold'>Skills</label>
-                                    <Field name="skills" as={Input}  placeholder="Enter Skills" />
+                                    <Field name="skills" as={Input} placeholder="Enter Skills" />
                                     <ErrorMessage name="skills" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>

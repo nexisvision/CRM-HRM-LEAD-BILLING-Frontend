@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table, Menu, Input, Button, Modal, message, Select } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
+import { DeleteOutlined, SearchOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
 import UserView from '../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import { useNavigate } from 'react-router-dom';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
 import AddDepartment from './AddDepartment';
 import EditDepartment from './EditDepartment';
 import { utils, writeFile } from "xlsx";
@@ -21,8 +19,6 @@ const DepartmentList = () => {
   const dispatch = useDispatch();
 
   const [users, setUsers] = useState([]);
-  const [list, setList] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddDepartmentModalVisible, setIsAddDepartmentModalVisible] = useState(false);
   const [isEditDepartmentModalVisible, setIsEditDepartmentModalVisible] = useState(false);
   const  [dept,setDept] = useState("");
@@ -72,10 +68,6 @@ const DepartmentList = () => {
 
   const closeEditDepartmentModal = () => {
     setIsEditDepartmentModalVisible(false);
-  };
-
-  const handleParticularDepartmentModal = () => {
-    navigate('/app/hrm/department/particulardepartment', { state: { user: selectedUser } });
   };
 
   const onSearch = (e) => {
@@ -131,7 +123,7 @@ const DepartmentList = () => {
       const filteredData = tabledata.Department.data.filter((item) => item.created_by === user);
       setUsers(filteredData);
     }
-  }, [tabledata]);
+  }, [tabledata,user]);
 
   const deleteUser = (userId) => {
     dispatch(DeleteDept( userId ))

@@ -1,61 +1,8 @@
 import React from "react";
 import { Card, Col, Row } from "antd";
-import { Line } from "react-chartjs-2";
 import { UserOutlined, ShoppingCartOutlined, TrophyOutlined } from "@ant-design/icons";
 
 const SuperadminDashboard = () => {
-  const data = {
-    labels: [
-      "22-Nov",
-      "23-Nov",
-      "24-Nov",
-      "25-Nov",
-      "26-Nov",
-      "27-Nov",
-      "28-Nov",
-      "29-Nov",
-      "30-Nov",
-      "01-Dec",
-      "02-Dec",
-      "03-Dec",
-      "04-Dec",
-      "05-Dec",
-    ],
-    datasets: [
-      {
-        label: "Revenue",
-        data: [300, 400, 500, 350, 450, 300, 500, 400, 300, 500, 550, 400, 450, 300],
-        fill: true,
-        backgroundColor: "rgba(102, 221, 102, 0.2)",
-        borderColor: "rgba(102, 221, 102, 1)",
-        tension: 0.4,
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false,
-      },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: "Months",
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: "Revenue",
-        },
-        beginAtZero: true,
-      },
-    },
-  };
 
   return (
     <div style={{ padding: "20px" }}>

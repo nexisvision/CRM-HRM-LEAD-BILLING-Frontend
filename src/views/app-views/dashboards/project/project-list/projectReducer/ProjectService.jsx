@@ -76,15 +76,11 @@ const EditPro = async (id, values) => {
 
 
 const UserService = {
-  // addUser,
+
   GetProject,
   AddProject,
   DeletePro,
   EditPro,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
 };
 
 export default UserService;

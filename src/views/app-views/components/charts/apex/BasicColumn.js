@@ -3,7 +3,7 @@ import Chart from "react-apexcharts";
 import { COLOR_1, COLOR_2, COLOR_4 } from 'constants/ChartConstant';
 
 export class BasicColumn extends Component {
-	state = {   
+	state = {
 		series: [{
 			name: 'Net Profit',
 			data: [44, 55, 57, 56, 61, 58, 63, 60, 66]
@@ -43,7 +43,7 @@ export class BasicColumn extends Component {
 				}
 			}
 		}
-	
+
 	};
 
 	render() {
@@ -51,7 +51,7 @@ export class BasicColumn extends Component {
 			<Chart
 				options={this.state.options}
 				series={this.state.series}
-				height= {300}
+				height={300}
 				type="bar"
 			/>
 		)

@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./MeetingService";
-import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
 export const AddMeet = createAsyncThunk(
@@ -16,6 +14,8 @@ export const AddMeet = createAsyncThunk(
   }
 );
 
+
+
 export const MeetData = createAsyncThunk(
   "emp/getmeet",
   async (loginData, thunkAPI) => {
@@ -27,6 +27,8 @@ export const MeetData = createAsyncThunk(
     }
   }
 );
+
+
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -76,15 +78,9 @@ export const EditMeet = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
+// Async thunk for updating a user
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
+
 
 const MeetingSlice = createSlice({
   name: "Meeting",
@@ -151,7 +147,7 @@ const MeetingSlice = createSlice({
         message.error(action.payload?.message);
       })
 
-     
+
       .addCase(deleteM.pending, (state) => {
         state.isLoading = true;
       })

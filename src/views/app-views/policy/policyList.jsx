@@ -2,51 +2,32 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Menu,
-  Tag,
   Input,
   message,
   Button,
   Modal,
-  Select,
   Space,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
   FileExcelOutlined,
   EditOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
-// import UserView from "../../../Users/user-list/UserView";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import Addpolicy from "./Addpolicy";
 import Editpolicy from "./Editpolicy";
-// import EditJobOfferLetter from "./EditJobOfferLetter";
 import { utils, writeFile } from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import { deletepolicys, getpolicys } from "./policyReducer/policySlice";
-// import {
-//   deletejobapplication,
-//   getjobapplication,
-// } from "./JobapplicationReducer/JobapplicationSlice";
-// import ViewJobApplication from './ViewJobApplication';
 import { debounce } from 'lodash';
-
-const { Option } = Select;
 
 const PolicyList = () => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
-  const [userProfileVisible, setUserProfileVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddpolicyModalVisible, setIsAddpolicyModalVisible] = useState(false);
 
   const [idd, setIdd] = useState("");
@@ -57,7 +38,7 @@ const PolicyList = () => {
 
   useEffect(() => {
     dispatch(getpolicys());
-  }, []);
+  }, [dispatch]);
 
   const allbranch = useSelector((state) => state.policy);
   const fndbranch = allbranch.policy.data;
@@ -70,10 +51,6 @@ const PolicyList = () => {
 
   const [isEditpolicyModalVisible, setIsEditpolicyModalVisible] =
     useState(false);
-
-  const alldata = useSelector((state) => state.jobapplications);
-  const fnddta = alldata.jobapplications.data;
-
 
 
   const openAddpolicyModal = () => {
@@ -95,9 +72,9 @@ const PolicyList = () => {
   // Create debounced version of search
   const debouncedSearch = debounce((value, data, setUsers) => {
     setIsSearching(true);
-    
+
     const searchValue = value.toLowerCase();
-    
+
     if (!searchValue) {
       setUsers(fndbranch || []);
       setIsSearching(false);
@@ -131,16 +108,6 @@ const PolicyList = () => {
     });
   };
 
-  const showUserProfile = (userInfo) => {
-    setUserProfileVisible(true);
-    setSelectedUser(userInfo);
-  };
-
-  const closeUserProfile = () => {
-    setUserProfileVisible(false);
-    setSelectedUser(null);
-  };
-
   const exportToExcel = () => {
     try {
       const ws = utils.json_to_sheet(users); // Convert JSON data to a sheet
@@ -155,39 +122,28 @@ const PolicyList = () => {
     }
   };
 
-
-
-  const getjobStatus = (status) => {
-    if (status === "active") {
-      return "blue";
-    }
-    if (status === "blocked") {
-      return "cyan";
-    }
-    return "";
-  };
-
   const eidtfun = (idd) => {
     openEditJobOfferLetterModal();
     setIdd(idd);
   };
 
-  const dropdownMenu = (elm) => ({
-    items: [
+  const getDropdownItems = (record) => {
+    return [
       {
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
-        onClick: () => eidtfun(elm.id)
+        onClick: () => eidtfun(record.id)
       },
       {
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
+        onClick: () => deleteUser(record.id),
+        danger: true
       }
-    ]
-  });
+    ];
+  };
 
   const tableColumns = [
     {
@@ -222,7 +178,7 @@ const PolicyList = () => {
         record.title
           ? record.title.toString().toLowerCase().includes(value.toLowerCase())
           : '',
-      sorter: (a, b) => a.title.length - b.title.length,
+      sorter: (a, b) => a.title?.length - b.title?.length,
     },
     {
       title: "Description",
@@ -230,14 +186,29 @@ const PolicyList = () => {
       render: (text) => (
         <div dangerouslySetInnerHTML={{ __html: text }} />
       ),
-      sorter: (a, b) => a.description.length - b.description.length,
+      sorter: (a, b) => a.description?.length - b.description?.length,
     },
     {
       title: "Action",
       dataIndex: "actions",
-      render: (_, elm) => (
+      render: (_, record) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            menu={{ items: getDropdownItems(record) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -262,27 +233,11 @@ const PolicyList = () => {
               loading={isSearching}
             />
           </div>
-          {/* <div className="w-full md:w-48 ">
-            <Select
-              defaultValue="All"
-              className="w-100"
-              style={{ minWidth: 180 }}
-              onChange={handleShowStatus}
-              placeholder="Status"
-            >
-              <Option value="All">All Job </Option>
-              {jobStatusList.map((elm) => (
-                <Option key={elm} value={elm}>
-                  {elm}
-                </Option>
-              ))}
-            </Select>
-          </div> */}
         </Flex>
         <Flex gap="7px">
           <Button type="primary" className="ml-2" onClick={openAddpolicyModal}>
             <PlusOutlined />
-            <span>New</span>  
+            <span>New</span>
           </Button>
           <Button
             type="primary"
@@ -302,13 +257,6 @@ const PolicyList = () => {
           scroll={{ x: 1200 }}
         />
       </div>
-      {/* <UserView
-        data={selectedUser}
-        visible={userProfileVisible}
-        close={closeUserProfile}
-      /> */}
-
-      {/* <ViewJobApplication data={selectedUser} visible={viewApplicationVisible} close={closeViewApplication} /> */}
       <Modal
         title="Add Policy"
         visible={isAddpolicyModalVisible}
@@ -330,18 +278,78 @@ const PolicyList = () => {
       >
         <Editpolicy onClose={closeEditpolicyModal} idd={idd} />
       </Modal>
-      {/* <Modal
-        title=""
-        visible={viewApplicationVisible}
-        onCancel={closeViewApplication}
-        footer={null}
-        width={1200}
-        className='mt-[-70px]'
-      >
-        <ViewJobApplication onClose={closeViewApplication} />
-      </Modal> */}
+
     </Card>
   );
 };
 
-export default PolicyList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 250px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
+  }
+
+  .ant-btn-text:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .ant-btn-text:active {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  @media (max-width: 768px) {
+    .search-input {
+      width: 100%;
+      min-width: unset;
+    }
+    
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const PolicyListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <PolicyList />
+  </>
+);
+
+export default PolicyListWithStyles;

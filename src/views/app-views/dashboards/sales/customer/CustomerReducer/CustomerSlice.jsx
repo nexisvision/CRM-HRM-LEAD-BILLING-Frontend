@@ -1,10 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./CustomerService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
-
-// Async thunk for adding user
 
 export const addcus = createAsyncThunk(
   "users/addcus",
@@ -18,8 +15,6 @@ export const addcus = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
-
 export const Getcus = createAsyncThunk(
   "emp/Getcus",
   async (loginData, thunkAPI) => {
@@ -32,8 +27,6 @@ export const Getcus = createAsyncThunk(
   }
 );
 
-
-// Async thunk for deleting a user
 export const delcus = createAsyncThunk(
   "users/delcuseet",
   async (userId, thunkAPI) => {
@@ -59,15 +52,7 @@ export const editcus = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const RoleAndPermissionSlice = createSlice({
   name: "customers",
@@ -115,7 +100,6 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(addcus.fulfilled, (state, action) => {
         state.isLoading = false;
-        // toast.success(action.payload?.data?.message);
         message.success(action.payload?.message);
       })
       .addCase(addcus.rejected, (state, action) => {
@@ -136,28 +120,24 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-      
-      //delete
       .addCase(delcus.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(delcus.fulfilled, (state, action) => {
         state.isLoading = false;
-        // toast.success(action.payload.message);
         message.success(action.payload.message);
       })
       .addCase(delcus.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
-      //update
       .addCase(editcus.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
       .addCase(editcus.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; // Update the state with the updated employee data
+        state.editItem = action.payload;
       })
       .addCase(editcus.rejected, (state, action) => {
         state.isLoading = false;

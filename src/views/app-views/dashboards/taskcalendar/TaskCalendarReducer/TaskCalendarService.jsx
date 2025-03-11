@@ -29,14 +29,12 @@ const AddTask = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
     throw error;
   }
 };
-
 const DeleteTask = async (id) => {
   const token = localStorage.getItem("auth_token");
 
@@ -49,7 +47,6 @@ const DeleteTask = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -78,15 +75,10 @@ const EditTask = async (idd, values) => {
 
 
 const UserService = {
-  // addUser,
   GetTask,
   AddTask,
   DeleteTask,
   EditTask,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
 };
 
 export default UserService;

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Button, Select, Switch, Row, Dropdown, Menu, Col, message } from 'antd';
+import { Input, Button, Select, Switch, Row, Dropdown, Menu, Col } from 'antd';
 import { Editplan, GetPlan } from './PlanReducers/PlanSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import moment from 'moment';
 import { getcurren } from '../setting/currencies/currenciesSlice/currenciesSlice';
 import { Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -13,8 +12,6 @@ const { Option } = Select;
 const EditPlan = ({ planData, onUpdate, id, onClose }) => {
   const allPlans = useSelector((state) => state.Plan.Plan || []);
   const currentPlan = allPlans.find(plan => plan.id === id) || {};
-
-  const [isTrialEnabled, setIsTrialEnabled] = useState(currentPlan?.trial || false);
   const [durationType, setDurationType] = useState(() => {
     if (currentPlan?.duration?.toLowerCase().includes('month')) return 'Monthly';
     if (currentPlan?.duration?.toLowerCase().includes('year')) return 'Yearly';
@@ -36,19 +33,6 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
     return durationType === 'Yearly' ? getDurationValue() : null;
   });
 
-  const initialValues = {
-    name: currentPlan?.name || '',
-    price: currentPlan?.price || '',
-    duration: currentPlan?.duration || '',
-    max_users: currentPlan?.max_users || '',
-    max_customers: currentPlan?.max_customers || '',
-    max_vendors: currentPlan?.max_vendors || '',
-    max_clients: currentPlan?.max_clients || '',
-    storage_limit: currentPlan?.storage_limit || '',
-    currency: currentPlan?.currency || getDefaultCurrency(),
-    trial: currentPlan?.trial || false,
-    trial_period: currentPlan?.trial_period || '',
-  };
 
   useEffect(() => {
     if (formikRef.current) {
@@ -68,10 +52,6 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
 
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies?.data;
-
-  const alldept = useSelector((state) => state.Plan);
-  const alldept2 = alldept.Plan.data;
-
   const formikRef = React.useRef();
 
   useEffect(() => {
@@ -98,6 +78,21 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
       return inrCurrency?.id || fnddatass[0]?.id || '';
     }
     return '';
+  };
+
+  // Set initial values from current plan
+  const initialValues = {
+    name: currentPlan?.name || '',
+    price: currentPlan?.price || '',
+    duration: currentPlan?.duration || '',
+    max_users: currentPlan?.max_users || '',
+    max_customers: currentPlan?.max_customers || '',
+    max_vendors: currentPlan?.max_vendors || '',
+    max_clients: currentPlan?.max_clients || '',
+    storage_limit: currentPlan?.storage_limit || '',
+    currency: currentPlan?.currency || getDefaultCurrency(),
+    trial: currentPlan?.trial || false,
+    trial_period: currentPlan?.trial_period || '',
   };
 
   const validationSchema = Yup.object().shape({
@@ -133,7 +128,7 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
 
   return (
     <div>
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

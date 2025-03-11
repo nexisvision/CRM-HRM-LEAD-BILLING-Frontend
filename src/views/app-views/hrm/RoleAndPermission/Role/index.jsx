@@ -3,9 +3,10 @@ import RoleList from './RoleList';
 
 const Role = () => (
 
-<div className="mail">
-<RoleList />
-</div>
+
+	<div className="mail">
+		<RoleList />
+	</div>
 
 );
 

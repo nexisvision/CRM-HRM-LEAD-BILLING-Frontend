@@ -3,44 +3,33 @@ import {
   Card,
   Table,
   Menu,
-  Row,
-  Col,
-  Tag,
   Input,
   message,
   Button,
   Modal,
   Radio,
   DatePicker,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
   EditOutlined,
-  FileAddOutlined,
   FileExcelOutlined,
   AppstoreOutlined,
   UnorderedListOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import UserView from "../../Users/user-list/UserView";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import StatisticWidget from "components/shared-components/StatisticWidget";
-import { DealStatisticData } from "../../dashboards/default/DefaultDashboardData";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddDeal from "./AddDeal";
-import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import EditDeal from "./EditDeal";
 import ViewDeal from "./ViewDeal";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteDeals, GetDeals } from "./DealReducers/DealSlice";
-import { useNavigate } from "react-router-dom";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { getstages } from '../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice';
 import { GetPip } from "../systemsetup/Pipeline/PiplineReducer/piplineSlice";
@@ -52,18 +41,11 @@ const VIEW_GRID = 'GRID';
 
 const DealList = () => {
   const [users, setUsers] = useState([]);
-  const [list, setList] = useState(OrderListData);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const navigate = useNavigate();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
-
   const dispatch = useDispatch();
 
   const [view, setView] = useState(VIEW_LIST);
-  
+
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddDealModalVisible, setIsAddDealModalVisible] = useState(false);
   const [isViewDealModalVisible, setIsViewDealModalVisible] = useState(false);
@@ -71,11 +53,7 @@ const DealList = () => {
   const [isEditDealModalVisible, setIsEditDealModalVisible] = useState(false);
 
   const [idd, setIdd] = useState("");
-
-  const [dealStatisticData] = useState(DealStatisticData);
-
   const tabledata = useSelector((state) => state.Deals);
-  const clientsData = useSelector((state) => state?.SubClient?.SubClient?.data || []);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
 
@@ -85,25 +63,21 @@ const DealList = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  useEffect(() => {
-  }, [tabledata, users]);
 
   useEffect(() => {
     if (tabledata?.Deals?.data) {
       const filteredDeals = tabledata.Deals.data.filter(deal => deal.created_by === user);
       setUsers(filteredDeals);
-      setFilteredUsers(filteredDeals); // Also set filtered users initially
     }
   }, [tabledata, user]);
 
   const debouncedSearch = debounce((value, date) => {
     setIsSearching(true);
     const searchValue = value.toLowerCase();
-    
+
     try {
       if (!tabledata?.Deals?.data) {
         setUsers([]);
-        setFilteredUsers([]);
         setIsSearching(false);
         return;
       }
@@ -115,19 +89,19 @@ const DealList = () => {
           (deal.leadTitle?.toString().toLowerCase().includes(searchValue)) ||
           (deal.project?.toString().toLowerCase().includes(searchValue))
         );
-        
+
+        // Add date filtering
         let matchesDate = true;
         if (date) {
           const dealDate = dayjs(deal.closedDate).startOf('day');
           const selectedDay = dayjs(date).startOf('day');
           matchesDate = dealDate.isSame(selectedDay, 'day');
         }
-        
+
         return matchesUser && matchesSearch && matchesDate;
       });
 
       setUsers(filteredData);
-      setFilteredUsers(filteredData);
     } catch (error) {
       console.error('Search error:', error);
     } finally {
@@ -146,9 +120,9 @@ const DealList = () => {
     debouncedSearch(searchValue, date);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(GetPip())
-  },[dispatch])
+  }, [dispatch])
 
   const stagesData = useSelector((state) => state.StagesLeadsDeals);
 
@@ -168,11 +142,6 @@ const DealList = () => {
     setIsEditDealModalVisible(false);
   };
 
-  const openViewDealModal = () => {
-    navigate("/app/dashboards/project/deal/viewDeal", {
-      state: { user: selectedUser },
-    }); // Pass user data as state if needed
-  };
   const exportToExcel = () => {
     try {
       const ws = utils.json_to_sheet(users);
@@ -186,40 +155,49 @@ const DealList = () => {
       message.error("Failed to export data. Please try again.");
     }
   };
-                      const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                      const roles = useSelector((state) => state.role?.role?.data);
-                      const roleData = roles?.find(role => role.id === roleId);
-                  
-                      const whorole = roleData.role_name;
-                  
-                      const parsedPermissions = Array.isArray(roleData?.permissions)
-                      ? roleData.permissions
-                      : typeof roleData?.permissions === 'string'
-                      ? JSON.parse(roleData.permissions)
-                      : [];
-                    
-                    
-                      let allpermisson;  
-                  
-                      if (parsedPermissions["dashboards-deal"] && parsedPermissions["dashboards-deal"][0]?.permissions) {
-                        allpermisson = parsedPermissions["dashboards-deal"][0].permissions;
-                      
-                      } else {
-                      }
-                      
-                      const canCreateClient = allpermisson?.includes('create');
-                      const canEditClient = allpermisson?.includes('edit');
-                      const canDeleteClient = allpermisson?.includes('delete');
-                      const canViewClient = allpermisson?.includes('view');
-            
+
+  //// permission
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+
+  let allpermisson;
+
+  if (parsedPermissions["dashboards-deal"] && parsedPermissions["dashboards-deal"][0]?.permissions) {
+    allpermisson = parsedPermissions["dashboards-deal"][0].permissions;
+    console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    // console.log('dashboards-deal is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+
+  // Close Add Job Modal
   const closeViewDealModal = () => {
     setIsViewDealModalVisible(false);
   };
+
+
   const deleteUser = async (userId) => {
     try {
       await dispatch(DeleteDeals(userId));
 
-      const updatedData = await dispatch(GetDeals());
+      await dispatch(GetDeals());
 
       setUsers(users.filter((item) => item.id !== userId));
 
@@ -228,10 +206,6 @@ const DealList = () => {
     }
   };
 
-  const showUserProfile = (userInfo) => {
-    setSelectedUser(userInfo);
-    setUserProfileVisible(true);
-  };
 
   const closeUserProfile = () => {
     setSelectedUser(null);
@@ -276,23 +250,30 @@ const DealList = () => {
     return stage ? stage.stageName : 'N/A';
   };
 
-  const dropdownMenu = (elm) => ({
-    items: [
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+  const getDropdownItems = (elm, whorole, canEditClient, canDeleteClient, EditDelas, deleteUser) => {
+    const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
         onClick: () => EditDelas(elm.id)
-      }] : []),
+      });
+    }
 
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(elm.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -361,68 +342,52 @@ const DealList = () => {
       },
     },
 
-   
-    
+
+
     {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm, whorole, canEditClient, canDeleteClient, EditDelas, deleteUser)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
   ];
 
-  useEffect(() => {
-  }, [users]);
-
-  const renderGridView = () => {
-    return (
-      <Row gutter={[16, 16]}>
-        {users.map((deal, index) => (
-          <Col xs={24} sm={12} md={8} lg={6} key={deal.id || index}>
-            <Card hoverable className="h-full">
-              <div className="p-3">
-                <h4 className="mb-2 font-semibold">{deal.dealName}</h4>
-                <div className="text-gray-600 mb-2">
-                  <div>Price: ${deal.price}</div>
-                  <div>Stage: {getStageName(deal.stage)}</div>
-                  {/* <div>Created by: {deal.created_by}</div> */}
-                </div>
-                <div className="text-gray-500">
-                  <div>Lead: {deal.leadTitle}</div>
-                  <div>Project: {deal.project}</div>
-                </div>
-                <div className="mt-3 flex justify-end">
-                  <EllipsisDropdown menu={dropdownMenu(deal)} />
-                </div>
-              </div>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-    );
-  };
-
-  const renderListView = () => {
-    return (
-      <div className="table-responsive">
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
-          <Table
-            columns={tableColumns}
-            dataSource={users}
-            rowKey="id"
-            scroll={{ x: 1200 }}
-          />
-        )}
-      </div>
-    );
-  };
+  const styles = `
+    .ant-dropdown-menu {
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .ant-dropdown-menu-item {
+      padding: 8px 16px;
+    }
+    .ant-dropdown-menu-item:hover {
+      background-color: #f5f5f5;
+    }
+    .ant-dropdown-menu-item-danger:hover {
+      background-color: #fff1f0;
+    }
+  `;
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
-      
       <Flex
         alignItems="center"
         justifyContent="space-between"
@@ -452,61 +417,63 @@ const DealList = () => {
           </div>
         </Flex>
         <Flex gap="7px" className="items-center">
-        
-        <Radio.Group
-              defaultValue={VIEW_LIST}
-              onChange={(e) => setView(e.target.value)} 
-              value={view}
-              className="mr-2 flex items-center"
-            >
-              <Radio.Button value={VIEW_GRID} className="flex items-center justify-center">
-                <AppstoreOutlined />
-              </Radio.Button>
-              <Radio.Button value={VIEW_LIST} className="flex items-center justify-center">
-                <UnorderedListOutlined />
-              </Radio.Button>
-            </Radio.Group>
 
-            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                     <Button type="primary" className="ml-2" onClick={openAddDealModal}>
-                                                                                                                     <PlusOutlined />
-                                                                                                                     <span>New</span>
-                                                                                                                   </Button>
-                                                                                                      
-                                                                                                          ) : null}
+          <Radio.Group
+            defaultValue={VIEW_LIST}
+            onChange={(e) => setView(e.target.value)}
+            value={view}
+            className="mr-2 flex items-center"
+          >
+            <Radio.Button value={VIEW_GRID} className="flex items-center justify-center">
+              <AppstoreOutlined />
+            </Radio.Button>
+            <Radio.Button value={VIEW_LIST} className="flex items-center justify-center">
+              <UnorderedListOutlined />
+            </Radio.Button>
+          </Radio.Group>
+
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Button type="primary" className="ml-2" onClick={openAddDealModal}>
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+
+          ) : null}
 
           <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
-         
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel} // Call export function when the button is clicked
+            block
+          >
+            Export All
+          </Button>
+          {/* <Button type="primary" icon={<FileAddOutlined />} block>
+            Import All
+          </Button> */}
         </Flex>
       </Flex>
 
 
- {view === VIEW_LIST ? (
-          <div className="table-responsive">
-            {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
-              <Table
-                columns={tableColumns}
-                dataSource={users}
-                rowKey="id"
-                pagination={{
-                  total: users.length,
-                  pageSize: 10,
-                  showSizeChanger: true,
-                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                }}
-              />
-            )}
-          </div>
-        ) : (
-          <DealCards data={users} />
-        )}
+      {view === VIEW_LIST ? (
+        <div className="table-responsive">
+          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
+            <Table
+              columns={tableColumns}
+              dataSource={users}
+              rowKey="id"
+              pagination={{
+                total: users.length,
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              }}
+            />
+          )}
+        </div>
+      ) : (
+        <DealCards data={users} />
+      )}
 
 
       <UserView
@@ -545,6 +512,8 @@ const DealList = () => {
       >
         <ViewDeal onClose={closeViewDealModal} />
       </Modal>
+
+      <style jsx>{styles}</style>
     </Card>
   );
 };

@@ -17,11 +17,11 @@ const DonutChartWidget = props => {
 	let options = JSON.parse(JSON.stringify(defaultOption))
 	options.labels = labels
 	options.plotOptions.pie.donut.labels.total.label = title
-	if(!title) {
+	if (!title) {
 		options.plotOptions.pie.donut.labels.show = false
 	}
-	if(customOptions) {
-		options = {...options, ...customOptions }
+	if (customOptions) {
+		options = { ...options, ...customOptions }
 	}
 	return (
 		<Card>

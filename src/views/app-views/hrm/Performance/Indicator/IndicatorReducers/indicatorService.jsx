@@ -77,7 +77,10 @@ const editIndicator = async (id, values) => {
   }
 };
 
+
+
 const AppraisalService = {
+
   getIndicators,
   addIndicator,
   deleteIndicator,

@@ -1,11 +1,8 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
-import { useDispatch, useSelector } from "react-redux";
-
 
 const GetUsers = async () => {
   const token = localStorage.getItem("auth_token");
-  const id = useSelector((state)=>state.user.loggedInUser.id)
   try {
     const res = await axios.get(`${env.API_ENDPOINT_URL}/userss/`, {
       headers: {
@@ -32,7 +29,7 @@ const Createuser = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -49,7 +46,7 @@ const DeleteUser = async (id) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -78,16 +75,10 @@ const Editusers = async (idd, values) => {
 
 
 const UserService = {
-  // addUser,
-
   GetUsers,
   Createuser,
   DeleteUser,
   Editusers,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
 };
 
 export default UserService;

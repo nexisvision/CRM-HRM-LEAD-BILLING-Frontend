@@ -1,10 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./generalService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
-// Async thunk for adding user
+
 
 export const creategenaralsett = createAsyncThunk(
   "users/addtgg",
@@ -19,7 +18,7 @@ export const creategenaralsett = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
+
 
 export const getgeneralsettings = createAsyncThunk(
   "emp/getgenaral",
@@ -33,7 +32,7 @@ export const getgeneralsettings = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
+
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -46,7 +45,7 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
+
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -59,7 +58,7 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const deletesettingss = createAsyncThunk(
   "users/Deletese",
   async (userId, thunkAPI) => {
@@ -85,15 +84,7 @@ export const Editicket = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const TicketSlice = createSlice({
   name: "generalsetting",
@@ -161,7 +152,7 @@ const TicketSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-      
+
       //delete
       .addCase(deletesettingss.pending, (state) => {
         state.isLoading = true;
@@ -182,7 +173,7 @@ const TicketSlice = createSlice({
       })
       .addCase(Editicket.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; 
+        state.editItem = action.payload;
         message.success(action.payload?.message);
         // Update the state with the updated employee data
       })

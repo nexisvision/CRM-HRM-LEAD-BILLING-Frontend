@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 const Value = props => {
 	let value;
-	switch(props.size) {
+	switch (props.size) {
 		case 'lg':
 			value = <h1 className="mb-0 font-weight-bold">{props.value}</h1>
 			break;
@@ -23,7 +23,7 @@ export const CustomStatistic = props => {
 	const { size, value, title } = props;
 	return (
 		<div>
-			<Value value={value} size={size}/>
+			<Value value={value} size={size} />
 			<p className="mb-0 text-muted">{title}</p>
 		</div>
 	)

@@ -3,11 +3,11 @@ import MeetingList from './MeetingList';
 
 const Meeting = () => (
 
-<div className="mail">
-<MeetingList />
 
+	<div className="mail">
+		<MeetingList />
 
-</div>
+	</div>
 
 );
 

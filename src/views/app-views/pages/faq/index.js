@@ -15,7 +15,7 @@ export class Faq extends Component {
 	render() {
 		const { curentCategory } = this.state
 		return (
-      		<>
+			<>
 				<PageHeaderAlt className="bg-primary" overlap>
 					<div className="container text-center">
 						<div className="py-lg-4">
@@ -29,7 +29,7 @@ export class Faq extends Component {
 							</Row>
 							<Row type="flex" justify="center" className="mb-5">
 								<Col xs={24} sm={24} md={12}>
-									<Input placeholder="Search" prefix={<SearchOutlined type="search" />}/>
+									<Input placeholder="Search" prefix={<SearchOutlined type="search" />} />
 								</Col>
 							</Row>
 						</div>
@@ -39,8 +39,8 @@ export class Faq extends Component {
 					<Row gutter={16}>
 						{faqCategories.map(elm => (
 							<Col xs={24} sm={24} md={8} key={elm.key}>
-								<Card 
-									hoverable 
+								<Card
+									hoverable
 									onClick={() => {
 										this.setState({
 											curentCategory: elm.key
@@ -55,23 +55,23 @@ export class Faq extends Component {
 						))}
 					</Row>
 					<Card className="mt-4">
-						<Collapse 
-							accordion 
-							defaultActiveKey={'faq-1-1'} 
+						<Collapse
+							accordion
+							defaultActiveKey={'faq-1-1'}
 							bordered={false}
 							expandIcon={({ isActive }) => <RightOutlined className="text-primary" type="right" rotate={isActive ? 90 : 0} />}
 						>
-							{faqList.filter( elm => elm.id === curentCategory)[0].data.map( elm => (
+							{faqList.filter(elm => elm.id === curentCategory)[0].data.map(elm => (
 								<Panel header={elm.title} key={elm.key}>
 									<p>{elm.desc}</p>
 								</Panel>
 							))}
 						</Collapse>
-				
+
 					</Card>
 				</div>
 			</>
-    	);
+		);
 	}
 }
 

@@ -22,9 +22,9 @@ const ComplatedList = () => {
               <td className="py-3 text-gray-500">Assigned To</td>
               <td className="py-3">
                 <div className="flex items-center gap-3">
-                  <img 
-                    src="https://demo-saas.worksuite.biz/img/gravatar.png" 
-                    alt="User" 
+                  <img
+                    src="https://demo-saas.worksuite.biz/img/gravatar.png"
+                    alt="User"
                     className="w-8 h-8 rounded-full border"
                   />
                   <div>

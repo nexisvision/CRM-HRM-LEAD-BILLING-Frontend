@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./LeaveService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
+
 import { message } from "antd";
 
-// Async thunk for adding user
+
 export const CreateL = createAsyncThunk(
     "users/addUser",
     async (userData, thunkAPI) => {
@@ -16,6 +16,9 @@ export const CreateL = createAsyncThunk(
         }
     }
 );
+
+
+
 
 export const GetLeave = createAsyncThunk(
     "leave/getLeave",
@@ -44,30 +47,25 @@ export const DeleteLea = createAsyncThunk(
 export const EditLeave = createAsyncThunk(
     "users/updateEmployee",
     async ({ id, values }, thunkAPI) => {
-      try {
-        const response = await UserService.EditLeave(id, values);
-        return response; // Return the updated data
-      } catch (error) {
-        return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
-      }
+        try {
+            console.log("idinslice", id)
+            const response = await UserService.EditLeave(id, values);
+            return response; // Return the updated data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
+        }
     }
-  );
+);
 
 
-const initialUser = () => {
-    const item = window.localStorage.getItem("USER");
-    return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-    const item = window.localStorage.getItem("isAuth");
-    return item ? JSON.parse(item) : false;
-};
+
+
 
 const LeaveSlice = createSlice({
     name: "Leave",
     initialState: {
-        Leave:[],
+        Leave: [],
         editItem: {},
         isLoading: false,
         addModel: false,
@@ -128,8 +126,8 @@ const LeaveSlice = createSlice({
                 state.isLoading = false;
                 toast.error(action.payload?.message);
             })
-           
-         
+
+
             .addCase(DeleteLea.pending, (state) => {
                 state.isLoading = true;
             })
@@ -147,17 +145,17 @@ const LeaveSlice = createSlice({
             .addCase(EditLeave.pending, (state) => {
                 state.isLoading = false;
                 state.error = null;
-              })
-              .addCase(EditLeave.fulfilled, (state, action) => {
+            })
+            .addCase(EditLeave.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
                 message.success(action.payload?.message);
-              })
-              .addCase(EditLeave.rejected, (state, action) => {
+            })
+            .addCase(EditLeave.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
                 message.error(action.payload?.message);
-              });
+            });
     },
 });
 

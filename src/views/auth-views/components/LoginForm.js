@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Button, Form, Input, Divider, Modal } from 'antd';
+import { Button, Form, Input, Modal } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
-import { GoogleSVG, FacebookSVG } from 'assets/svg/icon';
-import CustomIcon from 'components/util-components/CustomIcon'
-import { 
-	signIn, 
-	showLoading, 
-	showAuthMessage, 
-	hideAuthMessage, 
-	signInWithGoogle, 
-	signInWithFacebook 
+import {
+	signIn,
+	showLoading,
+	showAuthMessage,
+	hideAuthMessage,
+	signInWithGoogle,
+	signInWithFacebook
 } from 'store/slices/authSlice';
 import { useNavigate } from 'react-router-dom'
 
@@ -40,7 +38,7 @@ const ForgotPasswordForm = ({ visible, onCancel }) => {
 		}
 	};
 
-	
+
 
 	const renderStepContent = () => {
 		switch (step) {
@@ -53,7 +51,7 @@ const ForgotPasswordForm = ({ visible, onCancel }) => {
 							{ type: 'email', message: 'Please enter a valid email' }
 						]}
 					>
-						<Input 
+						<Input
 							prefix={<MailOutlined className="text-primary" />}
 							placeholder="Email"
 							className="rounded-md"
@@ -66,7 +64,7 @@ const ForgotPasswordForm = ({ visible, onCancel }) => {
 						name="otp"
 						rules={[{ required: true, message: 'Please enter OTP' }]}
 					>
-						<Input 
+						<Input
 							placeholder="Enter OTP"
 							className="rounded-md"
 							maxLength={6}
@@ -83,7 +81,7 @@ const ForgotPasswordForm = ({ visible, onCancel }) => {
 								{ min: 6, message: 'Password must be at least 6 characters' }
 							]}
 						>
-							<Input.Password 
+							<Input.Password
 								prefix={<LockOutlined className="text-primary" />}
 								placeholder="New Password"
 								className="rounded-md"
@@ -104,7 +102,7 @@ const ForgotPasswordForm = ({ visible, onCancel }) => {
 								}),
 							]}
 						>
-							<Input.Password 
+							<Input.Password
 								prefix={<LockOutlined className="text-primary" />}
 								placeholder="Confirm Password"
 								className="rounded-md"
@@ -136,25 +134,25 @@ const ForgotPasswordForm = ({ visible, onCancel }) => {
 			>
 				<div className="mb-4">
 					<p className="text-gray-600">
-						{step === 1 
+						{step === 1
 							? 'Enter your email to receive a verification code'
-							: step === 2 
-							? 'Enter the OTP sent to your email'
-							: 'Enter your new password'}
+							: step === 2
+								? 'Enter the OTP sent to your email'
+								: 'Enter your new password'}
 					</p>
 				</div>
 
 				{renderStepContent()}
 
 				<div className="flex justify-end space-x-4">
-					<Button 
+					<Button
 						onClick={onCancel}
 						className="px-4 py-2 text-gray-700 hover:text-gray-900"
 					>
 						Cancel
 					</Button>
-					<Button 
-						type="primary" 
+					<Button
+						type="primary"
 						htmlType="submit"
 						className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white"
 					>
@@ -168,18 +166,15 @@ const ForgotPasswordForm = ({ visible, onCancel }) => {
 
 export const LoginForm = props => {
 	const dispatch = useDispatch();
-	
+
 	const navigate = useNavigate();
 
 
-	const { 
-		
+	const {
+
 		hideAuthMessage,
 		showLoading,
-		signInWithGoogle,
-		signInWithFacebook,
-		token, 
-		loading,
+		token,
 		redirect,
 		showMessage,
 		allowRedirect = true
@@ -199,11 +194,11 @@ export const LoginForm = props => {
 
 			if (localemail) {
 				try {
-					
-					const response = await dispatch(autol({localemail,localtoken}));
-					
 
-					if (response.meta.requestStatus === 'fulfilled') { 
+					const response = await dispatch(autol({ localemail, localtoken }));
+
+
+					if (response.meta.requestStatus === 'fulfilled') {
 						localStorage.removeItem('email');
 						localStorage.removeItem("autologintoken");
 						navigate('/dashboard/default');
@@ -217,9 +212,9 @@ export const LoginForm = props => {
 		};
 
 		checkAndAutoLogin();
-		
-		const intervalId = setInterval(checkAndAutoLogin, 1000); 
-		
+
+		const intervalId = setInterval(checkAndAutoLogin, 1000); // Check every second
+
 		setTimeout(() => {
 			clearInterval(intervalId);
 		}, 5000);
@@ -229,30 +224,20 @@ export const LoginForm = props => {
 
 	const onLogin = values => {
 		showLoading()
-			dispatch(userLogin(values))
+		dispatch(userLogin(values))
 			.then((response) => {
-				if (response.meta.requestStatus === 'fulfilled') { 
+				if (response.meta.requestStatus === 'fulfilled') {
 					navigate('/dashboard/default');
 					window.location.reload();
 				}
 			})
 			.catch((error) => {
-				
+				// message.error("Login failed. Please try again.");
+
 				console.error('Login failed:', error);
 			})
-			.finally(() => {
-			});
 	};
 
-	const onGoogleLogin = () => {
-		showLoading()
-		signInWithGoogle()
-	}
-
-	const onFacebookLogin = () => {
-		showLoading()
-		signInWithFacebook()
-	}
 
 	useEffect(() => {
 		if (token !== null && allowRedirect) {
@@ -264,50 +249,23 @@ export const LoginForm = props => {
 				clearTimeout(timer);
 			};
 		}
-	}, []);
-	
-
-
-	const renderOtherSignIn = (
-		<div>
-			<Divider>
-				<span className="text-muted font-size-base font-weight-normal">or connect with</span>
-			</Divider>
-			<div className="d-flex justify-content-center">
-				<Button 
-					onClick={() => onGoogleLogin()} 
-					className="mr-2" 
-					disabled={loading} 
-					icon={<CustomIcon svg={GoogleSVG}/>}
-				>
-					Google
-				</Button>
-				<Button 
-					onClick={() => onFacebookLogin()} 
-					icon={<CustomIcon svg={FacebookSVG}/>}
-					disabled={loading} 
-				>
-					Facebook
-				</Button>
-			</div>
-		</div>
-	)
+	}, [allowRedirect, hideAuthMessage, navigate, redirect, showMessage, token]);
 
 	return (
 		<div className="bg-white rounded-2xl p-8 w-full max-w-md mx-auto ">
 			<div className="mb-6">
-				
+
 			</div>
 
-			<Form 
-				layout="vertical" 
-				name="login-form" 
+			<Form
+				layout="vertical"
+				name="login-form"
 				initialValues={initialCredential}
 				onFinish={onLogin}
 				className="space-y-4"
 			>
-				<Form.Item 
-					name="login" 
+				<Form.Item
+					name="login"
 					label={
 						<span className="flex items-center">
 							<span className="text-red-500 mr-1"></span>
@@ -319,15 +277,15 @@ export const LoginForm = props => {
 						{ type: 'text', message: 'Please enter a valid username or email' }
 					]}
 				>
-					<Input 
+					<Input
 						prefix={<MailOutlined className="text-gray-400" />}
 						className="h-12 rounded-md"
 						placeholder="Enter your email"
 					/>
 				</Form.Item>
-				
-				<Form.Item 
-					name="password" 
+
+				<Form.Item
+					name="password"
 					label={
 						<span className="flex items-center">
 							<span className="text-red-500 mr-1"></span>
@@ -338,7 +296,7 @@ export const LoginForm = props => {
 						{ required: true, message: 'Please input your password' }
 					]}
 				>
-					<Input.Password 
+					<Input.Password
 						prefix={<LockOutlined className="text-gray-400" />}
 						className="h-12 rounded-md"
 						placeholder="••••••••"
@@ -346,8 +304,8 @@ export const LoginForm = props => {
 				</Form.Item>
 
 				<div className="flex justify-end -mt-2 mb-4">
-					<span 
-						onClick={() => setForgotPasswordVisible(true)} 
+					<span
+						onClick={() => setForgotPasswordVisible(true)}
 						className="text-blue-600 hover:text-blue-700 cursor-pointer text-sm"
 					>
 						Forgot Password?
@@ -355,9 +313,9 @@ export const LoginForm = props => {
 				</div>
 
 				<Form.Item className="mb-0">
-					<Button 
-						type="primary" 
-						htmlType="submit" 
+					<Button
+						type="primary"
+						htmlType="submit"
 						block
 						className="h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 rounded-md"
 					>
@@ -366,7 +324,7 @@ export const LoginForm = props => {
 				</Form.Item>
 			</Form>
 
-			<ForgotPasswordForm 
+			<ForgotPasswordForm
 				visible={forgotPasswordVisible}
 				onCancel={() => setForgotPasswordVisible(false)}
 			/>
@@ -388,9 +346,9 @@ LoginForm.defaultProps = {
 	showForgetPassword: false
 };
 
-const mapStateToProps = ({auth}) => {
-	const {loading, message, showMessage, token, redirect} = auth;
-  return {loading, message, showMessage, token, redirect}
+const mapStateToProps = ({ auth }) => {
+	const { loading, message, showMessage, token, redirect } = auth;
+	return { loading, message, showMessage, token, redirect }
 }
 
 const mapDispatchToProps = {

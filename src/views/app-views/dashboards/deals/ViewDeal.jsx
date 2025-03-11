@@ -10,7 +10,6 @@ import Files from "./Files";
 import Discussion from "./Discussion";
 import Calls from "./Calls";
 import Activity from "./Activity";
-import { Card } from "antd";
 
 const ViewDeal = () => {
   const [selectedSection, setSelectedSection] = useState("general");

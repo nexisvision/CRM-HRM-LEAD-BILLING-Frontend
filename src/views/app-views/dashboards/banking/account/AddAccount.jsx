@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, DatePicker, Select, Row, Col, Checkbox, message, Modal } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Input, Button, Select, Row, Col, message, Modal } from 'antd';
 import 'react-quill/dist/quill.snow.css';
-import ReactQuill from 'react-quill';
 import { Formik, Field, Form as FormikForm, ErrorMessage } from 'formik';
 import { PlusOutlined } from '@ant-design/icons';
 import * as Yup from 'yup';
@@ -13,7 +11,6 @@ import AddCountries from "views/app-views/setting/countries/AddCountries";
 const { Option } = Select;
 
 const AddAccount = ({ onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries?.countries);
 

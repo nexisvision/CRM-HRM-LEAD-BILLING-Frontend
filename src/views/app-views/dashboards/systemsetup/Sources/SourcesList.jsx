@@ -1,11 +1,8 @@
-/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Select,
   Button,
-  Menu,
   Modal,
   message,
 } from "antd";
@@ -16,7 +13,6 @@ import {
 } from "@ant-design/icons";
 import Flex from "components/shared-components/Flex";
 import utils from "utils";
-import { PaymentStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import AddSources from "./AddSources";
 import EditSources from "./EditSources";
 import {
@@ -26,71 +22,35 @@ import {
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 
-const { Option } = Select;
-
 const SourcesList = () => {
   const [list, setList] = useState();
   const dispatch = useDispatch();
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddSourcesModalVisible, setIsAddSourcesModalVisible] =
     useState(false);
   const [isEditSourcesModalVisible, setIsEditSourcesModalVisible] =
     useState(false);
-  const [isViewSourcesModalVisible, setIsViewSourcesModalVisible] =
-    useState(false);
-  const [paymentStatisticData] = useState(PaymentStatisticData);
-
   const [idd, setIdd] = useState("");
-
   const allloggeddata = useSelector((state) => state.user);
   const userdata = allloggeddata.loggedInUser;
-
   const lid = userdata.id;
-
-  const user = userdata.username;
-
-
-
   const alltagdata = useSelector((state) => state.Lable);
-
   const alltaggdata = alltagdata.Lable.data || [];
-
-
-  const fndddata = alltaggdata.filter(item => item.created_by === user);
-
   const datas = alltaggdata?.filter(item => item.lableType === "source");
 
-
-
-  // Open Add Job Modal
   const openAddSourcesModal = () => {
     setIsAddSourcesModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddSourcesModal = () => {
     setIsAddSourcesModalVisible(false);
   };
 
-  // Open Add Job Modal
   const openEditSourcesModal = () => {
     setIsEditSourcesModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeEditSourcesModal = () => {
     setIsEditSourcesModalVisible(false);
-  };
-
-  // Open Add Job Modal
-  const openViewSourcesModal = () => {
-    setIsViewSourcesModalVisible(true);
-  };
-
-  // Close Add Job Modal
-  const closeViewSourcesModal = () => {
-    setIsViewSourcesModalVisible(false);
   };
 
   useEffect(() => {
@@ -117,23 +77,6 @@ const SourcesList = () => {
     openEditSourcesModal();
     setIdd(idd);
   };
-
-  const dropdownMenu = (row) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={openEditSourcesModal}>
-          <EditOutlined />
-          <span className="ml-2">Edit</span>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
 
   const tableColumns = [
     {
@@ -196,14 +139,12 @@ const SourcesList = () => {
           >
 
           </Flex>
-         
         </Flex>
         <div className="table-responsive">
           <Table
             columns={tableColumns}
             dataSource={list}
             rowKey="id"
-      
           />
         </div>
       </Card>
@@ -214,7 +155,6 @@ const SourcesList = () => {
         onCancel={closeAddSourcesModal}
         footer={null}
         width={700}
-      // className='mt-[-70px]'
       >
         <AddSources onClose={closeAddSourcesModal} />
       </Modal>
@@ -224,7 +164,6 @@ const SourcesList = () => {
         onCancel={closeEditSourcesModal}
         footer={null}
         width={700}
-      // className='mt-[-70px]'
       >
         <EditSources onClose={closeEditSourcesModal} idd={idd} />
       </Modal>

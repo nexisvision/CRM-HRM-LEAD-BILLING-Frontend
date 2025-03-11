@@ -3,7 +3,6 @@ import { Route, Routes, } from 'react-router-dom';
 import MailItem from './MailItem';
 import MailDetail from './MaiDetail';
 import MailCompose from "./MailCompose"
-
 export const MailContent = () => {
 	return (
 		<Routes>

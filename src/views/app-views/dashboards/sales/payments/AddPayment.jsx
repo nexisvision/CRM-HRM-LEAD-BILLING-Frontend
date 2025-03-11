@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Input, Button, DatePicker, Select, message, Row, Col, Checkbox } from 'antd';
+import { Input, Button, DatePicker, Select, message, Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
@@ -37,7 +37,7 @@ const AddPayment = () => {
 
   return (
     <div className="add-job-form">
-      <h2 className="mb-4 border-b pb-[5px] font-medium"></h2>
+      <hr className="mb-4 border-b font-medium"></hr>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -143,9 +143,9 @@ const AddPayment = () => {
                 {/* Conditionally show Upload field */}
                 {isExpanded && (
                   <>
-                    
+
                     <Col span={24}>
-                    <Field name="notes">
+                      <Field name="notes">
                         {({ field }) => (
                           <ReactQuill
                             {...field}
@@ -158,16 +158,16 @@ const AddPayment = () => {
                         **Private (not visible to the client)
                       </span>
                       <span className="flex gap-2 mt-4">
-                  <div className="text-lg">
-                    <Field type="checkbox" name="sendEmail" checked={values.sendEmail} />
-                  </div>
-                  <p>Send the client a payment receive email</p>
-                </span>
+                        <div className="text-lg">
+                          <Field type="checkbox" name="sendEmail" checked={values.sendEmail} />
+                        </div>
+                        <p>Send the client a payment receive email</p>
+                      </span>
 
-                <span className="flex mt-2 items-center">
-                  <h1 className="text-lg text-rose-400">*</h1>
-                  <span className="ml-2 text-sm text-gray-600">Required</span>
-                </span>
+                      <span className="flex mt-2 items-center">
+                        <h1 className="text-lg text-rose-400">*</h1>
+                        <span className="ml-2 text-sm text-gray-600">Required</span>
+                      </span>
 
                     </Col>
                   </>

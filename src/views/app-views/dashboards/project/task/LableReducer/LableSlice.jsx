@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./LableService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 
 export const AddLable = createAsyncThunk(
   "users/AddLable",
@@ -79,15 +78,7 @@ export const Editmins = createAsyncThunk(
 
 // Async thunk for updating a user
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const RoleAndPermissionSlice = createSlice({
   name: "Lable",

@@ -8,7 +8,7 @@ export class EditProfile extends Component {
 
 	avatarEndpoint = 'https://www.mocky.io/v2/5cc8019d300000980a055e76'
 
-	state= {
+	state = {
 		avatarUrl: '/img/avatars/thumb-6.jpg',
 		name: 'Charlie Howard',
 		email: 'charlie.howard@themenate.com',
@@ -47,7 +47,7 @@ export class EditProfile extends Component {
 				message.success({ content: 'Done!', key, duration: 2 });
 			}, 1000);
 		};
-	
+
 		const onFinishFailed = errorInfo => {
 		};
 
@@ -63,7 +63,7 @@ export class EditProfile extends Component {
 						avatarUrl: imageUrl,
 					}),
 				);
-				message.success({ content: 'Uploaded!', key,  duration: 1.5 });
+				message.success({ content: 'Uploaded!', key, duration: 1.5 });
 			}
 		};
 
@@ -78,7 +78,7 @@ export class EditProfile extends Component {
 		return (
 			<>
 				<Flex alignItems="center" mobileFlex={false} className="text-center text-md-left">
-					<Avatar size={90} src={avatarUrl} icon={<UserOutlined />}/>
+					<Avatar size={90} src={avatarUrl} icon={<UserOutlined />} />
 					<div className="ml-3 mt-md-0 mt-3">
 						<Upload onChange={onUploadAavater} showUploadList={false} action={this.avatarEndpoint}>
 							<Button type="primary">Change Avatar</Button>
@@ -91,7 +91,7 @@ export class EditProfile extends Component {
 						name="basicInformation"
 						layout="vertical"
 						initialValues={
-							{ 
+							{
 								'name': name,
 								'email': email,
 								'username': userName,
@@ -141,10 +141,10 @@ export class EditProfile extends Component {
 										<Form.Item
 											label="Email"
 											name="email"
-											rules={[{ 
+											rules={[{
 												required: true,
 												type: 'email',
-												message: 'Please enter a valid email!' 
+												message: 'Please enter a valid email!'
 											}]}
 										>
 											<Input />
@@ -155,7 +155,7 @@ export class EditProfile extends Component {
 											label="Date of Birth"
 											name="dateOfBirth"
 										>
-											<DatePicker className="w-100"/>
+											<DatePicker className="w-100" />
 										</Form.Item>
 									</Col>
 									<Col xs={24} sm={24} md={12}>

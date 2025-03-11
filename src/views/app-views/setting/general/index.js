@@ -3,9 +3,9 @@ import GeneralList from './GeneralList';
 
 const general = () => (
 
-<div className="mail">
-<GeneralList />
-</div>                                  
+	<div className="mail">
+		<GeneralList />
+	</div>
 
 );
 

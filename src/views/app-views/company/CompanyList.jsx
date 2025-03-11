@@ -3,54 +3,45 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteClient, ClientData } from "./CompanyReducers/CompanySlice";
 import {
-  EyeOutlined,
   DeleteOutlined,
-  EditOutlined,
-  PushpinOutlined,
   RocketOutlined,
   PlusOutlined,
-  FileExcelOutlined,
   AppstoreOutlined,
   UnorderedListOutlined,
   SearchOutlined,
+  EditOutlined,
+  LoginOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import {
   Button,
   Input,
-  Select,
   Modal,
   message,
   Radio,
   Row,
   Col,
-  Dropdown,
-  Tag,
   Menu,
   Table,
+  Dropdown,
 } from "antd";
 import { MdOutlineEmail } from "react-icons/md";
 import AddCompany from "./AddCompany";
 import EditCompany from "./EditCompany";
 import ResetPassword from "./ResetPassword";
 import utils from "utils";
-import PlanUpgrade from "./PlanUpgrade";
-import CompanyCard from "./CompanyCard"; // Import the CompanyCard component
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import Flex from "components/shared-components/Flex";
-import { getsubplandata } from "../subscribeduserplans/subplanReducer/subplanSlice";
+import CompanyCard from "./CompanyCard";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddUpgradePlan from './AddUpgradePlan';
 import EmailVerificationModal from "./EmailVerification";
 import { Avatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
-
-const { Option } = Select;
 const VIEW_LIST = "LIST";
 const VIEW_GRID = "GRID";
 
 const CompanyList = () => {
   const [users, setUsers] = useState([]);
-  const [view, setView] = useState(VIEW_GRID); // Default to grid view
+  const [view, setView] = useState(VIEW_GRID);
   const [isAddCompanyModalVisible, setIsAddCompanyModalVisible] =
     useState(false);
   const [isEditCompanyModalVisible, setIsEditCompanyModalVisible] =
@@ -61,10 +52,6 @@ const CompanyList = () => {
     useState(false);
   const [comnyid, setCompnyid] = useState("");
   const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
-  const [initialValues, setInitialValues] = useState({
-    email: "",
-  });
-
   const tableData = useSelector((state) => state.ClientData);
 
 
@@ -83,12 +70,6 @@ const CompanyList = () => {
       setUsers(tableData.ClientData.data);
     }
   }, [tableData]);
-
-  const handleShowStatus = (value) => {
-    const filteredUsers =
-      value !== "All" ? users.filter((user) => user.status === value) : users;
-    setUsers(filteredUsers);
-  };
 
   const handleCompanyClick = (id) => {
     navigate(`/app/company/${id}`);
@@ -113,49 +94,77 @@ const CompanyList = () => {
 
   const deleteUser = (userId) => {
     dispatch(deleteClient(userId))
-      .then(()=>{
+      .then(() => {
         dispatch(ClientData());
         message.success(`Deleted Company successfully`);
       })
   };
 
-  const dropdownMenu = (user) => ({
-    items: [
-      {
-        key: 'edit',
-        icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => {
-          setIsEditCompanyModalVisible(true);
-          setCompnyid(user.id);
-        }
-      },
-      {
-        key: 'email',
-        icon: <MdOutlineEmail />,
-        label: 'Update Email',
-        onClick: () => {
-          setIsEmailVerificationModalVisible(true);
-          setCompnyid(user.id);
-        }
-      },
-      {
-        key: 'upgrade',
-        icon: <RocketOutlined />,
-        label: 'Upgrade Plans',
-        onClick: () => {
-          setIsUpgradePlanModalVisible(true);
-          setCompnyid(user.id);
-        }
-      },
-      {
-        key: 'delete',
-        icon: <DeleteOutlined />,
-        label: 'Delete',
-        onClick: () => deleteUser(user.id)
+  const handleLoginAsCompany = (data) => {
+    try {
+      const tokens = localStorage.getItem("auth_token");
+
+      setTimeout(() => {
+        localStorage.setItem('autologintoken', tokens);
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('USER');
+        localStorage.removeItem('isAuth');
+        localStorage.setItem('email', data.email);
+        navigate(`/app/auth/login?email=${encodeURIComponent(data.email)}`);
+        window.location.reload();
+      }, 1000);
+
+      setTimeout(() => {
+        navigate(`/app/auth/login?email=${encodeURIComponent(data.email)}`);
+      }, 1100);
+    } catch (error) {
+      console.error('Error during login:', error);
+      message.error('Failed to login as company');
+    }
+  };
+
+  const getDropdownItems = (user) => [
+    {
+      key: 'login',
+      icon: <LoginOutlined />,
+      label: 'Login as Company',
+      onClick: () => handleLoginAsCompany(user)
+    },
+    {
+      key: 'edit',
+      icon: <EditOutlined />,
+      label: 'Edit',
+      onClick: () => {
+        setIsEditCompanyModalVisible(true);
+        setCompnyid(user.id);
       }
-    ]
-  });
+    },
+    {
+      key: 'email',
+      icon: <MdOutlineEmail />,
+      label: 'Update Email',
+      onClick: () => {
+        setIsEmailVerificationModalVisible(true);
+        setCompnyid(user.id);
+      }
+    },
+    {
+      key: 'upgrade',
+      icon: <RocketOutlined />,
+      label: 'Upgrade Plans',
+      onClick: () => {
+        setIsUpgradePlanModalVisible(true);
+        setCompnyid(user.id);
+      }
+    },
+    {
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      label: 'Delete',
+      onClick: () => deleteUser(user.id),
+      danger: true
+    }
+  ];
 
   const onChangeCompanyView = (e) => {
     setView(e.target.value);
@@ -250,9 +259,24 @@ const CompanyList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
-      ),
+      )
     },
   ];
 
@@ -266,7 +290,7 @@ const CompanyList = () => {
             onChange={onSearch}
             className="w-60"
           />
-         
+
         </div>
 
         <div className="flex gap-4 ">
@@ -375,7 +399,6 @@ const CompanyList = () => {
         onCancel={() => setIsEmailVerificationModalVisible(false)}
         onSubmit={handleEmailVerification}
         idd={comnyid}
-        initialEmail={initialValues.email}
       />
 
       <Modal

@@ -9,14 +9,14 @@ export const NavPanel = ({ direction, mode }) => {
 
 	const [open, setOpen] = useState(false);
 
-  	const showDrawer = () => {
+	const showDrawer = () => {
 		setOpen(true);
 	};
 
-  	const onClose = () => {
+	const onClose = () => {
 		setOpen(false);
 	};
-	
+
 	return (
 		<>
 			<NavItem onClick={showDrawer} mode={mode}>
@@ -24,12 +24,12 @@ export const NavPanel = ({ direction, mode }) => {
 			</NavItem>
 			<Drawer
 				title="Theme Config"
-				placement={direction === DIR_RTL ? 'left' : 'right'} 
+				placement={direction === DIR_RTL ? 'left' : 'right'}
 				width={350}
 				onClose={onClose}
 				open={open}
 			>
-				<ThemeConfigurator/>
+				<ThemeConfigurator />
 			</Drawer>
 		</>
 	)

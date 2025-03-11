@@ -21,7 +21,6 @@ const fetchEvents = async () => {
 
 const createEvent = async (payload) => {
   const token = localStorage.getItem("auth_token");
-  
   try {
     const res = await axios.post(
       `${env.API_ENDPOINT_URL}/events/`,
@@ -42,23 +41,23 @@ const createEvent = async (payload) => {
 const updateEventsetUp = async (id, data) => {
 
   try {
-      const token = JSON.parse(localStorage.getItem('auth_token'));
-      const res = await axios.put(`${env.API_ENDPOINT_URL}/events/${id}`, data, {
-          headers: {
-              Authorization: `Bearer ${token}`,
-          },
-      });
-      return res.data;
+    const token = JSON.parse(localStorage.getItem('auth_token'));
+    const res = await axios.put(`${env.API_ENDPOINT_URL}/events/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
 
   } catch (error) {
-      if (error.response) {
-          throw error.response.data; // Throw the response data directly
-      }
-      throw new Error('Update Failed');
+    if (error.response) {
+      throw error.response.data;
+    }
+    throw new Error('Update Failed');
   }
 };
 
-const getEventById =  async (id) => {
+const getEventById = async (id) => {
   try {
     const token = localStorage.getItem("auth_token");
     const response = await axios.get(

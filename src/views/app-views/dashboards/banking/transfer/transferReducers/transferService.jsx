@@ -74,7 +74,9 @@ const edittransfer = async (idd, values) => {
   }
 };
 
+
 const UserService = {
+
   transferdata,
   addaccounts,
   transferdelte,

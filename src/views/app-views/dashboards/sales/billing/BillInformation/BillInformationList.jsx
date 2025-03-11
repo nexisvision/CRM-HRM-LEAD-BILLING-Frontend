@@ -6,13 +6,14 @@ import { Getcus } from '../../customer/CustomerReducer/CustomerSlice';
 const BillInformationList = ({ billingId, onStatusUpdate }) => {
     const dispatch = useDispatch();
     const [customerData, setCustomerData] = useState(null);
-    
+
+    // Get data from Redux store
     const billingData = useSelector((state) => state?.salesbilling?.salesbilling?.data || []);
     const customers = useSelector((state) => state?.customers?.customers?.data);
     const loggedInUser = useSelector((state) => state?.user?.loggedInUser);
-    const payments = useSelector((state) => state?.payment?.payment || []); // Get payments data
 
-    const selectedBill = Array.isArray(billingData) 
+    // Find the selected bill using billingId
+    const selectedBill = Array.isArray(billingData)
         ? billingData.find(bill => bill.id === billingId)
         : null;
 
@@ -22,29 +23,8 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
         }
     }, [selectedBill, onStatusUpdate]);
 
-    const calculatePaymentStatus = () => {
-        if (!selectedBill || !payments) return 'Pending';
 
-        const billPayments = payments.filter(
-            payment => payment.bill === selectedBill.id
-        );
-
-        const totalPaid = billPayments.reduce(
-            (sum, payment) => sum + parseFloat(payment.amount), 
-            0
-        );
-
-        const billTotal = parseFloat(selectedBill.updated_total);
-        
-        if (totalPaid >= billTotal) {
-            onStatusUpdate('paid'); 
-            return 'Paid';
-        } else if (totalPaid > 0) {
-            return 'Partially Paid';
-        } else {
-            return 'Pending';
-        }
-    };
+    // Fetch customers on component mount
     useEffect(() => {
         dispatch(Getcus());
     }, [dispatch]);
@@ -54,7 +34,7 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
             const foundCustomer = customers.find(
                 customer => String(customer._id) === String(selectedBill.customer_id)
             );
-            
+
             if (foundCustomer) {
                 setCustomerData(foundCustomer);
             }
@@ -64,7 +44,7 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
     const billingAddress = React.useMemo(() => {
         if (!customerData?.billing_address) return {};
         try {
-            return typeof customerData.billing_address === 'string' 
+            return typeof customerData.billing_address === 'string'
                 ? JSON.parse(customerData.billing_address)
                 : customerData.billing_address;
         } catch (error) {
@@ -107,7 +87,7 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
                     <div className="text-right">
                         <p className="text-lg font-semibold text-gray-800">
                             {selectedBill?.billNumber || 'N/A'}
-                        </p>   
+                        </p>
                     </div>
                 </div>
 
@@ -137,7 +117,7 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
                                     {loggedInUser?.gstin || 'N/A'}
                                 </span><br />
                                 <span>
-                                    <span className="font-weight-semibold">Bill Status: </span><br/>
+                                    <span className="font-weight-semibold">Bill Status: </span><br />
                                     <span className={`px-2 py-1 mt-1 rounded-lg text-sm ${getStatusBadgeStyle(selectedBill?.bill_status)}`}>
                                         {formatStatusText(selectedBill?.bill_status)}
                                     </span>

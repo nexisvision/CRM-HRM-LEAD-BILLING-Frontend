@@ -1,31 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Card,
   Table,
-  Menu,
-  Tag,
   Input,
   message,
   Button,
   Modal,
-  Select,
   DatePicker,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
   FileExcelOutlined,
   EditOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import UserView from "../../../Users/user-list/UserView";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddJobOfferLetter from "./AddJobOfferLetter";
 import EditJobOfferLetter from "./EditJobOfferLetter";
 import { utils, writeFile } from "xlsx";
@@ -38,24 +32,17 @@ import { getjobapplication } from "../JobApplication/JobapplicationReducer/Jobap
 import { GetJobdata } from "../JobReducer/JobSlice";
 import AddEmployee from "../../Employee/AddEmployee";
 
-const { Option } = Select;
-
 const JobOfferLetterList = () => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddJobOfferLetterModalVisible, setIsAddJobOfferLetterModalVisible] =
     useState(false);
-
   const [idd, setIdd] = useState("");
   const [searchText, setSearchText] = useState('');
-
   const [isAddEmployeeModalVisible, setIsAddEmployeeModalVisible] = useState(false);
   const [employeeData, setEmployeeData] = useState(null);
-
   const [dateRange, setDateRange] = useState(null);
 
   useEffect(() => {
@@ -63,59 +50,56 @@ const JobOfferLetterList = () => {
     dispatch(getjobapplication());
     dispatch(GetJobdata());
   }, [dispatch]);
- 
-const user = useSelector((state) => state.user.loggedInUser.username);
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
 
   const alldatas = useSelector((state) => state.joboffers);
-  const fnddata = alldatas.joboffers.data || [];
+  const fnddata = useMemo(() => alldatas.joboffers.data || [], [alldatas.joboffers.data]);
 
+  console.log('fnddata', fnddata);
 
-  const alljob = useSelector((state)=>state?.Jobs?.Jobs?.data);
+  const alljob = useSelector((state) => state?.Jobs?.Jobs?.data);
+  console.log('alljob', alljob);
 
-  const jobappliaction = useSelector((state)=>state?.jobapplications?.jobapplications?.data);
+  const jobappliaction = useSelector((state) => state?.jobapplications?.jobapplications?.data);
+  console.log('jobappliaction', jobappliaction);
 
   const fnddtaa = fnddata.filter((item) => item.created_by === user);
 
   useEffect(() => {
     if (fnddata) {
-      setUsers(fnddtaa);  
+      setUsers(fnddtaa);
     }
-  }, [fnddata]);
+  }, [fnddata, fnddtaa]);
 
   const [
     isAddJobEditJobOfferLetterModalVisible,
     setIsEditJobOfferLetterModalVisible,
   ] = useState(false);
 
-  const alldata = useSelector((state) => state.jobapplications);
-  const fnddta = alldata.jobapplications.data;
 
-                                        
-                          const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                          const roles = useSelector((state) => state.role?.role?.data);
-                          const roleData = roles?.find(role => role.id === roleId);
-                       
-                          const whorole = roleData.role_name;
-                       
-                          const parsedPermissions = Array.isArray(roleData?.permissions)
-                          ? roleData.permissions
-                          : typeof roleData?.permissions === 'string'
-                          ? JSON.parse(roleData.permissions)
-                          : [];
-                        
-                          let allpermisson;  
-                       
-                          if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
-                            allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
-                          
-                          } else {
-                          }
-                          
-                          const canCreateClient = allpermisson?.includes('create');
-                          const canEditClient = allpermisson?.includes('edit');
-                          const canDeleteClient = allpermisson?.includes('delete');
-                          const canViewClient = allpermisson?.includes('view');
-                       
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
 
   const openAddJobOfferLetterModal = () => {
     setIsAddJobOfferLetterModalVisible(true);
@@ -140,7 +124,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
 
   const getFilteredOffers = () => {
     if (!users) return [];
-    
+
     let filtered = [...users];
 
     // Text search filter
@@ -155,11 +139,11 @@ const user = useSelector((state) => state.user.loggedInUser.username);
     if (dateRange && dateRange[0] && dateRange[1]) {
       const startDate = dayjs(dateRange[0]).format('YYYY-MM-DD');
       const endDate = dayjs(dateRange[1]).format('YYYY-MM-DD');
-      
+
       filtered = filtered.filter(offer => {
         const offerExpiry = dayjs(offer.offer_expiry).format('YYYY-MM-DD');
         const expectedJoining = dayjs(offer.expected_joining_date).format('YYYY-MM-DD');
-        
+
         return offerExpiry >= startDate && expectedJoining <= endDate;
       });
     }
@@ -192,38 +176,12 @@ const user = useSelector((state) => state.user.loggedInUser.username);
       message.error("Failed to export data. Please try again."); // Show error message
     }
   };
-  const showUserProfile = (userInfo) => {
-    setUserProfileVisible(true);
-    setSelectedUser(userInfo);
-  };
+
 
   const closeUserProfile = () => {
     setUserProfileVisible(false);
     setSelectedUser(null);
   };
-
-
-  const getjobStatus = (status) => {
-    if (status === "active") {
-      return "blue";
-    }
-    if (status === "blocked") {
-      return "cyan";
-    }
-    return "";
-  };
-
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "status";
-      const data = utils.filterArray(users, key, value);
-      setUsers(data);
-    } else {
-      setUsers(users);
-    }
-  };
-
-  const jobStatusList = ["active", "blocked"];
 
   const eidtfun = (idd) => {
     openEditJobOfferLetterModal();
@@ -251,31 +209,37 @@ const user = useSelector((state) => state.user.loggedInUser.username);
     setEmployeeData(null);
   };
 
-  const dropdownMenu = (elm) => ({
-    items: [
-     
+  const getDropdownItems = (row) => {
+    const items = [
       {
         key: 'convert',
         icon: <EditOutlined />,
         label: 'Convert To Employee',
-        onClick: () => convertemployee(elm.id)
-      },
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        onClick: () => convertemployee(row.id)
+      }
+    ];
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
-        onClick: () => eidtfun(elm.id)
-      }] : []),
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        onClick: () => eidtfun(row.id)
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(row.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -326,13 +290,28 @@ const user = useSelector((state) => state.user.loggedInUser.username);
         <div dangerouslySetInnerHTML={{ __html: text }} />
       ),
     },
-  
+
     {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            menu={{ items: getDropdownItems(elm) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -375,19 +354,19 @@ const user = useSelector((state) => state.user.loggedInUser.username);
           </div>
         </Flex>
         <Flex gap="7px">
-         
 
-             {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                            <Button
-                                                                                                                            type="primary"
-                                                                                                                            className="ml-2"
-                                                                                                                            onClick={openAddJobOfferLetterModal}
-                                                                                                                          >
-                                                                                                                            <PlusOutlined />
-                                                                                                                            <span>New</span>
-                                                                                                                          </Button>                                                                                                                       
-                                                                                                                                                                                                                                                          
-                                                                                                                                        ) : null}
+
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddJobOfferLetterModal}
+            >
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+
+          ) : null}
 
 
           <Button
@@ -402,21 +381,21 @@ const user = useSelector((state) => state.user.loggedInUser.username);
       </Flex>
       <div className="table-responsive mt-2">
 
-             {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                    <Table
-                                                                    columns={tableColumns}
-                                                                    dataSource={getFilteredOffers()}
-                                                                    rowKey="id"
-                                                                    pagination={{
-                                                                      total: getFilteredOffers().length,
-                                                                      pageSize: 10,
-                                                                      showSizeChanger: true,
-                                                                      showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                                                                    }}
-                                                                  />
-                                                                     ) : null}
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredOffers()}
+            rowKey="id"
+            pagination={{
+              total: getFilteredOffers().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
+          />
+        ) : null}
 
-      
+
       </div>
       <UserView
         data={selectedUser}
@@ -456,7 +435,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
       >
         <AddEmployee onClose={closeAddEmployeeModal} initialData={employeeData} />
       </Modal>
-      
+
     </Card>
   );
 };
@@ -488,6 +467,32 @@ const styles = `
     width: 90px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
   }
 
   @media (max-width: 768px) {

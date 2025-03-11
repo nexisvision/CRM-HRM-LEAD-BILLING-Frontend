@@ -27,14 +27,12 @@ const EditExpenses = ({ idd, onClose }) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const allempdata = useSelector((state) => state.Expense);
-  const Expensedata = allempdata?.Expense?.data || [];
-
+  const Expensedata = React.useMemo(() => allempdata?.Expense?.data || [], [allempdata?.Expense?.data]);
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
   const allproject = useSelector((state) => state.Project);
   const fndrewduxxdaa = allproject.Project.data;
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
-
 
   useEffect(() => {
     dispatch(getcurren());
@@ -66,19 +64,16 @@ const EditExpenses = ({ idd, onClose }) => {
   });
 
   useEffect(() => {
-    // Fetch expense data if not already available
     if (!Expensedata.length) {
       dispatch(Getexp());
     }
-  }, [dispatch]);
-
+  }, [dispatch, Expensedata]);
 
   useEffect(() => {
     if (Expensedata.length > 0 && idd) {
       const expdata = Expensedata.find((item) => item.id === idd);
 
       if (expdata) {
-        // Convert the date string to dayjs object if it exists
         const purchaseDate = expdata.purchase_date
           ? dayjs(expdata.purchase_date)
           : null;
@@ -88,13 +83,13 @@ const EditExpenses = ({ idd, onClose }) => {
           item: expdata.item || "",
           currency: expdata.currency || "",
           ExchangeRate: expdata.ExchangeRate || "",
-          price: expdata.price ? expdata.price.toString() : "", 
+          price: expdata.price ? expdata.price.toString() : "",
           purchase_date: purchaseDate,
           project: fnddata?.id || "",
           ExpenseCategory: expdata.ExpenseCategory || "",
           PurchasedFrom: expdata.PurchasedFrom || "",
           BankAccount: expdata.BankAccount || "",
-          description: expdata.description || "", 
+          description: expdata.description || "",
           bill: expdata.bill || "",
         });
       } else {
@@ -102,7 +97,7 @@ const EditExpenses = ({ idd, onClose }) => {
         navigate("/apps/sales/expenses");
       }
     }
-  }, [idd, Expensedata, navigate]);
+  }, [idd, Expensedata, navigate, fnddata?.id]);
 
   const onSubmit = async (values, { resetForm }) => {
     const updatedValues = {
@@ -136,7 +131,7 @@ const EditExpenses = ({ idd, onClose }) => {
     <div className="Edit-expenses-form">
       <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
       <Formik
-        enableReinitialize 
+        enableReinitialize
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
@@ -254,7 +249,7 @@ const EditExpenses = ({ idd, onClose }) => {
                   <ErrorMessage name="price" component="div" className="text-red-500 mt-1 text-sm" />
                 </div>
               </Col>
-             
+
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">PurchaseDate <span className="text-red-500">*</span></label>
@@ -272,7 +267,7 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-             
+
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Project <span className="text-red-500">*</span></label>

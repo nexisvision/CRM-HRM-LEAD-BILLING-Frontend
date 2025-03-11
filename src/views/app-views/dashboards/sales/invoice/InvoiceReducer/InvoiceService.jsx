@@ -1,6 +1,5 @@
-    import axios from "axios";
-    import { env } from "configs/EnvironmentConfig";
-
+import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 
 const getinv = async () => {
   const token = localStorage.getItem("auth_token");
@@ -78,13 +77,11 @@ const editinv = async (idd, values) => {
   }
 };
 
-
 const UserService = {
   getinv,
   addinv,
   deleteinv,
   editinv,
-
 };
 
 export default UserService;

@@ -2,70 +2,42 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Menu,
   Tag,
   Input,
   message,
   Button,
   Modal,
   DatePicker,
-  Select,
   Tooltip
 } from "antd";
 import {
-  EyeOutlined,
-  DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  FileExcelOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import UserView from "../../Users/user-list/UserView";
-import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddAttendance from "./AddAttendance";
-import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
-import utils from "utils";
 import {
-  deleteAttendance,
   getAttendances,
 } from "./AttendanceReducer/AttendanceSlice";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
 import { GetLeave } from "../Leaves/LeaveReducer/LeaveSlice";
 
-const { Option } = Select;
 
 const AttendanceList = () => {
   const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
-  const [list, setList] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(dayjs());
-  const [selectedDepartment, setSelectedDepartment] = useState("All Department");
-  const [selectedLocation, setSelectedLocation] = useState("All Location");
-  const [selectedEmployee, setSelectedEmployee] = useState("All Employee");
   const [userProfileVisible, setUserProfileVisible] = useState(false);
-  const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddAttendanceModalVisible, setIsAddAttendanceModalVisible] = useState(false);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [searchText, setSearchText] = useState('');
-
   const user = useSelector((state) => state.user.loggedInUser.username);
-
   const tabledata = useSelector((state) => state.attendance);
-  const fnddat = tabledata.Attendances.data || [];
-
-
+  const fnddat = React.useMemo(() => tabledata.Attendances.data || [], [tabledata.Attendances.data]);
   const employeeData = useSelector((state) => state.employee?.employee?.data || []);
-  
   const leaveData = useSelector((state) => state.Leave?.Leave?.data || []);
   const fndleavedata = leaveData.filter((item) => item.created_by === user);
 
@@ -88,18 +60,19 @@ const AttendanceList = () => {
 
       for (let i = 1; i <= daysInMonth; i++) {
         const date = selectedMonth.date(i);
-        if (date.day() !== 0) { 
+        if (date.day() !== 0) {
           totalWorkingDays++;
         }
       }
 
-     
+
       if (fnddat) {
         fnddat.forEach((attendance) => {
           const attendanceDate = dayjs(attendance.date);
           if (attendanceDate.isSame(selectedMonth, 'month')) {
             const day = attendanceDate.date();
-      
+
+            // Ensure employeeAttendanceMap[attendance.employee] exists
             if (!employeeAttendanceMap[attendance.employee]) {
               employeeAttendanceMap[attendance.employee] = {
                 attendanceByDay: {},
@@ -107,26 +80,26 @@ const AttendanceList = () => {
                 workingDays: 0,
               };
             }
-      
+
             if (!employeeAttendanceMap[attendance.employee].attendanceByDay[day]) {
               employeeAttendanceMap[attendance.employee].attendanceByDay[day] = {
                 status: 'P',
                 startTime: attendance.startTime,
                 endTime: attendance.endTime,
               };
-      
+
               const startTime = dayjs(attendance.startTime, "HH:mm:ss");
               const endTime = dayjs(attendance.endTime, "HH:mm:ss");
               const hoursWorked = endTime.diff(startTime, 'hour', true);
-      
+
               employeeAttendanceMap[attendance.employee].totalWorkingHours += hoursWorked;
               employeeAttendanceMap[attendance.employee].workingDays++;
             }
           }
         });
       }
-     
-     
+
+
       if (fndleavedata) {
         fndleavedata.forEach((leave) => {
           const leaveStart = dayjs(leave.startDate);
@@ -159,7 +132,7 @@ const AttendanceList = () => {
         setUsers(aggregatedData);
       }
     }
-  }, [fnddat, employeeData, fndleavedata, selectedMonth]);
+  }, [fnddat, employeeData, fndleavedata, selectedMonth, users]);
 
 
 
@@ -180,134 +153,49 @@ const AttendanceList = () => {
     setIsAddAttendanceModalVisible(false);
   };
 
-                                    const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                                    const roles = useSelector((state) => state.role?.role?.data);
-                                    const roleData = roles?.find(role => role.id === roleId);
-                                 
-                                    const whorole = roleData.role_name;
-                                 
-                                    const parsedPermissions = Array.isArray(roleData?.permissions)
-                                    ? roleData.permissions
-                                    : typeof roleData?.permissions === 'string'
-                                    ? JSON.parse(roleData.permissions)
-                                    : [];
-                                  
-                                    let allpermisson;  
-                                 
-                                    if (parsedPermissions["extra-hrm-role"] && parsedPermissions["extra-hrm-role"][0]?.permissions) {
-                                      allpermisson = parsedPermissions["extra-hrm-role"][0].permissions;
-                                    
-                                    } else {
-                                    }
-                                    
-                                    const canCreateClient = allpermisson?.includes('create');
-                                    const canEditClient = allpermisson?.includes('edit');
-                                    const canDeleteClient = allpermisson?.includes('delete');
-                                    const canViewClient = allpermisson?.includes('view');
-                                 
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-role"] && parsedPermissions["extra-hrm-role"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-role"][0].permissions;
+    console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    console.log('extra-hrm-role is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canViewClient = allpermisson?.includes('view');
 
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
   };
 
-  const onDateChange = (dates) => {
-    setStartDate(dates ? dates[0] : null);
-    setEndDate(dates ? dates[1] : null);
-  };
-
-  const filterByDate = (data) => {
-    if (startDate && endDate) {
-      return data.filter((item) => {
-        const itemDate = dayjs(item.intime);
-        return itemDate.isBetween(startDate, endDate, "day", "[]");
-      });
-    }
-    return data;
-  };
-
-  const showUserProfile = (userInfo) => {
-    setUserProfileVisible(true);
-    setSelectedUser(userInfo);
-  };
 
   const closeUserProfile = () => {
     setUserProfileVisible(false);
     setSelectedUser(null);
   };
 
-  const deleteAttendances = (userId) => {
-    dispatch(deleteAttendance(userId))
-      .then(() => {
-        dispatch(getAttendances());
-        message.success("Appraisal Deleted successfully!");
-        setUsers(users.filter((item) => item.id !== userId));
-      })
-      .catch((error) => {
-        console.error("Edit API error:", error);
-      });
-  };
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            onClick={() => {
-              showUserProfile(elm);
-            }}
-            size="small"
-          >
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<MailOutlined />}
-            onClick={() => {
-              showUserProfile(elm);
-            }}
-            size="small"
-          >
-            <span className="">Send Mail</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
 
-    
-
-                  
-                  {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                      <Menu.Item>
-                                      <Flex alignItems="center">
-                                        <Button
-                                          type=""
-                                          className=""
-                                          icon={<DeleteOutlined />}
-                                          onClick={() => {
-                                            deleteAttendances(elm.id);
-                                          }}
-                                          size="small"
-                                        >
-                                          <span className="">Delete</span>
-                                        </Button>
-                                      </Flex>
-                                    </Menu.Item>
-                                ) : null}
-    </Menu>
-  );
 
   const generateDateColumns = () => {
     const daysInMonth = selectedMonth.daysInMonth();
     const columns = [];
-  
+
     for (let i = 1; i <= daysInMonth; i++) {
       const date = selectedMonth.date(i);
       const isSunday = date.day() === 0;
@@ -341,14 +229,14 @@ const AttendanceList = () => {
 
   const renderAttendanceStatus = (attendanceByDay, day) => {
     if (!attendanceByDay) return null;
-  
+
     const attendance = attendanceByDay[day];
     const status = attendance ? 'P' : 'A';
     const statusColors = {
       P: 'green',
       A: 'red',
     };
-  
+
     if (!attendance) {
       return (
         <Tag color={statusColors[status]} className="m-0">
@@ -356,14 +244,14 @@ const AttendanceList = () => {
         </Tag>
       );
     }
-  
+
     const startTime = dayjs(attendance.startTime, "HH:mm:ss");
     const endTime = dayjs(attendance.endTime, "HH:mm:ss");
     const totalHours = endTime.diff(startTime, 'hour');
     const totalMinutes = endTime.diff(startTime, 'minute') % 60;
     const earlyOutHours = 17 - endTime.hour();
     const earlyOutMinutes = (60 - endTime.minute()) % 60;
-  
+
     const tooltipContent = (
       <div>
         <div>Total Working Hours: {totalHours}H : {totalMinutes}M</div>
@@ -371,7 +259,7 @@ const AttendanceList = () => {
         <div>Late IN Hours: {startTime.hour() - 9}H : {startTime.minute()}M</div>
       </div>
     );
-  
+
     return (
       <Tooltip title={tooltipContent}>
         <Tag color={statusColors[status]} className="m-0">
@@ -404,7 +292,7 @@ const AttendanceList = () => {
 
   const getFilteredAttendances = () => {
     if (!users) return [];
-    
+
     if (!searchText) return users;
 
     return users.filter(attendance => {
@@ -462,9 +350,9 @@ const AttendanceList = () => {
       </div>
       <div className="overflow-x-auto">
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-          <Table 
-            columns={tableColumns} 
-            dataSource={getFilteredAttendances()} 
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredAttendances()}
             rowKey="id"
             pagination={{
               total: getFilteredAttendances().length,

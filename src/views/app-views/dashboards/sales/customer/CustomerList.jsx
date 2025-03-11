@@ -3,44 +3,32 @@ import {
   Card,
   Table,
   Menu,
-  Row,
-  Col,
-  Tag,
   Input,
   message,
   Button,
   Modal,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
   FileExcelOutlined,
-  CopyOutlined,
   EditOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
 import UserView from "../../../Users/user-list/UserView";
 import ViewCustomer from "../customer/ViewCustomer";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import StatisticWidget from "components/shared-components/StatisticWidget";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddCustomer from "./AddCustomer";
-import { IoCopyOutline } from "react-icons/io5";
 import { utils, writeFile } from "xlsx";
 import EditCustomer from "./EditCustomer";
 import { delcus, Getcus } from "./CustomerReducer/CustomerSlice";
 import { useDispatch, useSelector } from "react-redux";
-import useSelection from "antd/es/table/hooks/useSelection";
 
 const CustomerList = () => {
   const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] =
@@ -55,46 +43,50 @@ const CustomerList = () => {
   useEffect(() => {
     dispatch(Getcus());
   }, [dispatch]);
-  
+
   const alldata = useSelector((state) => state.customers);
-  
-  const fnddata = alldata?.customers?.data || []; 
-  const loggid = useSelector((state)=>state.user.loggedInUser);
+
+  const fnddata = React.useMemo(() => alldata?.customers?.data || [], [alldata?.customers?.data]);
+  const loggid = useSelector((state) => state.user.loggedInUser);
 
   useEffect(() => {
     if (loggid && fnddata.length > 0) {
       setUsers(fnddata);
     }
-  }, [fnddata]);
-  
-        const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-        const roles = useSelector((state) => state.role?.role?.data);
-        const roleData = roles?.find(role => role.id === roleId);
-    
-        const whorole = roleData.role_name;
-    
-        const parsedPermissions = Array.isArray(roleData?.permissions)
-        ? roleData.permissions
-        : typeof roleData?.permissions === 'string'
-        ? JSON.parse(roleData.permissions)
-        : [];
-      
-      
-        let allpermisson;  
-    
-        if (parsedPermissions["dashboards-sales-customer"] && parsedPermissions["dashboards-sales-customer"][0]?.permissions) {
-          allpermisson = parsedPermissions["dashboards-sales-customer"][0].permissions;
-        
-        } else {
-        }
-        
-        const canCreateClient = allpermisson?.includes('create');
-        const canEditClient = allpermisson?.includes('edit');
-        const canDeleteClient = allpermisson?.includes('delete');
-        const canViewClient = allpermisson?.includes('view');
-  
-  
-        ///endpermission
+  }, [fnddata, loggid]);
+
+  //// permission
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+
+  let allpermisson;
+
+  if (parsedPermissions["dashboards-sales-customer"] && parsedPermissions["dashboards-sales-customer"][0]?.permissions) {
+    allpermisson = parsedPermissions["dashboards-sales-customer"][0].permissions;
+    // console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    // console.log('dashboards-sales-customer is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+
+  ///endpermission
 
   // Open Add Job Modal
   const openAddCustomerModal = () => {
@@ -116,9 +108,6 @@ const CustomerList = () => {
     setIsEditCustomerModalVisible(false);
   };
 
-  const openviewCustomerModal = () => {
-    setIsViewCustomerModalVisible(true);
-  };
 
   const closeViewCustomerModal = () => {
     setIsViewCustomerModalVisible(false);
@@ -130,8 +119,8 @@ const CustomerList = () => {
       setUsers(fnddata); // Reset to original filtered data
       return;
     }
-    const filteredUsers = fnddata.filter(user => 
-      Object.values(user).some(val => 
+    const filteredUsers = fnddata.filter(user =>
+      Object.values(user).some(val =>
         val && val.toString().toLowerCase().includes(value.toLowerCase())
       )
     );
@@ -162,10 +151,6 @@ const CustomerList = () => {
     }
   };
 
-  const showUserProfile = (userInfo) => {
-    setSelectedUser(userInfo);
-    setUserProfileVisible(true);
-  };
 
   const closeUserProfile = () => {
     setSelectedUser(null);
@@ -177,67 +162,89 @@ const CustomerList = () => {
     setIdd(idd);
   };
 
-  const dropdownMenu = (elm) => ({
-    items: [
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+  const getDropdownItems = (elm) => {
+    const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
         onClick: () => editfun(elm.id)
-      }] : []),
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(elm.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
-        title: "Customer Number",
-        dataIndex: "customerNumber",
-        sorter: (a, b) => {
-            if (a.customerNumber && b.customerNumber) {
-                return a.customerNumber.localeCompare(b.customerNumber);
-            }
-            return 0;
-        },
+      title: "Customer Number",
+      dataIndex: "customerNumber",
+      sorter: (a, b) => {
+        if (a.customerNumber && b.customerNumber) {
+          return a.customerNumber.localeCompare(b.customerNumber);
+        }
+        return 0;
+      },
     },
     {
-        title: "Name",
-        dataIndex: "name",
-        render: (name) => name || 'N/A',
-        sorter: (a, b) => {
-            if (a.name && b.name) {
-                return a.name.length - b.name.length;
-            }
-            return 0;
-        },
+      title: "Name",
+      dataIndex: "name",
+      render: (name) => name || 'N/A',
+      sorter: (a, b) => {
+        if (a.name && b.name) {
+          return a.name.length - b.name.length;
+        }
+        return 0;
+      },
     },
     {
-        title: "Tax Number",
-        dataIndex: "tax_number",
-        render: (tax_number) => tax_number || 'N/A',
-        sorter: (a, b) => {
-            if (a.tax_number && b.tax_number) {
-                return a.tax_number.localeCompare(b.tax_number);
-            }
-            return 0;
-        },
+      title: "Tax Number",
+      dataIndex: "tax_number",
+      render: (tax_number) => tax_number || 'N/A',
+      sorter: (a, b) => {
+        if (a.tax_number && b.tax_number) {
+          return a.tax_number.localeCompare(b.tax_number);
+        }
+        return 0;
+      },
     },
     {
-        title: "Action",
-        dataIndex: "actions",
-        render: (_, elm) => (
-            <div className="text-center">
-                <EllipsisDropdown menu={dropdownMenu(elm)} />
-            </div>
-        ),
+      title: "Action",
+      dataIndex: "actions",
+      render: (_, elm) => (
+        <div className="text-center">
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
+        </div>
+      ),
     },
-];
+  ];
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
@@ -257,7 +264,7 @@ const CustomerList = () => {
           </div>
         </Flex>
         <Flex gap="7px" className="flex">
-         
+
 
           {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
             <Button
@@ -328,6 +335,30 @@ const CustomerList = () => {
       >
         <EditCustomer onClose={closeEditCustomerModal} idd={idd} />
       </Modal>
+
+      <style>{`
+        .ant-dropdown-menu {
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          padding: 4px;
+        }
+        .ant-dropdown-menu-item {
+          padding: 8px 16px;
+          border-radius: 4px;
+          margin: 2px 0;
+          transition: all 0.3s;
+        }
+        .ant-dropdown-menu-item:hover {
+          background-color: #f5f5f5;
+        }
+        .ant-dropdown-menu-item-danger:hover {
+          background-color: #fff1f0;
+        }
+        .ant-dropdown-menu-item .anticon {
+          font-size: 16px;
+          margin-right: 8px;
+        }
+      `}</style>
     </Card>
   );
 };

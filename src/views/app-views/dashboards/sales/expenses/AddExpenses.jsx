@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Input, Button, DatePicker, Select, message, Row, Col, Switch, Upload, Modal } from 'antd';
+import { Input, Button, DatePicker, Select, message, Row, Col, Switch, Upload} from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';

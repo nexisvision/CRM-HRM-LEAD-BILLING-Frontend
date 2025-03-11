@@ -1,10 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./BranchService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
-
-// Async thunk for adding user
 
 export const AddBranchs = createAsyncThunk(
   "users/AddBranchs",
@@ -31,7 +28,7 @@ export const getBranch = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
+
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -44,7 +41,7 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
+
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -57,7 +54,7 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const deleteBranch = createAsyncThunk(
   "users/deleteBrancheet",
   async (userId, thunkAPI) => {
@@ -83,15 +80,7 @@ export const editBranch = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const BranchSlice = createSlice({
   name: "Branch",
@@ -159,7 +148,7 @@ const BranchSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-     
+
       //delete
       .addCase(deleteBranch.pending, (state) => {
         state.isLoading = true;

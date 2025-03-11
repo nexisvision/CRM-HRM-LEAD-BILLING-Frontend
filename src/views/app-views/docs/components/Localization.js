@@ -6,15 +6,15 @@ import { Tree } from 'antd';
 const { DirectoryTree } = Tree;
 
 const treeData = [
-  {
-    title: 'entries',
-    key: '0-0',
-    children: [],
+	{
+		title: 'entries',
+		key: '0-0',
+		children: [],
 	},
 	{
-    title: 'locales',
-    key: '0-1',
-    children: [],
+		title: 'locales',
+		key: '0-1',
+		children: [],
 	},
 	{
 		title: 'index.js',
@@ -94,8 +94,8 @@ const Localization = () => {
 	return (
 		<div>
 			<h2>Localization</h2>
-			<p>Emilus implement localization through <code>react-i18n-next</code>, 
-			corresponding files can be found in <code>src/lang/</code>, folder structure as below</p>
+			<p>Emilus implement localization through <code>react-i18n-next</code>,
+				corresponding files can be found in <code>src/lang/</code>, folder structure as below</p>
 			<div className="mb-4">
 				<DirectoryTree
 					multiple

@@ -62,18 +62,18 @@ export const { someActionFromYourSlice } = yourSlice.actions
 export default yourSlice.reducer`
 
 const ApiIntergration = () => {
-	return (
-		<div>
-			<h2>API Integration</h2>
+    return (
+        <div>
+            <h2>API Integration</h2>
             <div className="mt-4">
-                <Alert 
+                <Alert
                     type="info"
-                    description={<span>Note: If you want to connect API with your dev server, please make sure you have remove the mock server injectionin <strong>App.js</strong></span>} 
-                    showIcon 
-                /> 
+                    description={<span>Note: If you want to connect API with your dev server, please make sure you have remove the mock server injectionin <strong>App.js</strong></span>}
+                    showIcon
+                />
             </div>
-			<div className="mt-4">
-				<p>Follow the steps below to make backend api linkage working.</p>
+            <div className="mt-4">
+                <p>Follow the steps below to make backend api linkage working.</p>
                 <ol>
                     <li>
                         <p>First, create a <code>xxxService.js</code> file(depends on your feature or module) under <code>services</code> directory</p>
@@ -97,11 +97,11 @@ const ApiIntergration = () => {
                         </SyntaxHighlighter>
                     </li>
                 </ol>
-			</div>
-			<div className="mt-5">
-				<h4>Proxying</h4>
-				<p>Developer often consume API from different servers than the frontend application, there are complications that arise as a result of requests being sent across both servers, here is some way to setting up a proxy server.</p>
-				<ul>
+            </div>
+            <div className="mt-5">
+                <h4>Proxying</h4>
+                <p>Developer often consume API from different servers than the frontend application, there are complications that arise as a result of requests being sent across both servers, here is some way to setting up a proxy server.</p>
+                <ul>
                     <li>
                         <strong>Add proxy package.json</strong>
                         <p>A simple & quick solution to proxying a server</p>
@@ -125,9 +125,9 @@ module.exports = function(app) {
                         </SyntaxHighlighter>
                     </li>
                 </ul>
-			</div>
-		</div>
-	)
+            </div>
+        </div>
+    )
 }
 
 export default ApiIntergration

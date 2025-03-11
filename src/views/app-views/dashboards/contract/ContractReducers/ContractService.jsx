@@ -1,7 +1,5 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
-
-
 const ContaractData = async () => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -22,7 +20,7 @@ const CreateCon = async (payload) => {
 
   try {
     const res = await axios.post(
-        `${env.API_ENDPOINT_URL}/contracts/`,
+      `${env.API_ENDPOINT_URL}/contracts/`,
       payload,
       {
         headers: {
@@ -75,12 +73,12 @@ const Editcon = async (id, values) => {
   }
 };
 
+
 const UserService = {
   ContaractData,
   CreateCon,
   DeleteCon,
   Editcon,
-  
 };
 
 export default UserService;

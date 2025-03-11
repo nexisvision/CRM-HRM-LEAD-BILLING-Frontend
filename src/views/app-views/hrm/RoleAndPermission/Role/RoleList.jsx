@@ -1,38 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, Menu, Button, Input, message, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
-import UserView from '../../../Users/user-list/UserView';
+import { DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import { useDispatch, useSelector } from 'react-redux';
-import utils from 'utils';
 import AddRole from './AddRole';
 import { deleteRole, getRoles } from '../RoleAndPermissionReducers/RoleAndPermissionSlice';
 import EditRole from './EditRole';
 
 const RoleList = () => {
   const [users, setUsers] = useState([]);
-  const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [isEditRoleModalVisible, setIsEditRoleModalVisible] = useState(false);
-  const [id, setId] = useState(null);
-
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const id = null;
   const [isAddRoleModalVisible, setIsAddRoleModalVisible] = useState(false);
   const dispatch = useDispatch();
 
   const loginUser = useSelector((state) => state.user.loggedInUser);
   const tabledata = useSelector((state) => state.role.role.data);
 
-  const filteredData = Array.isArray(tabledata) && loginUser ?
-    tabledata.filter((item) => item.created_by === loginUser.username) : [];
+  const filteredData = React.useMemo(() => {
+    if (!Array.isArray(tabledata) || !loginUser) return [];
+    return tabledata.filter((item) => item.created_by === loginUser.username);
+  }, [tabledata, loginUser]);
 
   const [searchText, setSearchText] = useState('');
 
-  const openEditRoleModal = () => {
-    setIsEditRoleModalVisible(true);
-  };
 
   const closeEditRoleModal = () => {
     setIsEditRoleModalVisible(false);
@@ -49,6 +41,18 @@ const RoleList = () => {
   useEffect(() => {
     dispatch(getRoles());
   }, [dispatch]);
+
+  const deleteRoles = (userId) => {
+    dispatch(deleteRole(userId))
+      .then(() => {
+        dispatch(getRoles());
+        message.success('Appraisal Deleted successfully!');
+        setUsers(users.filter(item => item.id !== userId));
+      })
+      .catch((error) => {
+        console.error('Edit API error:', error);
+      });
+  };
 
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
@@ -92,31 +96,11 @@ const RoleList = () => {
   if (parsedPermissions["extra-hrm-role"] && parsedPermissions["extra-hrm-role"][0]?.permissions) {
     allpermisson = parsedPermissions["extra-hrm-role"][0].permissions;
 
-  } else {
   }
 
   const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
-
-
-  const editfun = (id) => {
-    openEditRoleModal();
-    setId(id);
-  }
-  const deleteRoles = (userId) => {
-    dispatch(deleteRole(userId))
-      .then(() => {
-        dispatch(getRoles());
-        message.success('Appraisal Deleted successfully!');
-        setUsers(users.filter(item => item.id !== userId));
-      })
-      .catch((error) => {
-        console.error('Edit API error:', error);
-      });
-  };
-
 
   const dropdownMenu = (elm) => (
     <Menu>

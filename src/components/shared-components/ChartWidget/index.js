@@ -2,8 +2,8 @@ import React, { useRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import Card from 'components/shared-components/Card';
 import ApexChart from "react-apexcharts";
-import { 
-	apexLineChartDefaultOption, 
+import {
+	apexLineChartDefaultOption,
 	apexBarChartDefaultOption,
 	apexAreaChartDefaultOption
 } from 'constants/ChartConstant';
@@ -15,7 +15,7 @@ const titleStyle = {
 	zIndex: '1'
 }
 
-const extraStyle ={
+const extraStyle = {
 	position: 'absolute',
 	zIndex: '1',
 	right: '0',
@@ -35,14 +35,14 @@ const getChartTypeDefaultOption = type => {
 	}
 }
 
-const ChartWidget = ({title, series, width, height, xAxis, customOptions, card, type, extra, direction, bodyClass}) =>  {
+const ChartWidget = ({ title, series, width, height, xAxis, customOptions, card, type, extra, direction, bodyClass }) => {
 	let options = JSON.parse(JSON.stringify(getChartTypeDefaultOption(type)))
-	const isMobile = window.innerWidth < 768 
+	const isMobile = window.innerWidth < 768
 	const setLegendOffset = () => {
-		if(chartRef.current) {
+		if (chartRef.current) {
 			const lengend = chartRef.current.querySelectorAll('div.apexcharts-legend')[0]
 			lengend.style.marginRight = `${isMobile ? 0 : extraRef.current?.offsetWidth}px`
-			if(direction === DIR_RTL) {
+			if (direction === DIR_RTL) {
 				lengend.style.right = 'auto'
 				lengend.style.left = '0'
 			}
@@ -53,23 +53,24 @@ const ChartWidget = ({title, series, width, height, xAxis, customOptions, card, 
 				lengend.style.padding = 0;
 			}
 		}
-	} 
+	}
 
 	useEffect(() => {
 		setLegendOffset()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
-	
+
 	const extraRef = useRef(null);
 	const chartRef = useRef();
-	
+
 	options.xaxis.categories = xAxis
-	if(customOptions) {
-		options = {...options, ...customOptions }
+	if (customOptions) {
+		options = { ...options, ...customOptions }
 	}
-	
+
 	const onResize = () => {
 		setTimeout(() => {
-			setLegendOffset()	
+			setLegendOffset()
 		}, 600);
 	}
 
@@ -81,23 +82,23 @@ const ChartWidget = ({title, series, width, height, xAxis, customOptions, card, 
 
 	const renderChart = () => (
 		<div ref={resizeRef}>
-			<div style={direction === DIR_RTL ? {direction: 'ltr'}: {}} className="chartRef" ref={chartRef}>
-				<ApexChart options={options} type={type} series={series} width={width} height={height}/>
+			<div style={direction === DIR_RTL ? { direction: 'ltr' } : {}} className="chartRef" ref={chartRef}>
+				<ApexChart options={options} type={type} series={series} width={width} height={height} />
 			</div>
 		</div>
 	)
 
 	return (
 		<>
-			{card ? 
+			{card ?
 				<Card >
 					<div className={`position-relative ${bodyClass}`}>
 						{<div style={!isMobile ? titleStyle : {}}>{title}</div> && <h4 className="font-weight-bold" style={!isMobile ? titleStyle : {}}>{title}</h4>}
 						{extra && <div ref={extraRef} style={!isMobile ? extraStyle : {}}>{extra}</div>}
 						{renderChart()}
 					</div>
-				</Card> 
-				: 
+				</Card>
+				:
 				renderChart()
 			}
 		</>

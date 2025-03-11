@@ -5,11 +5,11 @@ import {
   Tag,
   Select,
   Input,
-  Menu,
   message,
   Button,
   Modal,
   Avatar,
+  Dropdown,
 } from "antd";
 import {
   EyeOutlined,
@@ -18,13 +18,11 @@ import {
   EditOutlined,
   PlusOutlined,
   FileExcelOutlined,
-  UserOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import UserView from "./UserView";
 import Flex from "components/shared-components/Flex";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AddUser from "./AddUser"; // Assuming AddUser is a component
 import EditUser from "./EditUser"; // Assuming EditUser is a component
 import ResetPassword from "./ResetPassword";
@@ -42,7 +40,6 @@ const UserList = () => {
   const [isEditUserModalVisible, setIsEditUserModalVisible] = useState(false);
   const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] = useState(false);
   const [idd, setIdd] = useState("");
-  const [userUpdated, setUserUpdated] = useState(false);
   const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
 
@@ -50,19 +47,13 @@ const UserList = () => {
 
   useEffect(() => {
     dispatch(GetUsers());
-    setUserUpdated(false);
   }, [dispatch]);
 
   const alluserdata = useSelector((state) => state.Users);
   const finddata = alluserdata.Users.data;
 
-  const loggeddata = useSelector((state) => state?.user?.loggedInUser.client_id);
-
-  // const finddata = fndfdata?.filter((item) => item.client_id === loggeddata);
-
   const allroledata = useSelector((state) => state.role);
   const fnddata = allroledata.role.data;
-  const logged = useSelector((state) => state.user.loggedInUser.username);
 
   const [users, setUsers] = useState([]);
 
@@ -105,7 +96,6 @@ const UserList = () => {
 
   const handleShowStatus = (value) => {
     if (value !== "All") {
-      const key = "status";
       const data = users.filter(user => user.status === value);
       setUsers(data);
     } else {
@@ -142,7 +132,6 @@ const UserList = () => {
   const deleteUser = (userId) => {
     dispatch(Dleteusetr(userId));
     dispatch(GetUsers());
-    setUserUpdated(true);
     setUsers(users.filter((user) => user.id !== userId));
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
@@ -178,10 +167,6 @@ const UserList = () => {
     setIsEditUserModalVisible(false);
   };
 
-  const openResetPasswordModal = () => {
-    setIsResetPasswordModalVisible(true);
-  };
-
   const closeResetPasswordModal = () => {
     setIsResetPasswordModalVisible(false);
   };
@@ -191,44 +176,49 @@ const UserList = () => {
     setIdd(idd);
   };
 
-  const dropdownMenu = (elm) => ({
-    items: [
-      // View Details - conditional item
-      ...(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client") ? [{
+  const getDropdownItems = (record) => {
+    const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'view',
         icon: <EyeOutlined />,
         label: 'View Details',
-        onClick: () => showUserProfile(elm)
-      }] : []),
-      
-      // Edit - conditional item
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        onClick: () => showUserProfile(record)
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
-        onClick: () => Editfun(elm.id)
-      }] : []),
-      
-      // Update Email - always visible
-      {
-        key: 'email',
-        icon: <MdOutlineEmail />,
-        label: 'Update Email',
-        onClick: () => {
-          setIsEmailVerificationModalVisible(true);
-          setSelectedUserId(elm.id);
-        }
-      },
-      
-      // Delete - conditional item
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        onClick: () => Editfun(record.id)
+      });
+    }
+
+    items.push({
+      key: 'email',
+      icon: <MdOutlineEmail />,
+      label: 'Update Email',
+      onClick: () => {
+        setIsEmailVerificationModalVisible(true);
+        setSelectedUserId(record.id);
+      }
+    });
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(record.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -301,9 +291,24 @@ const UserList = () => {
     {
       title: "Action",
       dataIndex: "actions",
-      render: (_, elm) => (
+      render: (_, record) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            menu={{ items: getDropdownItems(record) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -423,4 +428,73 @@ const UserList = () => {
   );
 };
 
-export default UserList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 250px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
+  }
+
+  .ant-btn-text:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .ant-btn-text:active {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  @media (max-width: 768px) {
+    .search-input {
+      width: 100%;
+      min-width: unset;
+    }
+    
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const UserListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <UserList />
+  </>
+);
+
+export default UserListWithStyles;

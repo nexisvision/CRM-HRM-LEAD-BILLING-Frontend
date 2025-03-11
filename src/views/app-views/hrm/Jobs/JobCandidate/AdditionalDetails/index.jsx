@@ -2,9 +2,9 @@ import React from 'react';
 import AdditionalDetailsList from './AdditionalDetailsList';
 
 const additionaldetails = () => (
-<div className="mail">
-<AdditionalDetailsList />
-</div>
+	<div className="mail">
+		<AdditionalDetailsList />
+	</div>
 
 );
 

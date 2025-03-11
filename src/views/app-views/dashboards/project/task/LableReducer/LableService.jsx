@@ -48,7 +48,7 @@ const Deletemin = async (userId) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -75,8 +75,10 @@ const EditMin = async (idd, data) => {
   }
 };
 
+
+
 const UserService = {
-  // addUser,
+
   GetLable,
   AddLable,
   Deletemin,

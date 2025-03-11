@@ -3,9 +3,9 @@ import LeaveList from './LeaveList';
 
 const Leave = () => (
 
-<div className="mail">
-<LeaveList />
-</div>
+	<div className="mail">
+		<LeaveList />
+	</div>
 
 );
 

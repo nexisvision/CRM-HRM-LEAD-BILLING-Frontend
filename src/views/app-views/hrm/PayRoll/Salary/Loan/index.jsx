@@ -4,11 +4,11 @@ import LoanList from './LoanList';
 
 const Loan = ({ id, onClose }) => (
 
-<div className="mail">
+    <div className="mail">
 
-<LoanList id={id} onClose={onClose} />
- 
-</div>
+        <LoanList id={id} onClose={onClose} />
+
+    </div>
 
 );
 

@@ -18,12 +18,12 @@ export const PageHeader = ({ title, display }) => {
 				`}
 			>
 				<h3 className="mb-0 mr-3 font-weight-semibold">
-					<IntlMessage id={title? title : 'home'}/>
+					<IntlMessage id={title ? title : 'home'} />
 				</h3>
 				<AppBreadcrumb />
 			</div>
 		)
-		: null
+			: null
 	)
 }
 

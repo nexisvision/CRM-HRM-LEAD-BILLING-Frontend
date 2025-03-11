@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Modal, Form, Input, Select, DatePicker, TimePicker, Button } from 'antd';
 
 const { Option } = Select;
@@ -9,7 +9,8 @@ const AddInterviewSchedule = ({ visible, onCancel, onCreate }) => {
   const handleCreate = () => {
     form.validateFields()
       .then(values => {
-        onCreate(values); // Call parent handler with form data
+        console.log('Form Values:', values);
+        onCreate(values);
       })
       .catch(info => {
         console.error('Validation Failed:', info);

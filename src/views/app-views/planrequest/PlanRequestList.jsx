@@ -1,120 +1,14 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { useState } from 'react'
-// import { PrinterOutlined } from '@ant-design/icons';
-import StatisticWidget from 'components/shared-components/StatisticWidget';
 
-import { Row, Card, Col, Table, Select, Input, Button, Badge, Menu, Modal, Switch } from 'antd';
-// import { invoiceData } from '../../../pages/invoice/invoiceData';
-// import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
-import NumberFormat from 'react-number-format';
-import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, EditOutlined, PlusOutlined, DeleteOutlined,CheckOutlined ,CloseOutlined  } from '@ant-design/icons';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
+import { Card, Table, Input } from 'antd';
+import { SearchOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex'
-// import NumberFormat from 'react-number-format';
-import dayjs from 'dayjs';
-import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
-import utils from 'utils'   
-
-
-
-const { Column } = Table;
-
-const { Option } = Select
+import utils from 'utils'
 
 
 export const PlanRequestList = () => {
     const [users, setUsers] = useState([]);
-    const [selectedRows, setSelectedRows] = useState([])
-    const [isAddSubscribedUserPlansModalVisible, setIsAddSubscribedUserPlansModalVisible] = useState(false);
-    const [isEditSubscribedUserPlansModalVisible, setIsEditSubscribedUserPlansModalVisible] = useState(false);
-    const [isViewSubscribedUserPlansModalVisible, setIsViewSubscribedUserPlansModalVisible] = useState(false);
-
-
-    const [selectedRowKeys, setSelectedRowKeys] = useState([])
-
-    const handleShowStatus = value => {
-        if (value !== 'All') {
-            const key = 'paymentStatus'
-            const data = utils.filterArray(users, key, value)
-            setUsers(data)
-        } else {
-            setUsers([])
-        }
-    }
-
-    // Open Add Job Modal
-    const openAddSubscribedUserPlansModal = () => {
-        setIsAddSubscribedUserPlansModalVisible(true);
-    };
-
-    // Close Add Job Modal
-    const closeAddSubscribedUserPlansModal = () => {
-        setIsAddSubscribedUserPlansModalVisible(false);
-    };
-
-    // Open Add Job Modal
-    const openEditSubscribedUserPlansModal = () => {
-        setIsEditSubscribedUserPlansModalVisible(true);
-    };
-
-    // Close Add Job Modal
-    const closeEditSubscribedUserPlansModal = () => {
-        setIsEditSubscribedUserPlansModalVisible(false);
-    };
-
-
-    // Open Add Job Modal
-    const openViewSubscribedUserPlansModal = () => {
-        setIsViewSubscribedUserPlansModalVisible(true);
-    };
-
-    // Close Add Job Modal
-    const closeViewSubscribedUserPlansModal = () => {
-        setIsViewSubscribedUserPlansModalVisible(false);
-    };
-
-    const dropdownMenu = row => (
-        <Menu>
-            <Menu.Item>
-                <Flex alignItems="center" onClick={openViewSubscribedUserPlansModal}>
-                    <EyeOutlined />
-                    {/* <EyeOutlined /> */}
-                    <span className="ml-2">View Details</span>
-                </Flex>
-            </Menu.Item>
-
-            <Menu.Item>
-                <Flex alignItems="center" onClick={openEditSubscribedUserPlansModal}>
-                    <EditOutlined />
-                    {/* <EditOutlined /> */}
-                    <span className="ml-2">Edit</span>
-                </Flex>
-            </Menu.Item>
-        
-            <Menu.Item>
-                <Flex alignItems="center">
-                    <DeleteOutlined />
-                    <span className="ml-2">Delete</span>
-                </Flex>
-            </Menu.Item>
-        </Menu>
-    );
-
-    // Add this function to handle status changes
-const handleStatusChange = (checked, userId) => {
-    const newStatus = checked ? 'active' : 'inactive';
-    // Update your data/API here
-  };
-
-    const handleAccept = (id) => {
-       
-        
-    };
-
-    const handleReject = (id) => {
-        
-      
-    };
 
     const tableColumns = [
         {
@@ -135,7 +29,7 @@ const handleStatusChange = (checked, userId) => {
         {
             title: 'Total Customers',
             dataIndex: 'totalcustomers',
-            
+
             sorter: (a, b) => utils.antdTableSorter(a, b, 'totalcustomers')
         },
         {
@@ -158,8 +52,8 @@ const handleStatusChange = (checked, userId) => {
             dataIndex: 'actions',
             render: (_, elm) => (
                 <div className="text-center flex gap-3">
-                    <CheckOutlined className='border border-gray-300 bg-blue-400 text-white p-1'/>
-                    <CloseOutlined   className='border border-gray-300 bg-white text-red-500 p-1 '/>
+                    <CheckOutlined className='border border-gray-300 bg-blue-400 text-white p-1' />
+                    <CloseOutlined className='border border-gray-300 bg-white text-red-500 p-1 ' />
                 </div>
             ),
             sorter: (a, b) => utils.antdTableSorter(a, b, 'action')
@@ -172,19 +66,7 @@ const handleStatusChange = (checked, userId) => {
         const searchArray = e.currentTarget.value ? users : []
         const data = utils.wildCardSearch(searchArray, value)
         setUsers(data)
-        setSelectedRowKeys([])
     }
-
-    // total() {
-    // 	let total = 0;
-    // 	invoiceData.forEach((elm) => {
-    // 		total += elm.price;
-    // 	})
-    // 	return total
-    // }
-
-    // render() {
-
 
     return (
         <div className="container">
@@ -195,7 +77,6 @@ const handleStatusChange = (checked, userId) => {
                             <Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
                         </div>
                     </Flex>
-                   
                 </Flex>
                 <div className="table-responsive">
                     <Table
@@ -203,11 +84,8 @@ const handleStatusChange = (checked, userId) => {
                         dataSource={users}
                         rowKey='id'
                         scroll={{ x: 1200 }}
-                    
                     />
                 </div>
-
-               
             </Card>
         </div>
     );

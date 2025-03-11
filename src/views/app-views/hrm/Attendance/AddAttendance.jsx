@@ -11,7 +11,6 @@ import {
   message,
 } from "antd";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
 import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -25,9 +24,6 @@ const { Option } = Select;
 
 const AddAttendance = ({ onClose }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-
   const user = useSelector((state) => state.user.loggedInUser.username);
 
   const employeeDataa = useSelector(
@@ -68,7 +64,8 @@ const AddAttendance = ({ onClose }) => {
     dispatch(addAttendance(formattedValues))
 
 
-    .then(() => {
+      .then(() => {
+        console.log("formattedValues", formattedValues);
 
         dispatch(getAttendances());
         message.success("Attendance added successfully!");
@@ -83,7 +80,7 @@ const AddAttendance = ({ onClose }) => {
 
   return (
     <div className="add-attendance-form">
- <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
 
       <Formik
         initialValues={{
@@ -175,7 +172,7 @@ const AddAttendance = ({ onClose }) => {
                     disabledTime={() => {
                       const startTime = values.startTime;
                       if (!startTime) return {};
-                      
+
                       return {
                         disabledHours: () => {
                           const hours = [];
@@ -204,7 +201,7 @@ const AddAttendance = ({ onClose }) => {
                 </div>
               </Col>
 
-             
+
               <Col span={24}>
                 <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Comment <span className="text-red-500">*</span>  </label>

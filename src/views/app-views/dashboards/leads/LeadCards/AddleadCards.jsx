@@ -7,16 +7,11 @@ import {
   message,
   Row,
   Col,
-  Switch,
-  Upload,
   Card,
 } from "antd";
-import { useNavigate } from "react-router-dom";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
-import utils from "utils";
-import OrderListData from "assets/data/order-list.data.json";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,13 +26,10 @@ import { getallcountries } from "views/app-views/setting/countries/countriesredu
 const { Option } = Select;
 
 const AddLeadCards = ({ onClose }) => {
-  const navigate = useNavigate();
   const [details, setDetails] = useState(false);
   const [info, setInfo] = useState(false);
-  const [organisation, setorganisation] = useState(false);
-
   const { currencies } = useSelector((state) => state.currencies);
-  const currenciesData = currencies?.data || [];
+  const currenciesData = React.useMemo(() => currencies?.data || [], [currencies]);
   const { data: employee } = useSelector((state) => state.employee.employee);
   const alltagdata = useSelector((state) => state.Lable);
   const datas = alltagdata.Lable.data || [];
@@ -53,7 +45,7 @@ const AddLeadCards = ({ onClose }) => {
 
   useEffect(() => {
     dispatch(getstages());
-  }, []);
+  }, [dispatch]);
 
   const allstagedata = useSelector((state) => state.StagesLeadsDeals);
   const fndata = allstagedata?.StagesLeadsDeals?.data || [];
@@ -96,7 +88,7 @@ const AddLeadCards = ({ onClose }) => {
   useEffect(() => {
   }, [currenciesData]);
 
-  
+
   const handlePhoneNumberChange = (e, setFieldValue, fieldName) => {
     const value = e.target.value.replace(/\D/g, '').slice(0, 10);
     setFieldValue(fieldName, value);
@@ -129,7 +121,6 @@ const AddLeadCards = ({ onClose }) => {
       then: Yup.string().required("category is required"),
     }),
     lastContacted: Yup.date().nullable(),
-
     totalBudget: Yup.string().when("info", {
       is: true,
       then: Yup.string().required("Total Budget is required"),
@@ -222,7 +213,7 @@ const AddLeadCards = ({ onClose }) => {
           resetForm,
         }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
-            <h2 className=" border-b pb-2 font-medium"></h2>
+            <hr className=" border-b pb-2 font-medium"></hr>
 
             <Row gutter={16}>
               <Col span={24} className="mt-3">
@@ -279,59 +270,59 @@ const AddLeadCards = ({ onClose }) => {
                   />
                 </div>
               </Col>
-                <Col span={24} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">Telephone</label>
-                    <div className="flex">
-                      <Select
-                        style={{ width: '30%', marginRight: '8px' }}
-                        placeholder="Code"
-                        name="phoneCode"
-                        className="mt-1"
-                        onChange={(value) => setFieldValue('phoneCode', value)}
-                        value={values.phoneCode}
-                      >
-                        {Array.isArray(countries) && countries.length > 0 ? (
-                          countries.map((country) => (
-                            <Option key={country.id} value={country.phoneCode}>
-                              {country.phoneCode}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option value="" disabled>No country codes available</Option>
-                        )}
-                      </Select>
-                      <Field
-                        name="telephone"
-                        as={Input}
-                        type="number"
-                        maxLength={10}
-                        style={{ width: '70%' }}
-                        placeholder="Enter Contact"
-                        onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'telephone')}
-
-
-                        onKeyPress={(e) => {
-                          if (!/[0-9]/.test(e.key)) {
-                            e.preventDefault();
-                          }
-                        }}
-                      />
-                    </div>
-                    <ErrorMessage
+              <Col span={24} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Telephone</label>
+                  <div className="flex">
+                    <Select
+                      style={{ width: '30%', marginRight: '8px' }}
+                      placeholder="Code"
                       name="phoneCode"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-
-                    />
-                    <ErrorMessage
+                      className="mt-1"
+                      onChange={(value) => setFieldValue('phoneCode', value)}
+                      value={values.phoneCode}
+                    >
+                      {Array.isArray(countries) && countries.length > 0 ? (
+                        countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            {country.phoneCode}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="" disabled>No country codes available</Option>
+                      )}
+                    </Select>
+                    <Field
                       name="telephone"
-                      component="div"
-                      className="error-message text-red-500 my-1"
+                      as={Input}
+                      type="number"
+                      maxLength={10}
+                      style={{ width: '70%' }}
+                      placeholder="Enter Contact"
+                      onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'telephone')}
 
+
+                      onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                   </div>
-                </Col>
+                  <ErrorMessage
+                    name="phoneCode"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+
+                  />
+                  <ErrorMessage
+                    name="telephone"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+
+                  />
+                </div>
+              </Col>
 
               <Col span={24} className="mt-3">
                 <div className="form-item">
@@ -381,7 +372,7 @@ const AddLeadCards = ({ onClose }) => {
                 </div>
               </Col>
 
-                <Col span={12} className="mt-3">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Email Address</label>
                   <Field
@@ -401,20 +392,20 @@ const AddLeadCards = ({ onClose }) => {
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold mb-2">Lead Value</label>
-                  <Field 
-                    name="leadValue" 
-                    component={LeadValueField} 
+                  <Field
+                    name="leadValue"
+                    component={LeadValueField}
                     className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="leadValue.amount"
-                    component="div" 
+                    component="div"
                     className="text-red-500 text-sm mt-1"
                   />
                   <ErrorMessage
                     name="leadValue.currencyId"
                     component="div"
-                    className="text-red-500 text-sm mt-1" 
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
@@ -527,7 +518,7 @@ const AddLeadCards = ({ onClose }) => {
                     <Col span={24} className="mt-3">
                       <label className="font-semibold">Source <span className="text-rose-500">*</span></label>
                       <Select
-                        name="source" 
+                        name="source"
                         placeholder="Select Source"
                         className="w-full mt-1"
                         onChange={(value) => console.log("Selected:", value)}

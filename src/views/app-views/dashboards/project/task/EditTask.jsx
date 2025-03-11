@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Input,
   Button,
@@ -7,14 +7,12 @@ import {
   message,
   Row,
   Col,
-  Switch,
   Upload,
   Modal,
-  Checkbox,
 } from "antd";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -29,27 +27,17 @@ import { AddLable, GetLable } from "./LableReducer/LableSlice";
 const { Option } = Select;
 
 const EditTask = ({ idd, onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [isWithoutDueDate, setIsWithoutDueDate] = useState(false);
-  const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
-  const [showReceiptUpload, setShowReceiptUpload] = useState(false);
-
   const { id } = useParams();
-
   const [isPriorityModalVisible, setIsPriorityModalVisible] = useState(false);
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
   const [newPriority, setNewPriority] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newStatus, setNewStatus] = useState("");
-
   const [priorities, setPriorities] = useState([]);
   const [categories, setCategories] = useState([]);
   const [statuses, setStatuses] = useState([]);
-
-
-  const CustomInput = ({ field, form, ...props }) => <Input {...field} {...props} />;
 
   const [initialValues, setInitialValues] = useState({
     taskTitle: "",
@@ -72,40 +60,24 @@ const EditTask = ({ idd, onClose }) => {
     description: Yup.string().required("Please enter a Description."),
     addfile: Yup.mixed().required("Please upload a file."),
   });
-
-  const allempdata = useSelector((state) => state.Tasks);
-  const Expensedata = allempdata?.Tasks?.data || [];
-
-  const AllLoggedData = useSelector((state) => state.user || []);
-
   const allempdatass = useSelector((state) => state.employee);
   const empData = allempdatass?.employee?.data || [];
-
   const loggeduser = useSelector((state) => state.user.loggedInUser.username || []);
-
   const fnduserdatas = empData.filter((item) => item.created_by === loggeduser);
-
-
   const allproject = useSelector((state) => state.Project);
   const fndrewduxxdaa = allproject.Project.data || [];
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
-
   const [fileList, setFileList] = useState([]);
-
-
 
   useEffect(() => {
     dispatch(GetTasks(id))
-  }, [dispatch])
+  }, [dispatch, id])
 
   const taskadata = useSelector((state) => state.Tasks.Tasks.data)
-
-
 
   useEffect(() => {
     if (idd) {
       const milestone = taskadata.find((item) => item.id === idd);
-
 
 
       if (milestone) {
@@ -135,9 +107,8 @@ const EditTask = ({ idd, onClose }) => {
 
 
 
-  const fetchLables = async (lableType, setter) => {
+  const fetchLables = useCallback(async (lableType, setter) => {
     try {
-      const lid = AllLoggedData.loggedInUser.id; // User ID to fetch specific labels
       const response = await dispatch(GetLable(id)); // Fetch all labels
       if (response.payload && response.payload.data) {
         const filteredLables = response.payload.data
@@ -149,13 +120,13 @@ const EditTask = ({ idd, onClose }) => {
       console.error(`Failed to fetch ${lableType}:`, error);
       message.error(`Failed to load ${lableType}`);
     }
-  };
+  }, [dispatch, id]);
 
   useEffect(() => {
     fetchLables("priority", setPriorities);
     fetchLables("category", setCategories);
     fetchLables("status", setStatuses);
-  }, []);
+  }, [fetchLables]);
 
 
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
@@ -165,7 +136,6 @@ const EditTask = ({ idd, onClose }) => {
     }
 
     try {
-      const lid = AllLoggedData.loggedInUser.id; // User ID
       const payload = {
         name: newValue.trim(), // Label name
         lableType, // Dynamic labelType
@@ -221,14 +191,6 @@ const EditTask = ({ idd, onClose }) => {
         message.error(error?.response?.data?.message || "Failed to update task.");
         console.error("Edit API error:", error);
       });
-  };
-
-  const handleCheckboxChange = () => {
-    setIsWithoutDueDate(!isWithoutDueDate);
-  };
-
-  const toggleOtherDetails = () => {
-    setIsOtherDetailsVisible(!isOtherDetailsVisible);
   };
 
   return (

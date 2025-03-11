@@ -15,13 +15,12 @@ import moment from "moment-timezone";
 
 const EditHoliday = ({ onClose, idd }) => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.loggedInUser.username);
   const [initialValues, setInitialValues] = useState({
     holiday_name: "",
     start_date: null,
     end_date: null,
   });
-  const [enableReinitialize, setEnableReinitialize] = useState(true);
+  const enableReinitialize = true;
 
   useEffect(() => {
     dispatch(getsholidayss());
@@ -32,6 +31,7 @@ const EditHoliday = ({ onClose, idd }) => {
   useEffect(() => {
     if (allholidaudata && idd) {
       const filterdata = allholidaudata.find((item) => item.id === idd);
+      console.log("filterdata", filterdata);
       if (filterdata) {
         setInitialValues({
           holiday_name: filterdata.holiday_name,
@@ -56,7 +56,7 @@ const EditHoliday = ({ onClose, idd }) => {
       end_date: moment(values.end_date).format("YYYY-MM-DD"),
     };
 
-    dispatch(editsholidayss({idd,formattedValues}))
+    dispatch(editsholidayss({ idd, formattedValues }))
       .then(() => {
         dispatch(getsholidayss());
         message.success("Holiday updated successfully!");
@@ -71,7 +71,7 @@ const EditHoliday = ({ onClose, idd }) => {
 
   return (
     <div className="add-holiday-form">
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
 
       <Formik
         initialValues={initialValues}
@@ -127,7 +127,7 @@ const EditHoliday = ({ onClose, idd }) => {
                     placeholder="Select end date"
                     value={values.end_date}
                     onChange={(date) => setFieldValue(
-                        "end_date", date)}
+                      "end_date", date)}
                   />
                   {errors.end_date && touched.end_date && (
                     <div style={{ color: "red", fontSize: "12px" }}>

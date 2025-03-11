@@ -23,11 +23,9 @@ const ViewTrainingSetup = ({ idd, onClose }) => {
     newPlayingState[index] = true;
     setIsPlaying(newPlayingState);
   };
-
   const getEmbedUrl = (url) => {
     try {
       let videoId = "";
-
       if (url.includes("youtube.com/watch")) {
         const urlParams = new URLSearchParams(new URL(url).search);
         videoId = urlParams.get("v");
@@ -42,7 +40,6 @@ const ViewTrainingSetup = ({ idd, onClose }) => {
       if (videoId) {
         return `https://www.youtube.com/embed/${videoId}`;
       }
-
       return url;
     } catch (error) {
       console.error("Error parsing YouTube URL:", error);

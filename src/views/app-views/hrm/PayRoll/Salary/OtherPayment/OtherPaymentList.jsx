@@ -2,23 +2,19 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Menu,
-  Row,
-  Col,
   Input,
   Button,
   Modal,
   message,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   PlusOutlined,
   SearchOutlined,
-  FileExcelOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AddOtherPayment from "./AddOtherPayment";
 import employeeSalaryData from "assets/data/employee-salary.data.json";
 import utils from "utils";
@@ -29,25 +25,25 @@ import {
 } from "./otherpaymentReducer/otherpaymentSlice";
 
 const OtherPaymentList = ({ id, onClose }) => {
-  const [salaryData, setSalaryData] = useState(employeeSalaryData); // Salary data
-  const [isModalVisible, setIsModalVisible] = useState(false); // Add Salary Modal
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Selected rows for batch actions
+  const [salaryData, setSalaryData] = useState(employeeSalaryData);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getotherpay());
-  }, []);
+  }, [dispatch]);
 
   const alldata = useSelector((state) => state.otherpayment);
   const fnddata = alldata.otherpayment.data;
 
-  const fnddatasss = fnddata?.filter((item)=>item?.employeeId === id)
+  const fnddatasss = fnddata?.filter((item) => item?.employeeId === id)
 
   useEffect(() => {
     if (fnddatasss) {
       setSalaryData(fnddatasss);
     }
-  }, [fnddata,fnddatasss]);
+  }, [fnddata, fnddatasss]);
 
   const openModal = () => {
     setIsModalVisible(true);
@@ -72,24 +68,19 @@ const OtherPaymentList = ({ id, onClose }) => {
     });
   };
 
-  const dropdownMenu = (record) => (
-    <Menu>
-      
-      <Menu.Item>
-        <Button
-          type="text"
-          icon={<DeleteOutlined />}
-          size="small"
-          onClick={() => deleteSalaryEntry(record.id)}
-        >
-          Delete
-        </Button>
-      </Menu.Item>
-    </Menu>
-  );
+  const getDropdownItems = (record) => {
+    return [
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteSalaryEntry(record.id),
+        danger: true
+      }
+    ];
+  };
 
   const tableColumns = [
-
     {
       title: "Title",
       dataIndex: "title",
@@ -108,7 +99,26 @@ const OtherPaymentList = ({ id, onClose }) => {
     {
       title: "Action",
       dataIndex: "actions",
-      render: (_, record) => <EllipsisDropdown menu={dropdownMenu(record)} />,
+      render: (_, record) => (
+        <div className="text-center">
+          <Dropdown
+            menu={{ items: getDropdownItems(record) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
+        </div>
+      ),
     },
   ];
 
@@ -132,13 +142,13 @@ const OtherPaymentList = ({ id, onClose }) => {
             placeholder="Search"
             prefix={<SearchOutlined />}
             onChange={(e) => onSearch(e)}
+            className="search-input"
           />
         </div>
         <Flex gap="7px">
           <Button type="primary" onClick={openModal}>
             <PlusOutlined />
           </Button>
-         
         </Flex>
       </Flex>
       <div className="table-responsive mt-3">
@@ -166,4 +176,73 @@ const OtherPaymentList = ({ id, onClose }) => {
   );
 };
 
-export default OtherPaymentList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 250px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
+  }
+
+  .ant-btn-text:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .ant-btn-text:active {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  @media (max-width: 768px) {
+    .search-input {
+      width: 100%;
+      min-width: unset;
+    }
+    
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const OtherPaymentListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <OtherPaymentList />
+  </>
+);
+
+export default OtherPaymentListWithStyles;

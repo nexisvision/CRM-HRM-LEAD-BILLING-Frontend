@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 const RecentOrderGraph = () => {
   const [hoveredPoint, setHoveredPoint] = useState(null);
 
-  const data = [
+  const data = useMemo(() => [
     { date: '29-Dec', income: 400 },
     { date: '30-Dec', income: 100 },
     { date: '31-Dec', income: 380 },
@@ -18,7 +18,7 @@ const RecentOrderGraph = () => {
     { date: '09-Jan', income: 100 },
     { date: '10-Jan', income: 380 },
     { date: '11-Jan', income: 200 }
-  ];
+  ], []);
 
   const { linePath, areaPath } = useMemo(() => {
     const maxIncome = Math.max(...data.map(item => item.income));

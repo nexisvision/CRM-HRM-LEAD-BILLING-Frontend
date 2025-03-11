@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-const Nav = styled.div(({navWidth}) => ({
+const Nav = styled.div(({ navWidth }) => ({
 	display: 'flex',
 	justifyContent: 'space-between',
 	position: 'relative',

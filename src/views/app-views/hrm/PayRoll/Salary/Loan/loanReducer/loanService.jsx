@@ -1,4 +1,4 @@
-  import axios from "axios";
+import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
 
@@ -73,7 +73,9 @@ const editloan = async (meetid, values) => {
 };
 
 
+
 const UserService = {
+
   getloan,
   addloan,
   deleteloan,

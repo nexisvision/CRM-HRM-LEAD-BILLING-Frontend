@@ -3,10 +3,9 @@ import AllowanceList from './AllowanceList';
 
 const Allowance = ({ id, onClose }) => (
 
-<div className="mail">
-
-<AllowanceList id={id} onClose={onClose} />
-</div>
+	<div className="mail">
+		<AllowanceList id={id} onClose={onClose} />
+	</div>
 
 );
 

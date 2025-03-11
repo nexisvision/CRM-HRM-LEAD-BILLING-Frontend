@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Space, Card, Row, Col } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import AddReminder from './AddReminder';
-import { getssreinderss, deletessreinderss   } from './reminderReducers/reminderSlice';
+import { getssreinderss, deletessreinderss } from './reminderReducers/reminderSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 
 const ReminderList = () => {
-    const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
+    console.log(data, "data")
     const dispatch = useDispatch()
 
-    useEffect(()=>{
-      dispatch(getssreinderss())
-    },[dispatch])
+    useEffect(() => {
+        dispatch(getssreinderss())
+    }, [dispatch])
 
-    const allreminders = useSelector((state)=>state?.Reminder?.Reminder?.data)
+    const allreminders = useSelector((state) => state?.Reminder?.Reminder?.data)
 
-    useEffect(()=>{
-      if(allreminders){
-        setData(allreminders) 
-      }
-    },[allreminders])
 
+    useEffect(() => {
+        if (allreminders) {
+            setData(allreminders)
+        }
+    }, [allreminders])
     const columns = [
         {
             title: 'Description',
@@ -37,7 +37,6 @@ const ReminderList = () => {
             render: (text) => new Date(text).toLocaleString(),
             sorter: (a, b) => new Date(a.start_date) - new Date(b.start_date),
         },
-       
         {
             title: 'Created By',
             dataIndex: 'created_by',
@@ -55,10 +54,9 @@ const ReminderList = () => {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    
-                    <Button 
-                        type="primary" 
-                        danger 
+                    <Button
+                        type="primary"
+                        danger
                         icon={<DeleteOutlined />}
                         onClick={() => handleDelete(record.id)}
                         size="small"
@@ -75,10 +73,10 @@ const ReminderList = () => {
 
     const handleDelete = (id) => {
         dispatch(deletessreinderss(id))
-          .then(()=>{
-            toast.success("Deleted Successfully")
-            dispatch(getssreinderss())
-          })
+            .then(() => {
+                toast.success("Deleted Successfully")
+                dispatch(getssreinderss())
+            })
     };
 
     return (

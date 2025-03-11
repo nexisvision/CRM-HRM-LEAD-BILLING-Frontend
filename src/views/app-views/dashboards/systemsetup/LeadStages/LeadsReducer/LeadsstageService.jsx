@@ -1,7 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
-
 const GetAllLeadedelsa = async () => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -30,7 +29,6 @@ const createAllLeadedelsa = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -50,7 +48,6 @@ const deleteAllLeadedelsa = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -83,7 +80,6 @@ const UserService = {
   createAllLeadedelsa,
   deleteAllLeadedelsa,
   editAllLeadedelsa,
-
 };
 
 export default UserService;

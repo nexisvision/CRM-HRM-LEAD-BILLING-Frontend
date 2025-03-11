@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Form, Input, Button, Row, Col, message } from "antd";
-import { useNavigate } from "react-router-dom";
 import { PlusOutlined } from "@ant-design/icons";
 import { RxCross2 } from "react-icons/rx";
 import * as Yup from "yup";
-import { Formik, Field, ErrorMessage } from "formik";
+import { Formik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  AddTrainng,
   EditTraing,
   GetallTrainng,
 } from "./TrainingReducer/TrainingSlice";
@@ -16,11 +14,10 @@ import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/cu
 const EditTrainingSetup = ({ idd, onClose }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const [rows, setRows] = useState([]);
   const allempdata = useSelector((state) => state.Training);
-  const Expensedata = allempdata?.Training?.data || [];
+  const Expensedata = React.useMemo(() => allempdata?.Training?.data || [], [allempdata]);
 
   const [initialValues, setInitialValues] = useState({
     category: "",
@@ -54,7 +51,7 @@ const EditTrainingSetup = ({ idd, onClose }) => {
 
   useEffect(() => {
     dispatch(GetallTrainng());
-  }, []);
+  }, [dispatch]);
 
   const handleDeleteRow = (id) => {
     const updatedRows = rows.filter((row) => row.id !== id);

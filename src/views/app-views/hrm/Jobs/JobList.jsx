@@ -3,8 +3,6 @@ import {
   Card,
   Table,
   Menu,
-  Row,
-  Col,
   Tag,
   Input,
   message,
@@ -12,28 +10,21 @@ import {
   Modal,
   Select,
   DatePicker,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   EditOutlined,
   PlusOutlined,
-  PushpinOutlined,
   FileExcelOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import UserView from "../../Users/user-list/UserView";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import StatisticWidget from "components/shared-components/StatisticWidget";
-import { AnnualStatisticData } from "../../dashboards/default/DefaultDashboardData";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddJob from "./AddJob";
-import { useNavigate } from "react-router-dom";
 import { utils, writeFile } from "xlsx";
-import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
 import EditJob from "./EditJob";
 import { Deletejobs, GetJobdata } from "./JobReducer/JobSlice";
@@ -42,29 +33,21 @@ import { useDispatch, useSelector } from "react-redux";
 const { Option } = Select;
 
 const JobList = () => {
-  const [users, setUsers] = useState(userData);
   const [list, setList] = useState(OrderListData);
   const dispatch = useDispatch();
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false);
   const [isEditJobModalVisible, setIsEditJobModalVisible] = useState(false);
   const [idd, setIdd] = useState("");
-  const navigate = useNavigate();
   const [searchText, setSearchText] = useState('');
   const [dateRange, setDateRange] = useState([null, null]);
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [uniqueStatuses, setUniqueStatuses] = useState(['All']);
-
-  const [annualStatisticData] = useState(AnnualStatisticData);
-
   const user = useSelector((state) => state.user.loggedInUser.username);
   const allempdata = useSelector((state) => state.Jobs);
-  const filtermin = allempdata.Jobs.data || [];
+  const filtermin = React.useMemo(() => allempdata.Jobs.data || [], [allempdata.Jobs.data]);
   const filteredData = filtermin.filter((item) => item.created_by === user);
-
-  // Open Add Job Modal
   const openAddJobModal = () => {
     setIsAddJobModalVisible(true);
   };
@@ -74,9 +57,6 @@ const JobList = () => {
     setIsAddJobModalVisible(false);
   };
 
-  const handleJob = () => {
-    navigate("/app/hrm/jobs/viewjob", { state: { user: selectedUser } }); // Pass user data as state if needed
-  };
 
   const openEditJobModal = () => {
     setIsEditJobModalVisible(true);
@@ -93,7 +73,7 @@ const JobList = () => {
 
   const getFilteredJobs = () => {
     if (!filteredData) return [];
-    
+
     let filtered = [...filteredData];
 
     if (searchText) {
@@ -116,7 +96,7 @@ const JobList = () => {
 
       filtered = filtered.filter(job => {
         if (!job.startDate || !job.endDate) return false;
-        
+
         const jobStartDate = dayjs(job.startDate);
         const jobEndDate = dayjs(job.endDate);
 
@@ -137,7 +117,6 @@ const JobList = () => {
   const deleteUser = (userId) => {
     dispatch(Deletejobs(userId));
     dispatch(GetJobdata());
-    setUsers(list.filter((item) => item.id !== userId));
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
 
@@ -156,36 +135,35 @@ const JobList = () => {
   };
 
 
-                    const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                    const roles = useSelector((state) => state.role?.role?.data);
-                    const roleData = roles?.find(role => role.id === roleId);
-                 
-                    const whorole = roleData.role_name;
-                 
-                    const parsedPermissions = Array.isArray(roleData?.permissions)
-                    ? roleData.permissions
-                    : typeof roleData?.permissions === 'string'
-                    ? JSON.parse(roleData.permissions)
-                    : [];
-                  
-                    let allpermisson;  
-                 
-                    if (parsedPermissions["extra-hrm-jobs-joblist"] && parsedPermissions["extra-hrm-jobs-joblist"][0]?.permissions) {
-                      allpermisson = parsedPermissions["extra-hrm-jobs-joblist"][0].permissions;
-                    
-                    } else {
-                    }
-                    
-                    const canCreateClient = allpermisson?.includes('create');
-                    const canEditClient = allpermisson?.includes('edit');
-                    const canDeleteClient = allpermisson?.includes('delete');
-                    const canViewClient = allpermisson?.includes('view');
-                 
-  const showUserProfile = (userInfo) => {
-    setSelectedUser(userInfo);
-    setUserProfileVisible(true);
-  };
+  //// permission
 
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-jobs-joblist"] && parsedPermissions["extra-hrm-jobs-joblist"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-jobs-joblist"][0].permissions;
+    // console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    // console.log('extra-hrm-jobs-joblist is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+  // Close user profile
   const closeUserProfile = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);
@@ -200,17 +178,6 @@ const JobList = () => {
     }
     return "";
   };
-
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "status";
-      const data = utils.filterArray(userData, key, value);
-      setUsers(data);
-    } else {
-      setUsers(userData);
-    }
-  };
-
   useEffect(() => {
     dispatch(GetJobdata());
   }, [dispatch]);
@@ -228,24 +195,30 @@ const JobList = () => {
     setIdd(idd);
   };
 
-  const dropdownMenu = (elm) => ({
-    items: [
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+  const getDropdownItems = (elm) => {
+    const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
         onClick: () => editFunc(elm.id)
-      }] : []),
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(elm.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -284,7 +257,7 @@ const JobList = () => {
       dataIndex: "status",
       render: (_, record) => (
         <>
-         <Tag color={getjobStatus(record.status)}>{record.status}</Tag> 
+          <Tag color={getjobStatus(record.status)}>{record.status}</Tag>
         </>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
@@ -295,7 +268,22 @@ const JobList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -312,7 +300,7 @@ const JobList = () => {
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
-     
+
       <Flex
         alignItems="center"
         justifyContent="space-between"
@@ -357,45 +345,45 @@ const JobList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-        
 
 
-           {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                              <Button type="primary" className="ml-2" onClick={openAddJobModal}>
-                                                                                              <PlusOutlined />
-                                                                                              <span>New</span>
-                                                                                            </Button>                                                                                                                               
-                                                                                                                                                                                                                            
-                                                                                                          ) : null}
+
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Button type="primary" className="ml-2" onClick={openAddJobModal}>
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+
+          ) : null}
 
 
           <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} 
-                block
-              >
-                Export All
-              </Button>
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel} // Call export function when the button is clicked
+            block
+          >
+            Export All
+          </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
 
-         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                           <Table
-                                           columns={tableColumns}
-                                           dataSource={getFilteredJobs()}
-                                           rowKey="id"
-                                           pagination={{
-                                             total: getFilteredJobs().length,
-                                             pageSize: 10,
-                                             showSizeChanger: true,
-                                             showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                                           }}
-                                         />
-                                             ) : null}
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredJobs()}
+            rowKey="id"
+            pagination={{
+              total: getFilteredJobs().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
+          />
+        ) : null}
 
-       
+
       </div>
       <UserView
         data={selectedUser}
@@ -410,6 +398,7 @@ const JobList = () => {
         footer={null}
         width={1000}
         className="mt-[-70px]"
+      // height={1000}
       >
         <AddJob onClose={closeAddJobModal} />
       </Modal>
@@ -421,6 +410,7 @@ const JobList = () => {
         footer={null}
         width={1000}
         className="mt-[-70px]"
+      // height={1000}
       >
         <EditJob onClose={closeEditJobModal} idd={idd} />
       </Modal>
@@ -490,6 +480,28 @@ const styles = `
     .ant-select {
       width: 100%;
     }
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
   }
 `;
 

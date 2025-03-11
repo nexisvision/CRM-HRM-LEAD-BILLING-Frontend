@@ -5,7 +5,7 @@ import { FolderOutlined, FileOutlined } from '@ant-design/icons';
 const { DirectoryTree } = Tree;
 
 const treeData = [
-  	{
+	{
 		title: 'public',
 		key: '0-0',
 		children: [],
@@ -14,70 +14,70 @@ const treeData = [
 		title: 'src',
 		key: '0-1',
 		children: [
-			{ 
-				title: 'assets', 
-				key: '0-0-0', 
-				children: [] 
+			{
+				title: 'assets',
+				key: '0-0-0',
+				children: []
 			},
-			{ 
-				title: 'auth', 
-				key: '0-0-1', 
-				children: [] 
+			{
+				title: 'auth',
+				key: '0-0-1',
+				children: []
 			},
-			{ 
-				title: 'components', 
-				key: '0-0-2', 
-				children: [] 
+			{
+				title: 'components',
+				key: '0-0-2',
+				children: []
 			},
-			{ 
-				title: 'configs', 
-				key: '0-0-3', 
-				children: [] 
+			{
+				title: 'configs',
+				key: '0-0-3',
+				children: []
 			},
-			{ 
-				title: 'constant', 
-				key: '0-0-4', 
-				children: [] 
+			{
+				title: 'constant',
+				key: '0-0-4',
+				children: []
 			},
-			{ 
-				title: 'lang', 
-				key: '0-0-5', 
-				children: [] 
+			{
+				title: 'lang',
+				key: '0-0-5',
+				children: []
 			},
-			{ 
-				title: 'layouts', 
-				key: '0-0-6', 
-				children: [] 
+			{
+				title: 'layouts',
+				key: '0-0-6',
+				children: []
 			},
-			{ 
-				title: 'mock', 
-				key: '0-0-7', 
-				children: [] 
+			{
+				title: 'mock',
+				key: '0-0-7',
+				children: []
 			},
-			{ 
-				title: 'routes', 
-				key: '0-0-8', 
-				children: [] 
+			{
+				title: 'routes',
+				key: '0-0-8',
+				children: []
 			},
-			{ 
-				title: 'services', 
-				key: '0-0-9', 
-				children: [] 
+			{
+				title: 'services',
+				key: '0-0-9',
+				children: []
 			},
-			{ 
-				title: 'store', 
-				key: '0-0-10', 
-				children: [] 
+			{
+				title: 'store',
+				key: '0-0-10',
+				children: []
 			},
-			{ 
-				title: 'utils', 
-				key: '0-0-11', 
-				children: [] 
+			{
+				title: 'utils',
+				key: '0-0-11',
+				children: []
 			},
-			{ 
-				title: 'views', 
-				key: '0-0-12', 
-				children: [] 
+			{
+				title: 'views',
+				key: '0-0-12',
+				children: []
 			},
 			{
 				title: 'App.js',
@@ -105,7 +105,7 @@ const treeData = [
 
 const FolderTitle = props => (
 	<h4>
-		{props.type === 'file' ? <FileOutlined className="text-success" /> :  <FolderOutlined className="text-primary"/>}
+		{props.type === 'file' ? <FileOutlined className="text-success" /> : <FolderOutlined className="text-primary" />}
 		<span className="ml-2">{props.title}</span>
 	</h4>
 )
@@ -134,8 +134,8 @@ const FolderStructure = () => {
 			<FolderDescribe>
 				<FolderTitle title="src" />
 				<p>
-					src is the folder where contain our React code, 
-					it is also entry point of the application. The below folders 
+					src is the folder where contain our React code,
+					it is also entry point of the application. The below folders
 				</p>
 				<FolderDescribe level={2}>
 					<FolderTitle title="assets" />
@@ -191,15 +191,15 @@ const FolderStructure = () => {
 				</FolderDescribe>
 			</FolderDescribe>
 			<FolderDescribe>
-				<FolderTitle title="App.js" type="file"/>
+				<FolderTitle title="App.js" type="file" />
 				<p>Main app component.</p>
 			</FolderDescribe>
 			<FolderDescribe>
-				<FolderTitle title="index.js" type="file"/>
+				<FolderTitle title="index.js" type="file" />
 				<p>Javascript entry point.</p>
 			</FolderDescribe>
 			<FolderDescribe>
-				<FolderTitle title="index.css" type="file"/>
+				<FolderTitle title="index.css" type="file" />
 				<p>Main css file.</p>
 			</FolderDescribe>
 		</div>

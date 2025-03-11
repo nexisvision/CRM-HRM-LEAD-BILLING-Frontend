@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import {Line} from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import { COLOR_1, COLOR_2, COLOR_TEXT } from 'constants/ChartConstant';
 
 export class LineChart extends Component {
-	render() {
+  render() {
     const data = {
       labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
       datasets: [
@@ -39,7 +39,7 @@ export class LineChart extends Component {
         mode: 'index'
       },
       scales: {
-        xAxes: [{ 
+        xAxes: [{
           gridLines: [{
             display: false,
           }],
@@ -56,25 +56,25 @@ export class LineChart extends Component {
             drawTicks: false,
             borderDash: [3, 4],
             zeroLineWidth: 1,
-            zeroLineBorderDash: [3, 4]  
+            zeroLineBorderDash: [3, 4]
           },
           ticks: {
             display: true,
-            max: 100,                            
+            max: 100,
             stepSize: 20,
             fontColor: COLOR_TEXT,
             fontSize: 13,
             padding: 10
-          }  
+          }
         }]
       }
     }
-		return (
-			<div>
+    return (
+      <div>
         <Line data={data} options={options} />
       </div>
-		)
-	}
+    )
+  }
 }
 
 export default LineChart

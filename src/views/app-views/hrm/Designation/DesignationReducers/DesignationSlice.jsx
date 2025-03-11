@@ -1,10 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./DesignationService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
-// Async thunk for adding user
+
 export const AddDes = createAsyncThunk(
     "users/addUser",
     async (userData, thunkAPI) => {
@@ -16,6 +15,8 @@ export const AddDes = createAsyncThunk(
         }
     }
 );
+
+
 
 
 export const getDes = createAsyncThunk(
@@ -31,7 +32,7 @@ export const getDes = createAsyncThunk(
 );
 
 
-// Async thunk for deleting a user
+
 export const DeleteDes = createAsyncThunk(
     "users/deleteUser",
     async (userId, thunkAPI) => {
@@ -46,35 +47,25 @@ export const DeleteDes = createAsyncThunk(
 export const EditDes = createAsyncThunk(
     "users/updateEmployee",
     async ({ id, values }, thunkAPI) => {
-      try {
-        const response = await UserService.EditDesignation(id, values);
-        return response; // Return the updated data
-      } catch (error) {
-        return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
-      }
+        try {
+            console.log("idinslice", id)
+            const response = await UserService.EditDesignation(id, values);
+            return response; // Return the updated data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
+        }
     }
-  );
+);
 
 
 
 
 
-// Async thunk for updating a user
-
-const initialUser = () => {
-    const item = window.localStorage.getItem("USER");
-    return item ? JSON.parse(item) : null;
-};
-
-const initialIsAuth = () => {
-    const item = window.localStorage.getItem("isAuth");
-    return item ? JSON.parse(item) : false;
-};
 
 const DesignationSlice = createSlice({
     name: "Designation",
     initialState: {
-        Designation:[],
+        Designation: [],
         editItem: {},
         isLoading: false,
         addModel: false,
@@ -136,13 +127,13 @@ const DesignationSlice = createSlice({
                 state.isLoading = false;
                 toast.error(action.payload?.message);
             })
-           
-        
+
+
             //delete
             .addCase(DeleteDes.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(DeleteDes.fulfilled, (state, action) => {  
+            .addCase(DeleteDes.fulfilled, (state, action) => {
                 state.isLoading = false;
                 message.success(action.payload?.message);
             })
@@ -155,18 +146,18 @@ const DesignationSlice = createSlice({
             .addCase(EditDes.pending, (state) => {
                 state.isLoading = false;
                 state.error = null;
-              })
-              .addCase(EditDes.fulfilled, (state, action) => {
+            })
+            .addCase(EditDes.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
                 message.success(action.payload?.message);
-              })
+            })
 
-              .addCase(EditDes.rejected, (state, action) => {
+            .addCase(EditDes.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
                 message.error(action.payload?.message);
-              });
+            });
     },
 });
 

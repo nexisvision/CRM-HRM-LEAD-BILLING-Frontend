@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./fileService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
+
 import { message } from "antd";
 
-// Async thunk for adding user
+
 export const fileadd = createAsyncThunk(
   "users/fileadd",
-  async ({id,values}, thunkAPI) => {
+  async ({ id, values }, thunkAPI) => {
     try {
-      const response = await UserService.addfiless(id,values);
+      const response = await UserService.addfiless(id, values);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -17,7 +17,7 @@ export const fileadd = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
+
 
 export const GetProject = createAsyncThunk(
   "emp/GetProject",
@@ -31,7 +31,7 @@ export const GetProject = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
+
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -44,7 +44,7 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
+
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -57,7 +57,7 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const DeletePro = createAsyncThunk(
   "users/DeletePro",
   async (userId, thunkAPI) => {
@@ -85,15 +85,7 @@ export const Editpro = createAsyncThunk(
 
 // Async thunk for updating a user
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const ProjectSlice = createSlice({
   name: "Project",
@@ -160,7 +152,7 @@ const ProjectSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-     
+
 
       .addCase(DeletePro.pending, (state) => {
         state.isLoading = true;

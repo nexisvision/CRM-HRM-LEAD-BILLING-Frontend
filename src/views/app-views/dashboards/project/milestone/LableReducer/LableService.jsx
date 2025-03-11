@@ -1,7 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
-
 const GetLable = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -30,7 +29,6 @@ const AddLable = async (id, payload) => {
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -89,7 +87,6 @@ const Deletelable = async (userId) => {
         },
       }
     );
-    //   dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -118,17 +115,12 @@ const EditMin = async (idd, payload) => {
 
 
 const UserService = {
-  // addUser,
   GetLable,
   AddLable,
   Deletelable,
   EditMin,
   AddLablee,
   GetLablee,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
 };
 
 export default UserService;

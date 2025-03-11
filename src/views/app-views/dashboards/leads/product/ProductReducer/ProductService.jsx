@@ -1,7 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
-
 const GetPro = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -50,7 +49,7 @@ const DeletePro = async (userId) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -80,15 +79,12 @@ const EditPro = async (idd, formData) => {
 
 
 const UserService = {
-  // addUser,
+
   GetPro,
   AddPro,
   DeletePro,
   EditPro,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default UserService;

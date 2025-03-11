@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Button,
   Select,
   message,
   Row,
-  Col
+  Col,
 } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector } from "react-redux";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
-
 import { useDispatch } from "react-redux";
 import {
   GetProject,
@@ -21,7 +20,6 @@ import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 const { Option } = Select;
 const AddProjectMember = ({ onClose }) => {
-  const navigate = useNavigate();
 
   const dispatch = useDispatch();
   const initialValues = {
@@ -51,7 +49,6 @@ const AddProjectMember = ({ onClose }) => {
       return res.data;
     } catch (error) {
       if (error.response) {
-        // Server responded with a status code out of the range of 2xx
         console.error("Error response:", error.response.data);
         console.error("Status code:", error.response.status);
         console.error("Headers:", error.response.headers);
@@ -82,7 +79,7 @@ const AddProjectMember = ({ onClose }) => {
 
       message.success("Project added successfully!");
       resetForm();
-      onClose(); // Close modal after successful submission
+      onClose();
     } catch (error) {
       message.error("Failed to add project or fetch data!");
       console.error("Error in onSubmit:", error);
@@ -103,9 +100,6 @@ const AddProjectMember = ({ onClose }) => {
     }
   });
 
-
-  const Allpeoject = useSelector((state) => state.Project);
-  const Filterdta = Allpeoject?.Project?.data || [];
 
 
   useEffect(() => {

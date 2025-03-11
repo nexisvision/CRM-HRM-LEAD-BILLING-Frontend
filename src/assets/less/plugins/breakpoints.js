@@ -21,7 +21,8 @@ function rulesetToMap(context, { ruleset: { rules } } = { ruleset: { rules: [] }
 	const map = {}
 
 	rules.forEach(rule => {
-		if (! (rule instanceof tree.Declaration))
+		// Not exactly sure how to handle other types (or if they should be handled at all).
+		if (!(rule instanceof tree.Declaration))
 			return
 
 		const { name: key, value } = rule.eval(context)
@@ -33,7 +34,7 @@ function rulesetToMap(context, { ruleset: { rules } } = { ruleset: { rules: [] }
 }
 
 function getBreakpoints(context, breakpoints) {
-	if (! breakpoints) {
+	if (!breakpoints) {
 		if (Object.keys(gridBreakpoints).length === 0)
 			gridBreakpoints = lookupVariable(context, '@grid-breakpoints')
 
@@ -55,7 +56,7 @@ function getBreakpoints(context, breakpoints) {
 
 
 functions.add('breakpoint-next', function ({ value: breakpointName }, breakpoints) {
-	const breakpointsMap  = getBreakpoints(this.context, breakpoints)
+	const breakpointsMap = getBreakpoints(this.context, breakpoints)
 	const breakpointNames = Object.keys(breakpointsMap)
 	const breakpointIndex = breakpointNames.indexOf(breakpointName)
 
@@ -69,7 +70,7 @@ functions.add('breakpoint-next', function ({ value: breakpointName }, breakpoint
 })
 
 functions.add('breakpoint-min', function ({ value: breakpointName }, breakpoints) {
-	const breakpointsMap  = getBreakpoints(this.context, breakpoints)
+	const breakpointsMap = getBreakpoints(this.context, breakpoints)
 	const breakpointNames = Object.keys(breakpointsMap)
 	const breakpointIndex = breakpointNames.indexOf(breakpointName)
 
@@ -83,7 +84,7 @@ functions.add('breakpoint-min', function ({ value: breakpointName }, breakpoints
 })
 
 functions.add('breakpoint-max', function ({ value: breakpointName }, breakpoints) {
-	const breakpointsMap  = getBreakpoints(this.context, breakpoints)
+	const breakpointsMap = getBreakpoints(this.context, breakpoints)
 	const breakpointNames = Object.keys(breakpointsMap)
 	const breakpointIndex = breakpointNames.indexOf(breakpointName)
 
@@ -99,7 +100,7 @@ functions.add('breakpoint-max', function ({ value: breakpointName }, breakpoints
 })
 
 functions.add('breakpoint-infix', function ({ value: breakpointName }, breakpoints) {
-	const breakpointsMap  = getBreakpoints(this.context, breakpoints)
+	const breakpointsMap = getBreakpoints(this.context, breakpoints)
 	const breakpointNames = Object.keys(breakpointsMap)
 	const breakpointIndex = breakpointNames.indexOf(breakpointName)
 

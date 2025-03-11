@@ -9,8 +9,8 @@ import {
   Upload,
   Modal,
 } from "antd";
-import {PlusOutlined, QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
-import { useNavigate, useParams } from "react-router-dom";
+import { PlusOutlined, QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
+import { useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -23,14 +23,11 @@ import { Getexp } from '../expenses/Expencereducer/ExpenseSlice';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import AddCurrencies from "views/app-views/setting/currencies/AddCurrencies";
 const { Option } = Select;
-const AddPayment = ({ onClose}) => {
- 
+const AddPayment = ({ onClose, setFieldValue }) => {
   const dispatch = useDispatch();
   const { id } = useParams();
-
   const { currencies } = useSelector((state) => state.currencies);
   const curren = currencies?.data || [];
-
   const invoiceData = useSelector((state) => state.invoice?.invoices) || [];
   const estimateData = useSelector((state) => state.estimate?.estimates) || [];
   const expenseState = useSelector((state) => state.Expense);
@@ -45,13 +42,12 @@ const AddPayment = ({ onClose}) => {
   useEffect(() => {
     if (id) {
       dispatch(getcurren());
-    } 
+    }
   }, [dispatch, id]);
 
   const allproject = useSelector((state) => state.Project);
   const fndrewduxxdaa = allproject.Project.data
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
-
   const [selectedType, setSelectedType] = useState(null);
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
@@ -147,7 +143,7 @@ const AddPayment = ({ onClose}) => {
 
   return (
     <div className="add-expenses-form">
-<h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
+      <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -307,7 +303,7 @@ const AddPayment = ({ onClose}) => {
                         >
                           {expenseData && expenseData.map((expense) => (
                             <Option key={expense.id} value={expense.id}>
-                              {expense.item} 
+                              {expense.item}
                             </Option>
                           ))}
                         </Select>
@@ -537,23 +533,23 @@ const AddPayment = ({ onClose}) => {
           );
         }}
       </Formik>
-        
-         {/* Add Currency Modal */}
-         <Modal
-                title="Add New Currency"
-                visible={isAddCurrencyModalVisible}
-                onCancel={() => setIsAddCurrencyModalVisible(false)}
-                footer={null}
-                width={600}
-            >
-                <AddCurrencies
-                    onClose={() => {
-                        setIsAddCurrencyModalVisible(false);
-                        dispatch(getcurren()); // Refresh currency list after adding
-                    }}
-                />
-            </Modal>
- 
+
+      {/* Add Currency Modal */}
+      <Modal
+        title="Add New Currency"
+        visible={isAddCurrencyModalVisible}
+        onCancel={() => setIsAddCurrencyModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <AddCurrencies
+          onClose={() => {
+            setIsAddCurrencyModalVisible(false);
+            dispatch(getcurren()); // Refresh currency list after adding
+          }}
+        />
+      </Modal>
+
     </div>
   );
 };

@@ -94,7 +94,7 @@ const assignplan = async (payload) => {
   }
 };
 
-const sendemailotp = async (idd,values) => {
+const sendemailotp = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
 
   try {
@@ -107,7 +107,8 @@ const sendemailotp = async (idd,values) => {
         },
       }
     );
-    localStorage.setItem("emailupdate",res.data.data.sessionToken);
+    localStorage.setItem("emailupdate", res.data.data.sessionToken);
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -134,6 +135,8 @@ const otpverify = async (values) => {
     throw error;
   }
 };
+
+
 
 const UserService = {
   ClientData,

@@ -1,22 +1,15 @@
 import React, { useState } from "react";
 import { Button, Input, Form, Modal, Typography, Row, Col } from "antd";
-import { DownloadOutlined, StarFilled, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import AddInterviewSchedule from "./AddInterviewSchedule";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const { TextArea } = Input;
 
 const AdditionalDetailsList = () => {
 
   const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false);
-
-
-
-
-  const openAddJobOnBoard = () => {
-    setIsAddJobModalVisible(true);
-  };
 
   const closeAddJobModal = () => {
     setIsAddJobModalVisible(false);
@@ -27,22 +20,11 @@ const AdditionalDetailsList = () => {
 
   const handleAddNotes = () => {
   };
-
-  const handleCreateInterview = () => {
-  };
-
   const handleDelete = () => {
   };
 
   return (
     <div style={{ padding: "20px", backgroundColor: "#fff", borderRadius: "8px" }}>
-      {/* <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <h3>Additional Details</h3>
-        <Button type="primary" style={{ backgroundColor: "#66dd66", borderColor: "#66dd66" }} onClick={handleCreateInterview}>
-        <PlusOutlined />
-          + Create Interview Schedule
-        </Button>
-      </div> */}
 
       <Row justify="space-between" align="middle">
         <Col>

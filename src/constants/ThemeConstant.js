@@ -18,19 +18,19 @@ export const LAYOUT_CONTENT_GUTTER = 25;
 export const LAYOUT_CONTENT_GUTTER_SM = 15;
 export const SIDE_NAV_DARK_BG_COLOR = '#001529'
 
-export const BLUE_BASE= '#3e79f7';
-export const PURPLE_BASE= '#a461d8';
-export const CYAN_BASE= '#04d182';
-export const GREEN_BASE= '#21B573';
-export const MAGENTA_BASE= '#eb2f96';
-export const PINK_BASE= '#eb2f96';
-export const RED_BASE= '#de4436';
-export const ORANGE_BASE= '#fa8c16';
-export const YELLOW_BASE= '#fadb14';
-export const VOLCANO_BASE= '#ff6b72';
-export const GEEK_BLUE_BASE= '#17bcff';
-export const LIME_BASE= '#a0d911';
-export const GOLD_BASE= '#ffc542';
+export const BLUE_BASE = '#3e79f7';
+export const PURPLE_BASE = '#a461d8';
+export const CYAN_BASE = '#04d182';
+export const GREEN_BASE = '#21B573';
+export const MAGENTA_BASE = '#eb2f96';
+export const PINK_BASE = '#eb2f96';
+export const RED_BASE = '#de4436';
+export const ORANGE_BASE = '#fa8c16';
+export const YELLOW_BASE = '#fadb14';
+export const VOLCANO_BASE = '#ff6b72';
+export const GEEK_BLUE_BASE = '#17bcff';
+export const LIME_BASE = '#a0d911';
+export const GOLD_BASE = '#ffc542';
 
 export const WHITE = '#ffffff';
 export const DARK = '#000000';
@@ -137,7 +137,7 @@ export const GRAY_SCALE = {
     GRAY_LIGHTEST
 }
 
-export const DARK_MODE =  {
+export const DARK_MODE = {
     TEXT_COLOR: '#b4bed2',
     HEADING_COLOR: '#d6d7dc',
     BG_COLOR: '#283142',

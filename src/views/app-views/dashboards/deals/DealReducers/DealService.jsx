@@ -44,7 +44,7 @@ const DeleteDeals = async (id) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -72,12 +72,13 @@ const EditDeals = async (id, values) => {
 };
 
 
+
 const UserService = {
+
   DealsData,
   CreateDeals,
   DeleteDeals,
   EditDeals,
-  
 };
 
 export default UserService;

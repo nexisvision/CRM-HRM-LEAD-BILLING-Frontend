@@ -1,33 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Input,
   Button,
-  DatePicker,
   Select,
-  message,
   Row,
   Col,
-  Checkbox,
   Badge,
 } from "antd";
-import { useNavigate } from "react-router-dom";
-import "react-quill/dist/quill.snow.css";
-import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { AddSalaryss, getSalaryss } from "./SalaryReducers/SalarySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "../../Employee/EmployeeReducers/EmployeeSlice";
-import { Modal } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
-import { AddLable, GetLable } from "../../../dashboards/sales/LableReducer/LableSlice";
-// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 
 const { Option } = Select;
 
 const AddSalary = ({ onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -51,11 +40,8 @@ const AddSalary = ({ onClose }) => {
 
   useEffect(() => {
     dispatch(getcurren());
-  }, []);
+  }, [dispatch]);
 
-  const AllLoggedData = useSelector((state) => state.user);
-
-  const lid = AllLoggedData.loggedInUser.id;
 
   const onSubmit = (values, { resetForm }) => {
     const payload = {
@@ -98,7 +84,7 @@ const AddSalary = ({ onClose }) => {
         validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
-       
+
         {({
           values,
           setFieldValue,
@@ -112,7 +98,7 @@ const AddSalary = ({ onClose }) => {
             className="formik-form"
             onSubmit={handleSubmit}
           >
-            <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+            <div className="mb-3 border-b pb-1 font-medium"></div>
             <Row gutter={16}>
               <Col span={24}>
                 <div className="form-item">

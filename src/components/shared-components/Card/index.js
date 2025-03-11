@@ -1,7 +1,7 @@
 import { Card as AntdCard } from 'antd';
 
 
-const Card = ({style, ...rest}) => {
+const Card = ({ style, ...rest }) => {
     return (
         <AntdCard style={{ marginBottom: 20 }} {...rest} />
     )

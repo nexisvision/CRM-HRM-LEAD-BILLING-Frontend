@@ -1,7 +1,5 @@
 import axios from "axios";
-import { EditTasks } from "./TaskSlice";
 import { env } from "configs/EnvironmentConfig";
-
 
 const GetTask = async (id) => {
   const token = localStorage.getItem("auth_token");
@@ -31,7 +29,7 @@ const Addtask = async (id, values) => {
         },
       }
     );
-    //    dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -51,7 +49,7 @@ const Deletetask = async (idd) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -100,14 +98,12 @@ const EditTaskss = async (idd, values) => {
 };
 
 
-
 const UserService = {
   GetTask,
   Addtask,
   Deletetask,
   EditTask,
   EditTaskss,
-
 };
 
 export default UserService;

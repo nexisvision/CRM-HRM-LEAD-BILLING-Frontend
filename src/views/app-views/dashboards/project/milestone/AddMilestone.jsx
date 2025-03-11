@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  Card,
   Row,
   Col,
   Input,
@@ -10,7 +9,7 @@ import {
   DatePicker,
   Modal,
 } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -22,15 +21,12 @@ import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/cu
 import AddCurrencies from '../../../setting/currencies/AddCurrencies';
 const { Option } = Select;
 const AddMilestone = ({ onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams();
-  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
-  const [newTag, setNewTag] = useState("");
   const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
   const [newStatus, setNewStatus] = useState("");
   const [statuses, setStatuses] = useState([]);
-  const [tags, setTags] = useState([]);
+  const tags = [];
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
   // Get project data to access its currency
@@ -65,8 +61,6 @@ const AddMilestone = ({ onClose }) => {
     currency: getInitialCurrency(), // Set the currency from project
   };
 
-  const Tagsdetail = useSelector((state) => state.Lable);
-  const AllLoggeddtaa = useSelector((state) => state.user);
   const onSubmit = (values, { resetForm }) => {
     // Convert the values before sending
     const formattedValues = {
@@ -111,29 +105,7 @@ const AddMilestone = ({ onClose }) => {
         });
     }
   };
-  const fetchTags = async () => {
-    try {
-      const response = await dispatch(GetLable(id));
-      if (response.payload && response.payload.data) {
-        const uniqueTags = response.payload.data
-          .filter((label) => label && label.name) // Filter out invalid labels
-          .map((label) => ({
-            id: label.id,
-            name: label.name.trim(),
-          }))
-          .filter(
-            (label, index, self) =>
-              index === self.findIndex((t) => t.name === label.name)
-          ); // Remove duplicates
-        setTags(uniqueTags);
-      }
-    } catch (error) {
-      console.error("Failed to fetch tags:", error);
-      message.error("Failed to load tags");
-    }
-  };
-  
-  const fetchLables = async (lableType, setter) => {
+  const fetchLables = useCallback(async (lableType, setter, callback) => {
     try {
       const response = await dispatch(GetLable(id));
       if (response.payload && response.payload.data) {
@@ -141,16 +113,17 @@ const AddMilestone = ({ onClose }) => {
           .filter((lable) => lable.lableType === lableType)
           .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
         setter(filteredLables);
+        if (callback) callback(filteredLables);
       }
     } catch (error) {
       console.error(`Failed to fetch ${lableType}:`, error);
       message.error(`Failed to load ${lableType}`);
     }
-  };
+  }, [dispatch, id]);
 
   useEffect(() => {
     fetchLables("status", setStatuses);
-  }, []);
+  }, [fetchLables]);
 
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
     if (!newValue.trim()) {
@@ -176,11 +149,12 @@ const AddMilestone = ({ onClose }) => {
             .filter((lable) => lable.lableType === lableType)
             .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
 
-          // Update the appropriate state based on label type
           switch (lableType) {
             case "status":
               setStatuses(filteredLables);
               if (setFieldValue) setFieldValue("milestone_status", newValue.trim());
+              break;
+            default:
               break;
           }
         }
@@ -200,7 +174,7 @@ const AddMilestone = ({ onClose }) => {
   return (
     <div>
       <div className="add-expenses-form">
-      <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
+        <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
         <div className="p-2">
           <Formik
             initialValues={initialValues}

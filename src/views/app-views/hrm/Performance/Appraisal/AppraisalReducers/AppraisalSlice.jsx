@@ -1,10 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./AppraisalService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
-// Async thunk for adding user
+
 
 export const addAppraisals = createAsyncThunk(
   "users/addAppraisals",
@@ -18,7 +17,7 @@ export const addAppraisals = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
+
 
 export const getAppraisals = createAsyncThunk(
   "emp/getAppraisals",
@@ -32,7 +31,7 @@ export const getAppraisals = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
+
 export const getAllAppraisals = createAsyncThunk(
   "users/getAllAppraisals",
   async (thunkAPI) => {
@@ -45,7 +44,7 @@ export const getAllAppraisals = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
+
 export const getAppraisalById = createAsyncThunk(
   "users/getAppraisalById",
   async (userId, thunkAPI) => {
@@ -58,7 +57,7 @@ export const getAppraisalById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const deleteAppraisal = createAsyncThunk(
   "users/deleteAppraisal",
   async (userId, thunkAPI) => {
@@ -84,15 +83,7 @@ export const editAppraisal = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const AppraisalSlice = createSlice({
   name: "Appraisal",

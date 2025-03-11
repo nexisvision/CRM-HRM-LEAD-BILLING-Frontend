@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Rate } from 'antd';
+import { Rate } from 'antd';
 
 const ViewIndicator = ({ visible, onClose }) => {
   const data = [

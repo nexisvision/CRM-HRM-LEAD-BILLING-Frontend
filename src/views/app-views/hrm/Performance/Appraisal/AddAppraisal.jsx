@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, DatePicker, Select, message, Row, Col, Rate } from 'antd';
+import { Form, Button, Select, message, Row, Col, Rate } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { ErrorMessage, Formik } from 'formik';
-import { PlusOutlined } from "@ant-design/icons";
-import { addAppraisals,getAppraisals } from './AppraisalReducers/AppraisalSlice';
+import { addAppraisals, getAppraisals } from './AppraisalReducers/AppraisalSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { getBranch } from '../../Branch/BranchReducer/BranchSlice';
 import { empdata } from '../../Employee/EmployeeReducers/EmployeeSlice';
 const { Option } = Select;
-const { TextArea } = Input;
 
 const AddAppraisal = ({ onClose }) => {
-  const [form] = Form.useForm(); // Ensure this is called at the top
+  const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -23,11 +20,6 @@ const AddAppraisal = ({ onClose }) => {
 
 
   const [selectedBranch, setSelectedBranch] = useState(null);
-
-
-  const employeeData = useSelector((state) => 
-      (state.employee?.employee?.data || []).filter((employee) => employee.employeeId)
-    );
 
   const { data: employeee } = useSelector((state) => state.employee.employee);
 
@@ -56,14 +48,14 @@ const AddAppraisal = ({ onClose }) => {
 
   const initialValues = {
     branch: "",
-    employee:"",
+    employee: "",
     businessProcess: "",
     oralCommunication: "",
     leadership: "",
     overallRating: "",
     allocatingResources: "",
     projectManagement: "",
-    
+
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -81,10 +73,10 @@ const AddAppraisal = ({ onClose }) => {
         onFinish={handleSubmit}
         onFinishFailed={onFinishFailed}
       >
-        <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+        <div className="mb-3 border-b pb-1 font-medium"></div>
 
         <Row gutter={16}>
-        <Col span={12}>
+          <Col span={12}>
             <Form.Item
               name="branch"
               label="Branch"
@@ -106,7 +98,7 @@ const AddAppraisal = ({ onClose }) => {
             </Form.Item>
           </Col>
 
-         
+
 
           <Col span={12}>
             <Form.Item

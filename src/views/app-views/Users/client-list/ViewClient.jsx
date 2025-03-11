@@ -1,30 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { CircularProgressbar } from "react-circular-progressbar";
+import React from "react";
 import "react-circular-progressbar/dist/styles.css";
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    ResponsiveContainer,
-} from "recharts";
-import { Button, Modal, Avatar, Tag, Row, Col, Typography, Divider } from "antd";
-import { FaCoins, FaFileInvoiceDollar } from "react-icons/fa";
-import { HiOutlineDotsHorizontal } from "react-icons/hi";
-import { IoLayers } from "react-icons/io5";
-import { Pie } from "react-chartjs-2";
+import { Modal, Avatar, Tag, Row, Col, Typography, Divider } from "antd";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { TbClockHour3Filled } from "react-icons/tb";
-import { useDispatch, useSelector } from "react-redux";
-import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import {
     UserOutlined,
     BankOutlined,
     IdcardOutlined,
     MailOutlined,
     PhoneOutlined,
-    GlobalOutlined,
     CreditCardOutlined,
     BranchesOutlined,
     NumberOutlined,

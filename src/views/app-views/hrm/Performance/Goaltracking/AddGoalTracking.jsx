@@ -21,9 +21,6 @@ const AddGoalTracking = () => {
 
   return (
     <div className="add-goal-tracking">
-      {/* <h2 className="mb-4">Create New Goal Tracking</h2> */}
-      
-
       <Form
         layout="vertical"
         form={form}

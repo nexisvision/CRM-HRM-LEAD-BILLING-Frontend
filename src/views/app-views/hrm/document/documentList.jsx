@@ -2,47 +2,29 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Menu,
-  Tag,
-  Input,
   message,
   Button,
   Modal,
-  Select,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
-  SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
   FileExcelOutlined,
   EditOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddDocument from "./AddDocument";
 import EditDocument from "./EditDocument";
-import userData from "../../../../assets/data/user-list.data.json";
-import OrderListData from "../../../../assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
-import useSelection from "antd/es/table/hooks/useSelection";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { deleteDocu, getDocu } from "./DocumentReducers/documentSlice";
 
-const { Option } = Select;
-
 const DocumentList = () => {
   const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
-  const [userProfileVisible, setUserProfileVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddTrainingSetupModalVisible, setIsAddTrainingSetupModalVisible] =
     useState(false);
   const [isEditTrainingSetupModalVisible, setIsEditTrainingSetupModalVisible] =
@@ -52,7 +34,7 @@ const DocumentList = () => {
 
   useEffect(() => {
     dispatch(getDocu());
-  }, []);
+  }, [dispatch]);
 
   const alladatas = useSelector((state) => state.Documents);
   const fnddtaas = alladatas.Documents.data;
@@ -82,26 +64,18 @@ const DocumentList = () => {
     setIsEditTrainingSetupModalVisible(false);
   };
 
-
   const exportToExcel = () => {
     try {
-      const ws = utils.json_to_sheet(users); // Convert JSON data to a sheet
-      const wb = utils.book_new(); // Create a new workbook
-      utils.book_append_sheet(wb, ws, "Document"); // Append the sheet to the workbook
+      const ws = utils.json_to_sheet(users);
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, ws, "Document");
 
-      writeFile(wb, "DocumentData.xlsx"); // Save the file as ProposalData.xlsx
-      message.success("Data exported successfully!"); // Show success message
+      writeFile(wb, "DocumentData.xlsx");
+      message.success("Data exported successfully!");
     } catch (error) {
       console.error("Error exporting to Excel:", error);
-      message.error("Failed to export data. Please try again."); // Show error message
+      message.error("Failed to export data. Please try again.");
     }
-  };
-  const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = value ? list : [];
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
   };
 
   const deleteUser = (userId) => {
@@ -110,16 +84,6 @@ const DocumentList = () => {
       setUsers(users.filter((item) => item.id !== userId));
       message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
-  };
-
-  const showUserProfile = (userInfo) => {
-    setUserProfileVisible(true);
-    setSelectedUser(userInfo);
-  };
-
-  const closeUserProfile = () => {
-    setUserProfileVisible(false);
-    setSelectedUser(null);
   };
 
 
@@ -148,7 +112,6 @@ const DocumentList = () => {
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
 
-
   useEffect(() => {
     if (fnddata) {
       setUsers(fnddata);
@@ -156,51 +119,35 @@ const DocumentList = () => {
   }, [fnddata]);
 
 
-  const getjobStatus = (status) => {
-    if (status === "active") {
-      return "blue";
-    }
-    if (status === "blocked") {
-      return "cyan";
-    }
-    return "";
-  };
-
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "status";
-      const data = utils.filterArray(users, key, value);
-      setUsers(data);
-    } else {
-      setUsers(users);
-    }
-  };
-
   const editfun = (idd) => {
     openEditTrainingSetupModal();
     setIdd(idd);
   };
 
-  const jobStatusList = ["active", "blocked"];
+  const getDropdownItems = (row) => {
+    const items = [];
 
-  const dropdownMenu = (elm) => ({
-    items: [
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
-        onClick: () => editfun(elm.id)
-      }] : []),
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        onClick: () => editfun(row.id)
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(row.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -212,15 +159,29 @@ const DocumentList = () => {
       title: "description",
       dataIndex: "description",
       sorter: (a, b) => a.description.length - b.description.length,
-      render: (text) => <div dangerouslySetInnerHTML={{ __html: text }} /> // Render HTML content
+      render: (text) => <div dangerouslySetInnerHTML={{ __html: text }} />
     },
-
     {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            menu={{ items: getDropdownItems(elm) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -228,14 +189,46 @@ const DocumentList = () => {
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
+      <style>
+        {`
+          .ant-dropdown-menu {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            padding: 4px;
+          }
+
+          .ant-dropdown-menu-item {
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin: 2px 0;
+            transition: all 0.3s;
+          }
+
+          .ant-dropdown-menu-item:hover {
+            background-color: #f5f5f5;
+          }
+
+          .ant-dropdown-menu-item-danger:hover {
+            background-color: #fff1f0;
+          }
+
+          .ant-dropdown-menu-item .anticon {
+            font-size: 16px;
+            margin-right: 8px;
+          }
+
+          .table-responsive {
+            overflow-x: auto;
+          }
+        `}
+      </style>
       <Flex
         alignItems="center"
         justifyContent="space-between"
         mobileFlex={false}
       >
         <Flex className="mb-1" mobileFlex={false}>
-
-        </Flex>
+        </Flex >
         <Flex gap="7px">
 
 
@@ -254,13 +247,13 @@ const DocumentList = () => {
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
-            onClick={exportToExcel} // Call export function when the button is clicked
+            onClick={exportToExcel}
             block
           >
             Export All
           </Button>
         </Flex>
-      </Flex>
+      </Flex >
       <div className="table-responsive mt-4">
 
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
@@ -296,9 +289,7 @@ const DocumentList = () => {
       >
         <EditDocument onClose={closeEditTrainingSetupModal} idd={idd} />
       </Modal>
-
-     
-    </Card>
+    </Card >
   );
 };
 

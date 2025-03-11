@@ -5,13 +5,11 @@ import {
   Button,
   DatePicker,
   Select,
-  message,
   Row,
   Col,
 } from "antd";
 import { Formik, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { CreateL, GetLeave } from "./LeaveReducer/LeaveSlice";
 import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
@@ -30,7 +28,6 @@ const validationSchema = Yup.object().shape({
 });
 
 const AddLeave = ({ onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -41,7 +38,7 @@ const AddLeave = ({ onClose }) => {
   const user = useSelector((state) => state.user.loggedInUser.username);
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data || [];
-  
+
 
   const filteredEmpData = empData?.filter((item) => item.created_by === user);
   // Extract employee data
@@ -68,24 +65,24 @@ const AddLeave = ({ onClose }) => {
 
   return (
     <div className="">
-   <h1 className="border-b border-gray-200 mb-4"></h1>
-      
+      <hr className="border-b border-gray-200 mb-4"></hr>
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({ values, handleSubmit, setFieldValue, isSubmitting }) => (
-          <Form 
-            layout="vertical" 
-            onFinish={handleSubmit} 
+          <Form
+            layout="vertical"
+            onFinish={handleSubmit}
             className="space-y-6"
           >
             <Row gutter={[16, 16]}>
               <Col span={24}>
                 <div className="space-y-2">
-                  <label 
-                    htmlFor="employeeId" 
+                  <label
+                    htmlFor="employeeId"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Employee <span className="text-red-500">*</span>
@@ -107,9 +104,9 @@ const AddLeave = ({ onClose }) => {
                       </Select>
                     )}
                   </Field>
-                  <ErrorMessage 
-                    name="employeeId" 
-                    component="div" 
+                  <ErrorMessage
+                    name="employeeId"
+                    component="div"
                     className="text-sm text-red-600"
                   />
                 </div>
@@ -117,8 +114,8 @@ const AddLeave = ({ onClose }) => {
 
               <Col span={24}>
                 <div className="space-y-2">
-                  <label 
-                    htmlFor="leaveType" 
+                  <label
+                    htmlFor="leaveType"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Leave Type <span className="text-red-500">*</span>
@@ -138,9 +135,9 @@ const AddLeave = ({ onClose }) => {
                       </Select>
                     )}
                   </Field>
-                  <ErrorMessage 
-                    name="leaveType" 
-                    component="div" 
+                  <ErrorMessage
+                    name="leaveType"
+                    component="div"
                     className="text-sm text-red-600"
                   />
                 </div>
@@ -148,8 +145,8 @@ const AddLeave = ({ onClose }) => {
 
               <Col span={12}>
                 <div className="space-y-2">
-                  <label 
-                    htmlFor="startDate" 
+                  <label
+                    htmlFor="startDate"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Start Date <span className="text-red-500">*</span>
@@ -170,9 +167,9 @@ const AddLeave = ({ onClose }) => {
                       />
                     )}
                   </Field>
-                  <ErrorMessage 
-                    name="startDate" 
-                    component="div" 
+                  <ErrorMessage
+                    name="startDate"
+                    component="div"
                     className="text-sm text-red-600"
                   />
                 </div>
@@ -180,8 +177,8 @@ const AddLeave = ({ onClose }) => {
 
               <Col span={12}>
                 <div className="space-y-2">
-                  <label 
-                    htmlFor="endDate" 
+                  <label
+                    htmlFor="endDate"
                     className="block text-sm font-medium text-gray-700"
                   >
                     End Date <span className="text-red-500">*</span>
@@ -200,9 +197,9 @@ const AddLeave = ({ onClose }) => {
                       />
                     )}
                   </Field>
-                  <ErrorMessage 
-                    name="endDate" 
-                    component="div" 
+                  <ErrorMessage
+                    name="endDate"
+                    component="div"
                     className="text-sm text-red-600"
                   />
                 </div>
@@ -210,8 +207,8 @@ const AddLeave = ({ onClose }) => {
 
               <Col span={24}>
                 <div className="space-y-2">
-                  <label 
-                    htmlFor="reason" 
+                  <label
+                    htmlFor="reason"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Leave Reason <span className="text-red-500">*</span>
@@ -227,9 +224,9 @@ const AddLeave = ({ onClose }) => {
                       />
                     )}
                   </Field>
-                  <ErrorMessage 
-                    name="reason" 
-                    component="div" 
+                  <ErrorMessage
+                    name="reason"
+                    component="div"
                     className="text-sm text-red-600"
                   />
                 </div>
@@ -237,8 +234,8 @@ const AddLeave = ({ onClose }) => {
 
               <Col span={24}>
                 <div className="space-y-2">
-                  <label 
-                    htmlFor="remark" 
+                  <label
+                    htmlFor="remark"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Remark <span className="text-red-500">*</span>
@@ -254,9 +251,9 @@ const AddLeave = ({ onClose }) => {
                       />
                     )}
                   </Field>
-                  <ErrorMessage 
-                    name="remark" 
-                    component="div" 
+                  <ErrorMessage
+                    name="remark"
+                    component="div"
                     className="text-sm text-red-600"
                   />
                 </div>
@@ -264,14 +261,14 @@ const AddLeave = ({ onClose }) => {
             </Row>
 
             <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-              <Button 
+              <Button
                 onClick={onClose}
                 className="px-4 py-2 text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-300 rounded-md transition-colors duration-200"
               >
                 Cancel
               </Button>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 htmlType="submit"
                 loading={isSubmitting}
                 className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors duration-200 disabled:opacity-50"

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Flex from "components/shared-components/Flex";
 import {
   Card,
@@ -7,10 +7,9 @@ import {
   Input,
   Button,
   Modal,
-  Menu,
-  Dropdown,
   message,
   Space,
+  Dropdown,
 } from "antd";
 import {
   FileExcelOutlined,
@@ -23,7 +22,7 @@ import {
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
-import { utils, writeFile } from "xlsx";
+import { utils } from "xlsx";
 import EditTicket from "./EditTicket";
 import AddTicket from "./AddTicket";
 import ViewTicket from "./ViewTicket";
@@ -40,7 +39,6 @@ export const TicketList = () => {
   const [list, setList] = useState([]);
   const [pinnedTasks, setPinnedTasks] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [selectedPriority, setSelectedPriority] = useState('All');
   const [isAddTicketModalVisible, setIsAddTicketModalVisible] = useState(false);
   const [isEditTicketModalVisible, setIsEditTicketModalVisible] = useState(false);
   const [isViewTicketModalVisible, setIsViewTicketModalVisible] = useState(false);
@@ -49,7 +47,12 @@ export const TicketList = () => {
 
   const dispatch = useDispatch();
   const alldatat = useSelector((state) => state?.Ticket);
-  const fnddata = alldatat?.Ticket?.data || [];
+  const fnddata = useMemo(() => alldatat?.Ticket?.data || [], [alldatat?.Ticket?.data]);
+
+  useEffect(() => {
+    dispatch(empdata())
+  }, [dispatch])
+
   const alldatass = useSelector((state) => state.employee.employee.data);
 
   useEffect(() => {
@@ -57,6 +60,11 @@ export const TicketList = () => {
     dispatch(getAllTicket());
     const storedPinnedTasks = JSON.parse(localStorage.getItem("pinnedTasks")) || [];
     setPinnedTasks(storedPinnedTasks);
+  }, [dispatch]);
+
+
+  useEffect(() => {
+    dispatch(getAllTicket());
   }, [dispatch]);
 
   useEffect(() => {
@@ -90,6 +98,7 @@ export const TicketList = () => {
     }
   };
 
+
   const editfun = (idd) => {
     setIdd(idd);
     handleModalVisibility.edit.open();
@@ -105,111 +114,170 @@ export const TicketList = () => {
     });
   };
 
-  // Action menu for each row
-  const getActionMenu = (record) => (
-    <Menu>
-      <Menu.Item key="pin" onClick={() => togglePinTask(record.id)}>
-        <Flex alignItems="center">
-          <PushpinOutlined style={{ color: pinnedTasks.includes(record.id) ? "gold" : undefined }} />
-          <span className="ml-2">{pinnedTasks.includes(record.id) ? "Unpin" : "Pin"}</span>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item key="edit" onClick={() => editfun(record.id)}>
-        <Flex alignItems="center">
-          <EditOutlined />
-          <span className="ml-2">Edit</span>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item key="delete" onClick={() => deletfun(record.id)}>
-        <Flex alignItems="center">
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  // Create debounced version of search
+  const debouncedSearch = debounce((value, data, setList) => {
+    const searchValue = value.toLowerCase();
+
+    if (!searchValue) {
+      // Reset to original data
+      setList(data || []);
+      return;
+    }
+
+    const filteredData = data?.filter(ticket => {
+      return (
+        ticket.ticketSubject?.toString().toLowerCase().includes(searchValue) ||
+        ticket.requestor?.toString().toLowerCase().includes(searchValue) ||
+        ticket.priority?.toString().toLowerCase().includes(searchValue)
+      );
+    }) || [];
+
+    setList(filteredData);
+  }, 300); // 300ms delay
+
+  // Modified onSearch function
+  const onSearch = (e) => {
+    const value = e.currentTarget.value;
+    setSearchValue(value);
+    debouncedSearch(value, fnddata, setList);
+  };
+
+  const getDropdownItems = (record) => {
+    return [
+      {
+        key: 'pin',
+        icon: pinnedTasks.includes(record.id) ?
+          <PushpinOutlined style={{ color: "gold" }} /> :
+          <PushpinOutlined />,
+        label: pinnedTasks.includes(record.id) ? 'Unpin' : 'Pin',
+        onClick: () => togglePinTask(record.id)
+      },
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => editfun(record.id)
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deletfun(record.id),
+        danger: true
+      }
+    ];
+  };
 
   const tableColumns = [
     {
       title: "Pinned",
       dataIndex: "pinned",
-      width: 70,
-      render: (_, record) => (
-        <PushpinOutlined 
-          style={{ color: pinnedTasks.includes(record.id) ? "gold" : undefined }}
-          onClick={() => togglePinTask(record.id)}
-        />
+      render: (text, record) => (
+        <span>
+          {pinnedTasks.includes(record.id) ? (
+            <PushpinOutlined style={{ color: "gold" }} />
+          ) : (
+            <PushpinOutlined />
+          )}
+        </span>
       ),
     },
     {
       title: "Subject",
       dataIndex: "ticketSubject",
-      sorter: (a, b) => (a.ticketSubject || '').localeCompare(b.ticketSubject || ''),
-    },
-    {
-      title: "Requestor",
-      dataIndex: "requestor",
-      render: (requestorId) => {
-        const requestor = alldatass?.find(emp => emp.id === requestorId);
-        return requestor?.username || 'N/A';
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder="Search subject"
+            value={selectedKeys[0]}
+            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => confirm()}
+            style={{ width: 188, marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Search
+            </Button>
+            <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+              Reset
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) =>
+        record.ticketSubject
+          ? record.ticketSubject.toString().toLowerCase().includes(value.toLowerCase())
+          : '',
+      sorter: {
+        compare: (a, b) => (a.subject?.length || 0) - (b.subject?.length || 0),
       },
     },
     {
-      title: "Start Date",
+      title: "requestor",
+      dataIndex: "requestor",
+      sorter: (a, b) => {
+        const requestorNameA = alldatass.find(emp => emp.id === a.requestor)?.username || '';
+        const requestorNameB = alldatass.find(emp => emp.id === b.requestor)?.username || '';
+        return requestorNameA.localeCompare(requestorNameB);
+      },
+      render: (requestorId) => {
+        const requestorName = alldatass.find(emp => emp.id === requestorId)?.username;
+        return <span>{requestorName || 'N/A'}</span>;
+      },
+    },
+    {
+      title: "Start Date ",
       dataIndex: "createdAt",
-      render: (date) => dayjs(date).format(DATE_FORMAT_DD_MM_YYYY),
+      render: (_, record) => (
+        <span>{dayjs(record.createdAt).format(DATE_FORMAT_DD_MM_YYYY)}</span>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "createdAt"),
     },
     {
       title: "Priority",
       dataIndex: "priority",
+      sorter: {
+        compare: (a, b) => a.priority.length - b.priority.length,
+      },
     },
     {
-      title: "Description",
+      title: "description",
       dataIndex: "description",
-      ellipsis: true,
+      sorter: {
+        compare: (a, b) => a.activity.length - b.activity.length,
+      },
     },
     {
       title: "Action",
-      key: "action",
-      width: 80,
+      dataIndex: "actions",
       render: (_, record) => (
-        <Dropdown overlay={getActionMenu(record)} trigger={['click']}>
-          <Button type="text" icon={<MoreOutlined />} />
-        </Dropdown>
+        <div className="text-center">
+          <Dropdown
+            menu={{ items: getDropdownItems(record) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
+        </div>
       ),
     },
   ];
-
-  const debouncedSearch = debounce((value) => {
-    const searchLower = value.toLowerCase();
-    const filtered = fnddata?.filter(ticket => 
-      ticket.ticketSubject?.toLowerCase().includes(searchLower) ||
-      ticket.description?.toLowerCase().includes(searchLower)
-    ) || [];
-    setList(filtered);
-  }, 300);
-
-  const onSearch = (e) => {
-    const value = e.target.value;
-    setSearchValue(value);
-    if (!value) {
-      setList(fnddata);
-    } else {
-      debouncedSearch(value);
-    }
-  };
-
-  const exportToExcel = () => {
-    try {
-      const ws = utils.json_to_sheet(list);
-      const wb = utils.book_new();
-      utils.book_append_sheet(wb, ws, "Ticket");
-      writeFile(wb, "TicketData.xlsx");
-      message.success("Data exported successfully!");
-    } catch (error) {
-      message.error("Failed to export data");
-    }
-  };
 
   return (
     <div className="container">
@@ -230,7 +298,6 @@ export const TicketList = () => {
               <Select
                 defaultValue="All"
                 style={{ width: 120 }}
-                onChange={(value) => setSelectedPriority(value)}
               >
                 <Option value="All">All Priority</Option>
                 {priorityList.map((priority) => (
@@ -253,9 +320,9 @@ export const TicketList = () => {
             <Button
               type="primary"
               icon={<FileExcelOutlined />}
-              onClick={exportToExcel}
+              block
             >
-              Export
+              Export All
             </Button>
           </Flex>
         </Flex>
@@ -304,4 +371,73 @@ export const TicketList = () => {
   );
 };
 
-export default TicketList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 250px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
+  }
+
+  .ant-btn-text:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .ant-btn-text:active {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  @media (max-width: 768px) {
+    .search-input {
+      width: 100%;
+      min-width: unset;
+    }
+    
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const TicketListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <TicketList />
+  </>
+);
+
+export default TicketListWithStyles;

@@ -7,7 +7,7 @@ const createUID = len => {
 		chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
 		charlen = chars.length,
 		length = len || 32;
-			
+
 	for (let i = 0; i < length; i++) {
 		buf[i] = chars.charAt(Math.floor(Math.random() * charlen));
 	}
@@ -28,7 +28,7 @@ export const modalModeTypes = number => {
 }
 
 export const getLabelsColor = label => {
-	if(label) {
+	if (label) {
 		const color = labels.filter(elm => label === elm.label)[0].color
 		return color
 	}
@@ -36,9 +36,9 @@ export const getLabelsColor = label => {
 }
 
 export const getMember = id => {
-	if(id) {
+	if (id) {
 		const member = membersDetail.filter(elm => id === elm.id)[0]
-		if(member) {
+		if (member) {
 			return <Avatar src={member.img}></Avatar>
 		}
 	}
@@ -46,29 +46,29 @@ export const getMember = id => {
 }
 
 export const getCover = (id, attachments) => {
-	if(id) {
+	if (id) {
 		const cover = attachments.filter(elm => id === elm.id)[0].src
 		return cover
 	}
 	return
 }
 
-export const AssigneeAvatar = ({id, size = 20, name, chain}) => {
-	if(id) {
+export const AssigneeAvatar = ({ id, size = 20, name, chain }) => {
+	if (id) {
 		const member = membersDetail.filter(elm => id === elm.id)[0]
-		if(member) {
+		if (member) {
 			return (
-				<div className={`d-flex ${chain? 'ml-n2': ''}`}> 
-					<Tooltip title={name? '' : member.name}>
-						<Avatar 
-							className="cursor-pointer" 
-							size={size} 
+				<div className={`d-flex ${chain ? 'ml-n2' : ''}`}>
+					<Tooltip title={name ? '' : member.name}>
+						<Avatar
+							className="cursor-pointer"
+							size={size}
 							src={member.img}
-							style={chain?{border: '2px solid #fff'}: {}}
+							style={chain ? { border: '2px solid #fff' } : {}}
 						>
 						</Avatar>
 					</Tooltip>
-					{name? <span className="mb-0 ml-2 font-weight-semibold">{member.name}</span> : null}
+					{name ? <span className="mb-0 ml-2 font-weight-semibold">{member.name}</span> : null}
 				</div>
 			)
 		}

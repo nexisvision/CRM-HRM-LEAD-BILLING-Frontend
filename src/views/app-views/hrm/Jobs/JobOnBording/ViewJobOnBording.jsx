@@ -6,10 +6,9 @@ const ViewJobOnBording = () => {
     <div style={{ margin: "-22px", padding: "20px", height: "100px", background: "#f5f5f5" }}>
       <Row gutter={[16, 16]}>
 
-      <Col span={24}>
+        <Col span={24}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h2 className="text-lg font-bold mb-3">Employee</h2>
-            {/* <Button type="primary">+ Add to Job OnBoard</Button> */}
           </div>
         </Col>
         {/* Personal Detail */}

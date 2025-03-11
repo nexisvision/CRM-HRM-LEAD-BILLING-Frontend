@@ -6,7 +6,7 @@ const AuthContainer = styled.div(() => ({
 }))
 
 export const AuthLayout = ({ children }) => {
-	
+
 	return (
 		<AuthContainer>
 			{children}

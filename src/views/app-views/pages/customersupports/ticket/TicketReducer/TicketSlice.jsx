@@ -1,10 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./TicketService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
-// Async thunk for adding user
+
 
 export const AddTickets = createAsyncThunk(
   "users/addt",
@@ -19,7 +18,7 @@ export const AddTickets = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
+
 
 export const getAllTicket = createAsyncThunk(
   "emp/gett",
@@ -34,7 +33,7 @@ export const getAllTicket = createAsyncThunk(
 );
 
 
-// Async thunk for deleting a user
+
 export const DeleteTicket = createAsyncThunk(
   "users/DeleteTicketeet",
   async (userId, thunkAPI) => {
@@ -60,15 +59,7 @@ export const Editicket = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const TicketSlice = createSlice({
   name: "Ticket",
@@ -136,7 +127,7 @@ const TicketSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-      
+
       //delete
       .addCase(DeleteTicket.pending, (state) => {
         state.isLoading = true;
@@ -157,7 +148,7 @@ const TicketSlice = createSlice({
       })
       .addCase(Editicket.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; 
+        state.editItem = action.payload;
         message.success(action.payload?.message);
         // Update the state with the updated employee data
       })

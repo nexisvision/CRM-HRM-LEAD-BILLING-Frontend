@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Input, Button, Select, message, Row, Col, Modal, Upload } from "antd";
-import { PlusOutlined, UploadOutlined, QuestionCircleOutlined } from "@ant-design/icons";
-import { useNavigate, useParams } from "react-router-dom";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import { useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -23,12 +23,8 @@ const AddProduct = ({ idd, onClose }) => {
   const [categories, setCategories] = useState([]);
   const [fileList, setFileList] = useState([]);
 
-  useEffect(() => {
-    dispatch(getcurren());
-    fetchLables();
-  }, [dispatch]);
 
-  const fetchLables = async () => {
+  const fetchLables = React.useCallback(async () => {
     try {
       const response = await dispatch(GetLable(lid));
       if (response?.payload?.data) {
@@ -48,7 +44,12 @@ const AddProduct = ({ idd, onClose }) => {
       console.error("Failed to fetch categories:", error);
       message.error("Failed to load categories");
     }
-  };
+  }, [dispatch, lid]);
+
+  useEffect(() => {
+    dispatch(getcurren());
+    fetchLables();
+  }, [dispatch, fetchLables]);
 
   const handleAddNewCategory = async (setFieldValue) => {
     if (!newCategory.trim()) {
@@ -59,10 +60,10 @@ const AddProduct = ({ idd, onClose }) => {
     try {
       const payload = { name: newCategory.trim(), labelType: "status" };
       const response = await dispatch(AddLable({ lid, payload }));
-      
+
       if (response.payload && response.payload.success) {
         message.success("Category added successfully");
-        
+
         // Fetch updated categories immediately
         const labelsResponse = await dispatch(GetLable(lid));
         if (labelsResponse.payload && labelsResponse.payload.data) {
@@ -76,13 +77,13 @@ const AddProduct = ({ idd, onClose }) => {
               (label, index, self) =>
                 index === self.findIndex((t) => t?.name === label?.name)
             );
-          
+
           setCategories(filteredLabels);
           if (setFieldValue) {
             setFieldValue("category", newCategory.trim());
           }
         }
-        
+
         setNewCategory("");
         setIsCategoryModalVisible(false);
       } else {
@@ -127,7 +128,8 @@ const AddProduct = ({ idd, onClose }) => {
     }
 
     const formData = new FormData();
-    
+
+    // Append all form values except image
     Object.keys(values).forEach(key => {
       if (key !== 'image') {
         formData.append(key, values[key]);
@@ -148,16 +150,16 @@ const AddProduct = ({ idd, onClose }) => {
 
   const handleFileChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
-};
+  };
 
   const CustomInput = ({ field, form, ...props }) => <Input {...field} {...props} />;
 
   return (
     <div className="add-expenses-form">
       <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
-      <Formik initialValues={initialValues} 
-      validationSchema={validationSchema}
-       onSubmit={onSubmit}>
+      <Formik initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={onSubmit}>
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <>
             <Form className="formik-form" onSubmit={handleSubmit}>
@@ -236,10 +238,10 @@ const AddProduct = ({ idd, onClose }) => {
                 <Col span={12} className="mt-4">
                   <div className="form-item">
                     <label className="font-semibold">SKU <span className="text-red-500">*</span></label>
-                    <Field 
-                      className="mt-2" 
-                      name="sku" 
-                      as={CustomInput} 
+                    <Field
+                      className="mt-2"
+                      name="sku"
+                      as={CustomInput}
                       placeholder="Enter SKU"
                       validate={(value) => {
                         if (!value) {
@@ -256,10 +258,10 @@ const AddProduct = ({ idd, onClose }) => {
                 <Col span={12} className="mt-4">
                   <div className="form-item">
                     <label className="font-semibold">HSN/SAC <span className="text-red-500">*</span></label>
-                    <Field 
-                      className="mt-2" 
-                      name="hsn_sac" 
-                      as={CustomInput} 
+                    <Field
+                      className="mt-2"
+                      name="hsn_sac"
+                      as={CustomInput}
                       placeholder="Enter HSN/SAC"
                       validate={(value) => {
                         if (!value) {
@@ -275,7 +277,7 @@ const AddProduct = ({ idd, onClose }) => {
                 </Col>
                 <Col span={24} className="mt-4">
                   <div className="form-item">
-                      <label className="font-semibold">Description <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                     <ReactQuill
                       className="mt-1"
                       value={values.description}
@@ -287,7 +289,7 @@ const AddProduct = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-<div className="mt-4 w-full">
+                <div className="mt-4 w-full">
                   <span className="block font-semibold p-2">Product Image</span>
                   <Col span={24}>
                     <Upload
@@ -297,7 +299,7 @@ const AddProduct = ({ idd, onClose }) => {
                       maxCount={1}
                       fileList={fileList}
                       onChange={handleFileChange}
-                      showUploadList={{ 
+                      showUploadList={{
                         showRemoveIcon: true,
                         showPreviewIcon: true,
                         className: "upload-list-inline"

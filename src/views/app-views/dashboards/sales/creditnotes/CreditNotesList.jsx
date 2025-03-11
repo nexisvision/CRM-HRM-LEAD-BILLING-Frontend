@@ -1,24 +1,15 @@
-/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Select,
   Input,
   Button,
-  Badge,
-  Menu,
-  Tag,
   Modal,
-  message,
   DatePicker,
 } from "antd";
 import {
-  EyeOutlined,
-  DeleteOutlined,
   SearchOutlined,
   PlusOutlined,
-  EditOutlined,
 } from "@ant-design/icons";
 import Flex from "components/shared-components/Flex";
 import NumberFormat from "react-number-format";
@@ -27,23 +18,15 @@ import utils from "utils";
 import AddCrediteNotes from "./AddCrediteNotes";
 import EditCrediteNotes from "./EditCreditNotes";
 import {
-  deletecreditnote,
   getcreditnote,
 } from "./CustomerReducer/CreditnoteSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { getInvoice } from "../invoice/InvoiceReducer/InvoiceSlice";
 
-const { Option } = Select;
-
 const CreditNotesList = () => {
   const dispatch = useDispatch();
-
-  const [list, setList] = useState([]);
-
   const alldata = useSelector((state) => state.creditnotes);
   const fnddata = alldata.creditnotes.data;
-
-
   const [isAddCreditNotesModalVisible, setIsAddCreditNotesModalVisible] =
     useState(false);
   const [isEditCreditNotesModalVisible, setIsEditCreditNotesModalVisible] =
@@ -51,10 +34,7 @@ const CreditNotesList = () => {
   const [isViewCreditNotesModalVisible, setIsViewCreditNotesModalVisible] =
     useState(false);
   const [selectedCreditNoteId, setSelectedCreditNoteId] = useState(null);
-
-  const [idd, setIdd] = useState("");
-
-  // Get both credit notes and invoices data
+  const idd = "";
   const creditNotesData = useSelector((state) => state.creditnotes.creditnotes.data);
   const invoicesData = useSelector((state) => state.salesInvoices.salesInvoices.data);
 
@@ -87,14 +67,13 @@ const CreditNotesList = () => {
 
   useEffect(() => {
     if (creditNotesData && invoicesData) {
-      const combinedData = creditNotesData.map(creditNote => {
+      creditNotesData.map(creditNote => {
         const matchingInvoice = invoicesData.find(invoice => invoice.id === creditNote.invoice);
         return {
           ...creditNote,
           salesInvoiceNumber: matchingInvoice ? matchingInvoice.salesInvoiceNumber : 'N/A'
         };
       });
-      setList(combinedData);
     }
   }, [creditNotesData, invoicesData]);
 
@@ -108,33 +87,16 @@ const CreditNotesList = () => {
     setIsAddCreditNotesModalVisible(false);
   };
 
-  // Open Add Job Modal
-  const openEditCreditNotesModal = () => {
-    setIsEditCreditNotesModalVisible(true);
-  };
-
   // Close Add Job Modal
   const closeEditCreditNotesModal = () => {
     setIsEditCreditNotesModalVisible(false);
   };
 
-  const openviewCreditNotesModal = () => {
-    setIsViewCreditNotesModalVisible(true);
-  };
-
-  // Close Add Job Modal
   const closeViewCreditNotesModal = () => {
     setSelectedCreditNoteId(null);
     setIsViewCreditNotesModalVisible(false);
   };
 
-  const deletefun = (userId) => {
-    dispatch(deletecreditnote(userId)).then(() => {
-      dispatch(getcreditnote());
-      setList(list.filter((item) => item.id !== userId));
-      message.success("Credit Note deleted successfully.");
-    });
-  };
 
   const stripHtmlTags = (html) => {
     if (!html) return '';
@@ -142,11 +104,6 @@ const CreditNotesList = () => {
     const temp = document.createElement('div');
     temp.innerHTML = decoded;
     return temp.textContent || temp.innerText || '';
-  };
-
-  const edtfun = (idd) => {
-    openEditCreditNotesModal();
-    setIdd(idd);
   };
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
@@ -166,16 +123,11 @@ const CreditNotesList = () => {
 
   if (parsedPermissions["dashboards-sales-creditnotes"] && parsedPermissions["dashboards-sales-creditnotes"][0]?.permissions) {
     allpermisson = parsedPermissions["dashboards-sales-creditnotes"][0].permissions;
-
   } else {
   }
-
   const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
 
-  ///endpermission
 
   const tableColumns = [
     {
@@ -242,7 +194,7 @@ const CreditNotesList = () => {
           return textA.length - textB.length;
         },
       },
-    }
+    },
   ];
 
   const filterCreditNotes = (text, date) => {
@@ -258,7 +210,7 @@ const CreditNotesList = () => {
 
     // Apply text search filter
     if (text) {
-      filtered = filtered.filter(item => 
+      filtered = filtered.filter(item =>
         item.salesInvoiceNumber.toString().toLowerCase().includes(text.toLowerCase())
       );
     }
@@ -365,28 +317,39 @@ const CreditNotesList = () => {
         </div>
       </Card>
 
-     
-        <Modal
-          title="Add Credite Notes"
-          visible={isAddCreditNotesModalVisible}
-          onCancel={closeAddCreditNotesModal}
-          footer={null}
-          width={800}
-          className="mt-[-70px]"
-        >
-          <AddCrediteNotes onClose={closeAddCreditNotesModal} />
-        </Modal>
 
-        <Modal
-          title="Edit Credite Notes"
-          visible={isEditCreditNotesModalVisible}
-          onCancel={closeEditCreditNotesModal}
-          footer={null}
-          width={800}
-          className="mt-[-70px]"
-        >
-          <EditCrediteNotes onClose={closeEditCreditNotesModal} idd={idd} />
-        </Modal>
+      <Modal
+        title="Add Credite Notes"
+        visible={isAddCreditNotesModalVisible}
+        onCancel={closeAddCreditNotesModal}
+        footer={null}
+        width={800}
+        className="mt-[-70px]"
+      >
+        <AddCrediteNotes onClose={closeAddCreditNotesModal} />
+      </Modal>
+
+      <Modal
+        title="Edit Credite Notes"
+        visible={isEditCreditNotesModalVisible}
+        onCancel={closeEditCreditNotesModal}
+        footer={null}
+        width={800}
+        className="mt-[-70px]"
+      >
+        <EditCrediteNotes onClose={closeEditCreditNotesModal} idd={idd} />
+      </Modal>
+
+      <Modal
+        title={<h2 className="text-xl font-medium">View Credit Note</h2>}
+        visible={isViewCreditNotesModalVisible}
+        onCancel={closeViewCreditNotesModal}
+        footer={null}
+        width={1000}
+        className="mt-[-70px]"
+      >
+        <ViewCreditNotes creditNoteId={selectedCreditNoteId} onClose={closeViewCreditNotesModal} />
+      </Modal>
 
     </>
   );

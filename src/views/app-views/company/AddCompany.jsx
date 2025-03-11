@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Modal,
   Input,
@@ -7,9 +7,8 @@ import {
   Col,
   message,
 } from "antd";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { addClient, ClientData } from "./CompanyReducers/CompanySlice"; // Adjust this import according to your file structure
+import { addClient, ClientData } from "./CompanyReducers/CompanySlice";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
@@ -17,7 +16,6 @@ import { ReloadOutlined } from "@ant-design/icons";
 import { env } from "configs/EnvironmentConfig";
 
 const AddCompany = ({ onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -26,22 +24,24 @@ const AddCompany = ({ onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Function to generate random password
-  const 
-  
-  generatePassword = () => {
-    const length = 8;
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let password = "";
-    
-    for (let i = 0; i < length; i++) {
-      password += charset[Math.floor(Math.random() * charset.length)];
-    }
+  const
 
-    const randomNum = Math.floor(Math.random() * 10).toString();
-    password = password.slice(0, 7) + randomNum;
-    
-    return password;
-  };
+    generatePassword = () => {
+      const length = 8;
+      const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let password = "";
+
+      // Generate 6 characters
+      for (let i = 0; i < length; i++) {
+        password += charset[Math.floor(Math.random() * charset.length)];
+      }
+
+      // Ensure at least one number
+      const randomNum = Math.floor(Math.random() * 10).toString();
+      password = password.slice(0, 7) + randomNum;
+
+      return password;
+    };
 
   const otpapi = async (otp) => {
     try {
@@ -126,11 +126,10 @@ const AddCompany = ({ onClose }) => {
       >
         {({ isSubmitting, setFieldValue }) => (
           <Form className="space-y-4">
-            <h1 className="border-b-2 border-gray-200 pb-2"></h1>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item mt-2">
-                <label className="font-semibold">Username <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Username <span className="text-red-500">*</span></label>
                   <Field
                     name="username"
                     as={Input}
@@ -146,7 +145,7 @@ const AddCompany = ({ onClose }) => {
               </Col>
               <Col span={12}>
                 <div className="form-item mt-2">
-                <label className="font-semibold">Password <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Password <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <Field
                       name="password"
@@ -171,7 +170,7 @@ const AddCompany = ({ onClose }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                <label className="font-semibold">Email <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Email <span className="text-red-500">*</span></label>
                   <Field
                     name="email"
                     as={Input}
@@ -226,15 +225,15 @@ const AddCompany = ({ onClose }) => {
             onChange={(e) => setOtp(e.target.value)}
           />
           <div className="mt-4">
-          <Button
-                type="primary"
-                htmlType="submit"
-                loading={isSubmitting}
-                disabled={isSubmitting}
-                onClick={handleOtpVerify}
-              >
-                {isSubmitting ? "Verifying..." : "Verify OTP"}
-              </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              onClick={handleOtpVerify}
+            >
+              {isSubmitting ? "Verifying..." : "Verify OTP"}
+            </Button>
           </div>
         </div>
       </Modal>

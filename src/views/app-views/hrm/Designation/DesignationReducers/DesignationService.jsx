@@ -29,7 +29,7 @@ const AddDesignation = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -49,7 +49,7 @@ const DeleteDes = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -78,15 +78,12 @@ const EditDesignation = async (id, values) => {
 
 
 const UserService = {
-  // addUser,
+
   GetDes,
   AddDesignation,
   DeleteDes,
   EditDesignation,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default UserService;

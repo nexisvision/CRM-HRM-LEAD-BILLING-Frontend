@@ -32,7 +32,7 @@ const addbra = async (values) => {
         },
       }
     );
-    //    dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -52,7 +52,7 @@ const deletebra = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -80,12 +80,13 @@ const editbra = async (idd, values) => {
 };
 
 
+
 const UserService = {
+
   getbra,
   addbra,
   deletebra,
   editbra,
- 
 };
 
 export default UserService;

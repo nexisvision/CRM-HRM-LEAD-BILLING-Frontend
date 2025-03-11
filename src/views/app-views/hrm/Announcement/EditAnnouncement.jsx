@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
-import { Input, Button, message, Row, Col, Select, DatePicker, TimePicker, Modal } from 'antd';
+import { Input, Button, Row, Col, Select, DatePicker, TimePicker, Modal } from 'antd';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { editAnnounce, GetAnn } from './AnnouncementReducer/AnnouncementSlice';
@@ -22,23 +22,18 @@ const validationSchema = Yup.object().shape({
 const EditAnnouncement = ({ onClose, announcementData }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const branches = useSelector((state) => state.Branch?.Branch?.data || []);
-
   useEffect(() => {
     dispatch(getBranch());
   }, [dispatch]);
-
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
-
   const handleSubmit = (values, { resetForm }) => {
     const payload = {
       ...values,
       branch: {
         branch: values.branch,
       },
-    };
-
+    }
     dispatch(editAnnounce(payload))
       .then(() => {
         dispatch(GetAnn());

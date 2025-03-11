@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PrinterOutlined, DownloadOutlined, CloseOutlined } from '@ant-design/icons';
-import {  Table, Button, Select } from 'antd';
+import { Table, Button, Select } from 'antd';
 import NumberFormat from 'react-number-format';
 import html2pdf from 'html2pdf.js';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,57 +10,48 @@ import { Getcus } from '../customer/CustomerReducer/CustomerSlice';
 import { getsignaturesss } from 'views/app-views/setting/esignature/EsignatureReducers/EsignatureSlice';
 import { getgeneralsettings } from '../../../setting/general/generalReducer/generalSlice';
 
+
 const { Option } = Select;
 
-const ViewInvoice = ({idd}) => {
-
+const ViewInvoice = ({ idd, onClose }) => {
     const dispatch = useDispatch();
-    
     const [template, setTemplate] = useState('rendertemplate');
     const [parsedInvoice, setParsedInvoice] = useState({ items: [] });
     const [customerData, setCustomerData] = useState({});
     const [generalSettings, setGeneralSettings] = useState(null);
-
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(Getcus())
-    },[])
+    }, [dispatch])
 
-     useEffect(() => {
+    useEffect(() => {
         dispatch(getgeneralsettings());
     }, [dispatch]);
-    
 
-  const allInvoices = useSelector((state) => state?.salesInvoices?.salesInvoices?.data);
-  const invoiceData = allInvoices.find(inv => inv.id === idd);
 
-const allCustomers = useSelector((state) => state?.customers?.customers?.data);
+    const allInvoices = useSelector((state) => state?.salesInvoices?.salesInvoices?.data);
+    const invoiceData = allInvoices.find(inv => inv.id === idd);
+    const allCustomers = useSelector((state) => state?.customers?.customers?.data);
+    const generalSettingsData = useSelector((state) => state.generalsetting.generalsetting.data);
+    const loggedInUser = useSelector((state) => state?.user?.loggedInUser);
+    const [selectedSignature, setSelectedSignature] = useState(null);
+    const [selectedSignatureName, setSelectedSignatureName] = useState(null);
+    const signatures = useSelector((state) => state?.esignature?.esignature?.data);
 
- const generalSettingsData = useSelector((state) => state.generalsetting.generalsetting.data);
+    const [isSignatureConfirmed, setIsSignatureConfirmed] = useState(false);
 
-  const loggedInUser = useSelector((state) => state?.user?.loggedInUser);
-
-  const [selectedSignature, setSelectedSignature] = useState(null);
-  const [selectedSignatureName, setSelectedSignatureName] = useState(null);
-  const [showSelector, setShowSelector] = useState(true);
-  
-  const signatures = useSelector((state) => state?.esignature?.esignature?.data);
-
-  const [isSignatureConfirmed, setIsSignatureConfirmed] = useState(false);
-
-    
-     useEffect(() => {
+    useEffect(() => {
         dispatch(getInvoice());
-      }, [dispatch]);
+    }, [dispatch]);
 
-      useEffect(() => {
-    dispatch(Getcus());
-  }, []);
+    useEffect(() => {
+        dispatch(Getcus());
+    }, [dispatch]);
 
-   useEffect(() => {
-    if (generalSettingsData && generalSettingsData.length > 0) {
-        setGeneralSettings(generalSettingsData[0]);
-    }
-}, [generalSettingsData]);
+    useEffect(() => {
+        if (generalSettingsData && generalSettingsData.length > 0) {
+            setGeneralSettings(generalSettingsData[0]);
+        }
+    }, [generalSettingsData]);
 
     useEffect(() => {
         if (invoiceData?.items) {
@@ -73,7 +64,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     ...invoiceData,
                     items: Object.values(items),
                     discount: invoiceData.discount || 0,
-                    tax: invoiceData.tax ?? 0 
+                    tax: invoiceData.tax ?? 0
                 });
             } catch (error) {
                 console.error("Error parsing items:", error);
@@ -98,19 +89,15 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
         const sig = signatures.find(s => s.esignature_name === value);
         setSelectedSignatureName(value);
         setSelectedSignature(sig?.e_signatures || null);
-        setShowSelector(false);
     };
 
     const handleConfirmSignature = () => {
         setIsSignatureConfirmed(true);
-        setShowSelector(false);
     };
 
     const handleRemoveSignature = () => {
         setSelectedSignature(null);
         setSelectedSignatureName(null);
-        setShowSelector(true);
-        setIsSignatureConfirmed(false);
     };
 
     const renderSignatureSection = () => (
@@ -137,9 +124,9 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     <div className='flex flex-col relative'>
                         <h4 className="font-semibold text-lg mb-2">Signature:</h4>
                         <div className='w-36 h-28 flex flex-col items-center justify-center relative'>
-                            <img 
-                                src={selectedSignature} 
-                                alt="Digital Signature" 
+                            <img
+                                src={selectedSignature}
+                                alt="Digital Signature"
                                 className='w-full h-full object-contain border-0'
                             />
                             {!isSignatureConfirmed && (
@@ -167,11 +154,6 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
     );
 
     const handlePrint = () => {
-        // Store the current body content
-        const originalContent = document.body.innerHTML;
-        const printContent = document.getElementById('printable-content');
-    
-        // Create a style element for print-specific CSS
         const printStyles = `
             @media print {
                 body * {
@@ -205,13 +187,13 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                 }
             }
         `;
-    
+
         const styleSheet = document.createElement('style');
         styleSheet.innerHTML = printStyles;
         document.head.appendChild(styleSheet);
-    
+
         window.print();
-    
+
         document.head.removeChild(styleSheet);
     };
 
@@ -222,45 +204,28 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
             margin: 1,
             filename: 'invoice.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
+            html2canvas: {
                 scale: 2,
                 useCORS: true,
                 logging: false
             },
-            jsPDF: { 
-                unit: 'mm', 
-                format: 'a4', 
-                orientation: 'portrait' 
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
             }
         };
 
         html2pdf().set(opt).from(element).save();
     };
 
-    const calculateTotalDiscount = (subtotal, discountPercentage) => {
-        if (!subtotal || !discountPercentage) return 0;
-        return (subtotal * discountPercentage) / 100;
-    };
-    
     const calculateSubtotal = () => {
         if (!parsedInvoice?.items) return 0;
-        return Object.values(parsedInvoice.items).reduce((sum, item) => 
-                sum + parseFloat(item.final_amount || 0), 0
-            );
-    };
-    
-    const calculateTotalTax = (subtotal) => {
-        const taxRate = invoiceData?.tax ?? 0;
-        return (subtotal * taxRate) / 100;
-    };
-    
-    const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
-        return subtotal - totalDiscount + totalTax;
+        return Object.values(parsedInvoice.items).reduce((sum, item) =>
+            sum + parseFloat(item.final_amount || 0), 0
+        );
     };
 
-    const subtotal = calculateSubtotal(parsedInvoice.items);
-    const totalDiscount = calculateTotalDiscount(subtotal, parsedInvoice.discount);
-    const totalTax = calculateTotalTax(subtotal - totalDiscount); // Apply tax after discount
 
     const billingAddress = customerData?.billing_address
         ? JSON.parse(customerData.billing_address)
@@ -278,15 +243,15 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     <div className="flex justify-between items-center">
                         <h1 className="text-3xl text-gray-700">Invoice</h1>
                         <div className="flex items-center">
-                        {generalSettings?.companylogo ? (
-                        <img 
-                            src={generalSettings.companylogo} 
-                            alt="Company Logo" 
-                            className="h-16 mx-auto"
-                        />
-                    ) : (
-                        <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
-                    )}
+                            {generalSettings?.companylogo ? (
+                                <img
+                                    src={generalSettings.companylogo}
+                                    alt="Company Logo"
+                                    className="h-16 mx-auto"
+                                />
+                            ) : (
+                                <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -314,41 +279,41 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
                     <div className="grid grid-cols-2 gap-x-20 gap-y-4">
                         <div className='text-left'>
-                        <address>
-                            <p>
-                                <span className="font-weight-semibold text-dark font-size-md">
-                                    Billed By:</span><br />
-                                        <span>
-                                            <span className="font-weight-semibold">Address:</span> {loggedInUser?.Address}</span><br />  
-                                        <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
-                                        <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
-                                        <span><span className="font-weight-semibold">GstNumber:</span> {loggedInUser?.gstIn}</span><br />
-                            </p>
-                        </address>
+                            <address>
+                                <p>
+                                    <span className="font-weight-semibold text-dark font-size-md">
+                                        Billed By:</span><br />
+                                    <span>
+                                        <span className="font-weight-semibold">Address:</span> {loggedInUser?.Address}</span><br />
+                                    <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
+                                    <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
+                                    <span><span className="font-weight-semibold">GstNumber:</span> {loggedInUser?.gstIn}</span><br />
+                                </p>
+                            </address>
                         </div>
 
                         {/* Customer Details Section */}
                         <div>
                             <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
                             <address>
+                                <p>
                                     <p>
-                                    <p>
-                                    <span>
-                                    <span className='font-weight-semibold'>Address: </span>
-                                    {cleanStreet && `${cleanStreet}, `}
-                                    {billingAddress?.city && `${billingAddress.city}, `}
-                                    {billingAddress?.state && `${billingAddress.state}, `}
-                                    {billingAddress?.zip && `${billingAddress.zip}, `}      
-                                    {billingAddress?.country || 'N/A'}
-                                </span><br />
+                                        <span>
+                                            <span className='font-weight-semibold'>Address: </span>
+                                            {cleanStreet && `${cleanStreet}, `}
+                                            {billingAddress?.city && `${billingAddress.city}, `}
+                                            {billingAddress?.state && `${billingAddress.state}, `}
+                                            {billingAddress?.zip && `${billingAddress.zip}, `}
+                                            {billingAddress?.country || 'N/A'}
+                                        </span><br />
                                     </p>
 
-                                        <span> <span className="font-weight-semibold  ">Name: </span>{customerData.name}</span><br />
-                                        <p> <span className="font-weight-semibold">Email: </span> {customerData.email}</p>
-                                        <p> <span className="font-weight-semibold  ">Phone: </span> {customerData.contact}</p>
-                                        <p> <span className="font-weight-semibold  ">GstIn: </span> {customerData.gstIn}</p>
-                                    </p>
-                                </address>
+                                    <span> <span className="font-weight-semibold  ">Name: </span>{customerData.name}</span><br />
+                                    <p> <span className="font-weight-semibold">Email: </span> {customerData.email}</p>
+                                    <p> <span className="font-weight-semibold  ">Phone: </span> {customerData.contact}</p>
+                                    <p> <span className="font-weight-semibold  ">GstIn: </span> {customerData.gstIn}</p>
+                                </p>
+                            </address>
                         </div>
 
                     </div>
@@ -356,8 +321,8 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
                 {/* Items Table */}
                 <div className="">
-                <div className="">
-                <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
+                    <div className="">
+                        <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
                             <Table.Column title="No." key="key" render={(text, record, index) => index + 1} />
                             <Table.Column title="Product" dataIndex="item" key="item" />
                             <Table.Column title="Quantity" dataIndex="quantity" key="quantity" />
@@ -378,7 +343,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                 render={(record) => `${record.discount_percentage || 0}%`}
                                 key="discount_percentage"
                             />
-                            
+
                             <Table.Column
                                 title="Tax (%)"
                                 render={(record) => `${record.tax_percentage || 0}%`}
@@ -403,19 +368,17 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                 key="amount"
                             />
                         </Table>
-
-                    {/* Invoice Summary */}
                         <div className="d-flex justify-content-end mb-3">
-                        <div className="text-start">
+                            <div className="text-start">
                                 <div className="border-bottom">
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Sub-Total : </span>
                                         <NumberFormat
-                                        displayType="text"
-                                        value={calculateSubtotal()}
-                                        prefix="$"
-                                        thousandSeparator={true}
-                                    />
+                                            displayType="text"
+                                            value={calculateSubtotal()}
+                                            prefix="$"
+                                            thousandSeparator={true}
+                                        />
                                     </p>
 
                                     <p className="mb-2">
@@ -460,30 +423,29 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             <div className=" rounded-lg p-8">
                                 {renderSignatureSection()}
                             </div>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold text-lg mb-2">Terms & Conditions:</h4>
+                            {generalSettings?.termsandconditions ? (
+                                <div
+                                    dangerouslySetInnerHTML={{
+                                        __html: generalSettings.termsandconditions
+                                    }}
+                                    className="text-gray-600 text-sm"
+                                />
+                            ) : (
+                                <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
+                                    <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+                                    <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
+                                </ol>
+                            )}
+                        </div>
                     </div>
-                {/* </div> */}
-                <div>
-                        <h4 className="font-semibold text-lg mb-2">Terms & Conditions:</h4>
-                        {generalSettings?.termsandconditions ? (
-                        <div 
-                            dangerouslySetInnerHTML={{ 
-                                __html: generalSettings.termsandconditions 
-                            }} 
-                            className="text-gray-600 text-sm"
-                        />
-                    ) : (
-                        <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
-                            <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
-                            <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
-                        </ol>
-                    )}
+                    <div className="text-center font-semibold mt-8">
+                        <p>Thanks for your Business</p>
                     </div>
-                </div>
-                <div className="text-center font-semibold mt-8">
-                    <p>Thanks for your Business</p>
                 </div>
             </div>
-            // </div>
         );
     };
 
@@ -494,10 +456,10 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
         return (
             <div className="bg-white rounded-lg shadow-lg p-8">
                 <div>
-                {generalSettings?.companylogo ? (
-                        <img 
-                            src={generalSettings.companylogo} 
-                            alt="Company Logo" 
+                    {generalSettings?.companylogo ? (
+                        <img
+                            src={generalSettings.companylogo}
+                            alt="Company Logo"
                             className="h-16"
                         />
                     ) : (
@@ -511,30 +473,30 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             <p>
 
                                 <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
-                                        <span><span className="font-weight-semibold">Address:</span> {loggedInUser?.Address}</span><br />
-                                        <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
-                                        <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
-                                        <p><span className="font-weight-semibold">GstNumber:</span> {loggedInUser?.gstIn}</p>
+                                <span><span className="font-weight-semibold">Address:</span> {loggedInUser?.Address}</span><br />
+                                <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
+                                <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
+                                <p><span className="font-weight-semibold">GstNumber:</span> {loggedInUser?.gstIn}</p>
                             </p>
                         </address>
                     </div>
                     {/* Customer Details Section */}
                     <div>
-                        <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />   
-                            <address>
+                        <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
+                        <address>
+                            <p>
+                                <span><span className="font-weight-semibold">Name:</span> {customerData.name}</span><br />
                                 <p>
-                                    <span><span className="font-weight-semibold">Name:</span> {customerData.name}</span><br/>
-                                    <p>
-                                        <span className="font-weight-semibold">Address:</span> {cleanStreet}, <br />
-                                        <span className="font-weight-semibold">City:</span> {billingAddress.city}, <br />
-                                        <span className="font-weight-semibold">State:</span> {billingAddress.state}, <br />
-                                        <span className="font-weight-semibold">Zip:</span> {billingAddress.zip}, <br />
-                                        <span className="font-weight-semibold">Country:</span> {billingAddress.country}
-                                    </p>
-                                    <p><span className="font-weight-semibold">Email:</span> {customerData.email}</p>
-                                    <p><span className="font-weight-semibold">Phone:</span> {customerData.contact}</p>
+                                    <span className="font-weight-semibold">Address:</span> {cleanStreet}, <br />
+                                    <span className="font-weight-semibold">City:</span> {billingAddress.city}, <br />
+                                    <span className="font-weight-semibold">State:</span> {billingAddress.state}, <br />
+                                    <span className="font-weight-semibold">Zip:</span> {billingAddress.zip}, <br />
+                                    <span className="font-weight-semibold">Country:</span> {billingAddress.country}
                                 </p>
-                            </address>
+                                <p><span className="font-weight-semibold">Email:</span> {customerData.email}</p>
+                                <p><span className="font-weight-semibold">Phone:</span> {customerData.contact}</p>
+                            </p>
+                        </address>
                     </div>
 
                     {/* Invoice Details Section */}
@@ -577,7 +539,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                 render={(record) => `${record.discount_percentage || 0}%`}
                                 key="discount_percentage"
                             />
-                            
+
                             <Table.Column
                                 title="Tax (%)"
                                 render={(record) => `${record.tax_percentage || 0}%`}
@@ -609,11 +571,11 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Sub-Total : </span>
                                         <NumberFormat
-                                        displayType="text"
-                                        value={calculateSubtotal()}
-                                        prefix="$"
-                                        thousandSeparator={true}
-                                    />
+                                            displayType="text"
+                                            value={calculateSubtotal()}
+                                            prefix="$"
+                                            thousandSeparator={true}
+                                        />
                                     </p>
 
                                     <p className="mb-2">
@@ -658,29 +620,29 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                 {renderSignatureSection()}
                             </div>
                         </div>
-                    {/* </div> */}
-                    <div>
-                        <h4><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
-                        {generalSettings?.termsandconditions ? (
-                        <div 
-                            dangerouslySetInnerHTML={{ 
-                                __html: generalSettings.termsandconditions 
-                            }} 
-                            className="text-gray-600 text-sm"
-                        />
-                    ) : (
-                        <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
-                            <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
-                            <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
-                        </ol>
-                    )}
+                        {/* </div> */}
+                        <div>
+                            <h4><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
+                            {generalSettings?.termsandconditions ? (
+                                <div
+                                    dangerouslySetInnerHTML={{
+                                        __html: generalSettings.termsandconditions
+                                    }}
+                                    className="text-gray-600 text-sm"
+                                />
+                            ) : (
+                                <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
+                                    <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+                                    <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
+                                </ol>
+                            )}
+                        </div>
+                    </div>
+                    <div className="text-center font-semibold mt-8">
+                        <p>Thanks for your Business</p>
                     </div>
                 </div>
-                <div className="text-center font-semibold mt-8">
-                    <p>Thanks for your Business</p>
-                </div>
             </div>
-           </div>
         );
     };
 
@@ -692,15 +654,15 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                 {/* Header Section */}
                 <div className="flex flex-col items-center mb-8 text-center">
                     <div>
-                {generalSettings?.companylogo ? (
-                        <img 
-                            src={generalSettings.companylogo} 
-                            alt="Company Logo" 
-                            className="h-16 mx-auto"
-                        />
-                    ) : (
-                        <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
-                    )}
+                        {generalSettings?.companylogo ? (
+                            <img
+                                src={generalSettings.companylogo}
+                                alt="Company Logo"
+                                className="h-16 mx-auto"
+                            />
+                        ) : (
+                            <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                        )}
                     </div>
                     <div className="text-gray-600 mt-2">
                         <div className='flex'>
@@ -723,16 +685,16 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                 <div className="grid grid-cols-2 gap-8 mb-8">
                     <div className="border-r pr-8 text-left">
                         <div className='text-left'>
-                        <address>
-                            <p>
+                            <address>
+                                <p>
 
-                                <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
-                                        <span><span className="font-weight-semibold">Address:</span> {loggedInUser?.Address}</span><br />
-                                        <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
-                                        <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
-                                        <span><span className="font-weight-semibold">GstNumber:</span> {loggedInUser?.gstIn}</span><br />
-                            </p>
-                        </address>
+                                    <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
+                                    <span><span className="font-weight-semibold">Address:</span> {loggedInUser?.Address}</span><br />
+                                    <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
+                                    <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
+                                    <span><span className="font-weight-semibold">GstNumber:</span> {loggedInUser?.gstIn}</span><br />
+                                </p>
+                            </address>
                         </div>
 
 
@@ -760,8 +722,8 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                 </div>
 
                 <div className="">
-                <div className="">
-                <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
+                    <div className="">
+                        <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
                             <Table.Column title="No." key="key" render={(text, record, index) => index + 1} />
                             <Table.Column title="Product" dataIndex="item" key="item" />
                             <Table.Column title="Quantity" dataIndex="quantity" key="quantity" />
@@ -782,19 +744,19 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                 render={(record) => `${record.discount_percentage || 0}%`}
                                 key="discount_percentage"
                             />
-                            
+
                             <Table.Column
                                 title="Tax (%)"
                                 render={(record) => `${record.tax_percentage || 0}%`}
                                 key="tax_percentage"
                             />
 
-<Table.Column
+                            <Table.Column
                                 title="Gst Name"
                                 render={(record) => `${record.tax_name || "--"}`}
                                 key="tax_name"
                             />
-                            
+
                             <Table.Column
                                 title="Amount"
                                 render={(record) => (
@@ -809,23 +771,23 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             />
                         </Table>
 
-                    {/* Invoice Summary */}
-                    <div className="d-flex justify-content-end mb-3">
-                    <div className="text-start">
+                        {/* Invoice Summary */}
+                        <div className="d-flex justify-content-end mb-3">
+                            <div className="text-start">
                                 <div className="border-bottom">
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Sub-Total : </span>
                                         <NumberFormat
-                                        displayType="text"
-                                        value={calculateSubtotal()}
-                                        prefix="$"
-                                        thousandSeparator={true}
-                                    />
+                                            displayType="text"
+                                            value={calculateSubtotal()}
+                                            prefix="$"
+                                            thousandSeparator={true}
+                                        />
                                     </p>
 
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Discount : </span>
-                                            {`₹${parsedInvoice.discount || 0}`}
+                                        {`₹${parsedInvoice.discount || 0}`}
                                     </p>
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Total Discount Amount: </span>
@@ -857,9 +819,9 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                     />
                                 </h2>
                             </div>
+                        </div>
                     </div>
-                </div>
-                <div>
+                    <div>
                         <div className="flex justify-end items-center">
                             <div className=" rounded-lg  p-8">
                                 {renderSignatureSection()}
@@ -869,18 +831,18 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     <div>
                         <h4 className=""><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
                         {generalSettings?.termsandconditions ? (
-                        <div 
-                            dangerouslySetInnerHTML={{ 
-                                __html: generalSettings.termsandconditions 
-                            }} 
-                            className="text-gray-600 text-sm"
-                        />
-                    ) : (
-                        <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
-                            <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
-                            <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
-                        </ol>
-                    )}
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: generalSettings.termsandconditions
+                                }}
+                                className="text-gray-600 text-sm"
+                            />
+                        ) : (
+                            <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
+                                <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+                                <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
+                            </ol>
+                        )}
                     </div>
                 </div>
                 <div className="text-center font-semibold mt-8">
@@ -898,7 +860,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                 {/* Header */}
                 <div className="flex justify-between items-center mb-12">
                     <div className='text-left'>
-                    <div>
+                        <div>
                             {generalSettings?.companylogo ? (
                                 <img
                                     src={generalSettings.companylogo}
@@ -908,7 +870,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             ) : (
                                 <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
                             )}
-                </div>
+                        </div>
                         <div className="text-gray-600 mt-2">
                             <div className='flex'>
                                 <span className="mb-1 me-2 font-weight-semibold">Invoice Number:</span>
@@ -930,16 +892,16 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                 <div className="grid grid-cols-2 gap-12 mb-12">
                     <div className="border-r pr-8 text-left">
                         <div className='text-left'>
-                        <address>
-                            <p>
+                            <address>
+                                <p>
 
-                                <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
-                                        <span><span className="font-weight-semibold">Address:</span> {loggedInUser?.Address}</span><br />
-                                        <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
-                                        <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
-                                        <span><span className="font-weight-semibold">GstNumber:</span> {loggedInUser?.gstIn}</span><br />
-                            </p>
-                        </address>
+                                    <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
+                                    <span><span className="font-weight-semibold">Address:</span> {loggedInUser?.Address}</span><br />
+                                    <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
+                                    <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
+                                    <span><span className="font-weight-semibold">GstNumber:</span> {loggedInUser?.gstIn}</span><br />
+                                </p>
+                            </address>
                         </div>
 
                     </div>
@@ -952,7 +914,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                     <span><span className="font-weight-semibold">Name:</span> {customerData.name}</span><br />
                                     <span><span className="font-weight-semibold">customerNumber:</span> {customerData.customerNumber}</span><br />
                                     <p>
-                                     <span className="font-weight-semibold">Address:</span> {cleanStreet}, <br />
+                                        <span className="font-weight-semibold">Address:</span> {cleanStreet}, <br />
                                         <span className="font-weight-semibold">City:</span> {billingAddress.city}, <br />
                                         <span className="font-weight-semibold">State:</span> {billingAddress.state}, <br />
                                         <span className="font-weight-semibold">Zip:</span> {billingAddress.zip}, <br />
@@ -1065,30 +1027,30 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             </div>
                         </div>
                     </div>
-                <div>
-                <div>
-                        <div className="flex justify-end items-center">
-                            <div className=" rounded-lg p-8">
-                                {renderSignatureSection()}
+                    <div>
+                        <div>
+                            <div className="flex justify-end items-center">
+                                <div className=" rounded-lg p-8">
+                                    {renderSignatureSection()}
+                                </div>
                             </div>
                         </div>
-                        </div>
                     </div>
-                <div>
+                    <div>
                         <h4><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
                         {generalSettings?.termsandconditions ? (
-                        <div 
-                            dangerouslySetInnerHTML={{ 
-                                __html: generalSettings.termsandconditions 
-                            }} 
-                            className="text-gray-600 text-sm"
-                        />
-                    ) : (
-                        <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
-                            <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
-                            <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
-                        </ol>
-                    )}
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: generalSettings.termsandconditions
+                                }}
+                                className="text-gray-600 text-sm"
+                            />
+                        ) : (
+                            <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
+                                <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+                                <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
+                            </ol>
+                        )}
                     </div>
                 </div>
                 <div className="text-center font-semibold mt-8">
@@ -1128,8 +1090,8 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                 <div id="printable-content" className="max-w-6xl mx-auto" >
                     {template === 'rendertemplate' && renderTemplate()}
                     {template === 'modern' && renderModernTemplate()}
-                     {template === 'classic' && renderClassicTemplate()}
-                   {template === 'minimal' && renderMinimalTemplate()} 
+                    {template === 'classic' && renderClassicTemplate()}
+                    {template === 'minimal' && renderMinimalTemplate()}
                 </div>
             </div>
         </div>

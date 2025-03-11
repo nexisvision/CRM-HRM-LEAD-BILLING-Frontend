@@ -1,16 +1,16 @@
 import React from 'react'
 import { Menu, Button, Badge } from 'antd';
-import { 
-	InboxOutlined, 
-	FileTextOutlined, 
-	MailOutlined, 
-	StarOutlined, 
-	DeleteOutlined, 
-	EditOutlined 
+import {
+	InboxOutlined,
+	FileTextOutlined,
+	MailOutlined,
+	StarOutlined,
+	DeleteOutlined,
+	EditOutlined
 } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
 
-const MenuItem = ({prefix, path, label, url}) => {
+const MenuItem = ({ prefix, path, label, url }) => {
 
 	return (
 		<>

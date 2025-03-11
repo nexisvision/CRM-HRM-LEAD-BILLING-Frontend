@@ -23,7 +23,7 @@ const LoginTwo = props => {
 								<h1>Sign In</h1>
 								<p>Don't have an account yet? <a href="/auth/register-2">Sign Up</a></p>
 								<div className="mt-4">
-									<LoginForm {...props}/>
+									<LoginForm {...props} />
 								</div>
 							</Col>
 						</Row>
@@ -32,11 +32,11 @@ const LoginTwo = props => {
 				<Col xs={0} sm={0} md={0} lg={8}>
 					<div className="d-flex flex-column justify-content-between h-100 px-4" style={backgroundStyle}>
 						<div className="text-right">
-							<img src="/img/logo-white.png" alt="logo"/>
+							<img src="/img/logo-white.png" alt="logo" />
 						</div>
 						<Row justify="center">
 							<Col xs={0} sm={0} md={0} lg={20}>
-								<img className="img-fluid mb-5" src="/img/others/img-18.png" alt=""/>
+								<img className="img-fluid mb-5" src="/img/others/img-18.png" alt="" />
 								<h1 className="text-white">Welcome to emilus</h1>
 								<p className="text-white">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ullamcorper nisl erat, vel convallis elit fermentum pellentesque.</p>
 							</Col>

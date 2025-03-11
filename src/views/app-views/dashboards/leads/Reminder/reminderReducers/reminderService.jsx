@@ -1,6 +1,5 @@
 import axios from "axios";
-  import { env } from "configs/EnvironmentConfig";
-
+import { env } from "configs/EnvironmentConfig";
 const getreinderss = async () => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -21,7 +20,7 @@ const addreinderss = async (payload) => {
 
   try {
     const res = await axios.post(
-        `${env.API_ENDPOINT_URL}/reminders/`,
+      `${env.API_ENDPOINT_URL}/reminders/`,
       payload,
       {
         headers: {
@@ -72,7 +71,9 @@ const EditLeads = async (id, formData) => {
 };
 
 
+
 const UserService = {
+
   getreinderss,
   addreinderss,
   deletereinderss,

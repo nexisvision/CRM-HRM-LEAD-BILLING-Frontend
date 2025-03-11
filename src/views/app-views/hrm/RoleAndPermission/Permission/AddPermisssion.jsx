@@ -1,8 +1,8 @@
 import React from 'react';
-import { Form, Input, Button, DatePicker, Select, message, Row, Col } from 'antd';
+import { Form, Input, Button, message, Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
-const { Option } = Select;
+
 
 const AddPermission = () => {
   const [form] = Form.useForm();
@@ -18,7 +18,7 @@ const AddPermission = () => {
     message.error('Please fill out all required fields.');
   };
 
-  
+
 
   return (
     <div className="add-employee">
@@ -29,7 +29,7 @@ const AddPermission = () => {
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
-                            <h2 className="mb-4 border-b pb-2 font-medium"></h2>
+        <hr className="mb-4 border-b pb-2 font-medium"></hr>
 
         {/* User Information */}
         <Row gutter={16}>
@@ -42,7 +42,7 @@ const AddPermission = () => {
               <Input placeholder="John" />
             </Form.Item>
           </Col>
-         
+
         </Row>
 
         <Form.Item>

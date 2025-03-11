@@ -20,11 +20,11 @@ const Demo = () => {
 					<span>Menu Item 3</span>
 				</Menu.Item>
 			</Menu>
-		}/>
+		} />
 	)
 }
 
-const  usageStr = `import React from 'react'
+const usageStr = `import React from 'react'
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown'
 import { Menu } from 'antd'
 
@@ -51,8 +51,8 @@ const EllipsisDropdownDemo = () => {
 		<div>
 			<h2>EllipsisDropdown</h2>
 			<div className="mt-4">
-				<ComponentIntro name="Location" desc="src/components/shared-components/EllipsisDropdown.js"/>
-				<ComponentIntro name="Description" desc="Dropdown menu with ellipsis icon"/>
+				<ComponentIntro name="Location" desc="src/components/shared-components/EllipsisDropdown.js" />
+				<ComponentIntro name="Description" desc="Dropdown menu with ellipsis icon" />
 				<div className="mt-4">
 					<Card title="Example">
 						<Demo />

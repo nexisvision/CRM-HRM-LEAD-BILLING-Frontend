@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import moment from "moment";
-import { Card, Row, Col, Modal, Form, Input, Select, TimePicker, Button, Tooltip, message, DatePicker } from 'antd';
+import { Card, Form, Button, Tooltip, message } from 'antd';
 import { DeleteOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -8,10 +8,7 @@ import {
   getInterview,
   AddInterviews
 } from "./interviewReducer/interviewSlice";
-import { GetJobdata } from '../JobReducer/JobSlice';
-import { getjobapplication } from '../JobApplication/JobapplicationReducer/JobapplicationSlice';
 import AddInterviewModal from './AddInterview';
-const { Option } = Select;
 const SidebarInterviews = ({ interviews, onDeleteInterview }) => {
   const sortedInterviews = Array.isArray(interviews)
     ? [...interviews].sort((a, b) => moment(a.startOn).valueOf() - moment(b.startOn).valueOf())
@@ -55,8 +52,6 @@ const SidebarInterviews = ({ interviews, onDeleteInterview }) => {
 };
 const CustomCalendar = ({ interviewData, onDeleteInterview, onDateSelect }) => {
   const [currentDate, setCurrentDate] = useState(moment());
-  const [selectedView, setSelectedView] = useState('Month');
-  // Generate calendar data
   const generateCalendarDays = () => {
     const firstDay = moment(currentDate).startOf('month');
     const lastDay = moment(currentDate).endOf('month');
@@ -85,7 +80,6 @@ const CustomCalendar = ({ interviewData, onDeleteInterview, onDateSelect }) => {
   };
   const renderInterviewBadge = (interview) => {
     const timeStr = formatInterviewTime(interview.startTime);
-    const type = interview.interviewType === 'Online' ? 'Video' : 'Phone';
     const text = `${timeStr} ${interview.interviewer}`;
     return (
       <div key={interview.id} className="interview-badge">
@@ -146,8 +140,8 @@ const CustomCalendar = ({ interviewData, onDeleteInterview, onDateSelect }) => {
 };
 const InterviewCalendarApp = () => {
   const dispatch = useDispatch();
-      const allInterviewData = useSelector((state) => state.Interviews);
-      const interviewData = allInterviewData?.Interviews.data || [];
+  const allInterviewData = useSelector((state) => state.Interviews);
+  const interviewData = allInterviewData?.Interviews.data || [];
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [form] = Form.useForm();

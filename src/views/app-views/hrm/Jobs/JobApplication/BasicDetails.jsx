@@ -20,8 +20,6 @@ class BasicDetails extends Component {
 
     return (
       <Card title="Basic Details" extra={<Button type="primary">UnArchive</Button>} style={{ width: 400, height: 500 }}>
-        <
-
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
           <Avatar size={64} src={user.image} />
           <div style={{ marginLeft: 16 }}>

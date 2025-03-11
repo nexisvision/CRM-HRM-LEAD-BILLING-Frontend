@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, DatePicker, Select, Row, Col, message } from 'antd';
+import { Input, Button, DatePicker, Select, Row, Col, message } from 'antd';
 import { Formik, Field, Form as FormikForm } from 'formik';
 import * as Yup from 'yup';
 import moment from 'moment';
@@ -65,14 +65,14 @@ const AddDebitnote = ({ onClose }) => {
       date: moment(values.date).format('YYYY-MM-DD'),
       amount: parseFloat(values.amount),
     };
-    
+
     dispatch(createDebitNote(formattedData));
     setSubmitting(false);
   };
 
   return (
     <div className="add-debitnote-form">
-      <h1 className="border-b-2 border-gray-300"></h1>
+      <hr className="border-b-2 border-gray-300"></hr>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -144,7 +144,7 @@ const AddDebitnote = ({ onClose }) => {
                         className={`w-full mt-1 ${errors.amount && touched.amount ? 'border-red-500' : ''}`}
                         max={selectedBillAmount}
                         value={values.amount}
-                        // disabled
+                      // disabled
                       />
                     )}
                   </Field>

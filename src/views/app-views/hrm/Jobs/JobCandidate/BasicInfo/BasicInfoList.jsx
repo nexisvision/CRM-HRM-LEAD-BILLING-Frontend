@@ -1,19 +1,15 @@
 import React, { useState } from "react";
-import { Card, Button, Row, Col, Modal, Typography } from "antd";
+import { Button, Row, Col, Modal, Typography } from "antd";
 import { DownloadOutlined, StarFilled, PlusOutlined } from "@ant-design/icons";
 import AddJobOnBoard from "./AddJobOnBoard";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 
 const BasicInfoList = () => {
 
   const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false);
 
-
-  const openAddJobOnBoard = () => {
-    setIsAddJobModalVisible(true);
-  };
 
   const closeAddJobModal = () => {
     setIsAddJobModalVisible(false);
@@ -32,12 +28,6 @@ const BasicInfoList = () => {
           </Button>
         </Col>
       </Row>
-      {/* <h1 className="text-lg font-bold mb-3">Basic Info</h1>
-    <Button type="primary" style={{ backgroundColor: "#66dd66", borderColor: "#66dd66" }} onClick={openAddJobOnBoard}>
-    
-  </Button> */}
-
-
       <Row gutter={[16, 16]}>
         <Col span={24}>
           <p className="mb-2"><strong>Phone:</strong> 1457896589</p>

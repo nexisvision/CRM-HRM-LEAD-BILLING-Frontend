@@ -26,15 +26,15 @@ const Demo = () => {
 		return arr
 	}
 	return (
-		<DonutChartWidget 
-			series={sessionData} 
-			labels={sessionLabels} 
+		<DonutChartWidget
+			series={sessionData}
+			labels={sessionLabels}
 			title="Sessions Device"
-			customOptions={{colors: sessionColor}}
+			customOptions={{ colors: sessionColor }}
 			extra={
-				<Row  justify="center">
+				<Row justify="center">
 					<Col xs={20} sm={20} md={20} lg={24}>
-						<div className="mt-4 mx-auto" style={{maxWidth: 200}}>
+						<div className="mt-4 mx-auto" style={{ maxWidth: 200 }}>
 							{jointSessionData().map(elm => (
 								<Flex alignItems="center" justifyContent="space-between" className="mb-3" key={elm.label}>
 									<div>
@@ -52,7 +52,7 @@ const Demo = () => {
 	)
 }
 
-const  usageStr = `import React from 'react'
+const usageStr = `import React from 'react'
 import DonutChartWidget from 'components/shared-components/DonutChartWidget'
 import Flex from 'components/shared-components/Flex'
 import { Card, Row, Col, Badge } from 'antd'
@@ -107,8 +107,8 @@ const DonutChartWidgetDemo = () => {
 		<div>
 			<h2>DonutChartWidget</h2>
 			<div className="mt-4">
-				<ComponentIntro name="Location" desc="src/components/shared-components/DonutChartWidget.js"/>
-				<ComponentIntro name="Description" desc="Display dounut chart in a widget"/>
+				<ComponentIntro name="Location" desc="src/components/shared-components/DonutChartWidget.js" />
+				<ComponentIntro name="Description" desc="Display dounut chart in a widget" />
 				<div className="mt-4">
 					<Card title="Example">
 						<Demo />

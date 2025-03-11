@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Modal, Form, Input, Upload, Button, message, Select, Menu,  Dropdown } from 'antd';
+import { Avatar, Modal, Input, Upload, Button, message, Select, Menu, Dropdown } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import {
 	EditOutlined,
-	SettingOutlined,
-	ShopOutlined,
-	QuestionCircleOutlined,
 	LogoutOutlined,
 	UserOutlined,
 	UploadOutlined,
@@ -19,7 +16,6 @@ import styled from '@emotion/styled';
 import { FONT_WEIGHT, MEDIA_QUERIES, SPACER } from 'constants/ThemeConstant';
 import EditCompany from 'views/app-views/company/EditCompany';
 import { Formik } from "formik";
-import * as Yup from "yup";
 import AddCountries from "views/app-views/setting/countries/AddCountries";
 import { getallcountries } from 'views/app-views/setting/countries/countriesreducer/countriesSlice';
 
@@ -137,20 +133,6 @@ const Name = styled.div`
 	line-height: 1.2;
 `;
 
-const Title = styled.span`
-	opacity: 0.8;
-	font-size: 12px;
-	line-height: 1.2;
-`;
-
-const validationSchema = Yup.object({
-	email: Yup.string().email('Invalid email').required('Email is required'),
-	firstName: Yup.string().required('First name is required'),
-	lastName: Yup.string().required('Last name is required'),
-	phone: Yup.string().required('Phone number is required'),
-	password: Yup.string().min(6, 'Password must be at least 6 characters')
-});
-
 const FormField = ({ label, name, type = "text", required, children, error }) => (
 	<div className="form-field">
 		<label>{label} {required && <span style={{ color: '#dc3545' }}>*</span>}</label>
@@ -178,7 +160,7 @@ export const NavProfile = ({ mode }) => {
 		const role = roles.find(r => r?.id === rolee)?.role_name;
 
 		setUserRole(role || "");
-		
+
 		setUserName(loggedInUser?.username || "");
 
 		if (loggedInUser?.profilePic) {
@@ -198,7 +180,8 @@ export const NavProfile = ({ mode }) => {
 	const handleSubmit = async (values, { setSubmitting }) => {
 		try {
 			const formData = new FormData();
-			
+
+			// Append basic fields
 			formData.append('id', loggedInUser?.id);
 			formData.append('firstName', values.firstName);
 			formData.append('lastName', values.lastName);
@@ -241,7 +224,7 @@ export const NavProfile = ({ mode }) => {
 					<span className="ml-2">Edit Profile</span>
 				</Flex>
 			</Menu.Item>
-			
+
 			<Menu.Item key="logout" onClick={() => dispatch(signOut())}>
 				<Flex alignItems="center">
 					<LogoutOutlined />
@@ -299,7 +282,7 @@ export const NavProfile = ({ mode }) => {
 							/>
 							<UserInfo>
 								<Name>{userName}</Name>
-								
+
 							</UserInfo>
 						</Profile>
 					</NavItem>

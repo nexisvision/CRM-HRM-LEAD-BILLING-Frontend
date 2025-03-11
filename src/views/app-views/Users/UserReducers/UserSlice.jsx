@@ -1,12 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./UserService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import axios from "axios";
 import { message } from "antd";
 import { env } from "configs/EnvironmentConfig";
 
-// Async thunk for adding user
+
 
 export const AddUserss = createAsyncThunk(
   "users/addtu",
@@ -20,7 +19,7 @@ export const AddUserss = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
+
 
 export const GetUsers = createAsyncThunk(
   "emp/getUsers", // action type
@@ -39,7 +38,7 @@ export const GetUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
+
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -52,7 +51,7 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
+
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -65,7 +64,7 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const Dleteusetr = createAsyncThunk(
   "users/Dleteusetreet",
   async (userId, thunkAPI) => {
@@ -91,15 +90,7 @@ export const Edituser = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const UserSlice = createSlice({
   name: "Users",

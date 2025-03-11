@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Chart from "react-apexcharts";
-import { COLORS} from 'constants/ChartConstant';
+import { COLORS } from 'constants/ChartConstant';
 
 export class Pie extends Component {
 	state = {
@@ -27,7 +27,7 @@ export class Pie extends Component {
 			<Chart
 				options={this.state.options}
 				series={this.state.series}
-				height= {300}
+				height={300}
 				type="pie"
 			/>
 		)

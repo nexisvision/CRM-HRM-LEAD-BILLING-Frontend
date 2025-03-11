@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Input, Button, DatePicker, Select, message, Row, Col, Upload, Tag } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { AddTasks, EditTaskss, GetTasks } from "../project/task/TaskReducer/TaskSlice";
+import { EditTaskss, GetTasks } from "../project/task/TaskReducer/TaskSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-import moment from "moment/moment";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
@@ -19,8 +16,6 @@ const { Option } = Select;
 const EditTask = ({ onClose, idd, projectId }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
-  const [isWithoutDueDate, setIsWithoutDueDate] = useState(false);
-  const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
   const [fileList, setFileList] = useState([]);
 
   const allloggeduserdata = useSelector((state) => state.user);
@@ -34,7 +29,7 @@ const EditTask = ({ onClose, idd, projectId }) => {
 
   useEffect(() => {
     dispatch(GetTasks(id))
-  }, [])
+  }, [dispatch, id])
 
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
@@ -52,7 +47,7 @@ const EditTask = ({ onClose, idd, projectId }) => {
 
   const taskadata = useSelector((state) => state.Tasks.Tasks);
 
-  const fndatatask = taskadata?.data || [];
+  const fndatatask = React.useMemo(() => taskadata?.data || [], [taskadata?.data]);
 
   const [initialValues, setInitialValues] = useState({
     taskName: "",

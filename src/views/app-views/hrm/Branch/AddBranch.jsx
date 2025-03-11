@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
-import { Input, Button, Row, Col, message, Modal, Select } from 'antd';
+import { Input, Button, Row, Col, Modal, Select } from 'antd';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddBranchs, getBranch } from './BranchReducer/BranchSlice';
 import { GetUsers } from '../../Users/UserReducers/UserSlice';
-import { PlusOutlined } from '@ant-design/icons';
 import AddUser from '../../Users/user-list/AddUser';
 
 const { Option } = Select;
@@ -25,12 +23,8 @@ const validationSchema = Yup.object().shape({
 });
 
 const AddBranch = ({ onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [selectedBranch, setSelectedBranch] = useState(null);
   const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false);
-  const [managers, setManagers] = useState([]);
-
   const alldata = useSelector((state) => state.Users.Users?.data || []);
 
   useEffect(() => {
@@ -108,7 +102,6 @@ const AddBranch = ({ onClose }) => {
                           setFieldValue("branchManager", value);
                           setFieldValue("department", "");
                           setFieldValue("designation", "");
-                          setSelectedBranch(value);
                         }}
                       >
                         {Array.isArray(alldata) && alldata.length > 0 ? (
@@ -167,11 +160,6 @@ const AddBranch = ({ onClose }) => {
           onClose={() => {
             setIsAddUserModalVisible(false);
             dispatch(GetUsers())
-              .then((response) => {
-                if (response.payload?.data) {
-                  setManagers(response.payload.data);
-                }
-              });
           }}
         />
       </Modal>

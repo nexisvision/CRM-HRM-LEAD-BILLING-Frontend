@@ -26,14 +26,14 @@ export class AvatarComponent extends Component {
         }
       `}>
         <Row gutter={16} type="flex">
-					<Col sm={24} md={24} lg={12}>
-						<DemoCard code={BasicMd}><Basic /></DemoCard>
-						<DemoCard code={DynamicMd}><Dynamic /></DemoCard>
-					</Col>
-					<Col sm={24} md={24} lg={12}>
-						<DemoCard code={TypeMd}><Type /></DemoCard>
-						<DemoCard code={BadgeMd}><Badge /></DemoCard>
-					</Col>
+          <Col sm={24} md={24} lg={12}>
+            <DemoCard code={BasicMd}><Basic /></DemoCard>
+            <DemoCard code={DynamicMd}><Dynamic /></DemoCard>
+          </Col>
+          <Col sm={24} md={24} lg={12}>
+            <DemoCard code={TypeMd}><Type /></DemoCard>
+            <DemoCard code={BadgeMd}><Badge /></DemoCard>
+          </Col>
         </Row>
         <ApiContainer code={IndexMd} />
       </div>

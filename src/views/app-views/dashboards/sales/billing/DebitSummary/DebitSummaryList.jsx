@@ -1,20 +1,13 @@
 import React, { useState } from 'react';
-import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
+import { Card, Table, Menu, Col, message, Button } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import userData from '../../../../../../assets/data/user-list.data.json';
 import OrderListData from '../../../../../../assets/data/order-list.data.json';
 
-
 function DebitSummaryList() {
-
-    const [users, setUsers] = useState(userData);
     const [list, setList] = useState(OrderListData);
-    const [isEditInvoiceModalVisible, setIsEditInvoiceModalVisible] = useState(false);
-    const openEditInvoiceModal = () => {
-        setIsEditInvoiceModalVisible(true);
-    };
+
     const deleteUser = (userId) => {
         setList(list.filter((item) => item.id !== userId));
         message.success({ content: `Deleted list ${userId}`, duration: 2 });
@@ -28,7 +21,6 @@ function DebitSummaryList() {
                         type=""
                         className=""
                         icon={<EditOutlined />}
-                        onClick={openEditInvoiceModal}
                         size="small"
                     >
                         <span className="">Edit</span>
@@ -50,8 +42,6 @@ function DebitSummaryList() {
             </Menu.Item>
         </Menu>
     );
-
-
 
     const billTable = [
         {
@@ -86,10 +76,8 @@ function DebitSummaryList() {
         },
     ];
 
-
     return (
         <>
-        
             <Card bodyStyle={{ padding: '-3px' }}>
                 <Col span={24}>
                     <h4 className='font-medium'>Debit Note Summary</h4>
@@ -101,7 +89,6 @@ function DebitSummaryList() {
                         rowKey="id"
                     />
                 </div>
-                
             </Card>
         </>
     )

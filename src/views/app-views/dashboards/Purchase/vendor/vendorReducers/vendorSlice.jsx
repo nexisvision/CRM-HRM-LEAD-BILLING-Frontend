@@ -1,10 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./vendorService";
-import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
-// Async thunk for adding user
+
 
 export const vendordataeaddd = createAsyncThunk(
   "users/vendordataeaddd",
@@ -17,7 +15,7 @@ export const vendordataeaddd = createAsyncThunk(
     }
   }
 );
-// Async thunk for user login
+
 
 export const vendordataedata = createAsyncThunk(
   "emp/vendordataedata",
@@ -32,7 +30,7 @@ export const vendordataedata = createAsyncThunk(
 );
 
 
-// Async thunk for deleting a user
+
 export const vendordatadeletee = createAsyncThunk(
   "users/vendordatadeletee",
   async (userId, thunkAPI) => {
@@ -60,15 +58,7 @@ export const vendordataeditt = createAsyncThunk(
 
 // Async thunk for updating a user
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const ContractSlice = createSlice({
   name: "vendors",
@@ -171,5 +161,5 @@ const ContractSlice = createSlice({
 });
 
 export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-ContractSlice.actions;
+  ContractSlice.actions;
 export default ContractSlice.reducer;

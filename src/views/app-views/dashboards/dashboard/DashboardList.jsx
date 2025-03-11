@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "react-circular-progressbar/dist/styles.css";
-import { TfiMenuAlt } from "react-icons/tfi";
-import { FaLayerGroup } from "react-icons/fa";
 import { GoPeople } from "react-icons/go";
-import { IoCartOutline } from "react-icons/io5";
 import { CiTrophy } from "react-icons/ci";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import RecentOrderGraph from "../../../../components/RecentOrderGraph.jsx";
@@ -11,22 +8,19 @@ import DateRangeFilter from "../../../../components/DateRangeFilter.jsx";
 import TicketList from "../../../../components/TicketTableList.jsx";
 import RegistionTable from "../../../../components/RegistrationTableList.jsx";
 import { Pie } from "react-chartjs-2";
-import { Table, Row, Col, Card, Button,Empty,Badge, Select } from "antd";
+import { Table, Row, Col, Card, Empty, Badge, Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice.jsx";
 import { GetPlan } from "views/app-views/plan/PlanReducers/PlanSlice.jsx";
 import { getAllTicket } from "views/app-views/pages/customersupports/ticket/TicketReducer/TicketSlice.jsx";
 import { getsubplandata } from "views/app-views/subscribeduserplans/subplanReducer/subplanSlice.jsx";
 import { } from "antd";
-import SubscribedUserPlansList from "views/app-views/subscribeduserplans/SubscribedUserPlansList.jsx";
 import Flex from 'components/shared-components/Flex'; // Use your existing Flex component
 import DonutChartWidget from 'components/shared-components/DonutChartWidget';
 import { getallcountries } from 'views/app-views/setting/countries/countriesreducer/countriesSlice';
 import dayjs from "dayjs";
 import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import utils from "utils";
-import { DownloadOutlined } from '@ant-design/icons';
-import { Bar } from 'react-chartjs-2';
 import ReactApexChart from 'react-apexcharts';
 import moment from 'moment';
 
@@ -57,7 +51,7 @@ const MonthlyRevenueCard = () => {
       });
 
       const monthlyCounts = monthsInYear.map(monthYear => {
-        return subclients.filter(client => 
+        return subclients.filter(client =>
           moment(client.createdAt).format('YYYY') === selectedYear.toString() &&
           moment(client.createdAt).format('MMM YYYY') === monthYear
         ).length;
@@ -69,9 +63,9 @@ const MonthlyRevenueCard = () => {
       const currentMonth = moment().month();
       const currentMonthCount = monthlyCounts[currentMonth];
       const previousMonthCount = monthlyCounts[currentMonth - 1] || 0;
-      
-      const growth = previousMonthCount !== 0 
-        ? ((currentMonthCount - previousMonthCount) / previousMonthCount) * 100 
+
+      const growth = previousMonthCount !== 0
+        ? ((currentMonthCount - previousMonthCount) / previousMonthCount) * 100
         : 0;
       setGrowthPercentage(growth.toFixed(1));
 
@@ -131,7 +125,7 @@ const MonthlyRevenueCard = () => {
       },
     },
     xaxis: {
-      categories: [...Array(12)].map((_, i) => 
+      categories: [...Array(12)].map((_, i) =>
         moment().month(i).format('MMM')
       ),
       axisBorder: {
@@ -167,7 +161,7 @@ const MonthlyRevenueCard = () => {
           colors: '#64748b',
           fontSize: '12px'
         },
-        formatter: function(val) {
+        formatter: function (val) {
           return val.toFixed(1);
         }
       }
@@ -232,7 +226,7 @@ const MonthlyRevenueCard = () => {
           ) : (
             <ReactApexChart
               options={chartOptions}
-              series={[{ 
+              series={[{
                 name: 'Clients',
                 data: chartData
               }]}
@@ -251,7 +245,6 @@ const DashboardList = () => {
   const [clientdata, setclientdata] = useState("");
   const [plan, setPlan] = useState("");
   const [users, setUsers] = useState([]);
-  const planSales = useSelector((state) => state?.Plan?.planSales || []);
   const plans = useSelector((state) => state?.Plan?.Plan || []);
 
   useEffect(() => {
@@ -268,26 +261,25 @@ const DashboardList = () => {
 
 
   const planNames = fnddataplan?.map((plan) => plan.name) || [];
-const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
+  const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
 
   const allticket = useSelector((state) => state.Ticket);
   const fnddataticket = allticket.Ticket.data;
   const subscriptions = useSelector((state) => state?.subplan?.subplan?.data || []);
 
-  
-  const alldatas = useSelector((state) => state.subplan);
-  const fnddtat = alldatas.subplan.data || [];
 
+  const alldatas = useSelector((state) => state.subplan);
+  const fnddtat = useMemo(() => alldatas.subplan.data || [], [alldatas.subplan.data]);
 
   useEffect(() => {
     dispatch(getsubplandata());
-  }, []);
+  }, [dispatch]);
 
 
   useEffect(() => {
     dispatch(GetPlan());
     dispatch(ClientData());
-  }, []);
+  }, [dispatch]);
 
 
   const allclient = useSelector((state) => state.ClientData);
@@ -306,55 +298,57 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
 
 
   useEffect(() => {
-    setTasks(fnddataticket);
-  }, [fnddataticket]);
-
-  useEffect(() => {
     dispatch(getsubplandata());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(getallcountries());
   }, [dispatch]);
 
-    const ticketStatusColors = {
-      'Low': '#22c55e',    // Green for low priority
-      'Medium': '#f97316',  // Orange for medium priority
-      'High': '#ef4444',    // Red for high priority
-      'Unknown': '#94a3b8'  // Gray for unknown/undefined priority
-    };
-    
-    const calculateTicketStatusData = () => {
-      if (!fnddataticket || !Array.isArray(fnddataticket)) {
-        return {
-          sessionData: [],
-          sessionLabels: [],
-          conbinedSessionData: []
-        };
-      }
-  
-      const statusCounts = fnddataticket.reduce((acc, ticket) => {
-        const priority = (ticket.priority || 'Unknown').charAt(0).toUpperCase() + 
-                        (ticket.priority || 'Unknown').slice(1).toLowerCase();
-        acc[priority] = (acc[priority] || 0) + 1;
-        return acc;
-      }, {});
+  // Update the ticketStatusColors definition
+  const ticketStatusColors = {
+    'Low': '#22c55e',    // Green for low priority
+    'Medium': '#f97316',  // Orange for medium priority
+    'High': '#ef4444',    // Red for high priority
+    'Unknown': '#94a3b8'  // Gray for unknown/undefined priority
+  };
 
-      const sessionLabels = Object.keys(statusCounts);
-      const sessionData = Object.values(statusCounts);
-      
-      const conbinedSessionData = sessionLabels.map((label) => ({
-        label: label,
-        data: statusCounts[label],
-        color: ticketStatusColors[label]
-      }));
-
+  // Calculate ticket status data
+  const calculateTicketStatusData = () => {
+    if (!fnddataticket || !Array.isArray(fnddataticket)) {
       return {
-        sessionData,
-        sessionLabels,
-        conbinedSessionData
+        sessionData: [],
+        sessionLabels: [],
+        conbinedSessionData: []
       };
+    }
+
+    // Count tickets by priority and ensure correct color mapping
+    const statusCounts = fnddataticket.reduce((acc, ticket) => {
+      // Convert priority to proper case to match our color mapping
+      const priority = (ticket.priority || 'Unknown').charAt(0).toUpperCase() +
+        (ticket.priority || 'Unknown').slice(1).toLowerCase();
+      acc[priority] = (acc[priority] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Create arrays for chart data
+    const sessionLabels = Object.keys(statusCounts);
+    const sessionData = Object.values(statusCounts);
+
+    // Create combined data for legend with correct colors
+    const conbinedSessionData = sessionLabels.map((label) => ({
+      label: label,
+      data: statusCounts[label],
+      color: ticketStatusColors[label]
+    }));
+
+    return {
+      sessionData,
+      sessionLabels,
+      conbinedSessionData
     };
+  };
 
   // Get the calculated data
   const { sessionData, sessionLabels, conbinedSessionData } = calculateTicketStatusData();
@@ -367,11 +361,10 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
   useEffect(() => {
     const datalength = fnddataplan?.length; // Getting the length of the array
     setPlan(datalength); // Storing only the length of the array
-  }, [fnddataclint]);
+  }, [fnddataplan]); // Fix dependency to match the data being used
 
 
   const tableColumns = [
-   
     {
       title: "Plan Name",
       dataIndex: "plan_id",
@@ -386,7 +379,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
       dataIndex: "client_id",
       render: (client_id) => {
         const client = fndclient.find((c) => c.id === client_id);
-        return client ? client.username : "Unknown Client"; // Display the client name or a fallback
+        return client ? client.username : "Unknown Client";
       },
     },
 
@@ -423,7 +416,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "start_date"),
     },
-    
+
     {
       title: "End Date",
       dataIndex: "end_date",
@@ -433,36 +426,9 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
       sorter: (a, b) => utils.antdTableSorter(a, b, "end_date"),
 
     },
-    
+
   ];
 
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      task: "March Hare moved.",
-      status: "To Do",
-      dueDate: "Sun 06 Oct 2024",
-    },
-    {
-      id: 2,
-      task: "This seemed to be.",
-      status: "Doing",
-      dueDate: "Fri 28 Jun 2024",
-    },
-    {
-      id: 3,
-      task: "Mock Turtle, and.",
-      status: "Doing",
-      dueDate: "Fri 11 Oct 2024",
-    },
-    {
-      id: 4,
-      task: "The moment Alice.",
-      status: "Doing",
-      dueDate: "Wed 14 Feb 2024",
-    },
-  ]);
-  
 
   const chartData = {
     labels: planNames, // Dynamically setting labels
@@ -475,11 +441,12 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
     ],
   };
 
- 
+
 
   const calculateRegionDistribution = () => {
     if (!fnddataclint || !Array.isArray(fnddataclint)) return [];
-    
+
+    // Count companies by state
     const stateCount = fnddataclint.reduce((acc, company) => {
       const state = company.state || 'Unknown';
       acc[state] = (acc[state] || 0) + 1;
@@ -496,14 +463,8 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
     return distribution.sort((a, b) => b.percentage - a.percentage);
   };
 
-  const calculateTotalPlanAmount = () => {
-    if (!fnddataplan || !Array.isArray(fnddataplan)) return 0;
-    
-    return fnddataplan.reduce((total, plan) => {
-      const price = parseFloat(plan.price) || 0;
-      return total + price;
-    }, 0);
-  };
+
+  // Calculate plan sales statistics
   const calculatePlanStats = () => {
     if (!plans.length || !subscriptions.length) return {
       totalSales: 0,
@@ -534,12 +495,12 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
     <div className="p-2 bg-gray-50">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
-     
+
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         {/* Yearly Revenue Card */}
-        
+
 
         {/* Plan Card */}
         <div className="bg-white p-6 rounded-lg shadow">
@@ -550,7 +511,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
             </span>
             <div className="flex flex-col">
               <span className="text-green-500 flex items-center font-bold text-lg">
-                  {(planStats.totalSales * 0.01).toFixed(2)}%
+                {(planStats.totalSales * 0.01).toFixed(2)}%
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                   <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
                 </svg>
@@ -608,7 +569,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
           <p className="text-gray-500 text-sm mt-2">Compare to last year (2019)</p>
         </div>
       </div>
-    
+
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-6">
         <div class="bg-white p-6 rounded-lg shadow flex justify-between items-center">
           <div class="flex space-x-4 items-center">
@@ -664,7 +625,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
           </div>
         </div>
       </div>
-      
+
       <Row gutter={[24, 32]}>
         <Col xs={24} sm={24} md={8} lg={8} xl={8}>
           <div
@@ -731,7 +692,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
           <div className="bg-white rounded-lg shadow">
             {sessionData.length > 0 ? (
-              <DonutChartWidget 
+              <DonutChartWidget
                 series={sessionData}
                 labels={sessionLabels}
                 title="Ticket Priority"
@@ -745,7 +706,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
                 extra={
                   <Row justify="center">
                     <Col xs={20} sm={20} md={20} lg={24}>
-                      <div className="mt-4 mx-auto" style={{maxWidth: 200}}>
+                      <div className="mt-4 mx-auto" style={{ maxWidth: 200 }}>
                         {conbinedSessionData.map(elm => (
                           <Flex alignItems="center" justifyContent="space-between" className="mb-3" key={elm.label}>
                             <Flex gap={5}>
@@ -761,10 +722,10 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
                 }
               />
             ) : (
-                  <div className="text-center p-4">
-                    <p className="text-gray-500">Ticket Priority Not Found</p>
-                    <p className="text-sm text-gray-400">No ticket priority data is currently available</p>
-                  </div>
+              <div className="text-center p-4">
+                <p className="text-gray-500">Ticket Priority Not Found</p>
+                <p className="text-sm text-gray-400">No ticket priority data is currently available</p>
+              </div>
             )}
           </div>
         </Col>
@@ -778,9 +739,8 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
                 {calculateRegionDistribution().map((item, index) => (
                   <div key={item.state} className="flex items-center justify-between text-lg">
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${
-                        ['bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500', 'bg-purple-500', 'bg-pink-500'][index % 6]
-                      }`}>
+                      <div className={`w-3 h-3 rounded-full ${['bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500', 'bg-purple-500', 'bg-pink-500'][index % 6]
+                        }`}>
                       </div>
                       <span className="text-gray-600">{item.state}</span>
                     </div>
@@ -828,7 +788,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
           </div>
         )}
       </div>
-      
+
       <div className="container mx-auto p-4 bg-white  rounded-lg shadow mt-8">
         <h1 className="text-xl font-medium text-black">Subscribed User Plans</h1>
         <div className="table-responsive">
@@ -837,7 +797,12 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
             dataSource={users}
             rowKey="id"
             scroll={{ x: 1200 }}
-         
+          // rowSelection={{
+          // 	selectedRowKeys: selectedRowKeys,
+          // 	type: 'checkbox',
+          // 	preserveSelectedRowKeys: false,
+          // 	...rowSelection,
+          // }}
           />
         </div>
       </div>

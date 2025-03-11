@@ -1,11 +1,11 @@
 import React from 'react';
-import { Table, Button, Dropdown, Menu, Space, Typography, Empty } from 'antd';
-import { EditOutlined, DeleteOutlined, DownOutlined, EyeOutlined } from '@ant-design/icons';
+import { Table, Button, Typography, Empty } from 'antd';
+import { EyeOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
 
 const ParticularDepartment = () => {
-  const data = []; // Empty data for the table
+  const data = [];
 
   const columns = [
     {
@@ -57,7 +57,7 @@ const ParticularDepartment = () => {
         <Title level={4}>
           ID : 8 | Logistics
         </Title>
-        
+
       </div>
 
       {/* Subtitle Section */}
@@ -68,7 +68,7 @@ const ParticularDepartment = () => {
       {/* Actions Section */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
         <Button type="primary">Download CSV</Button>
-       
+
       </div>
 
       {/* Table Section */}

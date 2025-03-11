@@ -39,7 +39,7 @@ function ActivityList() {
 
   useEffect(() => {
     GetActriv(id);
-  }, []);
+  }, [id]);
 
   const timestamp = "2025-01-03T11:02:10.000Z";
   const date = new Date(timestamp);

@@ -128,7 +128,7 @@ const logData = [
 		date: '7 Jan 2021',
 		updateContent: [
 			'[New] Dark mode',
-			'[Update] Dependencies Update' ,
+			'[Update] Dependencies Update',
 			'[Breaking Change] Switch scss to less'
 		]
 	},
@@ -201,16 +201,16 @@ const Changelog = () => {
 				logData.map(elm => (
 					<Log key={elm.version} version={`v${elm.version}`} date={elm.date}>
 						{
-							elm.updateContent.length > 0 ? 
-							<ul>
-								{
-									elm.updateContent.map((item, i) => (
-										<li key={i}>{item}</li>
-									))
-								}
-							</ul>
-							:
-							null
+							elm.updateContent.length > 0 ?
+								<ul>
+									{
+										elm.updateContent.map((item, i) => (
+											<li key={i}>{item}</li>
+										))
+									}
+								</ul>
+								:
+								null
 						}
 					</Log>
 				))

@@ -1,4 +1,4 @@
-import {    message, Row, Typography } from 'antd';
+import { message, Row, Typography } from 'antd';
 import React, { useEffect } from 'react';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
@@ -34,19 +34,9 @@ const ViewMeeting = ({ visible, onClose, meetid }) => {
     const fndata = alladatas;
     const alladata = fndata?.find((item) => item.id === meetid);
 
-    // Handle copying meeting link
-    const handleCopyLink = () => {
-        if (alladata?.meeting_link) {
-            navigator.clipboard.writeText(alladata.meeting_link);
-            message.success('Meeting link copied to clipboard!');
-        } else {
-            message.warning('No meeting link available');
-        }
-    };
-
     return (
         <div>
-            <h1 className='border-b border-gray-300 pb-2 '></h1>
+            <hr className='border-b border-gray-300 pb-2 '></hr>
             <Row style={rowStyle} className='mt-2'>
                 <Text style={labelStyle}>Title</Text>
                 <Text style={valueStyle}>{alladata?.title}</Text>
@@ -78,18 +68,18 @@ const ViewMeeting = ({ visible, onClose, meetid }) => {
                 </Text>
             </Row>
 
-                <Row style={rowStyle}>
-                    <Text style={labelStyle}>Meeting Link</Text>
-                    <Text 
-                        style={{...valueStyle, cursor: 'pointer', color: '#1890ff'}}
-                        onClick={() => {
-                            navigator.clipboard.writeText(alladata?.meetingLink);
-                            message.success('Meeting link copied to clipboard!');
-                        }}
-                    >
-                        {alladata?.meetingLink}
-                    </Text>
-                </Row>
+            <Row style={rowStyle}>
+                <Text style={labelStyle}>Meeting Link</Text>
+                <Text
+                    style={{ ...valueStyle, cursor: 'pointer', color: '#1890ff' }}
+                    onClick={() => {
+                        navigator.clipboard.writeText(alladata?.meetingLink);
+                        message.success('Meeting link copied to clipboard!');
+                    }}
+                >
+                    {alladata?.meetingLink}
+                </Text>
+            </Row>
 
             <Row style={rowStyle}>
                 <Text style={labelStyle}>Description</Text>

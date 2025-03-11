@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, Avatar, Card } from 'antd';
+import { List, Card } from 'antd';
 
 const activities = [
   {

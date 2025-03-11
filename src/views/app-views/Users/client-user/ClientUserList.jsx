@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Menu, Table, Tag, Button,Modal,Select,Input } from 'antd';
-import { EyeOutlined, DeleteOutlined, MailOutlined,FileExcelOutlined,PlusOutlined,SearchOutlined } from '@ant-design/icons';
+import { Card, Menu, Table, Tag, Button, Modal, Select, Input } from 'antd';
+import { EyeOutlined, DeleteOutlined, MailOutlined, FileExcelOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { RiLockPasswordLine } from "react-icons/ri";
 import OrderListData from 'assets/data/order-list.data.json';
 import { utils, writeFile } from "xlsx";
@@ -224,7 +224,7 @@ const ClientUserList = () => {
 
   return (
     <Card bodyStyle={{ 'padding': '0px' }}>
-         <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
@@ -256,13 +256,13 @@ const ClientUserList = () => {
             New
           </Button>
           <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel} // Call export function when the button is clicked
+            block
+          >
+            Export All
+          </Button>
         </Flex>
       </Flex>
       <div className="table-responsive">
@@ -275,7 +275,7 @@ const ClientUserList = () => {
         onCancel={closeAddClientUserModal}
         footer={null}
         width={1100}
-        // className="mt-[-70px]"
+      // className="mt-[-70px]"
       >
         <AddClientUser onClose={closeAddClientUserModal} />
       </Modal>

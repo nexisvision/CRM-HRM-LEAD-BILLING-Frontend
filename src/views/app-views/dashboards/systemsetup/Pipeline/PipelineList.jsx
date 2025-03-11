@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Card, Table, Input, Button, Modal, message } from "antd";
+import { Card, Table, Button, Modal, message } from "antd";
 import {
-  SearchOutlined,
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
@@ -13,22 +12,15 @@ import EditPipeLine from "./EditPipeLine";
 import { useDispatch, useSelector } from "react-redux";
 import { Deletepip, GetPip } from "./PiplineReducer/piplineSlice";
 
-
 const PipelineList = () => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [isAddPipeLineModalVisible, setIsAddPipeLineModalVisible] =
     useState(false);
   const [isEditPipeLineModalVisible, setIsEditPipeLineModalVisible] =
     useState(false);
-
   const [idd, setIdd] = useState("");
-
   const Allpipline = useSelector((state) => state.Piplines);
-  const fnddatas = Allpipline?.Piplines?.data || [];
-
-  const logged = useSelector((state)=>state.user.loggedInUser.username)
-
+  const fnddatas = React.useMemo(() => Allpipline?.Piplines?.data || [], [Allpipline?.Piplines?.data]);
   const dispatch = useDispatch();
 
   const openAddPipeLineModal = () => {
@@ -59,30 +51,27 @@ const PipelineList = () => {
     });
   };
 
-   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-   const roles = useSelector((state) => state.role?.role?.data);
-   const roleData = roles?.find(role => role.id === roleId);
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
 
-   const whorole = roleData.role_name;
 
-   const parsedPermissions = Array.isArray(roleData?.permissions)
-   ? roleData.permissions
-   : typeof roleData?.permissions === 'string'
-   ? JSON.parse(roleData.permissions)
-   : [];
- 
-   let allpermisson;  
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
 
-   if (parsedPermissions["extra-hrm-trainingSetup"] && parsedPermissions["extra-hrm-trainingSetup"][0]?.permissions) {
-     allpermisson = parsedPermissions["extra-hrm-trainingSetup"][0].permissions;
-   
-   } else {
-   }
-   
-   const canCreateClient = allpermisson?.includes('create');
-   const canEditClient = allpermisson?.includes('edit');
-   const canDeleteClient = allpermisson?.includes('delete');
-   const canViewClient = allpermisson?.includes('view');
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-trainingSetup"] && parsedPermissions["extra-hrm-trainingSetup"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-trainingSetup"][0].permissions;
+    console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    console.log('extra-hrm-trainingSetup is not available');
+  }
+
 
   const tableColumns = [
     {
@@ -112,21 +101,6 @@ const PipelineList = () => {
     },
   ];
 
-  const onSearch = (e) => {
-    const value = e.currentTarget.value.toLowerCase();
-    
-    if (!value) {
-      setFilteredData(fnddatas); 
-      return;
-    }
-
-    const filtered = fnddatas.filter((item) => 
-      item.pipeline_name?.toString().toLowerCase().includes(value)
-    );
-    
-    setFilteredData(filtered);
-    setSelectedRowKeys([]);
-  };
 
   useEffect(() => {
     dispatch(GetPip());
@@ -152,7 +126,7 @@ const PipelineList = () => {
             <Button type="primary" onClick={openAddPipeLineModal}>
               <PlusOutlined />
             </Button>
-            
+
           </div>
         </Flex>
       </div>
@@ -163,12 +137,12 @@ const PipelineList = () => {
           mobileFlex={false}
           className="flex flex-wrap mt-2 gap-4"
         >
-         
+
         </Flex>
         <div className="table-responsive">
           <Table
             columns={tableColumns}
-            dataSource={filteredData} 
+            dataSource={filteredData}
             rowKey="id"
           />
         </div>

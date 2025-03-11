@@ -10,19 +10,19 @@ const Demo = () => {
 	return (
 		<div className="d-flex align-items-center">
 			<div className="mr-5">
-				<CustomStatistic size={'lg'} value={'1,128'} title={'Active Users'}/>
+				<CustomStatistic size={'lg'} value={'1,128'} title={'Active Users'} />
 			</div>
 			<div className="mr-5">
-				<CustomStatistic size={'md'} value={'1,128'} title={'Active Users'}/>
+				<CustomStatistic size={'md'} value={'1,128'} title={'Active Users'} />
 			</div>
 			<div>
-				<CustomStatistic size={'sm'} value={'1,128'} title={'Active Users'}/>
+				<CustomStatistic size={'sm'} value={'1,128'} title={'Active Users'} />
 			</div>
 		</div>
 	)
 }
 
-const  usageStr = `import React from 'react'
+const usageStr = `import React from 'react'
 import CustomStatistic from 'components/shared-components/CustomStatistic'
 
 export default const Demo = () =>  (
@@ -44,8 +44,8 @@ const CustomStatisticDemo = () => {
 		<div>
 			<h2>CustomStatistic</h2>
 			<div className="mt-4">
-				<ComponentIntro name="Location" desc="src/components/shared-components/CustomStatistic.js"/>
-				<ComponentIntro name="Description" desc="highlight data with description"/>
+				<ComponentIntro name="Location" desc="src/components/shared-components/CustomStatistic.js" />
+				<ComponentIntro name="Description" desc="highlight data with description" />
 				<div className="mt-4">
 					<Card title="Example">
 						<Demo />

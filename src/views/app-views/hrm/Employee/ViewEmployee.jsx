@@ -1,26 +1,15 @@
 import React, { useEffect } from 'react';
-import { Avatar, Row, Col, Typography, Divider, Tag } from 'antd';
+import { Avatar, Row, Col, Typography, Divider } from 'antd';
 import {
   UserOutlined,
   BankOutlined,
   IdcardOutlined,
   MailOutlined,
   PhoneOutlined,
-  DollarOutlined,
-  TeamOutlined,
-  CalendarOutlined,
   EnvironmentOutlined,
-  BranchesOutlined,
-  BuildOutlined,
-  FileOutlined,
   SafetyCertificateOutlined,
-  ClockCircleOutlined,
   GlobalOutlined,
   NumberOutlined,
-  ShopOutlined,
-  AuditOutlined,
-  LockOutlined,
-  LinkOutlined
 } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { empdata } from './EmployeeReducers/EmployeeSlice';

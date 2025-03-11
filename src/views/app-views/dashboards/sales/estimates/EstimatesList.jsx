@@ -5,51 +5,36 @@ import {
   Table,
   Select,
   Input,
-  Row,
-  Col,
   Button,
-  Badge,
   Menu,
-  Tag,
   Modal,
-  message
+  message,
+  Dropdown,
 } from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
   FileExcelOutlined,
-  CopyOutlined,
   EditOutlined,
-  PlusCircleOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import AvatarStatus from "components/shared-components/AvatarStatus";
-import StatisticWidget from "components/shared-components/StatisticWidget";
-import { TiPinOutline } from "react-icons/ti";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
 import NumberFormat from "react-number-format";
 import dayjs from "dayjs";
-import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
-import { getallquotations, getquotationsById, deletequotations } from "../estimates/estimatesReducer/EstimatesSlice";
+import { getallquotations, deletequotations } from "../estimates/estimatesReducer/EstimatesSlice";
 import { utils, writeFile } from "xlsx";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
 import AddEstimates from "./AddEstimates";
 import EditEstimates from "./EditEstimates";
 import ViewEstimates from "./ViewEstimates";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 const { Option } = Select;
 const EstimatesList = () => {
-  const { salesquotations, loading, error } = useSelector((state) => state.estimate);
   const [list, setList] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const [selectedquotations, setSelectedquotations] = useState(null);
   const [isAddEstimatesModalVisible, setIsAddEstimatesModalVisible] =
     useState(false);
   const [isEditEstimatesModalVisible, setIsEditEstimatesModalVisible] =
@@ -65,13 +50,12 @@ const EstimatesList = () => {
 
   const customerData = useSelector((state) => state.customers);
   const fnddataCustomers = customerData.customers.data;
-
   useEffect(() => {
     dispatch(getallquotations());
-    dispatch(Getcus()); // Fetch customer data
-  }, []);
+    dispatch(Getcus());
+  }, [dispatch]);
 
-  const allsdata = useSelector((state)=>state.salesquotation.salesquotations)
+  const allsdata = useSelector((state) => state.salesquotation.salesquotations)
 
 
   useEffect(() => {
@@ -88,16 +72,18 @@ const EstimatesList = () => {
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
-    
+
+    // If no data or empty search, show all data
     if (!value || !allsdata) {
       setFilteredData(allsdata);
       return;
     }
-    
-    const filtered = allsdata.filter(estimate => 
+
+    // Filter the data based on Quotation Number
+    const filtered = allsdata.filter(estimate =>
       estimate.salesQuotationNumber?.toString().toLowerCase().includes(value)
     );
-    
+
     setFilteredData(filtered);
   };
 
@@ -126,8 +112,7 @@ const EstimatesList = () => {
   const EditFun = (id) => {
     openEditEstimatesModal();
     setIdd(id);
-    
-};
+  };
   const exportToExcel = () => {
     try {
       const ws = utils.json_to_sheet(filteredData);
@@ -151,70 +136,78 @@ const EstimatesList = () => {
     }
 
   };
-      
-                const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                const roles = useSelector((state) => state.role?.role?.data);
-                const roleData = roles?.find(role => role.id === roleId);
-            
-                const whorole = roleData.role_name;
-            
-                const parsedPermissions = Array.isArray(roleData?.permissions)
-                ? roleData.permissions
-                : typeof roleData?.permissions === 'string'
-                ? JSON.parse(roleData.permissions)
-                : [];
-              
-              
-                let allpermisson;  
-            
-                if (parsedPermissions["dashboards-sales-estimates"] && parsedPermissions["dashboards-sales-estimates"][0]?.permissions) {
-                  allpermisson = parsedPermissions["dashboards-sales-estimates"][0].permissions;
-                
-                } else {
-                }
-                
-                const canCreateClient = allpermisson?.includes('create');
-                const canEditClient = allpermisson?.includes('edit');
-                const canDeleteClient = allpermisson?.includes('delete');
-                const canViewClient = allpermisson?.includes('view');
-      
-
-  const dropdownMenu = (row) => (
-    <Menu>
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item onClick={() => {
-                              setSelectedQuotationId(row.id);
-                              openviewEstimatesModal();
-                          }}>
-            <Flex alignItems="center">
-                <EyeOutlined />
-                <span className="ml-2">View Details</span>
-            </Flex>
-        </Menu.Item>
-        ) : null}
-        
-        {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-           <Menu.Item onClick={() => EditFun(row.id)}>
-           <Flex alignItems="center">
-               <EditOutlined />
-               <span className="ml-2">Edit</span>
-           </Flex>
-       </Menu.Item>
-                      ) : null}
-        
-        
-        {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                        <Menu.Item>
-                        <Flex alignItems="center" onClick={() => DeleteFun(row.id)}>
-                          <DeleteOutlined />
-                          <span className="ml-2" >Delete</span>
-                        </Flex>
-                      </Menu.Item>
-                      ) : null}
 
 
-    </Menu>
-  );
+  //// permission
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+
+  let allpermisson;
+
+  if (parsedPermissions["dashboards-sales-estimates"] && parsedPermissions["dashboards-sales-estimates"][0]?.permissions) {
+    allpermisson = parsedPermissions["dashboards-sales-estimates"][0].permissions;
+    console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    console.log('dashboards-sales-estimates is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
+
+
+  const getDropdownItems = (row) => {
+    const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
+        key: 'view',
+        icon: <EyeOutlined />,
+        label: 'View Details',
+        onClick: () => {
+          setSelectedQuotationId(row.id);
+          openviewEstimatesModal();
+        }
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => EditFun(row.id)
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => DeleteFun(row.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
+
   const tableColumns = [
     {
       title: "Quotation Number",
@@ -254,7 +247,7 @@ const EstimatesList = () => {
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "created_by"),
     },
-   
+
     {
       title: "Customer",
       dataIndex: "customer",
@@ -268,14 +261,14 @@ const EstimatesList = () => {
         return customerA.localeCompare(customerB);
       },
     },
-   
+
     {
       title: "Category",
       dataIndex: "category",
       key: "category",
       sorter: (a, b) => utils.antdTableSorter(a, b, "category"),
     },
-   
+
     {
       title: "Amount",
       dataIndex: "total",
@@ -291,35 +284,42 @@ const EstimatesList = () => {
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "total"),
     },
-    
+
     {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
   ];
- 
-  const safeFilteredData = React.useMemo(() => {
-    if (!Array.isArray(filteredData)) {
-      console.warn('filteredData is not an array:', filteredData);
-      return [];
-    }
-    return filteredData;
-  }, [filteredData]);
 
   const handleCategoryChange = (value) => {
     setSelectedCategory(value);
-    
+
     if (value === 'All') {
       setFilteredData(allsdata);
       return;
     }
 
-    const filtered = allsdata.filter(item => 
+    const filtered = allsdata.filter(item =>
       item.category === value
     );
     setFilteredData(filtered);
@@ -327,17 +327,17 @@ const EstimatesList = () => {
 
   const getFilteredEstimates = () => {
     if (!filteredData) return [];
-    
+
     let filtered = filteredData;
 
     if (searchText) {
-      filtered = filtered.filter(item => 
+      filtered = filtered.filter(item =>
         item.salesQuotationNumber?.toString().toLowerCase().includes(searchText.toLowerCase())
       );
     }
 
     if (selectedCategory !== 'All') {
-      filtered = filtered.filter(item => 
+      filtered = filtered.filter(item =>
         item.category === selectedCategory
       );
     }
@@ -348,7 +348,7 @@ const EstimatesList = () => {
   return (
     <>
       <Card>
-       
+
         <Flex
           alignItems="center"
           justifyContent="space-between"
@@ -369,7 +369,7 @@ const EstimatesList = () => {
                 className="search-input"
               />
             </div>
-           
+
             <div className="mb-3">
               <Select
                 defaultValue="All"
@@ -388,49 +388,49 @@ const EstimatesList = () => {
             </div>
           </Flex>
           <Flex gap="7px" className="flex">
-        
 
-               {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                              <Button
-                                                                              type="primary"
-                                                                              className="flex items-center"
-                                                                              onClick={openAddEstimatesModal}
-                                                                            >
-                                                                              <PlusOutlined />
-                                                                              <span className="ml-2">New</span>
-                                                                            </Button>
-                                                                        ) : null}
+
+            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+              <Button
+                type="primary"
+                className="flex items-center"
+                onClick={openAddEstimatesModal}
+              >
+                <PlusOutlined />
+                <span className="ml-2">New</span>
+              </Button>
+            ) : null}
 
 
             <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+              type="primary"
+              icon={<FileExcelOutlined />}
+              onClick={exportToExcel} // Call export function when the button is clicked
+              block
+            >
+              Export All
+            </Button>
           </Flex>
         </Flex>
         <div className="table-responsive">
 
-            {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                              <Table
-                                                              columns={tableColumns}
-                                                              dataSource={getFilteredEstimates()}
-                                                              rowKey="id"
-                                                              scroll={{ x: 1200 }}
-                                                              pagination={{
-                                                                total: getFilteredEstimates().length,
-                                                                pageSize: 10,
-                                                                showSizeChanger: true,
-                                                                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                                                              }}
-                                                            />
-                                                              ) : null}
+          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Table
+              columns={tableColumns}
+              dataSource={getFilteredEstimates()}
+              rowKey="id"
+              scroll={{ x: 1200 }}
+              pagination={{
+                total: getFilteredEstimates().length,
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              }}
+            />
+          ) : null}
 
 
-        
+
         </div>
       </Card>
       <Card>
@@ -466,12 +466,35 @@ const EstimatesList = () => {
           className="mt-[-70px]"
         >
           {selectedQuotationId && (
-            <ViewEstimates 
-              quotationId={selectedQuotationId} 
-              onClose={closeViewEstimatesModal} 
+            <ViewEstimates
+              quotationId={selectedQuotationId}
+              onClose={closeViewEstimatesModal}
             />
           )}
         </Modal>
+        <style>{`
+          .ant-dropdown-menu {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            padding: 4px;
+          }
+          .ant-dropdown-menu-item {
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin: 2px 0;
+            transition: all 0.3s;
+          }
+          .ant-dropdown-menu-item:hover {
+            background-color: #f5f5f5;
+          }
+          .ant-dropdown-menu-item-danger:hover {
+            background-color: #fff1f0;
+          }
+          .ant-dropdown-menu-item .anticon {
+            font-size: 16px;
+            margin-right: 8px;
+          }
+        `}</style>
       </Card>
     </>
   );

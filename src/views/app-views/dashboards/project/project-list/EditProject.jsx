@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Input,
   Button,
@@ -9,7 +9,6 @@ import {
   Col,
   Modal,
 } from "antd";
-import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -18,7 +17,7 @@ import { Editpro, GetProject } from "./projectReducer/ProjectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-import { GetTagspro, AddTags } from "./tagReducer/TagSlice";
+import { GetTagspro } from "./tagReducer/TagSlice";
 import { PlusOutlined } from "@ant-design/icons";
 import { GetLable, AddLable } from "../../sales/LableReducer/LableSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
@@ -29,48 +28,29 @@ const { Option } = Select;
 
 const EditProject = ({ id, onClose }) => {
   const dispatch = useDispatch();
-
-
   const allloggeduser = useSelector((state) => state.user.loggedInUser.username)
-
-  const { currencies } = useSelector((state) => state.currencies);
-
-  const curr = currencies?.data || [];
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
-
-  const curren = curr?.filter((item) => item.created_by === allloggeduser);
-
   const AllLoggedData = useSelector((state) => state.user);
-
   const allempdata = useSelector((state) => state.Project);
   const AllEmployee = useSelector((state) => state.employee);
   const employeedata = AllEmployee.employee.data;
-
   const alluserdatas = useSelector((state) => state.Users);
   const fnadat = alluserdatas?.Users?.data;
-
   const fnd = fnadat?.filter((item) => item?.created_by === allloggeduser)
-
   const fnd2 = employeedata?.filter((item) => item?.created_by === allloggeduser)
-
   const AllLoggeddtaa = useSelector((state) => state.user);
-
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
-
   const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
   const [newStatus, setNewStatus] = useState("");
   const [statuses, setStatuses] = useState([]);
-
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
-
   const [newTag, setNewTag] = useState("");
   const [tags, setTags] = useState([]);
 
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies?.data;
-
   const getInitialCurrency = () => {
     if (fnddatass?.length > 0) {
       const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
@@ -85,7 +65,6 @@ const EditProject = ({ id, onClose }) => {
   const Allclient = useSelector((state) => state.ClientData);
   const clientdata = Allclient.ClientData.data;
 
-  const [selectedClientName, setSelectedClientName] = useState("");
 
   useEffect(() => {
     if (id && projectdata.length > 0) {
@@ -121,13 +100,6 @@ const EditProject = ({ id, onClose }) => {
         }
 
         const clientId = project.client || project.client_id;
-
-        if (clientdata && clientdata.length > 0) {
-          const clientInfo = clientdata.find(c => c.id === clientId);
-          if (clientInfo) {
-            setSelectedClientName(clientInfo.firstName || clientInfo.username || "Unnamed Client");
-          }
-        }
 
         setSingleEmp({
           ...project,
@@ -202,16 +174,14 @@ const EditProject = ({ id, onClose }) => {
   useEffect(() => {
     const lid = AllLoggeddtaa.loggedInUser.id;
     GetLable(lid);
-  }, []);
-
-  const fetchLables = async (lableType, setter) => {
+  }, [AllLoggeddtaa]);
+  const fetchLables = useCallback(async (lableType, setter) => {
     try {
       const lid = AllLoggedData.loggedInUser.id;
       const response = await dispatch(GetLable(lid));
       if (response.payload && response.payload.data) {
         const filteredLables = response.payload.data
           .filter((lable) => lable.lableType === lableType)
-
           .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
         setter(filteredLables);
       }
@@ -219,13 +189,13 @@ const EditProject = ({ id, onClose }) => {
       console.error(`Failed to fetch ${lableType}:`, error);
       message.error(`Failed to load ${lableType}`);
     }
-  };
+  }, [AllLoggedData.loggedInUser.id, dispatch]);
 
   useEffect(() => {
     fetchLables("tag", setTags);
     fetchLables("category", setCategories);
     fetchLables("status", setStatuses);
-  }, []);
+  }, [fetchLables]);
 
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
     if (!newValue.trim()) {
@@ -265,6 +235,8 @@ const EditProject = ({ id, onClose }) => {
             case "status":
               setStatuses(filteredLables);
               if (setFieldValue) setFieldValue("status", newValue.trim());
+              break;
+            default:
               break;
           }
         }
@@ -365,7 +337,7 @@ const EditProject = ({ id, onClose }) => {
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <>
             <Form className="formik-form" onSubmit={handleSubmit}>
-              <h2 className="mb-4 border-b pb-2 font-medium"></h2>
+              <hr className="mb-4 border-b pb-2 font-medium"></hr>
 
               <Row gutter={16}>
                 <Col span={24}>

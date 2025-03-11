@@ -30,6 +30,7 @@ const adddoc = async (payload) => {
         },
       }
     );
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -76,7 +77,9 @@ const editdoc = async (idd, formData) => {
 };
 
 
+
 const UserService = {
+
   getdoc,
   adddoc,
   deldoc,

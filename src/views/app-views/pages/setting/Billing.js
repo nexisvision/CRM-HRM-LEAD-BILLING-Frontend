@@ -34,9 +34,9 @@ const AddNewCardForm = ({ visible, onCreate, onCancel }) => {
           name="cardHolderName"
           rules={
             [
-              { 
+              {
                 require: true,
-                message: 'Please enter card holder name!' 
+                message: 'Please enter card holder name!'
               }
             ]
           }
@@ -49,9 +49,9 @@ const AddNewCardForm = ({ visible, onCreate, onCancel }) => {
           hasFeedback
           rules={
             [
-              { 
+              {
                 pattern: /(\d{4}[-. ]?){4}|\d{4}[-. ]?\d{6}[-. ]?\d{5}/g,
-                message: 'Please enter a valid credit card number!' 
+                message: 'Please enter a valid credit card number!'
               }
             ]
           }
@@ -65,9 +65,9 @@ const AddNewCardForm = ({ visible, onCreate, onCancel }) => {
               name="exp"
               rules={
                 [
-                  { 
+                  {
                     pattern: /^(0[1-9]|1[0-2])[- /.]\d{2}/,
-                    message: 'Please enter a valid date format!' 
+                    message: 'Please enter a valid date format!'
                   }
                 ]
               }
@@ -81,21 +81,21 @@ const AddNewCardForm = ({ visible, onCreate, onCancel }) => {
               name="cvv"
               rules={
                 [
-                  { 
+                  {
                     pattern: /^[0-9]{3,4}$/,
-                    message: 'Please enter a CVV code format!' 
+                    message: 'Please enter a CVV code format!'
                   }
                 ]
               }
             >
-              <Input 
+              <Input
                 suffix={
                   <Tooltip title="The last three digits printed on the back of the card">
                     <QuestionCircleOutlined className="cursor-pointer" />
                   </Tooltip>
-                } 
+                }
                 placeholder="000"
-                />
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -106,9 +106,9 @@ const AddNewCardForm = ({ visible, onCreate, onCancel }) => {
 
 export class Billing extends Component {
 
-	state = {
+  state = {
     selectedRowKeys: ["card-1"], // Check here to configure the default column
-    creditCards : [
+    creditCards: [
       {
         key: 'card-1',
         cardType: 'Visa',
@@ -179,8 +179,8 @@ export class Billing extends Component {
     })
   };
 
-	render() {
-		const { selectedRowKeys, creditCards, modalVisible } = this.state;
+  render() {
+    const { selectedRowKeys, creditCards, modalVisible } = this.state;
     const rowSelection = {
       selectedRowKeys,
       type: 'radio',
@@ -190,19 +190,19 @@ export class Billing extends Component {
     const locale = {
       emptyText: (
         <div className="text-center my-4">
-          <img src="/img/others/img-7.png" alt="Add credit card" style={{maxWidth: '90px'}}/>
+          <img src="/img/others/img-7.png" alt="Add credit card" style={{ maxWidth: '90px' }} />
           <h3 className="mt-3 font-weight-light">Please add a credit card!</h3>
         </div>
       )
     };
 
-		return (
-			<>
-				<h2 className="mb-4">Billing</h2>
-				<Table locale={locale} dataSource={creditCards} rowSelection={rowSelection} pagination={false}>
-					<Column 
-            title="Card type" 
-            key="cardType" 
+    return (
+      <>
+        <h2 className="mb-4">Billing</h2>
+        <Table locale={locale} dataSource={creditCards} rowSelection={rowSelection} pagination={false}>
+          <Column
+            title="Card type"
+            key="cardType"
             render={(text, record) => (
               <>
                 <img src={record.cardTypeImg} alt={record.cardType} />
@@ -210,36 +210,36 @@ export class Billing extends Component {
               </>
             )}
           />
-					<Column title="Card Number" dataIndex="cardNumber" key="cardNumber" />
-					<Column title="Expires on" dataIndex="exp" key="exp" />
-          <Column 
-            title="" 
+          <Column title="Card Number" dataIndex="cardNumber" key="cardNumber" />
+          <Column title="Expires on" dataIndex="exp" key="exp" />
+          <Column
+            title=""
             key="actions"
-            className="text-right" 
+            className="text-right"
             render={(text, record) => (
               <Tooltip title="Remove card">
-                <Button 
-                  type="text" 
-                  shape="circle" 
-                  icon={<DeleteOutlined />} 
+                <Button
+                  type="text"
+                  shape="circle"
+                  icon={<DeleteOutlined />}
                   onClick={() => {
                     const newCreditCards = [...creditCards];
                     this.setState({
                       creditCards: newCreditCards.filter(item => item.key !== record.key),
                     });
-                  }} 
+                  }}
                 />
               </Tooltip>
             )}
           />
-				</Table>
+        </Table>
         <div className="mt-3 text-right">
           <Button type="primary" onClick={this.showModal}>Add new card</Button>
         </div>
-          <AddNewCardForm visible={modalVisible} onCreate={this.addCard} onCancel={this.closeModal}/>
-			</>
-		)
-	}
+        <AddNewCardForm visible={modalVisible} onCreate={this.addCard} onCancel={this.closeModal} />
+      </>
+    )
+  }
 }
 
 export default Billing

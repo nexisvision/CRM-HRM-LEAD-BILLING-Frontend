@@ -19,96 +19,96 @@ export const memberIds = [
 ]
 
 export const membersDetail = [
-  {
-    id: "eileenHorton-1153",
-    name: "Eileen Horton",
-    email: "eileen_h@hotmail.com",
-    img: "/img/avatars/thumb-1.jpg"
-  },
-  {
-    id: "terranceMoreno-1322",
-    name: "Terrance Moreno",
-    email: "",
-    img: "/img/avatars/thumb-2.jpg"
-  },
-  {
-    id: "ronVargas7653",
-    name: "Ron Vargas",
-    email: "ronnie_vergas@infotech.io",
-    img: "/img/avatars/thumb-3.jpg"
-  },
-  {
-    id: "lukeCook4721",
-    name: "Luke Cook",
-    email: "cookie_lukie@hotmail.com",
-    img: "/img/avatars/thumb-4.jpg"
-  },
-  {
-    id: "joyceFreeman1384",
-    name: "Joyce Freeman",
-    email: "joyce991@infotech.io",
-    img: "/img/avatars/thumb-5.jpg"
-  },
-  {
-    id: "samanthaPhillips8493",
-    name: "Samantha Phillips",
-    email: "samanthaphil@infotech.io",
-    img: "/img/avatars/thumb-6.jpg"
-  },
-  {
-    id: "taraFletcher1263",
-    name: "Tara Fletcher",
-    email: "taratarara@imaze.edu.du",
-    img: "/img/avatars/thumb-7.jpg"
-  },
-  {
-    id: "frederickAdams6532",
-    name: "Frederick Adams",
-    email: "iamfred@imaze.infotech.io",
-    img: "/img/avatars/thumb-8.jpg"
-  },
-  {
-    id: "carolynHanson7953",
-    name: "Carolyn Hanson",
-    email: "carolyn_h@gmail.com",
-    img: "/img/avatars/thumb-9.jpg"
-  },
-  {
-    id: "brittanyHale3683",
-    name: "Brittany Hale",
-    email: "brittany1134@gmail.com",
-    img: "/img/avatars/thumb-10.jpg"
-  },
-  {
-    id: "lloydObrien1564",
-    name: "Lloyd Obrien",
-    email: "handsome-obrien@hotmail.com",
-    img: "/img/avatars/thumb-11.jpg"
-  },
-  {
-    id: "gabriellaMay2850",
-    name: "Gabriella May",
-    email: "maymaymay12@infotech.io",
-    img: "/img/avatars/thumb-12.jpg"
-  },
-  {
-    id: "leeWheeler1941",
-    name: "Lee Wheeler",
-    email: "",
-    img: "/img/avatars/thumb-13.jpg"
-  },
-  {
-    id: "gailBarnes7615",
-    name: "Gail Barnes",
-    email: "gailby0116@infotech.io",
-    img: "/img/avatars/thumb-14.jpg"
-  },
-  {
-    id: "ellaRobinson1093",
-    name: "Ella Robinson",
-    email: "ella_robinson@infotech.io",
-    img: "/img/avatars/thumb-15.jpg"
-  }
+	{
+		id: "eileenHorton-1153",
+		name: "Eileen Horton",
+		email: "eileen_h@hotmail.com",
+		img: "/img/avatars/thumb-1.jpg"
+	},
+	{
+		id: "terranceMoreno-1322",
+		name: "Terrance Moreno",
+		email: "",
+		img: "/img/avatars/thumb-2.jpg"
+	},
+	{
+		id: "ronVargas7653",
+		name: "Ron Vargas",
+		email: "ronnie_vergas@infotech.io",
+		img: "/img/avatars/thumb-3.jpg"
+	},
+	{
+		id: "lukeCook4721",
+		name: "Luke Cook",
+		email: "cookie_lukie@hotmail.com",
+		img: "/img/avatars/thumb-4.jpg"
+	},
+	{
+		id: "joyceFreeman1384",
+		name: "Joyce Freeman",
+		email: "joyce991@infotech.io",
+		img: "/img/avatars/thumb-5.jpg"
+	},
+	{
+		id: "samanthaPhillips8493",
+		name: "Samantha Phillips",
+		email: "samanthaphil@infotech.io",
+		img: "/img/avatars/thumb-6.jpg"
+	},
+	{
+		id: "taraFletcher1263",
+		name: "Tara Fletcher",
+		email: "taratarara@imaze.edu.du",
+		img: "/img/avatars/thumb-7.jpg"
+	},
+	{
+		id: "frederickAdams6532",
+		name: "Frederick Adams",
+		email: "iamfred@imaze.infotech.io",
+		img: "/img/avatars/thumb-8.jpg"
+	},
+	{
+		id: "carolynHanson7953",
+		name: "Carolyn Hanson",
+		email: "carolyn_h@gmail.com",
+		img: "/img/avatars/thumb-9.jpg"
+	},
+	{
+		id: "brittanyHale3683",
+		name: "Brittany Hale",
+		email: "brittany1134@gmail.com",
+		img: "/img/avatars/thumb-10.jpg"
+	},
+	{
+		id: "lloydObrien1564",
+		name: "Lloyd Obrien",
+		email: "handsome-obrien@hotmail.com",
+		img: "/img/avatars/thumb-11.jpg"
+	},
+	{
+		id: "gabriellaMay2850",
+		name: "Gabriella May",
+		email: "maymaymay12@infotech.io",
+		img: "/img/avatars/thumb-12.jpg"
+	},
+	{
+		id: "leeWheeler1941",
+		name: "Lee Wheeler",
+		email: "",
+		img: "/img/avatars/thumb-13.jpg"
+	},
+	{
+		id: "gailBarnes7615",
+		name: "Gail Barnes",
+		email: "gailby0116@infotech.io",
+		img: "/img/avatars/thumb-14.jpg"
+	},
+	{
+		id: "ellaRobinson1093",
+		name: "Ella Robinson",
+		email: "ella_robinson@infotech.io",
+		img: "/img/avatars/thumb-15.jpg"
+	}
 ]
 
 export const labels = [
@@ -129,7 +129,7 @@ export const labels = [
 		label: 'Low priority'
 	}
 ];
-  
+
 
 const toBeProcessCards = [
 	{

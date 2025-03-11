@@ -1,10 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./jobofferlatterService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
-import { message } from "antd";
-
-// Async thunk for adding user
 
 export const Addjobofferss = createAsyncThunk(
   "users/Addjobofferss",
@@ -18,6 +14,8 @@ export const Addjobofferss = createAsyncThunk(
   }
 );
 
+
+
 export const getjobofferss = createAsyncThunk(
   "emp/getjobofferss",
   async (thunkAPI) => {
@@ -30,7 +28,7 @@ export const getjobofferss = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
+
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -43,7 +41,7 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
+
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -56,7 +54,7 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const deletejobofferss = createAsyncThunk(
   "users/deletejobofferss",
   async (userId, thunkAPI) => {
@@ -82,15 +80,7 @@ export const editjobofferss = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const jobofferlateerSlice = createSlice({
   name: "joboffers",
@@ -157,7 +147,7 @@ const jobofferlateerSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-   
+
       .addCase(deletejobofferss.pending, (state) => {
         state.isLoading = true;
       })
@@ -174,7 +164,9 @@ const jobofferlateerSlice = createSlice({
       })
       .addCase(editjobofferss.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; 
+        state.editItem = action.payload;
+        // message.success(action.payload?.message);
+        // Update the state with the updated employee data
       })
       .addCase(editjobofferss.rejected, (state, action) => {
         state.isLoading = false;

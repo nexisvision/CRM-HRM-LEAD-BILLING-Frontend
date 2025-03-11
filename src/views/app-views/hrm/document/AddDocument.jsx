@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Form, Input, Button, Row, Col, message, Upload, Select } from "antd";
-import { useNavigate } from "react-router-dom";
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
-import { RxCross2 } from "react-icons/rx";
+import { UploadOutlined } from "@ant-design/icons";
 import * as Yup from "yup";
 import { Formik, Field, ErrorMessage } from "formik";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,14 +11,6 @@ const { Option } = Select;
 const AddDocument = ({ onClose }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [rows, setRows] = useState([
-    {
-      id: Date.now(),
-      link: "",
-      title: "",
-    },
-  ]);
   const initialValues = {
     name: "",
     role: null,
@@ -38,21 +28,9 @@ const AddDocument = ({ onClose }) => {
     dispatch(getRoles());
   }, [dispatch]);
 
-  const handleAddRow = () => {
-    setRows([
-      ...rows,
-      {
-        id: Date.now(),
-        link: "",
-        title: "",
-      },
-    ]);
-  };
-
   const onSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       const formData = new FormData();
-
       Object.keys(values).forEach(key => {
         if (key === 'file') {
           if (values[key]) {
@@ -62,7 +40,6 @@ const AddDocument = ({ onClose }) => {
           formData.append(key, values[key]);
         }
       });
-
       if (!values.name || !values.role || !values.description) {
         throw new Error('Please fill in all required fields');
       }
@@ -81,7 +58,7 @@ const AddDocument = ({ onClose }) => {
 
   return (
     <div className="add-trainingSetup">
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>  
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Row, Col, Input, message, Button, Select, DatePicker } from "antd";
-import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -16,34 +15,20 @@ const { Option } = Select;
 
 const AddCrediteNotes = ({ onClose }) => {
   const dispatch = useDispatch();
-  
   const invoicesData = useSelector((state) => state.salesInvoices.salesInvoices.data);
 
   useEffect(() => {
     dispatch(getInvoice());
   }, [dispatch]);
 
-  const [rows, setRows] = useState([
-    {
-      id: Date.now(),
-      item: "",
-      quantity: "",
-      price: "",
-      discount: "",
-      tax: "",
-      amount: "0",
-      description: "",
-      isNew: false,
-    },
-  ]);
 
   const onSubmit = (values, { resetForm }) => {
     const selectedInvoice = invoicesData.find(invoice => invoice.id === values.invoice);
-    
+
     const submitData = {
       ...values,
       salesInvoiceNumber: selectedInvoice ? selectedInvoice.salesInvoiceNumber : null,
-      invoice: values.invoice 
+      invoice: values.invoice
     };
 
     dispatch(Addcreditnote(submitData))
@@ -91,7 +76,7 @@ const AddCrediteNotes = ({ onClose }) => {
     <>
       <div>
         <div className="">
-          <h2 className="mb-3 border-b pb-[5px] font-medium"></h2>
+          <hr className="mb-3 border-b font-medium"></hr>
           <div className="">
             <div className="">
               <Formik
@@ -103,7 +88,7 @@ const AddCrediteNotes = ({ onClose }) => {
                 {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
                   <Form className="formik-form" onSubmit={handleSubmit}>
                     <Row gutter={16}>
-                      
+
                       <Col span={24} className="">
                         <div className="form-item">
                           <label className="font-semibold">Invoice <span className="text-red-500">*</span></label>
@@ -148,6 +133,7 @@ const AddCrediteNotes = ({ onClose }) => {
                             className="mt-1"
                             placeholder="Enter Amount"
                             type="number"
+                          // disabled // Make the amount field read-only since it's set automatically
                           />
                           <ErrorMessage
                             name="amount"

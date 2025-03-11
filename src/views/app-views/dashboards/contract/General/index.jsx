@@ -4,7 +4,6 @@ import {
   PaperClipOutlined,
   MessageOutlined,
   FileTextOutlined,
-  CalendarOutlined,
 } from '@ant-design/icons';
 
 const General = () => {

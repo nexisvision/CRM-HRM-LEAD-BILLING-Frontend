@@ -3,61 +3,43 @@ import {
   Card,
   Table,
   Menu,
-  Row,
-  Col,
-  Tag,
   Input,
   message,
   Button,
   Modal,
   DatePicker,
-  Select,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
   FileExcelOutlined,
-  CopyOutlined,
   EditOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import UserView from "../../Users/user-list/UserView";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import StatisticWidget from "components/shared-components/StatisticWidget";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddContract from "./AddContract";
 import ViewContract from "./ViewContract";
 import EditContract from "./EditContract";
-import { useNavigate } from "react-router-dom";
 import userData from "../../../../assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
-import { IoCopyOutline } from "react-icons/io5";
 import { utils, writeFile } from "xlsx";
 import { GetProject } from "../project/project-list/projectReducer/ProjectSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ContaractData, DeleteCon } from "./ContractReducers/ContractSlice";
-
-const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 const ContractList = () => {
   const [users, setUsers] = useState(userData);
-  const [list, setList] = useState(OrderListData);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [idd, setIdd] = useState("");
   const dispatch = useDispatch();
-
   const tabledata = useSelector((state) => state.Contract);
   const clientData = useSelector((state) => state.SubClient?.SubClient?.data);
   const projectData = useSelector((state) => state.Project?.Project?.data);
-
   useEffect(() => {
     dispatch(GetProject());
     dispatch(ClientData());
@@ -85,19 +67,12 @@ const ContractList = () => {
     useState(false);
   const [isEditContractModalVisible, setIsEditContractModalVisible] =
     useState(false);
-    const navigate = useNavigate();
-
   const openAddContractModal = () => {
     setIsAddContractModalVisible(true);
   };
+
   const closeAddContractModal = () => {
     setIsAddContractModalVisible(false);
-  };
-
-  const openViewContractModal = () => {
-    navigate("/app/dashboards/project/contract/viewContract", {
-      state: { user: selectedUser },
-    }); // Pass user data as state if needed
   };
   const closeViewContractModal = () => {
     setIsViewContractModalVisible(false);
@@ -114,32 +89,32 @@ const ContractList = () => {
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
-    
+
     if (!value) {
-        setUsers(tabledata?.Contract?.data || []);
-        return;
+      setUsers(tabledata?.Contract?.data || []);
+      return;
     }
-    
-    const filtered = tabledata?.Contract?.data?.filter(contract => 
-        contract.contract_number?.toLowerCase().includes(value) ||
-        contract.phone?.toLowerCase().includes(value) ||
-        contract.country?.toLowerCase().includes(value)
+
+    const filtered = tabledata?.Contract?.data?.filter(contract =>
+      contract.contract_number?.toLowerCase().includes(value) ||
+      contract.phone?.toLowerCase().includes(value) ||
+      contract.country?.toLowerCase().includes(value)
     ) || [];
-    
+
     setUsers(filtered);
   };
 
   const getFilteredContracts = () => {
     if (!users) return [];
-    
+
     let filtered = users;
 
     if (searchText) {
       filtered = filtered.filter(contract => {
-        const clientName = clientData?.find(client => 
+        const clientName = clientData?.find(client =>
           client.id === contract.client
         )?.username?.toLowerCase();
-        
+
         return clientName?.includes(searchText.toLowerCase());
       });
     }
@@ -165,7 +140,7 @@ const ContractList = () => {
     try {
       await dispatch(DeleteCon(userId));
 
-      const updatedData = await dispatch(ContaractData());
+      await dispatch(ContaractData());
 
       setUsers(users.filter((item) => item.id !== userId));
 
@@ -181,7 +156,9 @@ const ContractList = () => {
   const exportToExcel = () => {
     try {
 
-      const ws = utils.json_to_sheet(list);
+
+      // Create a worksheet from the formatted data
+      const ws = utils.json_to_sheet(users);
       const wb = utils.book_new(); // Create a new workbook
       utils.book_append_sheet(wb, ws, "Contract"); // Append the worksheet to the workbook
 
@@ -193,68 +170,83 @@ const ContractList = () => {
     }
   };
 
-  const showUserProfile = (userInfo) => {
-    setSelectedUser(userInfo);
-    setUserProfileVisible(true);
-  };
+  // Close user profile
   const closeUserProfile = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);
   };
 
-      const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-      const roles = useSelector((state) => state.role?.role?.data);
-      const roleData = roles?.find(role => role.id === roleId);
-  
-      const whorole = roleData.role_name;
-  
-      const parsedPermissions = Array.isArray(roleData?.permissions)
-      ? roleData.permissions
-      : typeof roleData?.permissions === 'string'
+  //// permission
+
+
+
+
+
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
       ? JSON.parse(roleData.permissions)
       : [];
-    
-    
-      let allpermisson;  
-  
-      if (parsedPermissions["dashboards-project-Contract"] && parsedPermissions["dashboards-project-Contract"][0]?.permissions) {
-        allpermisson = parsedPermissions["dashboards-project-Contract"][0].permissions;
-      
-      } else {
-      }
-      
-      const canCreateClient = allpermisson?.includes('create');
-      const canEditClient = allpermisson?.includes('edit');
-      const canDeleteClient = allpermisson?.includes('delete');
-      const canViewClient = allpermisson?.includes('view');
+
+
+  let allpermisson;
+
+  if (parsedPermissions["dashboards-project-Contract"] && parsedPermissions["dashboards-project-Contract"][0]?.permissions) {
+    allpermisson = parsedPermissions["dashboards-project-Contract"][0].permissions;
+    // console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    // console.log('dashboards-project-Contract is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
 
 
 
 
+  ///endpermission
 
-  const dropdownMenu = (elm) => ({
-    items: [
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+  const getDropdownItems = (elm) => {
+    const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
         onClick: () => Editfun(elm.id)
-      }] : []),
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(elm.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
+
   const tableColumns = [
     {
-        title: 'Contract Number',
-        dataIndex: 'contract_number',
-       
-        sorter: (a, b) => a.contract_number.localeCompare(b.contract_number)
+      title: 'Contract Number',
+      dataIndex: 'contract_number',
+
+      sorter: (a, b) => a.contract_number.localeCompare(b.contract_number)
     },
     {
       title: "Client",
@@ -292,25 +284,25 @@ const ContractList = () => {
       title: 'Phone',
       dataIndex: 'phone',
       render: phone => (
-          <span>{phone || '-'}</span>
+        <span>{phone || '-'}</span>
       ),
       sorter: (a, b) => (a.phone || '').localeCompare(b.phone || '')
-  },
-  {
+    },
+    {
       title: 'Country',
       dataIndex: 'country',
       render: country => (
-          <span>{country || '-'}</span>
+        <span>{country || '-'}</span>
       ),
       sorter: (a, b) => (a.country || '').localeCompare(b.country || '')
-  },
-  {
-    title: "Subject",
-    dataIndex: "subject",
-    sorter: {
-      compare: (a, b) => a.subject.length - b.subject.length,
     },
-  },
+    {
+      title: "Subject",
+      dataIndex: "subject",
+      sorter: {
+        compare: (a, b) => a.subject.length - b.subject.length,
+      },
+    },
     {
       title: "Contract Value",
       dataIndex: "value",
@@ -343,7 +335,22 @@ const ContractList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -377,44 +384,44 @@ const ContractList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-          
-  {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                <Button
-                type="primary"
-                className="ml-2"
-                onClick={openAddContractModal}
-              >
-                <PlusOutlined />
-                <span>New</span>
-              </Button>
-              ) : null}
-         
+
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddContractModal}
+            >
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+          ) : null}
+
           <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel} // Call export function when the button is clicked
+            block
+          >
+            Export All
+          </Button>
         </Flex>
       </Flex>
 
       <div className="table-responsive mt-2">
 
-      {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-							  <Table
-                columns={tableColumns}
-                dataSource={getFilteredContracts()}
-                rowKey="id"
-                pagination={{
-                  total: getFilteredContracts().length,
-                  pageSize: 10,
-                  showSizeChanger: true,
-                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                }}
-              />
-							) : null}
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredContracts()}
+            rowKey="id"
+            pagination={{
+              total: getFilteredContracts().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
+          />
+        ) : null}
       </div>
       <UserView
         data={selectedUser}
@@ -479,6 +486,20 @@ const styles = `
       width: 100%;
       margin-bottom: 1rem;
     }
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+  }
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
   }
 `;
 

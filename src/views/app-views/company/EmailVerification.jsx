@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Modal, Form, Input, Button, message } from 'antd';
 import { MdOutlineEmail } from 'react-icons/md';
@@ -10,13 +9,12 @@ import { empdata } from '../hrm/Employee/EmployeeReducers/EmployeeSlice';
 
 
 
-const EmailVerification = ({idd, visible, onCancel, initialEmail }) => {
+const EmailVerification = ({ idd, visible, onCancel, initialEmail }) => {
   const [form] = Form.useForm();
   const [otpForm] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState('');
-  const [step, setStep] = useState(1);
   const dispatch = useDispatch();
 
 
@@ -24,9 +22,10 @@ const EmailVerification = ({idd, visible, onCancel, initialEmail }) => {
     try {
       const values = await form.validateFields();
       setIsLoading(true);
-      
+
+      // First API call to send OTP
       const response = await dispatch(sendmailupdateotp({ idd, values }));
-      
+
       if (response.payload?.success) {  // Adjust condition based on your API response structure
         message.success('OTP sent successfully');
         setVerificationEmail(values.email);
@@ -44,15 +43,16 @@ const EmailVerification = ({idd, visible, onCancel, initialEmail }) => {
   const handleVerifyOtp = async (values) => {
     try {
       setIsLoading(true);
-      
+
+      // Second API call to verify OTP
       const response = await dispatch(otpverifyemail(values));
-      
-      if (response.payload?.success) {  
+
+      if (response.payload?.success) {
         message.success('Email verified successfully');
         dispatch(ClientData())
-         dispatch(GetUsers());
-         dispatch(NewClientData())
-         dispatch(empdata())
+        dispatch(GetUsers());
+        dispatch(NewClientData())
+        dispatch(empdata())
         handleClose();
       } else {
         message.error('Invalid OTP');
@@ -117,7 +117,7 @@ const EmailVerification = ({idd, visible, onCancel, initialEmail }) => {
               { type: 'email', message: 'Please enter a valid email' }
             ]}
           >
-            <Input 
+            <Input
               placeholder="Enter your email"
               className="rounded-md"
             />

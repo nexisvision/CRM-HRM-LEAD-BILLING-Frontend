@@ -3,9 +3,9 @@ import HolidayList from './HolidayList';
 
 const Attendance = () => (
 
-<div className="mail">
-<HolidayList  />
-</div>
+	<div className="mail">
+		<HolidayList />
+	</div>
 
 );
 

@@ -1,6 +1,5 @@
 import React from "react";
-import { Card, Form, Input, Button, notification, message } from "antd";
-import { useNavigate } from 'react-router-dom';
+import { Input, Button, message } from "antd";
 import { useDispatch } from 'react-redux';
 import { addCountry, getallcountries } from './countriesreducer/countriesSlice';
 import { Formik, Field, ErrorMessage } from 'formik';
@@ -14,7 +13,6 @@ const validationSchema = Yup.object().shape({
 });
 
 const AddCountries = ({ onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const initialValues = {
@@ -27,12 +25,10 @@ const AddCountries = ({ onClose }) => {
     try {
       await dispatch(addCountry(values)).unwrap();
       await dispatch(getallcountries());
-      
       message.success('Country added successfully.');
       resetForm();
       onClose();
     } catch (error) {
-
       message.error('Failed to add country.');
     } finally {
       setSubmitting(false);
@@ -41,7 +37,7 @@ const AddCountries = ({ onClose }) => {
 
   return (
     <div>
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
 
       <Formik
         initialValues={initialValues}

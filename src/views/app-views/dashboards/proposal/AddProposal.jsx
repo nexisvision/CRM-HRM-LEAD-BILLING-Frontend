@@ -1,82 +1,47 @@
 import React, { useState, useEffect } from "react";
 import {
-  Card,
   Form,
-  Menu,
   Row,
   Col,
-  Tag,
   Input,
   message,
   Button,
-  Upload,
   Select,
   DatePicker,
-  Modal,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
-  CloudUploadOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
-  FileExcelOutlined,
-  FilterOutlined,
-  EditOutlined,
-  LinkOutlined,
-  SearchOutlined,
 } from "@ant-design/icons";
-import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-import OrderListData from "assets/data/order-list.data.json";
-import Flex from "components/shared-components/Flex";
 import { useSelector, useDispatch } from "react-redux";
 import * as Yup from "yup";
-
 import { GetLeads } from "../leads/LeadReducers/LeadSlice";
 import { addpropos, getpropos } from "./proposalReducers/proposalSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { getAllTaxes } from "views/app-views/setting/tax/taxreducer/taxSlice";
-import ReactQuill from "react-quill";
 
 const { Option } = Select;
 
 const AddProposal = ({ onClose }) => {
-  const { id } = useParams();
-  const [discountType, setDiscountType] = useState('percentage');
-  const [loading, setLoading] = useState(false);
-  const [discountValue, setDiscountValue] = useState(0);
-  const [isAddProductModalVisible, setIsAddProductModalVisible] =
-    useState(false);
-  const [list, setList] = useState(OrderListData);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedMilestone, setSelectedMilestone] = useState(null);
-  const [showFields, setShowFields] = useState(false);
-  const { data: milestones } = useSelector(
-    (state) => state.Milestone.Milestone
-  );
-
-  
-
+  const [discountType] = useState('percentage');
+  const [discountValue] = useState(0);
   const currencies = useSelector((state) => state.currencies?.currencies?.data || []);
-  const [discountRate, setDiscountRate] = useState(10);
   const dispatch = useDispatch();
 
   const Leads = useSelector((state) => state.Leads?.Leads?.data || []);
- 
+
 
   const allogged = useSelector((state) => state.user?.loggedInUser?.username);
 
- 
-  const fndlead = Array.isArray(Leads) 
+
+  const fndlead = Array.isArray(Leads)
     ? Leads.filter((item) => item?.created_by === allogged)
     : [];
 
   const { taxes } = useSelector((state) => state.tax);
 
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
-
   const [form] = Form.useForm();
   const [totals, setTotals] = useState({
     subtotal: 0,
@@ -116,29 +81,25 @@ const AddProposal = ({ onClose }) => {
 
   useEffect(() => {
     dispatch(GetLeads());
-    // dispatch(GetDeals());
     dispatch(getAllTaxes());
   }, [dispatch]);
 
+
+
+
   const handleFinish = async (values) => {
     try {
-      setLoading(true);
-
-      const subtotal = calculateSubTotal();
       const discountAmount = totals.discount;
-
-      // Restructured proposal data to match backend requirements
       const proposalData = {
-        lead_title: values.lead_title, // deal_title: values.deal_title,
+        lead_title: values.lead_title,
         valid_till: values.valid_till.format("YYYY-MM-DD"),
         currency: values.currency,
-        description: "", // Add description field
+        description: "",
         items: tableData.map((item) => ({
           item: item.item,
           quantity: parseFloat(item.quantity),
           price: parseFloat(item.price),
-          tax_name: selectedTaxDetails[item.id]?.
-            gstName || '',
+          tax_name: selectedTaxDetails[item.id]?.gstName || '',
           tax: parseFloat(item.tax) || 0,
           amount: parseFloat(item.amount),
           description: item.description,
@@ -146,7 +107,6 @@ const AddProposal = ({ onClose }) => {
         discount: parseFloat(discountAmount),
         discountType: discountType,
         discountValue: parseFloat(discountValue) || 0,
-        discountRate: discountRate, // Optionally store the rate 
         tax: totals.totalTax, // Added separate tax field
         total: totals.finalTotal,
       };
@@ -160,8 +120,7 @@ const AddProposal = ({ onClose }) => {
           console.error("Error during proposal submission:", error);
         });
     } catch (error) {
-    } finally {
-      setLoading(false);
+      // message.error("Failed to create proposal: " + error.message);
     }
   };
 
@@ -190,15 +149,6 @@ const AddProposal = ({ onClose }) => {
     }
   };
 
-
-  // Calculate subtotal (sum of all row amounts before discount)
-  const calculateSubTotal = () => {
-    return tableData.reduce((sum, row) => {
-      const quantity = parseFloat(row.quantity) || 0;
-      const price = parseFloat(row.price) || 0;
-      return sum + (quantity * price);
-    }, 0);
-  };
 
   const calculateTotal = (data = tableData, discountVal = discountValue, discType = discountType) => {
     if (!Array.isArray(data)) {
@@ -312,14 +262,14 @@ const AddProposal = ({ onClose }) => {
     <>
       <div>
         <div className=" ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4">
-          <h2 className="mb-4 border-b pb-[30px] font-medium"></h2>
+          <div className="mb-4 border-b pb-[30px] font-medium"></div>
           <Form
             form={form}
             layout="vertical"
             onFinish={handleFinish}
             validationSchema={validationSchema}
             initialValues={initialValues}
-          >  
+          >
             <div className="">
               <div className=" p-2">
                 <Row gutter={16}>
@@ -369,7 +319,7 @@ const AddProposal = ({ onClose }) => {
                       </Select>
                     </Form.Item>
                   </Col>
-                 
+
                   <Col span={12}>
                     <Form.Item
                       name="valid_till"
@@ -415,19 +365,14 @@ const AddProposal = ({ onClose }) => {
                       </Select>
                     </Form.Item>
                   </Col>
-
-                
                   <Col span={24}>
                     <Form.Item label="Description" name="description">
                       <Input.TextArea placeholder="Enter Description" />
                     </Form.Item>
                   </Col>
-                </Row>
-              </div>
-            </div>
-            {/* </Card> */}
-
-            {/* <Card> */}
+                </Row >
+              </div >
+            </div >
 
             <div>
               <div className="overflow-x-auto">
@@ -623,9 +568,9 @@ const AddProposal = ({ onClose }) => {
                 </Col>
               </Row>
             </Form.Item>
-          </Form>
-        </div>
-      </div>
+          </Form >
+        </div >
+      </div >
     </>
   );
 };

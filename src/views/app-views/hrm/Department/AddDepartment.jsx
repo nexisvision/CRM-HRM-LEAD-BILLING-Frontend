@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
-import { Input, Button, Row, Col, message, Select, Modal } from "antd";
+import { Input, Button, Row, Col, Select, Modal } from "antd";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AddDept, getDept } from "./DepartmentReducers/DepartmentSlice";
 import { getBranch } from "../Branch/BranchReducer/BranchSlice";
@@ -19,7 +18,6 @@ const validationSchema = Yup.object().shape({
 });
 
 const AddDepartment = ({ onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
@@ -55,7 +53,7 @@ const AddDepartment = ({ onClose }) => {
 
   return (
     <div className="add-employee">
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
 
       <Formik
         initialValues={{

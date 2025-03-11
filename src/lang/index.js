@@ -34,7 +34,7 @@ i18n.use(initReactI18next).init({
     fallbackLng: THEME_CONFIG.locale,
     lng: THEME_CONFIG.locale,
     interpolation: {
-        escapeValue: false 
+        escapeValue: false
     }
 })
 

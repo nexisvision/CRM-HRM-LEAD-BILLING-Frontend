@@ -7,9 +7,9 @@ export class Mail extends Component {
 	render() {
 		return (
 			<div className="mail">
-				<InnerAppLayout 
-					sideContent={<MailMenu url="/app/dashboards/mail/" {...this.props}/>}
-					mainContent={<MailContent {...this.props}/>}
+				<InnerAppLayout
+					sideContent={<MailMenu url="/app/dashboards/mail/" {...this.props} />}
+					mainContent={<MailContent {...this.props} />}
 					border
 				/>
 			</div>

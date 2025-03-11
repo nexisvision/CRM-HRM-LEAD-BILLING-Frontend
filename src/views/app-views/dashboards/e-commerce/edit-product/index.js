@@ -6,7 +6,7 @@ const EditProduct = () => {
 	const params = useParams();
 
 	return (
-		<ProductForm mode="EDIT" param={params}/>
+		<ProductForm mode="EDIT" param={params} />
 	)
 }
 

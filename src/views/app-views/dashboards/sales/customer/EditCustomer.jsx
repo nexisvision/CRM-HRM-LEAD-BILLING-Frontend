@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Input, Button, message, Row, Col, Select, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
-import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { PlusOutlined } from "@ant-design/icons";
@@ -173,7 +172,7 @@ const EditCustomer = ({ idd, onClose }) => {
   return (
     <div className="add-job-form">
       <div className=" ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4">
-        <h1 className="mb-4 border-b pb-4 font-medium"></h1>
+        <hr className="mb-4 border-b pb-4 font-medium"></hr>
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
@@ -188,7 +187,7 @@ const EditCustomer = ({ idd, onClose }) => {
             resetForm,
           }) => (
             <Form className="formik-form" onSubmit={handleSubmit}>
-             <Row gutter={16} className="mt-4">
+              <Row gutter={16} className="mt-4">
                 <Col span={24}>
                   <h1 className="font-semibold text-lg">Basic Info</h1>
                 </Col>
@@ -299,7 +298,7 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                  <Col span={8} className="mt-3">
+                <Col span={8} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Tax Number</label>
                     <Field
@@ -749,7 +748,7 @@ const EditCustomer = ({ idd, onClose }) => {
                     <Field
                       name="shipping_zipcode"
                       as={Input}
-                        placeholder="Enter Zip Code"
+                      placeholder="Enter Zip Code"
                       className="mt-1"
                     />
 

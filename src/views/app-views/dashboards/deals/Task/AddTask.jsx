@@ -1,13 +1,11 @@
 import React from "react";
-import { Modal, Input, DatePicker, TimePicker, Select, Button } from "antd";
+import { Input, DatePicker, TimePicker, Select, Button } from "antd";
 
 const { Option } = Select;
 
 const AddTask = ({ visible, onCancel, onCreate }) => {
   return (
-    
     <form className="space-y-6">
-
       <div>
         <label className="block font-medium mb-1">
           Name <span className="text-red-500">*</span>

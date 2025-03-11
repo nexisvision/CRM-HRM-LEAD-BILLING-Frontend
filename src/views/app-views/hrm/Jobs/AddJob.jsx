@@ -7,19 +7,15 @@ import {
   message,
   Row,
   Col,
-  Switch,
-  Upload,
   Modal,
 } from "antd";
-import { CloudUploadOutlined, PlusOutlined, QuestionCircleOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { PlusOutlined } from "@ant-design/icons";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  AddLable,
   AddLablee,
   GetLable,
   GetLablee,
@@ -33,8 +29,6 @@ import AddCurrencies from "../../setting/currencies/AddCurrencies";
 const { Option } = Select;
 
 const AddJob = ({ onClose }) => {
-  const navigate = useNavigate();
-  const [showReceiptUpload, setShowReceiptUpload] = useState(false);
   const [jobCategories, setJobCategories] = useState([]);
   const [jobSkills, setJobSkills] = useState([]);
   const [jobStatuses, setJobStatuses] = useState([]);
@@ -45,8 +39,6 @@ const AddJob = ({ onClose }) => {
   const [newJobSkill, setNewJobSkill] = useState("");
   const [newJobStatus, setNewJobStatus] = useState("");
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
-
-  const { currencies } = useSelector((state) => state.currencies);
   const dispatch = useDispatch();
 
   const AllLoggeddtaa = useSelector((state) => state.user);
@@ -69,10 +61,6 @@ const AddJob = ({ onClose }) => {
   useEffect(() => {
     dispatch(getInterview());
   }, [dispatch]);
-
-  const allinterview = useSelector((state) => state.Interviews.Interviews.data);
-
-
 
   const initialValues = {
     title: "",
@@ -105,7 +93,6 @@ const AddJob = ({ onClose }) => {
     description: Yup.string().required("Please enter Job Discription."),
     status: Yup.string().required("Please enter Status."),
     expectedSalary: Yup.string().required("Please enter Expect Salary."),
-
   });
 
   const onSubmit = (values, { resetForm }) => {
@@ -135,8 +122,8 @@ const AddJob = ({ onClose }) => {
 
     const transformedValues = {
       ...values,
-      skills: { Skills: values.skillss }, // Send as object
-      interviewRounds: { InterviewRounds: values.interviewRounds }, // Send as object, not JSON string
+      skills: { Skills: values.skillss },
+      interviewRounds: { InterviewRounds: values.interviewRounds },
       startDate: values.startDate ? values.startDate.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]') : null,
       endDate: values.endDate ? values.endDate.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]') : null,
     };
@@ -146,7 +133,7 @@ const AddJob = ({ onClose }) => {
     dispatch(AddJobs(transformedValues)).then(() => {
       dispatch(GetJobdata());
       message.success("Job added successfully!");
-      onClose(); // Close modal after successful submission
+      onClose();
       resetForm();
     }).catch((error) => {
       console.error('Error adding job:', error);
@@ -157,10 +144,10 @@ const AddJob = ({ onClose }) => {
   useEffect(() => {
     const lid = AllLoggeddtaa.loggedInUser.id;
     GetLable(lid);
-  }, []);
+  }, [AllLoggeddtaa.loggedInUser.id]);
 
 
-  const fetchLabels = async (lableType, setter) => {
+  const fetchLabels = React.useCallback(async (lableType, setter) => {
     try {
       const lid = AllLoggeddtaa.loggedInUser.id;
       const response = await dispatch(GetLablee(lid));
@@ -183,14 +170,13 @@ const AddJob = ({ onClose }) => {
       console.error(`Failed to fetch ${lableType}:`, error);
       message.error(`Failed to load ${lableType}`);
     }
-  };
+  }, [AllLoggeddtaa.loggedInUser.id, dispatch]);
 
-  // Call the function for different label types when the component mounts
   useEffect(() => {
     fetchLabels("jobcategory", setJobCategories);
     fetchLabels("jobskill", setJobSkills);
     fetchLabels("jobstatus", setJobStatuses);
-  }, []);
+  }, [fetchLabels]);
 
 
   const handleAddNewLabel = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
@@ -235,7 +221,7 @@ const AddJob = ({ onClose }) => {
   };
   return (
     <div className="add-expenses-form">
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -431,8 +417,6 @@ const AddJob = ({ onClose }) => {
                       name="recruiter"
                       as={Input}
                       placeholder="Enter recruiter"
-
-
                     />
                     <ErrorMessage
                       name="recruiter"
@@ -482,93 +466,93 @@ const AddJob = ({ onClose }) => {
                 </Col>
 
                 <Col span={12} className="mt-2">
-  <div className="form-group">
-    <label className="text-gray-600 font-semibold mb-2 block">Currency & Expected Salary <span className="text-red-500">*</span></label>
-    <div className="flex gap-0">
-      <Field name="currency">
-        {({ field }) => (
-          <Select
-            {...field}
-            className="currency-select"
-            style={{
-              width: '80px',
-              borderTopRightRadius: 0,
-              borderBottomRightRadius: 0,
-              borderRight: 0,
-              backgroundColor: '#f8fafc',
-            }}
-            placeholder={<span className="text-gray-400">₹</span>}
-            onChange={(value) => {
-              if (value === 'add_new') {
-                setIsAddCurrencyModalVisible(true);
-              } else {
-                setFieldValue("currency", value);
-              }
-            }}
-            value={values.currency}
-            dropdownStyle={{ minWidth: '180px' }}
-            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-            loading={!fnddatass}
-            dropdownRender={menu => (
-              <div>
-                <div
-                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                  onClick={() => setIsAddCurrencyModalVisible(true)}
-                >
-                  <PlusOutlined className="mr-2" />
-                  <span className="text-sm">Add New</span>
-                </div>
-                {menu}
-              </div>
-            )}
-          >
-            {fnddatass?.map((currency) => (
-              <Option key={currency.id} value={currency.id}>
-                <div className="flex items-center w-full px-1">
-                  <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
-                  <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
-                  <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
-                </div>
-              </Option>
-            ))}
-          </Select>
-        )}
-      </Field>
-      <Field name="expectedSalary">
-        {({ field, form }) => (
-          <Input
-            {...field}
-            className="price-input"
-            style={{
-              borderTopLeftRadius: 0,
-              borderBottomLeftRadius: 0,
-              borderLeft: '1px solid #d9d9d9',
-              width: 'calc(100% - 80px)'
-            }}
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="0.00"
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                form.setFieldValue('expectedSalary', value);
-              }
-            }}
-            prefix={
-              values.currency && (
-                <span className="text-gray-600 font-medium mr-1">
-                  {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
-                </span>
-              )
-            }
-          />
-        )}
-      </Field>
-    </div>
-    <ErrorMessage name="expectedSalary" component="div" className="text-red-500 mt-1 text-sm" />
-  </div>
-</Col>
+                  <div className="form-group">
+                    <label className="text-gray-600 font-semibold mb-2 block">Currency & Expected Salary <span className="text-red-500">*</span></label>
+                    <div className="flex gap-0">
+                      <Field name="currency">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className="currency-select"
+                            style={{
+                              width: '80px',
+                              borderTopRightRadius: 0,
+                              borderBottomRightRadius: 0,
+                              borderRight: 0,
+                              backgroundColor: '#f8fafc',
+                            }}
+                            placeholder={<span className="text-gray-400">₹</span>}
+                            onChange={(value) => {
+                              if (value === 'add_new') {
+                                setIsAddCurrencyModalVisible(true);
+                              } else {
+                                setFieldValue("currency", value);
+                              }
+                            }}
+                            value={values.currency}
+                            dropdownStyle={{ minWidth: '180px' }}
+                            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                            loading={!fnddatass}
+                            dropdownRender={menu => (
+                              <div>
+                                <div
+                                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                  onClick={() => setIsAddCurrencyModalVisible(true)}
+                                >
+                                  <PlusOutlined className="mr-2" />
+                                  <span className="text-sm">Add New</span>
+                                </div>
+                                {menu}
+                              </div>
+                            )}
+                          >
+                            {fnddatass?.map((currency) => (
+                              <Option key={currency.id} value={currency.id}>
+                                <div className="flex items-center w-full px-1">
+                                  <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                  <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                  <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                </div>
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                      <Field name="expectedSalary">
+                        {({ field, form }) => (
+                          <Input
+                            {...field}
+                            className="price-input"
+                            style={{
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              borderLeft: '1px solid #d9d9d9',
+                              width: 'calc(100% - 80px)'
+                            }}
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                form.setFieldValue('expectedSalary', value);
+                              }
+                            }}
+                            prefix={
+                              values.currency && (
+                                <span className="text-gray-600 font-medium mr-1">
+                                  {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                                </span>
+                              )
+                            }
+                          />
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage name="expectedSalary" component="div" className="text-red-500 mt-1 text-sm" />
+                  </div>
+                </Col>
 
 
                 <Col span={12}>

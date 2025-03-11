@@ -22,7 +22,7 @@ const addpropo = async (payload) => {
 
   try {
     const res = await axios.post(
-          `${env.API_ENDPOINT_URL}/proposals/`,
+      `${env.API_ENDPOINT_URL}/proposals/`,
       payload,
       {
         headers: {
@@ -30,7 +30,7 @@ const addpropo = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -50,7 +50,7 @@ const delpropo = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -78,7 +78,9 @@ const editpropo = async (id, proposalData) => {
 };
 
 
+
 const UserService = {
+
   getpropo,
   addpropo,
   delpropo,

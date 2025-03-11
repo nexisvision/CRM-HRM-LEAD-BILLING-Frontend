@@ -28,15 +28,11 @@ const { Option } = Select;
 const EditRevenue = ({ idd, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
-
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
-
   const AllLoggedData = useSelector((state) => state.user);
-
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies?.data;
 
@@ -48,14 +44,14 @@ const EditRevenue = ({ idd, onClose }) => {
     return '';
   };
 
-  const fetchLables = async (lableType, setter) => {
+  const fetchLables = React.useCallback(async (lableType, setter) => {
     try {
       const lid = AllLoggedData.loggedInUser.id;
       const response = await dispatch(GetLable(lid));
 
       if (response.payload && response.payload.data) {
         const uniqueCategories = response.payload.data
-          .filter((label) => label && label.name) // Filter out invalid labels
+          .filter((label) => label && label.name)
           .map((label) => ({
             id: label.id,
             name: label.name.trim(),
@@ -63,7 +59,7 @@ const EditRevenue = ({ idd, onClose }) => {
           .filter(
             (label, index, self) =>
               index === self.findIndex((t) => t.name === label.name)
-          ); 
+          );
 
         setCategories(uniqueCategories);
       }
@@ -71,11 +67,11 @@ const EditRevenue = ({ idd, onClose }) => {
       console.error("Failed to fetch categories:", error);
       message.error("Failed to load categories");
     }
-  };
+  }, [AllLoggedData.loggedInUser.id, dispatch]);
 
   useEffect(() => {
     fetchLables("category", setCategories);
-  }, []);
+  }, [fetchLables]);
 
   const handleAddNewCategory = async () => {
     if (!newCategory.trim()) {
@@ -101,7 +97,6 @@ const EditRevenue = ({ idd, onClose }) => {
       message.error("Failed to add Category");
     }
   };
-
 
   const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] = useState(false);
 
@@ -150,7 +145,7 @@ const EditRevenue = ({ idd, onClose }) => {
 
   useEffect(() => {
     dispatch(Getcus());
-  }, []);
+  }, [dispatch]);
 
   const customerdata = useSelector((state) => state.customers);
   const fnddatas = customerdata.customers.data;
@@ -199,7 +194,7 @@ const EditRevenue = ({ idd, onClose }) => {
 
   return (
     <div className="add-job-form">
-      <h2 className="mb-2 border-b font-medium"></h2>
+      <hr className="mb-2 border-b font-medium"></hr>
       <div className="">
         <div className=" p-2">
           <Formik
@@ -234,107 +229,107 @@ const EditRevenue = ({ idd, onClose }) => {
                     </div>
                   </Col>
                   <Col span={12} className="">
-                      <div className="form-group">
-                        <label className="text-gray-600 font-semibold mb-1 block">Currency & Amount <span className="text-red-500">*</span></label>
-                        <div className="flex gap-0" style={{ display: 'flex' }}>
-                          <Field name="currency">
-                            {({ field }) => (
-                              <Select
-                                {...field}
-                                className="currency-select"
-                                style={{
-                                  width: '80px',
-                                  minWidth: '80px',
-                                  flex: '0 0 80px',
-                                  borderTopRightRadius: 0,
-                                  borderBottomRightRadius: 0,
-                                  borderRight: 0,
-                                  backgroundColor: '#f8fafc',
-                                }}
-                                placeholder={<span className="text-gray-400">$</span>}
-                                onChange={(value) => {
-                                  if (value === 'add_new') {
-                                    setIsAddCurrencyModalVisible(true);
-                                  } else {
-                                    setFieldValue("currency", value);
-                                  }
-                                }}
-                                value={values.currency}
-                                dropdownStyle={{ minWidth: '180px' }}
-                                 
-                                suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                                loading={!currencies}
-                            dropdownRender={menu => (
-                              <div>
-                                <div
-                                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                  onClick={() => setIsAddCurrencyModalVisible(true)}
-                                >
-                                  <PlusOutlined className="mr-2" />
-                                  <span className="text-sm">Add New</span>
-                                </div>
-                                {menu}
-                              </div>
-                            )}
-                              >
-                                {fnddatass?.map((currency) => (
-                                  <Option key={currency.id} value={currency.id}>
-                                    <div className="flex items-center w-full px-1">
-                                      <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
-                                      <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
-                                      <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
-                                    </div>
-                                  </Option>
-                                ))}
-                              </Select>
-                            )}
-                          </Field>
-                          <Field name="amount">
-                            {({ field, form }) => (
-                              <Input
-                                {...field}
-                                className="price-input"
-                                style={{
-                                  flex: 1,
-                                  borderTopLeftRadius: 0,
-                                  borderBottomLeftRadius: 0,
-                                  borderLeft: '1px solid #d9d9d9',
-                                }}
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                placeholder="0.00"
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                                    setFieldValue('amount', value);
-                                  }
-                                }}
-                                onBlur={() => setFieldTouched("amount", true)}
-                                onKeyPress={(e) => {
-                                  const charCode = e.which ? e.which : e.keyCode;
-                                  if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-                                    e.preventDefault();
-                                  }
-                                  if (charCode === 46 && field.value.includes('.')) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                                prefix={
-                                  values.currency && (
-                                    <span className="text-gray-600 font-medium mr-1">
-                                      {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
-                                    </span>
-                                  )
+                    <div className="form-group">
+                      <label className="text-gray-600 font-semibold mb-1 block">Currency & Amount <span className="text-red-500">*</span></label>
+                      <div className="flex gap-0" style={{ display: 'flex' }}>
+                        <Field name="currency">
+                          {({ field }) => (
+                            <Select
+                              {...field}
+                              className="currency-select"
+                              style={{
+                                width: '80px',
+                                minWidth: '80px',
+                                flex: '0 0 80px',
+                                borderTopRightRadius: 0,
+                                borderBottomRightRadius: 0,
+                                borderRight: 0,
+                                backgroundColor: '#f8fafc',
+                              }}
+                              placeholder={<span className="text-gray-400">$</span>}
+                              onChange={(value) => {
+                                if (value === 'add_new') {
+                                  setIsAddCurrencyModalVisible(true);
+                                } else {
+                                  setFieldValue("currency", value);
                                 }
-                              />
-                            )}
-                          </Field>
-                        </div>
-                        <ErrorMessage name="amount" component="div" className="text-red-500 mt-1 text-sm" />
-                        <ErrorMessage name="currency" component="div" className="text-red-500 mt-1 text-sm" />
+                              }}
+                              value={values.currency}
+                              dropdownStyle={{ minWidth: '180px' }}
+
+                              suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                              loading={!currencies}
+                              dropdownRender={menu => (
+                                <div>
+                                  <div
+                                    className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                    onClick={() => setIsAddCurrencyModalVisible(true)}
+                                  >
+                                    <PlusOutlined className="mr-2" />
+                                    <span className="text-sm">Add New</span>
+                                  </div>
+                                  {menu}
+                                </div>
+                              )}
+                            >
+                              {fnddatass?.map((currency) => (
+                                <Option key={currency.id} value={currency.id}>
+                                  <div className="flex items-center w-full px-1">
+                                    <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                    <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                    <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                  </div>
+                                </Option>
+                              ))}
+                            </Select>
+                          )}
+                        </Field>
+                        <Field name="amount">
+                          {({ field, form }) => (
+                            <Input
+                              {...field}
+                              className="price-input"
+                              style={{
+                                flex: 1,
+                                borderTopLeftRadius: 0,
+                                borderBottomLeftRadius: 0,
+                                borderLeft: '1px solid #d9d9d9',
+                              }}
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              placeholder="0.00"
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                  setFieldValue('amount', value);
+                                }
+                              }}
+                              onBlur={() => setFieldTouched("amount", true)}
+                              onKeyPress={(e) => {
+                                const charCode = e.which ? e.which : e.keyCode;
+                                if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                  e.preventDefault();
+                                }
+                                if (charCode === 46 && field.value.includes('.')) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              prefix={
+                                values.currency && (
+                                  <span className="text-gray-600 font-medium mr-1">
+                                    {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                                  </span>
+                                )
+                              }
+                            />
+                          )}
+                        </Field>
                       </div>
-                    </Col>
+                      <ErrorMessage name="amount" component="div" className="text-red-500 mt-1 text-sm" />
+                      <ErrorMessage name="currency" component="div" className="text-red-500 mt-1 text-sm" />
+                    </div>
+                  </Col>
                   <Col span={12} className="mt-3">
                     <div className="form-item">
                       <label className="font-semibold">Account</label>
@@ -470,7 +465,7 @@ const EditRevenue = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                 
+
                   <Col span={12} className="mt-3">
                     <div className="form-item">
                       <label className="font-semibold">Payment Receipt</label>
@@ -508,8 +503,8 @@ const EditRevenue = ({ idd, onClose }) => {
           </Formik>
         </div>
       </div>
-       {/* Add Category Modal */}
-       <Modal
+      {/* Add Category Modal */}
+      <Modal
         title="Add New Category"
         open={isCategoryModalVisible}
         onCancel={() => setIsCategoryModalVisible(false)}
@@ -534,8 +529,8 @@ const EditRevenue = ({ idd, onClose }) => {
         <AddCustomer onClose={closeAddCustomerModal} />
       </Modal>
 
-       {/* Add Currency Modal */}
-       <Modal
+      {/* Add Currency Modal */}
+      <Modal
         title="Add New Currency"
         visible={isAddCurrencyModalVisible}
         onCancel={() => setIsAddCurrencyModalVisible(false)}
@@ -578,7 +573,7 @@ const EditRevenue = ({ idd, onClose }) => {
           width: 100% !important;
         }
       `}</style>
-      
+
     </div>
   );
 };

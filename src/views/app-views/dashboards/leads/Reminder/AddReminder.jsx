@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Button, Form, DatePicker, Select, Input, Checkbox, Row, Col, message } from 'antd';
-import { Formik, Field, ErrorMessage } from 'formik';
+import { Formik, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import moment from 'moment';
 import { adddreinderss, getssreinderss } from './reminderReducers/reminderSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { GetUsers } from 'views/app-views/Users/UserReducers/UserSlice';
@@ -10,12 +9,6 @@ import { Option } from 'antd/es/mentions';
 
 const { TextArea } = Input;
 
-const reminderOptions = [
-  { value: 'call', label: 'Call Reminder' },
-  { value: 'meeting', label: 'Meeting Reminder' },
-  { value: 'followup', label: 'Follow-up Reminder' },
-  { value: 'other', label: 'Other' }
-];
 
 const validationSchema = Yup.object().shape({
   start_date: Yup.date().required('Date is required'),
@@ -30,16 +23,11 @@ const ReminderList = () => {
   const dispatch = useDispatch();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(GetUsers())
-  },[dispatch])
+  }, [dispatch])
 
-  const alluserdata = useSelector((state)=>state.Users.Users.data);
-
-  const allloggedinuser = useSelector((state)=>state.user.loggedInUser);
-  
-
-  const filterdatas = alluserdata?.filter((item)=>item?.created_by == allloggedinuser?.id)
+  const alluserdata = useSelector((state) => state.Users.Users.data);
 
 
 
@@ -62,14 +50,14 @@ const ReminderList = () => {
 
   const onSubmit = (values, { setSubmitting, resetForm }) => {
     dispatch(adddreinderss(values))
-      .then(()=>{
+      .then(() => {
         dispatch(getssreinderss())
         message.success("Reminder added successfully")
         setSubmitting(false);
         setIsModalVisible(false);
         resetForm();
       })
-   
+
   };
 
   return (
@@ -129,33 +117,33 @@ const ReminderList = () => {
                   </Form.Item>
                 </Col>
 
-               
+
                 <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Set reminder to </label>
-                  <Select
-                    name="users"
-                    mode="multiple"
-                    style={{ width: "100%" }}
-                    className="w-full mt-1"
-                    placeholder="Select users"
-                    value={values.users.users}
-                    onChange={(selectedUsers) => setFieldValue("users", { users: selectedUsers })}
-                  >
-                    {alluserdata.map((user) => (
-                      <Option key={user.id} value={user.id}>
-                        {user.username}
-                      </Option>
-                    ))}
-                  </Select>
-                  <ErrorMessage
-                    name="users"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-               
+                  <div className="form-item">
+                    <label className="font-semibold">Set reminder to </label>
+                    <Select
+                      name="users"
+                      mode="multiple"
+                      style={{ width: "100%" }}
+                      className="w-full mt-1"
+                      placeholder="Select users"
+                      value={values.users.users}
+                      onChange={(selectedUsers) => setFieldValue("users", { users: selectedUsers })}
+                    >
+                      {alluserdata.map((user) => (
+                        <Option key={user.id} value={user.id}>
+                          {user.username}
+                        </Option>
+                      ))}
+                    </Select>
+                    <ErrorMessage
+                      name="users"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
 
                 <Col xs={24}>
                   <Form.Item
@@ -198,10 +186,11 @@ const ReminderList = () => {
                       </Button>
                     </Col>
                     <Col>
-                      <Button 
-                        type="primary" 
-                        htmlType="submit" 
+                      <Button
+                        type="primary"
+                        htmlType="submit"
                         loading={isSubmitting}
+                      // disabled={isSubmitting || Object.keys(errors).length > 0}
                       >
                         Save
                       </Button>

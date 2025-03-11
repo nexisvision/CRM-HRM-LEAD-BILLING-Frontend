@@ -1,7 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
-
 const getcalend = async () => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -80,7 +79,6 @@ const UserService = {
   addcalend,
   dellcalend,
   editcalend,
- 
 };
 
 export default UserService;

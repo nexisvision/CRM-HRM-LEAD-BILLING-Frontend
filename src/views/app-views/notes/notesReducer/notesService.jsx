@@ -46,7 +46,7 @@ const adddelnote = async (id) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);

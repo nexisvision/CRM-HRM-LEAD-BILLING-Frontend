@@ -1,25 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Menu, Tag, Input, message, Button, Modal, DatePicker, Space } from "antd";
+import { Card, Table, Input, message, Button, Modal, DatePicker, Dropdown } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
   FileExcelOutlined,
   EditOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import UserView from "../../Users/user-list/UserView";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddLeave from "./AddLeave";
-import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import ViewLeave from "./ViewLeave";
 import EditLeave from "./EditLeave";
@@ -34,7 +28,6 @@ const { RangePicker } = DatePicker;
 const LeaveList = () => {
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddLeaveModalVisible, setIsAddLeaveModalVisible] = useState(false);
   const [isViewLeaveModalVisible, setIsViewLeaveModalVisible] = useState(false);
   const [isEditLeaveModalVisible, setIsEditLeaveModalVisible] = useState(false);
@@ -43,31 +36,20 @@ const LeaveList = () => {
   const dispatch = useDispatch();
   const [searchText, setSearchText] = useState('');
   const [dateRange, setDateRange] = useState(null);
-  const [filteredData, setFilteredData] = useState([]);
-
-  const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Leave);
-
   const openAddLeaveModal = () => {
     setIsAddLeaveModalVisible(true);
   };
-  // Close Add Employee Modal
   const closeAddLeaveModal = () => {
     setIsAddLeaveModalVisible(false);
   };
-  // Open Add Employee Modal
-  const openViewLeaveModal = () => {
-    setIsViewLeaveModalVisible(true);
-  };
-  // Close Add Employee Modal
   const closeViewLeaveModal = () => {
     setIsViewLeaveModalVisible(false);
   };
-  // Open Add Employee Modal
+
   const openEditLeaveModal = () => {
     setIsEditLeaveModalVisible(true);
   };
-  // Close Add Employee Modal
   const closeEditLeaveModal = () => {
     setIsEditLeaveModalVisible(false);
   };
@@ -78,28 +60,23 @@ const LeaveList = () => {
 
   const getFilteredLeaves = () => {
     if (!users) return [];
-    
+
     let result = [...users];
 
-    // Apply text search filter
     if (searchText) {
-      result = result.filter(leave => 
+      result = result.filter(leave =>
         leave.leaveType?.toLowerCase().includes(searchText.toLowerCase()) ||
         leave.reason?.toLowerCase().includes(searchText.toLowerCase()) ||
         leave.status?.toLowerCase().includes(searchText.toLowerCase())
       );
     }
-
-    // Apply date range filter
     if (dateRange && dateRange[0] && dateRange[1]) {
       const startDate = dayjs(dateRange[0]).startOf('day');
       const endDate = dayjs(dateRange[1]).endOf('day');
-      
+
       result = result.filter(leave => {
         const leaveStartDate = dayjs(leave.startDate);
         const leaveEndDate = dayjs(leave.endDate);
-        
-        // Check if leave dates fall within the selected range
         return (
           (leaveStartDate.isAfter(startDate) || leaveStartDate.isSame(startDate)) &&
           (leaveEndDate.isBefore(endDate) || leaveEndDate.isSame(endDate))
@@ -110,56 +87,43 @@ const LeaveList = () => {
     return result;
   };
 
-  const handleSearch = () => {
-    message.success('Search completed');
-  };
-                              
-                const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                const roles = useSelector((state) => state.role?.role?.data);
-                const roleData = roles?.find(role => role.id === roleId);
-             
-                const whorole = roleData.role_name;
-             
-                const parsedPermissions = Array.isArray(roleData?.permissions)
-                ? roleData.permissions
-                : typeof roleData?.permissions === 'string'
-                ? JSON.parse(roleData.permissions)
-                : [];
-              
-                let allpermisson;  
-             
-                if (parsedPermissions["extra-hrm-leave-leavelist"] && parsedPermissions["extra-hrm-leave-leavelist"][0]?.permissions) {
-                  allpermisson = parsedPermissions["extra-hrm-leave-leavelist"][0].permissions;
-                
-                } else {
-                }
-                
-                const canCreateClient = allpermisson?.includes('create');
-                const canEditClient = allpermisson?.includes('edit');
-                const canDeleteClient = allpermisson?.includes('delete');
-                const canViewClient = allpermisson?.includes('view');
-             
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-leave-leavelist"] && parsedPermissions["extra-hrm-leave-leavelist"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-leave-leavelist"][0].permissions;
+
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
+
   const deleteUser = async (userId) => {
     try {
       await dispatch(DeleteLea(userId));
-
-      const updatedData = await dispatch(GetLeave());
-
+      await dispatch(GetLeave());
       setUsers(users.filter((item) => item.id !== userId));
-
     } catch (error) {
       console.error("Error deleting user:", error);
     }
   };
-  const Editfun = async (userId) => {
-    // showUserProfile(elm);
-    openEditLeaveModal();
-    setEditid(userId);
-  };
-  const showUserProfile = (userInfo) => {
-    setUserProfileVisible(true);
-    setSelectedUser(userInfo);
-  };
+
   const closeUserProfile = () => {
     setUserProfileVisible(false);
     setSelectedUser(null);
@@ -183,12 +147,12 @@ const LeaveList = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(empdata()); // Fetch employee data on mount
+    dispatch(empdata());
   }, [dispatch]);
 
   useEffect(() => {
     if (tabledata && tabledata.Leave && tabledata.Leave.data) {
-      const filteredData = tabledata.Leave.data;  
+      const filteredData = tabledata.Leave.data;
       setUsers(filteredData);
     }
   }, [tabledata]);
@@ -197,50 +161,56 @@ const LeaveList = () => {
     openEditLeaveModal();
     setEditid(id);
   };
-  const ViewData = (id) => {
-    openViewLeaveModal();
-    setEditid(id);
-  };
+
 
   const functionleaveok = async (id, status) => {
     const token = localStorage.getItem("auth_token");
     try {
-        const res = await axios.put(
-            `${env.API_ENDPOINT_URL}/leaves/approve/${id}`,
-            {
-                status: status,
-                remarks: status === "approved" ? "Leave approved." : "Leave rejected."
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
-        dispatch(GetLeave());
-        return res.data;
+      const res = await axios.put(
+        `${env.API_ENDPOINT_URL}/leaves/approve/${id}`,
+        {
+          status: status,
+          remarks: status === "approved" ? "Leave approved." : "Leave rejected."
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      dispatch(GetLeave());
+      return res.data;
     } catch (error) {
-        console.error("Error fetching data:", error);
-        throw error; 
+      console.error("Error fetching data:", error);
+      throw error;
     }
   }
-  const dropdownMenu = (elm) => ({
-    items: [
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+
+  const getDropdownItems = (row) => {
+    const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
-        onClick: () => editleave(elm.id)
-      }] : []),
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        onClick: () => editleave(row.id)
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(row.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
+
   const tableColumns = [
     {
       title: "created_by",
@@ -281,13 +251,13 @@ const LeaveList = () => {
       sorter: (a, b) => utils.antdTableSorter(a, b, "endDate"),
     },
 
-  
+
     {
       title: "Leave Reason",
       dataIndex: "reason",
       sorter: (a, b) => a.leavereason.length - b.leavereason.length,
     },
- 
+
     {
       title: "Approval Actions",
       dataIndex: "approval",
@@ -351,7 +321,22 @@ const LeaveList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            menu={{ items: getDropdownItems(elm) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -389,47 +374,47 @@ const LeaveList = () => {
               placeholder={['Start Date', 'End Date']}
               allowClear
               style={{ width: '280px' }}
-             
+
             />
           </div>
         </Flex>
         <Flex gap="7px">
-          
 
-             {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                         <Button type="primary" className="ml-2" onClick={openAddLeaveModal}>
-                                                                         <PlusOutlined />
-                                                                         <span>New</span>
-                                                                       </Button>                                                                                                                                      
-                                                                                                                                                                                                        
-                                                                                      ) : null}
+
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Button type="primary" className="ml-2" onClick={openAddLeaveModal}>
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+
+          ) : null}
           <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel} // Call export function when the button is clicked
+            block
+          >
+            Export All
+          </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
 
-         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                           <Table
-                           columns={tableColumns}
-                           dataSource={getFilteredLeaves()}
-                           rowKey="id"
-                           pagination={{
-                             total: getFilteredLeaves().length,
-                             pageSize: 10,
-                             showSizeChanger: true,
-                             showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                           }}
-                         />
-                             ) : null}
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredLeaves()}
+            rowKey="id"
+            pagination={{
+              total: getFilteredLeaves().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
+          />
+        ) : null}
 
-       
+
       </div>
       <UserView
         data={selectedUser}
@@ -553,6 +538,32 @@ const styles = `
     border-radius: 4px;
     font-size: 12px;
     white-space: nowrap;
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
   }
 `;
 

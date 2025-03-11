@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import ChatMenu from './ChatMenu'
 import ChatContent from './ChatContent'
 import socketService from 'services/SocketService';
 
 const Chat = () => {
-	const dispatch = useDispatch();
 	const [selectedUser, setSelectedUser] = useState(null);
 	const [groupChats, setGroupChats] = useState([]);
-	const allUsers = useSelector((state) => state.Users.Users?.data || []);
 	const loggedInUser = useSelector((state) => state.user.loggedInUser);
 
 	useEffect(() => {
@@ -44,7 +42,7 @@ const Chat = () => {
 			socket.off('group_chats_received');
 			socket.off('group_chat_updated');
 		};
-	}, [loggedInUser.id]);
+	}, [loggedInUser, selectedUser?.id]);
 
 	const handleSelectUser = (userOrGroup) => {
 		const isGroup = userOrGroup.isGroup;

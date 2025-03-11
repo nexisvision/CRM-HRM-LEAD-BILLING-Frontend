@@ -1,7 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
-
 const GetPayment = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -78,15 +77,12 @@ const EditPayment = async (id, data) => {
 
 
 const UserService = {
-  // addUser,
+
   GetPayment,
   AddPyment,
   DeletePayment,
   EditPayment,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default UserService;

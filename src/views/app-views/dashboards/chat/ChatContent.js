@@ -342,8 +342,6 @@ export default function ChatContent({ selectedUser }) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef(null);
   const [editingMessage, setEditingMessage] = useState(null);
-  const [showMessageOptions, setShowMessageOptions] = useState(null);
-  const [activeContextMenu, setActiveContextMenu] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
   const [uploadProgress, setUploadProgress] = useState({});
@@ -456,7 +454,8 @@ export default function ChatContent({ selectedUser }) {
       ));
     });
 
-    if (selectedUser.id) {
+    // Mark messages as read when opening chat
+    if (selectedUser?.id) {
       newSocket.emit('mark_messages_read', {
         sender_id: selectedUser.id,
         receiver_id: loggedInUser.id,
@@ -476,7 +475,7 @@ export default function ChatContent({ selectedUser }) {
       newSocket.off('users_status');
       newSocket.off('message_edited');
     };
-  }, [selectedUser?.id, loggedInUser.id]);
+  }, [selectedUser, loggedInUser.id]);
 
   const handleFileTypeSelect = (type) => {
     const acceptTypes = {
@@ -484,8 +483,6 @@ export default function ChatContent({ selectedUser }) {
       video: UPLOAD_CONFIG.ALLOWED_FILE_TYPES.VIDEO.join(','),
       document: UPLOAD_CONFIG.ALLOWED_FILE_TYPES.DOCUMENT.join(',')
     };
-
-    const maxSize = type === 'video' ? 100 * 1024 * 1024 : 25 * 1024 * 1024; // 100MB for videos, 25MB for others
 
     fileInputRef.current.accept = acceptTypes[type];
     fileInputRef.current.dataset.fileType = type;

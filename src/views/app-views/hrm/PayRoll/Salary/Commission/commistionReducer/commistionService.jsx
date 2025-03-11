@@ -75,12 +75,13 @@ const editcom = async (meetid, values) => {
 };
 
 
+
 const UserService = {
+
   getcom,
   addcom,
   deletecom,
   editcom,
- 
 };
 
 export default UserService;

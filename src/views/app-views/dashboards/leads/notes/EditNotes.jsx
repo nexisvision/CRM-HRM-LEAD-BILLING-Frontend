@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import { Input, Button, Select, message, Row, Col } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
@@ -18,7 +16,6 @@ const EditNotes = ({ idd, onClose }) => {
   const dispatch = useDispatch();
   const { id } = useParams();
 
-
   const filterdata = useSelector((state) => state.employee.employee.data)
 
   const loggeduesr = useSelector((state) => state.user.loggedInUser.username)
@@ -30,7 +27,7 @@ const EditNotes = ({ idd, onClose }) => {
 
   useEffect(() => {
     dispatch(empdata());
-  }, []);
+  }, [dispatch]);
 
   const [initialValues, setInitialValues] = useState({
     note_title: "",
@@ -46,7 +43,7 @@ const EditNotes = ({ idd, onClose }) => {
   });
 
   const allempdata = useSelector((state) => state.Notes);
-  const Expensedata = allempdata?.Notes?.data || [];
+  const Expensedata = React.useMemo(() => allempdata?.Notes?.data || [], [allempdata?.Notes?.data]);
 
   useEffect(() => {
     if (!Expensedata.length || !idd) {

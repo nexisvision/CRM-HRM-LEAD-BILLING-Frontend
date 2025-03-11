@@ -1,10 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./jobonBoardinService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
-// Async thunk for adding user
+
 
 export const AddJobonBoarding = createAsyncThunk(
   "users/AddJobonBoarding",
@@ -18,7 +17,7 @@ export const AddJobonBoarding = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
+
 
 export const getJobonBoarding = createAsyncThunk(
   "emp/getJobonBoarding",
@@ -44,7 +43,7 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
+
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -57,7 +56,6 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Asyc thunk for deleting a user
 export const deleteJobonBoarding = createAsyncThunk(
   "users/deleteJobonBoardingeet",
   async (userId, thunkAPI) => {
@@ -83,15 +81,7 @@ export const editJobonBoardingss = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const jobonboardingSlice = createSlice({
   name: "jobonboarding",
@@ -158,7 +148,7 @@ const jobonboardingSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-    
+
       .addCase(deleteJobonBoarding.pending, (state) => {
         state.isLoading = true;
       })

@@ -1,15 +1,11 @@
-import React, { useState } from "react";
-
+import React from "react";
 
 const GeneralList = () => {
 
 
   return (
     <div className="bg-white shadow rounded-lg p-6 space-y-4 w-full">
-      {/* Table Header */}
-      <h2 className="text-lg font-semibold mb-4">Tasks</h2>
-
-      {/* Table */}
+      <hr className="text-lg font-semibold mb-4">Tasks</hr>
       <div className="overflow-x-auto">
         <table className="min-w-full border">
           <thead>
@@ -24,7 +20,6 @@ const GeneralList = () => {
             </tr>
           </thead>
           <tbody>
-            {/* No Records Found Row */}
             <tr className="text-center text-gray-500">
               <td colSpan="7" className="px-4 py-8">
                 <div className="flex flex-col items-center">

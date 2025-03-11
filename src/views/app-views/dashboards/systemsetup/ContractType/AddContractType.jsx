@@ -1,22 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import {
- 
   Row,
   Col,
- 
   Input,
   message,
   Button,
-
-  Select,
- 
 } from "antd";
-
-import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-
-import userData from "assets/data/user-list.data.json";
-
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import {
@@ -25,31 +15,22 @@ import {
 } from "../../project/milestone/LableReducer/LableSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-
-
 const AddContractType = ({ onClose }) => {
-
   const dispatch = useDispatch();
-
   const allloggeddata = useSelector((state) => state.user);
   const userdata = allloggeddata.loggedInUser;
-
   const lid = userdata.id;
-
-
-
   const onSubmit = (values, { resetForm }) => {
     const payload = {
       ...values,
       lableType: "contract",
     };
 
-
     dispatch(AddLablee({ lid, payload }));
     dispatch(GetLablee(lid));
     dispatch(GetLablee(lid));
     onClose();
-    resetForm();
+    resetForm()
     message.success("Contract Type added successfully!");
   };
 
@@ -66,7 +47,7 @@ const AddContractType = ({ onClose }) => {
     <>
       <div>
         <div className="">
-          <h2 className="mb-1 border-b font-medium"></h2>
+          <hr className="mb-1 border-b font-medium"></hr>
 
           <div className="">
             <div className="">
@@ -76,9 +57,9 @@ const AddContractType = ({ onClose }) => {
                 onSubmit={onSubmit}
               >
                 {({
-                
+
                   handleSubmit,
-                 
+
                 }) => (
                   <Form className="formik-form" onSubmit={handleSubmit}>
                     <Row gutter={16}>

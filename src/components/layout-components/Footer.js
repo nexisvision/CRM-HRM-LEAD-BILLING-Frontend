@@ -15,7 +15,7 @@ export default function Footer() {
 			display: flex;
 			margin: 0 ${TEMPLATE.LAYOUT_CONTENT_GUTTER}px;
 			align-items: center;
-			border-top: 1px solid ${currentTheme === 'dark' ? DARK_MODE.BORDER_BASE_COLOR : BORDER.BASE_COLOR };
+			border-top: 1px solid ${currentTheme === 'dark' ? DARK_MODE.BORDER_BASE_COLOR : BORDER.BASE_COLOR};
 			justify-content: space-between;
 		
 			@media ${MEDIA_QUERIES.MOBILE} {

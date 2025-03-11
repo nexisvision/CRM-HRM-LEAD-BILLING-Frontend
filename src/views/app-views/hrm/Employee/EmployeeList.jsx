@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Menu, Input, message, Button, Modal, Select, Switch, Badge, Avatar, Tag } from "antd";
+import { Card, Table, Menu, Input, message, Button, Modal, Select, Switch, Badge, Avatar, Tag, Dropdown } from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
@@ -7,15 +7,13 @@ import {
   EditOutlined,
   PlusOutlined,
   FileExcelOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AddEmployee from "./AddEmployee";
 import EditEmployee from "./EditEmployee";
 import ViewEmployee from "./ViewEmployee";
 import { utils, writeFile } from "xlsx";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteEmp, empdata } from "./EmployeeReducers/EmployeeSlice";
 import { roledata } from "../RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice";
@@ -45,8 +43,6 @@ const EmployeeList = () => {
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.employee);
-  const allroledata = useSelector((state) => state.role);
-  const fndroledata = allroledata.role.data;
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
   const branchDataa = useSelector((state) => state.Branch?.Branch?.data || []);
@@ -56,7 +52,7 @@ const EmployeeList = () => {
 
   useEffect(() => {
     dispatch(roledata());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(empdata());
@@ -108,7 +104,7 @@ const EmployeeList = () => {
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
 
-  const checkAndUpdateSalaryStatus = (salaryRecord) => {
+  const checkAndUpdateSalaryStatus = React.useCallback((salaryRecord) => {
     if (!salaryRecord || !salaryRecord.paymentDate) return salaryRecord;
 
     const lastPaymentDate = moment(salaryRecord.paymentDate);
@@ -127,11 +123,11 @@ const EmployeeList = () => {
     }
 
     return salaryRecord;
-  };
+  }, [dispatch]);
 
   const getEmployeeSalaryStatus = (employeeId) => {
-    const salaryRecord = salaryData.find(salary => 
-      salary.employeeId === employeeId && 
+    const salaryRecord = salaryData.find(salary =>
+      salary.employeeId === employeeId &&
       salary.created_by === user
     );
 
@@ -155,11 +151,11 @@ const EmployeeList = () => {
     const intervalId = setInterval(checkSalaryStatuses, 86400000);
 
     return () => clearInterval(intervalId);
-  }, [salaryData]);
+  }, [salaryData, checkAndUpdateSalaryStatus]);
 
   const handleEmployeeSalaryStatus = (record, checked) => {
-    const salaryRecord = salaryData.find(salary => 
-      salary.employeeId === record.id && 
+    const salaryRecord = salaryData.find(salary =>
+      salary.employeeId === record.id &&
       salary.created_by === user
     );
 
@@ -262,9 +258,11 @@ const EmployeeList = () => {
     }
   };
 
-  const dropdownMenu = (elm) => ({
-    items: [
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+  const getDropdownItems = (elm) => {
+    const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
@@ -272,45 +270,55 @@ const EmployeeList = () => {
           setSelectedEmployeeId(elm.id);
           setIsEditEmployeeModalVisible(true);
         }
-      }] : []),
-      {
-        key: 'email',
-        icon: <MdOutlineEmail />,
-        label: 'Update Email',
-        onClick: () => {
-          setIsEmailVerificationModalVisible(true);
-          setCompnyid(elm.id);
-        }
-      },
-      {
-        key: 'view',
-        icon: <EyeOutlined />,
-        label: 'View',
-        onClick: () => {
-          setSelectedEmployeeId(elm.id);
-          setIsViewEmployeeModalVisible(true);
-        }
-      },
-      {
-        key: 'checkin',
-        icon: <EditOutlined />,
-        label: 'Check In',
-        onClick: () => handleCheckIn(elm.id)
-      },
-      {
-        key: 'checkout',
-        icon: <EditOutlined />,
-        label: 'Check Out',
-        onClick: () => handleCheckOut(elm.id)
-      },
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+      });
+    }
+
+    items.push({
+      key: 'email',
+      icon: <MdOutlineEmail />,
+      label: 'Update Email',
+      onClick: () => {
+        setIsEmailVerificationModalVisible(true);
+        setCompnyid(elm.id);
+      }
+    });
+
+    items.push({
+      key: 'view',
+      icon: <EyeOutlined />,
+      label: 'View',
+      onClick: () => {
+        setSelectedEmployeeId(elm.id);
+        setIsViewEmployeeModalVisible(true);
+      }
+    });
+
+    items.push({
+      key: 'checkin',
+      icon: <EditOutlined />,
+      label: 'Check In',
+      onClick: () => handleCheckIn(elm.id)
+    });
+
+    items.push({
+      key: 'checkout',
+      icon: <EditOutlined />,
+      label: 'Check Out',
+      onClick: () => handleCheckOut(elm.id)
+    });
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(elm.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -395,7 +403,7 @@ const EmployeeList = () => {
       key: "salaryStatus",
       render: (_, record) => {
         const salaryRecord = getEmployeeSalaryStatus(record.id);
-        const nextPaymentDate = salaryRecord?.paymentDate 
+        const nextPaymentDate = salaryRecord?.paymentDate
           ? moment(salaryRecord.paymentDate).add(1, 'month').format('DD MMM YYYY')
           : 'N/A';
 
@@ -433,7 +441,22 @@ const EmployeeList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -619,6 +642,25 @@ const EmployeeList = () => {
         }
         .ant-table {
           border-radius: 0;
+        }
+        .ant-dropdown-menu {
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          padding: 4px;
+        }
+        .ant-dropdown-menu-item {
+          padding: 8px 16px;
+          border-radius: 4px;
+          margin: 2px 0;
+        }
+        .ant-dropdown-menu-item:hover {
+          background-color: #f5f5f5;
+        }
+        .ant-dropdown-menu-item-danger:hover {
+          background-color: #fff1f0;
+        }
+        .ant-dropdown-menu-item .anticon {
+          font-size: 16px;
         }
       `}</style>
     </Card>

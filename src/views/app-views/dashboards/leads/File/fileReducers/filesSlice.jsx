@@ -1,14 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./fileService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
+
 import { message } from "antd";
 
 export const fileadd = createAsyncThunk(
   "users/fileadd",
-  async ({id,values}, thunkAPI) => {
+  async ({ id, values }, thunkAPI) => {
     try {
-      const response = await UserService.addfiless(id,values);
+      const response = await UserService.addfiless(id, values);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -27,7 +27,6 @@ export const GetProject = createAsyncThunk(
     }
   }
 );
-
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -77,16 +76,6 @@ export const Editpro = createAsyncThunk(
   }
 );
 
-
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
-
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const ProjectSlice = createSlice({
   name: "Project",
@@ -153,7 +142,7 @@ const ProjectSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-     
+
 
       .addCase(DeletePro.pending, (state) => {
         state.isLoading = true;

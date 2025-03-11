@@ -75,13 +75,12 @@ const EditEx = async (id, values) => {
   }
 };
 
-
 const UserService = {
+
   Getex,
   AddExpence,
   DeleteEx,
   EditEx,
- 
 };
 
 export default UserService;

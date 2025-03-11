@@ -19,17 +19,17 @@ const Introduction = () => {
 		<div>
 			<h2>Introduction</h2>
 			<p className="font-size-md">
-				<strong>Emilus</strong> - 
-				A developer friendly & highly scalable admin 
+				<strong>Emilus</strong> -
+				A developer friendly & highly scalable admin
 				dashboard template built with React & top notch technologies stack.
-				It offers a clean code base and detailed documentation which allow you 
+				It offers a clean code base and detailed documentation which allow you
 				to develop your web application faster and cost effectively.
 				Emilus can be used to build any modern web application including a SaaS, admin panels, CRM, CMS, e-commerce panel, etc.
 			</p>
 			<p className="font-size-md">
 				<strong>NOTE: </strong>
 				<span>
-					This is a React based template, 
+					This is a React based template,
 					it required at least an entry-level of Javascript(ES6), React, Redux, LESS to use this template.
 				</span>
 			</p>

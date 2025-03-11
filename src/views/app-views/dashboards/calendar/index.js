@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Badge, Card, Row, Col, Modal, Form, Input, Select, TimePicker, Button, Tooltip, message } from 'antd';
+import { Badge, Card, Row, Col, Modal, Form, Input, Select, TimePicker, Button, Tooltip, message } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { addcalends, getcalends, deletecalends } from './calanderReducer/calanderSlice';
@@ -8,7 +8,7 @@ import moment from 'moment';
 const { Option } = Select;
 
 const badgeColors = [
-  'pink', 'red', 'orange',  'green'
+  'pink', 'red', 'orange', 'green'
 ];
 
 const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
@@ -21,7 +21,7 @@ const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
     const endDate = moment(lastDay).endOf('week');
     const calendar = [];
     let week = [];
-    
+
     for (let day = moment(startDate); day.isSameOrBefore(endDate); day.add(1, 'day')) {
       week.push({
         date: moment(day),
@@ -45,7 +45,7 @@ const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
   const renderEventBadge = (event) => {
     const timeStr = formatEventTime(event.startDate);
     return (
-      <Tooltip 
+      <Tooltip
         title={
           <div>
             <div><strong>{event.name}</strong></div>
@@ -54,10 +54,10 @@ const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
           </div>
         }
       >
-        <div 
-          key={event.id} 
-          className="event-badge" 
-          style={{ 
+        <div
+          key={event.id}
+          className="event-badge"
+          style={{
             backgroundColor: event.color,
             color: 'white',
             height: '24px'
@@ -81,13 +81,13 @@ const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
   return (
     <div className="custom-calendar">
       <div className="calendar-header">
-        <Button 
+        <Button
           onClick={() => setCurrentDate(moment(currentDate).subtract(1, 'month'))}
         >
           Previous
         </Button>
         <h2>{currentDate.format('MMMM YYYY')}</h2>
-        <Button 
+        <Button
           onClick={() => setCurrentDate(moment(currentDate).add(1, 'month'))}
         >
           Next
@@ -200,40 +200,8 @@ const CalendarApp = () => {
   }
 
   const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
-
-
-  const cellRender = (value) => {
-    const currentDate = value.format('YYYY-MM-DD');
-
-    const listData = fndata.filter((event) => {
-      const eventStart = moment(event.startDate);
-      return eventStart.format('YYYY-MM-DD') === currentDate;
-    });
-
-    if (listData.length === 0) return null;
-
-    return (
-      <div style={{ position: 'absolute', bottom: '4px', left: 0, right: 0, padding: '2px', overflow: 'hidden' }}>
-        {listData.map((item) => (
-          <Tooltip key={item.id} title={item.name}>
-            <div
-              style={{
-                backgroundColor: item.color,
-                height: '6px',
-                marginBottom: '2px',
-                borderRadius: '2px',
-                width: '100%',
-              }}
-            />
-          </Tooltip>
-        ))}
-      </div>
-    );
-  };
-
   const handleStartTimeChange = (time) => {
     form.setFieldsValue({ end: null }); // Reset end time when start time changes
     form.validateFields(['end']); // Revalidate end time
@@ -241,7 +209,7 @@ const CalendarApp = () => {
 
   return (
     <div className="calendar-container">
-      
+
       <Row gutter={16}>
         <Col xs={24} sm={24} md={8} lg={6}>
           <Card className="sidebar-card">
@@ -310,16 +278,16 @@ const CalendarApp = () => {
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item name="start" label="Start" rules={[{ required: true, message: 'Please select start time' }]}>
-                  <TimePicker 
-                    className="w-100" 
+                  <TimePicker
+                    className="w-100"
                     onChange={handleStartTimeChange}
                   />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item 
-                  name="end" 
-                  label="End" 
+                <Form.Item
+                  name="end"
+                  label="End"
                   rules={[
                     { required: true, message: 'Please select end time' },
                     ({ getFieldValue }) => ({
@@ -333,12 +301,12 @@ const CalendarApp = () => {
                     }),
                   ]}
                 >
-                  <TimePicker 
+                  <TimePicker
                     className="w-100"
                     disabledTime={() => {
                       const startTime = form.getFieldValue('start');
                       if (!startTime) return {};
-                      
+
                       return {
                         disabledHours: () => {
                           const hours = [];
@@ -366,10 +334,10 @@ const CalendarApp = () => {
               <Select>
                 {badgeColors.map((elm) => (
                   <Option value={elm} key={elm}>
-                  <div className="flex items-center gap-2">
-                  <Badge color={elm} />
-                  <span className="text-capitalize font-weight-semibold">{elm}</span>
-                </div>
+                    <div className="flex items-center gap-2">
+                      <Badge color={elm} />
+                      <span className="text-capitalize font-weight-semibold">{elm}</span>
+                    </div>
                   </Option>
                 ))}
               </Select>

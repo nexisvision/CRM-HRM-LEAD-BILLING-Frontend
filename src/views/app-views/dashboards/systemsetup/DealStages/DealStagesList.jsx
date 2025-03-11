@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { TiArrowMove } from "react-icons/ti";
-
 import Flex from "components/shared-components/Flex";
 import { Button, message, Modal, Select } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -18,29 +17,15 @@ const DealStagesList = () => {
     useState(false);
   const [isAddLeadStagesModalVisible, setIsAddLeadStagesModalVisible] =
     useState(false);
-
   const [selectedPipeline, setSelectedPipeline] = useState("all");
-
   const dispatch = useDispatch();
-
-  // const loggeduser = useSelector((state) => state.user.loggedInUser.username);
-
-
   const allfdata = useSelector((state) => state.StagesLeadsDeals);
-  const fnddata = allfdata?.StagesLeadsDeals?.data || [];
-
-  // const fnddata = fnddataa.filter((item)=>item.created_by === loggeduser)
-
-
+  const fnddata = useMemo(() => allfdata?.StagesLeadsDeals?.data || [], [allfdata?.StagesLeadsDeals?.data]);
   const [leadadatafilter, setLeadadatafilter] = useState([]);
   const [idd, setIdd] = useState("");
 
   const Allpipline = useSelector((state) => state.Piplines);
   const filterpipline = Allpipline?.Piplines?.data || [];
-
-  
-    // const filterpipline = Filterpipline.filter((item)=>item.created_by === loggeduser)
-
   useEffect(() => {
     dispatch(getstages());
   }, [dispatch]);

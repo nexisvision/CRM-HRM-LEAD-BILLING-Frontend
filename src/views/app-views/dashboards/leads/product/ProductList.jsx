@@ -3,53 +3,28 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Select,
   Input,
   Button,
-  Badge,
   Menu,
-  Tag,
   Modal,
-  Row,
-  Col,
   message,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   FileExcelOutlined,
   SearchOutlined,
-  PlusCircleOutlined,
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-import NumberFormat from "react-number-format";
-import dayjs from "dayjs";
-import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import { utils, writeFile } from "xlsx";
 import AddProduct from "./AddProduct";
 import EditProduct from "./EditProduct";
-import ViewProduct from "./ViewProduct";
-import { PaymentStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { DeleteProdu, GetProdu } from "./ProductReducer/ProductsSlice";
-
-const { Option } = Select;
-
-const getPaymentStatus = (method) => {
-  if (method === "Normal") {
-    return "success";
-  }
-  if (method === "Expired") {
-    return "warning";
-  }
-  return "";
-};
-
-const paymentStatusList = ["Normal", "Expired"];
 
 const ProductList = () => {
   const dispatch = useDispatch();
@@ -59,21 +34,17 @@ const ProductList = () => {
 
   const filtermin = allempdata.Product.data;
   const [list, setList] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
-
   const [idd, setIdd] = useState("");
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddProductModalVisible, setIsAddProductModalVisible] =
     useState(false);
   const [isEditProductModalVisible, setIsEditProductModalVisible] =
     useState(false);
   const [isViewProductModalVisible, setIsViewProductModalVisible] =
     useState(false);
-  const [paymentStatisticData] = useState(PaymentStatisticData);
 
   useEffect(() => {
     dispatch(GetProdu(id));
-  }, [dispatch]);
+  }, [dispatch, id]);
 
   useEffect(() => {
     if (filtermin) {
@@ -97,23 +68,11 @@ const ProductList = () => {
     setIsEditProductModalVisible(false);
   };
 
-  const openViewProductModal = () => {
-    setIsViewProductModalVisible(true);
-  };
 
   const closeViewProductModal = () => {
     setIsViewProductModalVisible(false);
   };
 
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "status";
-      const data = utils.filterArray(list, key, value);
-      setList(data);
-    } else {
-      setList(filtermin);
-    }
-  };
 
   const Deletefun = async (exid) => {
     try {
@@ -121,20 +80,16 @@ const ProductList = () => {
       if (response.error) {
         throw new Error(response.error.message);
       }
-      const updatedData = await dispatch(GetProdu(id));
       setList(list.filter((item) => item.id !== exid));
-
     } catch (error) {
       console.error("Error deleting user:", error.message || error);
     }
   };
   const exportToExcel = () => {
     try {
-      
       const ws = utils.json_to_sheet(list);
-      const wb = utils.book_new(); // Create a new workbook
-      utils.book_append_sheet(wb, ws, "Product"); // Append the worksheet to the workbook
-
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, ws, "Product");
       writeFile(wb, "ProductData.xlsx");
       message.success("Data exported successfully!");
     } catch (error) {
@@ -147,34 +102,23 @@ const ProductList = () => {
     setIdd(idd);
   };
 
-  const dropdownMenu = (row) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center" onClick={openViewProductModal}>
-          <EyeOutlined />
-          <span className="ml-2">View Details</span>
-        </Flex>
-      </Menu.Item> */}
-
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => editFun(row.id)}>
-          <EditOutlined />
-          {/* <EditOutlined /> */}
-          <span className="ml-2">Edit</span>
-        </Flex>
-      </Menu.Item>
-
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => Deletefun(row.id)}>
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const getDropdownItems = (row) => [
+    {
+      key: 'edit',
+      icon: <EditOutlined />,
+      label: 'Edit',
+      onClick: () => editFun(row.id)
+    },
+    {
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      label: 'Delete',
+      onClick: () => Deletefun(row.id),
+      danger: true
+    }
+  ];
 
   const tableColumns = [
-  
     {
       title: "Name",
       dataIndex: "name",
@@ -204,32 +148,53 @@ const ProductList = () => {
       ),
       sorter: (a, b) => a.description.length - b.description.length,
     },
-   
     {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
   ];
-
-  const rowSelection = {
-    onChange: (key, rows) => {
-      setSelectedRows(rows);
-      setSelectedRowKeys(key);
-    },
-  };
-
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const searchArray = e.currentTarget.value ? list : filtermin;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
-    setSelectedRowKeys([]);
   };
+
+  const styles = `
+    .ant-dropdown-menu {
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .ant-dropdown-menu-item {
+      padding: 8px 16px;
+    }
+    .ant-dropdown-menu-item:hover {
+      background-color: #f5f5f5;
+    }
+    .ant-dropdown-menu-item-danger:hover {
+      background-color: #fff1f0;
+    }
+  `;
 
   return (
     <>
@@ -282,7 +247,6 @@ const ProductList = () => {
             dataSource={list}
             rowKey="id"
             scroll={{ x: 1200 }}
-         
           />
         </div>
       </Card>
@@ -317,9 +281,9 @@ const ProductList = () => {
           width={800}
           className="mt-[-70px]"
         >
-          <ViewProduct onClose={closeViewProductModal} />
         </Modal>
       </Card>
+      <style jsx>{styles}</style>
     </>
   );
 };

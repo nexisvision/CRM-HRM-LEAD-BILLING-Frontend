@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Button, Tooltip, Tag, Progress, Avatar, Modal, Card, Radio, Row, Col, Dropdown, Menu, Select, Input } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, AppstoreOutlined, UnorderedListOutlined, PaperClipOutlined, CheckCircleOutlined, ClockCircleOutlined, ConsoleSqlOutlined, EllipsisOutlined, CalendarOutlined, TeamOutlined, DollarOutlined, ExclamationCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Table, Button, Tooltip, Avatar, Modal, Card, Radio, Row, Col, Dropdown, Menu, Select, Input } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, AppstoreOutlined, UnorderedListOutlined, CheckCircleOutlined, ClockCircleOutlined, CalendarOutlined, DollarOutlined, ExclamationCircleOutlined, CloseCircleOutlined, EllipsisOutlined } from '@ant-design/icons';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import ProjectListData from './ProjectListData';
-import AddProject from './AddProject';
 import EditProject from './EditProject';
-import utils from 'utils';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import PageHeaderAlt from 'components/layout-components/PageHeaderAlt';
 import Flex from 'components/shared-components/Flex';
 import { empdata } from 'views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice';
@@ -18,6 +15,7 @@ import { message } from 'antd';
 import { GetLable, AddLable } from '../../sales/LableReducer/LableSlice';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { GetUsers } from 'views/app-views/Users/UserReducers/UserSlice';
+import AddProject from './AddProject';
 
 const VIEW_LIST = 'LIST';
 const VIEW_GRID = 'GRID';
@@ -122,29 +120,22 @@ const ProjectList = () => {
 	const [isEditProjectModalVisible, setIsEditProjectModalVisible] = useState(false);
 	const [clientid, setClientId] = useState("");
 	const [idd, setIdd] = useState("");
-
 	const [isTagModalVisible, setIsTagModalVisible] = useState(false);
 	const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
 	const [newTag, setNewTag] = useState("");
 	const [newStatus, setNewStatus] = useState("");
-
 	const AllProject = useSelector((state) => state.Project);
 	const properdata = AllProject.Project.data;
-
 	const loggedInUser = useSelector((state) => state.user.loggedInUser);
 	const username = loggedInUser ? loggedInUser.client_id : "";
-
 	const { state } = useLocation();
-
 	const [tags, setTags] = useState([]);
 	const [statuses, setStatuses] = useState([]);
 	const AllLoggedData = useSelector((state) => state.user);
-
 	const { currencies } = useSelector((state) => state.currencies);
-	const currencyData = currencies?.data || [];
-
+	const currencyData = useMemo(() => currencies?.data || [], [currencies]);
 	const alluserdatas = useSelector((state) => state.Users);
-	const allUsers = alluserdatas?.Users?.data || [];
+	const allUsers = useMemo(() => alluserdatas?.Users?.data || [], [alluserdatas]);
 
 	useEffect(() => {
 		if (state?.idd) {
@@ -152,7 +143,6 @@ const ProjectList = () => {
 		}
 	}, [state]);
 
-	const matchingClients = properdata?.filter(client => client?.client === clientid);
 
 	const dispatch = useDispatch();
 
@@ -179,7 +169,6 @@ const ProjectList = () => {
 
 		const formattedData = properdata.map((item) => {
 			let projectMembers = [];
-			let filesArray = [];
 
 			try {
 				if (item.project_members) {
@@ -200,10 +189,9 @@ const ProjectList = () => {
 
 				if (item.files) {
 					try {
-						filesArray = JSON.parse(item.files) || [];
+						JSON.parse(item.files);
 					} catch (e) {
 						console.error('Error parsing files:', e);
-						filesArray = [];
 					}
 				}
 			} catch (error) {
@@ -308,9 +296,6 @@ const ProjectList = () => {
 
 		</Menu>
 	);
-
-	const allEmployeeData = useSelector((state) => state.employee);
-	const empData = allEmployeeData?.employee?.data || [];
 
 	const tableColumns = [
 
@@ -473,15 +458,6 @@ const ProjectList = () => {
 		}
 	];
 
-	const getStatusIcon = (dayleft) => {
-		if (dayleft > 10) {
-			return <CheckCircleOutlined className="text-success" />;
-		} else if (dayleft > 5) {
-			return <ExclamationCircleOutlined className="text-warning" />;
-		}
-		return <CloseCircleOutlined className="text-danger" />;
-	};
-
 	const handleStatusChange = async (projectId, newStatus) => {
 		try {
 			const project = list.find(p => p.id === projectId);
@@ -560,27 +536,6 @@ const ProjectList = () => {
 		} catch (error) {
 			message.error('Failed to update tag');
 			console.error('Tag update error:', error);
-		}
-	};
-
-	const getStatusColor = (status) => {
-		switch (status?.toLowerCase()) {
-			case 'completed': return 'bg-green-500';
-			case 'in progress': return 'bg-blue-500';
-			case 'on hold': return 'bg-yellow-500';
-			case 'cancelled': return 'bg-red-500';
-			default: return 'bg-gray-500';
-		}
-	};
-
-	const getTagColor = (tag) => {
-		switch (tag?.toLowerCase()) {
-			case 'urgent': return 'red';
-			case 'high priority': return 'orange';
-			case 'in progress': return 'blue';
-			case 'completed': return 'green';
-			case 'on hold': return 'yellow';
-			default: return 'default';
 		}
 	};
 
@@ -670,8 +625,6 @@ const ProjectList = () => {
 					) : (
 						<Row gutter={[24, 24]} className="project-list-container">
 							{list.map((item) => {
-								let statusColor = item.dayleft > 10 ? '#52c41a' : item.dayleft > 5 ? '#faad14' : '#f5222d';
-
 								return (
 									<Col xs={24} sm={12} lg={8} xxl={6} key={item.id}>
 										<Card

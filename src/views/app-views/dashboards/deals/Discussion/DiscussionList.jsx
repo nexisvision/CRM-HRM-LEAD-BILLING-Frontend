@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Button, Avatar, Card, Modal } from 'antd';
+import { Table, Button, Card, Modal } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import AddDiscussion from './AddDiscussion';
 

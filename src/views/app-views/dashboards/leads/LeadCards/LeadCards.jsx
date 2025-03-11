@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Card, Row, Col, Button, Modal, Input, Form, Select, Avatar, Tag, Badge, Tooltip, Progress } from "antd";
-import { PlusOutlined, CalendarOutlined, MessageOutlined, CommentOutlined, UserOutlined, PhoneOutlined, MailOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import React, { useState, useEffect, useMemo } from "react";
+import { Card, Row, Col, Modal, Select, Avatar, Tag } from "antd";
+import { CalendarOutlined, CommentOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import {
   DndContext,
   useDroppable,
@@ -18,8 +18,8 @@ import {
 } from "@dnd-kit/sortable";
 import { useDispatch, useSelector } from "react-redux";
 import { getstages } from "../../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
-import { GetLeads, LeadsEdit } from "../LeadReducers/LeadSlice"; 
-import AddLeadCards from "./AddleadCards"; // Assuming AddLead is an action
+import { GetLeads, LeadsEdit } from "../LeadReducers/LeadSlice";
+import AddLeadCards from "./AddleadCards";
 import { GetPip } from "../../systemsetup/Pipeline/PiplineReducer/piplineSlice";
 import { Option } from "antd/es/mentions";
 
@@ -38,23 +38,9 @@ const DraggableItem = ({ lead, id }) => {
     cursor: "move",
   };
 
-  const daysSinceCreation = () => {
-    const createdDate = new Date(lead.createdAt);
-    const today = new Date();
-    const diffTime = today - createdDate;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
-
-  const getProgressColor = (days) => {
-    if (days <= 7) return "#52c41a";
-    if (days <= 14) return "#faad14";
-    return "#ff4d4f";
-  };
-
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Card 
+      <Card
         className="lead-card cursor-pointer"
         bodyStyle={{ padding: '12px' }}
         bordered={false}
@@ -67,9 +53,8 @@ const DraggableItem = ({ lead, id }) => {
           overflow: 'hidden'
         }}
       >
-        {/* Left border line */}
-        <div 
-          style={{ 
+        <div
+          style={{
             position: 'absolute',
             left: "16px",
             right: 0,
@@ -79,7 +64,7 @@ const DraggableItem = ({ lead, id }) => {
             backgroundColor: '#1677ff',
             borderTopLeftRadius: '3px',
             borderTopRightRadius: '3px'
-          }} 
+          }}
         />
         <div>
           <div className="flex justify-between items-start">
@@ -102,7 +87,7 @@ const DraggableItem = ({ lead, id }) => {
           </div>
           <div className="mt-2 flex justify-end">
             <Avatar.Group size={35}>
-              <Avatar 
+              <Avatar
                 src={lead.assigned?.profilePicture || "https://www.gravatar.com/avatar/?d=mp"}
                 alt={lead.assigned?.name || "User Avatar"}
               />
@@ -126,11 +111,6 @@ const DroppableColumn = ({ status, leads }) => {
   const { setNodeRef } = useDroppable({
     id: status,
   });
-  const [isAddLeadVisible, setIsAddLeadVisible] = useState(false); 
-  const handleAddLeadClick = () => {
-    setIsAddLeadVisible(false);
-  };
-
   return (
     <div
       ref={setNodeRef}
@@ -149,22 +129,15 @@ const DroppableColumn = ({ status, leads }) => {
           <DraggableItem key={lead?.id} lead={lead} id={lead?.id} />
         ))}
       </SortableContext>
-      {/* <Button className="mt-2 w-full"  onClick={handleAddLeadClick}>
-        Add task
-        <PlusOutlined />
-      </Button> */}
     </div>
   );
 };
 
 const LeadCards = () => {
   const [leadData, setLeadData] = useState([]);
-  const [isAddLeadCardsVisible, setIsAddLeadCardsVisible] = useState(false); // State for toggling the add lead form
-  const [newLead, setNewLead] = useState({}); // State for form inputs
+  const [isAddLeadCardsVisible, setIsAddLeadCardsVisible] = useState(false);
   const dispatch = useDispatch();
-   const [selectedPipeline, setSelectedPipeline] = useState("all");
-     const [leadadatafilter, setLeadadatafilter] = useState([]);
-
+  const [selectedPipeline, setSelectedPipeline] = useState("all");
   const loggeduserdata = useSelector((state) => state.user.loggedInUser.username);
 
   useEffect(() => {
@@ -173,26 +146,31 @@ const LeadCards = () => {
   }, [dispatch]);
 
   const allstagedata = useSelector((state) => state.StagesLeadsDeals);
-  const fndata = allstagedata?.StagesLeadsDeals?.data || [];
-
   const allleaddata = useSelector((state) => state.Leads);
-  const fndleadadat = allleaddata?.Leads?.data || [];
+
+  const fndata = useMemo(() => {
+    return allstagedata?.StagesLeadsDeals?.data || [];
+  }, [allstagedata]);
+
+  const fndleadadat = useMemo(() => {
+    return allleaddata?.Leads?.data || [];
+  }, [allleaddata]);
 
 
-  useEffect(()=>{
-   dispatch(GetPip());
-  },[])
-  
-    const Allpipline = useSelector((state) => state.Piplines);
-    const Filterpipline = Allpipline?.Piplines?.data || [];
+  useEffect(() => {
+    dispatch(GetPip());
+  }, [dispatch])
 
-    const alldatas = useSelector((state)=>state.user.loggedInUser.username)
+  const Allpipline = useSelector((state) => state.Piplines);
+  const Filterpipline = Allpipline?.Piplines?.data || [];
 
-    const fnddatss = Filterpipline.filter((item)=>item.created_by === alldatas)
+  const alldatas = useSelector((state) => state.user.loggedInUser.username)
+
+  const fnddatss = Filterpipline.filter((item) => item.created_by === alldatas)
 
   useEffect(() => {
     if (fndata.length > 0) {
-      const filteredStages = selectedPipeline === "all" 
+      const filteredStages = selectedPipeline === "all"
         ? fndata.filter((stage) => stage.stageType === "lead" && stage.created_by === loggeduserdata)
         : fndata.filter((stage) => stage.pipeline === selectedPipeline && stage.stageType === "lead" && stage.created_by === loggeduserdata);
 
@@ -280,35 +258,18 @@ const LeadCards = () => {
     setLeadData(updatedLeadData);
   };
 
-  const handleAddLeadCardsClick = () => {
-    setIsAddLeadCardsVisible(true);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewLead((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
- 
-  const handleAddLeadCardsSubmit = () => {
-    dispatch(AddLeadCards(newLead));
-    setIsAddLeadCardsVisible(false); // Close the form after submission
-  };
 
   const handlePipelineChange = (value) => {
     setSelectedPipeline(value);
   };
-  
+
 
   return (
     <div className="lead-board" style={{ padding: "24px" }}>
       <div className="lead-board-header" style={{ marginBottom: "24px" }}>
         <Select
           placeholder="Select Pipeline"
-          style={{ 
+          style={{
             width: '100%',
             maxWidth: '300px',
             marginBottom: '16px'
@@ -327,7 +288,7 @@ const LeadCards = () => {
       </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <Row 
+        <Row
           gutter={[16, 16]}
           style={{
             margin: 0,
@@ -338,14 +299,14 @@ const LeadCards = () => {
         >
           {leadData?.length > 0 ? (
             leadData.map((leadGroup) => (
-              <Col 
+              <Col
                 key={leadGroup?.stageId}
                 style={{
                   minWidth: '300px',
                   maxWidth: '350px'
                 }}
               >
-                <Card 
+                <Card
                   title={
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span>{leadGroup?.status}</span>
@@ -353,12 +314,12 @@ const LeadCards = () => {
                     </div>
                   }
                   className="stage-card"
-                  headStyle={{ 
+                  headStyle={{
                     backgroundColor: '#fafafa',
                     borderBottom: '1px solid #f0f0f0',
                     padding: '12px 16px'
                   }}
-                  bodyStyle={{ 
+                  bodyStyle={{
                     padding: '16px',
                     backgroundColor: 'rgba(0,0,0,0.02)'
                   }}

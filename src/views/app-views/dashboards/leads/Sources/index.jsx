@@ -3,9 +3,9 @@ import SourcesList from './SourcesList';
 
 const Sources = () => (
 
-<div className="mail">
-<SourcesList />
-</div>
+	<div className="mail">
+		<SourcesList />
+	</div>
 
 );
 

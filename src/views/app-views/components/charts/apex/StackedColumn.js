@@ -62,7 +62,7 @@ export class StackedColumn extends Component {
 				options={this.state.options}
 				series={this.state.series}
 				type="bar"
-				height= {300}
+				height={300}
 			/>
 		)
 	}

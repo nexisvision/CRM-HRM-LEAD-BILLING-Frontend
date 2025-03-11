@@ -3,7 +3,7 @@ import UserService from "./EsignatureService";
 import { toast } from "react-toastify";
 import { message } from "antd";
 
-// Async thunk for adding user
+
 
 export const addesig = createAsyncThunk(
   "users/addesig",
@@ -17,7 +17,7 @@ export const addesig = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
+
 
 export const getsignaturesss = createAsyncThunk(
   "emp/getsignaturesss",
@@ -31,7 +31,7 @@ export const getsignaturesss = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const deletesigssss = createAsyncThunk(
   "users/deletesigssss",
   async (userId, thunkAPI) => {
@@ -45,15 +45,7 @@ export const deletesigssss = createAsyncThunk(
 );
 
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const EsignatureSlice = createSlice({
   name: "esignature",
@@ -121,7 +113,7 @@ const EsignatureSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-     
+
       //delete
       .addCase(deletesigssss.pending, (state) => {
         state.isLoading = true;
@@ -134,7 +126,6 @@ const EsignatureSlice = createSlice({
         state.isLoading = false;
         message.error(action.payload?.message);
       })
-
 
   },
 });

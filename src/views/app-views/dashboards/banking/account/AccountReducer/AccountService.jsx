@@ -74,16 +74,15 @@ const updateAccount = async (id, payload) => {
   }
 };
 
+
+
 const AccountService = {
-  // addUser,
+
   getAccounts,
   createAccount,
   updateAccount,
   deleteAccount,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default AccountService;

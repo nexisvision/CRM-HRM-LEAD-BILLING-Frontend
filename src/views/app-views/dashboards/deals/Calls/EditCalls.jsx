@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Modal, Input, Select, Button, Form, Row, Col, message } from 'antd';
+import { Input, Select, Button, Form, Row, Col, message } from 'antd';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -33,7 +33,6 @@ const EditCalls = ({ visible, onClose, callData, onUpdate }) => {
   };
 
   return (
-    
     <Form layout="vertical" form={form} onFinish={onSubmit}>
 
 

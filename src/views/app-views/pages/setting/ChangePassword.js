@@ -9,11 +9,11 @@ export class ChangePassword extends Component {
 	onFinish = () => {
 		message.success({ content: 'Password Changed!', duration: 2 });
 		this.onReset()
-  };
+	};
 
 	onReset = () => {
-    this.changePasswordFormRef.current.resetFields();
-  };
+		this.changePasswordFormRef.current.resetFields();
+	};
 
 	render() {
 
@@ -31,9 +31,9 @@ export class ChangePassword extends Component {
 							<Form.Item
 								label="Current Password"
 								name="currentPassword"
-								rules={[{ 
+								rules={[{
 									required: true,
-									message: 'Please enter your currrent password!' 
+									message: 'Please enter your currrent password!'
 								}]}
 							>
 								<Input.Password />
@@ -41,9 +41,9 @@ export class ChangePassword extends Component {
 							<Form.Item
 								label="New Password"
 								name="newPassword"
-								rules={[{ 
+								rules={[{
 									required: true,
-									message: 'Please enter your new password!' 
+									message: 'Please enter your new password!'
 								}]}
 							>
 								<Input.Password />
@@ -53,9 +53,9 @@ export class ChangePassword extends Component {
 								name="confirmPassword"
 								rules={
 									[
-										{ 
+										{
 											required: true,
-											message: 'Please confirm your password!' 
+											message: 'Please confirm your password!'
 										},
 										({ getFieldValue }) => ({
 											validator(rule, value) {
@@ -71,8 +71,8 @@ export class ChangePassword extends Component {
 								<Input.Password />
 							</Form.Item>
 							<Button type="primary" htmlType="submit">
-									Change password
-								</Button>
+								Change password
+							</Button>
 						</Form>
 					</Col>
 				</Row>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker, Modal } from 'antd';
-import { DeleteOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
+import { Form, Row, Col, Input, message, Button, Select, DatePicker } from 'antd';
+import { DeleteOutlined, PlusOutlined, } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import { useSelector, useDispatch } from 'react-redux';
@@ -14,13 +14,9 @@ const { Option } = Select;
 
 const EditEstimates = ({ idd, onClose }) => {
     const { id } = useParams();
-    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [form] = Form.useForm();
-
-    const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
-
 
     const user = useSelector((state) => state.user.loggedInUser.username);
 
@@ -46,7 +42,7 @@ const EditEstimates = ({ idd, onClose }) => {
     const subClientData = sub?.find((subClient) => subClient?.id === client);
 
 
-    const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads || []);
+    const { data: Leads } = useSelector((state) => state.Leads.Leads || []);
 
     const lead = Leads?.filter((item) => item.created_by === user) || [];
     const leadDetails = lead?.find((lead) => lead.id === currentEstimate?.lead);
@@ -77,6 +73,8 @@ const EditEstimates = ({ idd, onClose }) => {
         }
     ]);
 
+
+
     const [discountType, setDiscountType] = useState('');
     const [discountValue, setDiscountValue] = useState(0);
 
@@ -95,7 +93,7 @@ const EditEstimates = ({ idd, onClose }) => {
         if (id) {
             dispatch(getestimateById(id));
         }
-    }, [dispatch]);
+    }, [dispatch, id]);
 
 
     useEffect(() => {
@@ -121,14 +119,15 @@ const EditEstimates = ({ idd, onClose }) => {
                     if (currentEstimate.items) {
                         try {
                             // Parse items if it's a string
-                            const parsedItems = typeof currentEstimate.items === 'string' 
+                            parsedItems = typeof currentEstimate.items === 'string'
                                 ? JSON.parse(currentEstimate.items)
                                 : currentEstimate.items;
-                            
+
+                            console.log("Parsed Items:", parsedItems);
 
                             // Convert items object to array if needed
-                            const itemsArray = Array.isArray(parsedItems) 
-                                ? parsedItems 
+                            const itemsArray = Array.isArray(parsedItems)
+                                ? parsedItems
                                 : Object.values(parsedItems);
 
                             // Format items for table
@@ -191,7 +190,7 @@ const EditEstimates = ({ idd, onClose }) => {
             const quantity = parseFloat(row.quantity) || 0;
             const price = parseFloat(row.price) || 0;
             const baseAmount = quantity * price;
-            
+
             // Calculate item discount
             let itemDiscountAmount = 0;
             const discountValue = parseFloat(row.discountValue) || 0;
@@ -271,8 +270,8 @@ const EditEstimates = ({ idd, onClose }) => {
                     tax_name: item.tax?.gstName || '',
                     tax: taxPercentage,
                     base_amount: baseAmount.toFixed(2),
-                    discount_percentage: item.discountType === 'percentage' ? 
-                    discountValue : 0,
+                    discount_percentage: item.discountType === 'percentage' ?
+                        discountValue : 0,
                     tax_amount: taxAmount.toFixed(2),
                     amount: itemTotal.toFixed(2),
                     // discount: parseFloat(discount_percentage) || 0
@@ -301,9 +300,7 @@ const EditEstimates = ({ idd, onClose }) => {
             message.success('Estimate updated successfully');
             onClose();
         } catch (error) {
-            message.error('Failed to update estimate');
-        } finally {
-            setLoading(false);
+            message.error('Failed to update estimate: ' + (error.message || 'Unknown error'));
         }
     };
 
@@ -317,18 +314,20 @@ const EditEstimates = ({ idd, onClose }) => {
         }
     };
 
+
+
     // Handle table data changes
     const handleTableDataChange = (id, field, value) => {
         const updatedData = tableData.map((row) => {
             if (row.id === id) {
                 const updatedRow = { ...row, [field]: value };
-                
+
                 // Calculate amount if quantity, price, or tax changes
                 if (field === 'quantity' || field === 'price' || field === 'tax' || field === 'discountType' || field === 'discountValue') {
                     const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
                     const price = parseFloat(field === 'price' ? value : row.price) || 0;
                     const baseAmount = quantity * price;
-                    
+
                     // Calculate item discount
                     let itemDiscountAmount = 0;
                     const discountValue = parseFloat(updatedRow.discountValue) || 0;
@@ -340,16 +339,16 @@ const EditEstimates = ({ idd, onClose }) => {
 
                     // Calculate tax on amount after discount
                     const amountAfterDiscount = baseAmount - itemDiscountAmount;
-                    const tax = field === 'tax' ? 
-                        (value ? parseFloat(value.gstPercentage) : 0) : 
+                    const tax = field === 'tax' ?
+                        (value ? parseFloat(value.gstPercentage) : 0) :
                         (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
                     const taxAmount = (amountAfterDiscount * tax) / 100;
-                    
+
                     // Calculate final amount
                     const finalAmount = amountAfterDiscount + taxAmount;
                     updatedRow.amount = finalAmount.toFixed(2);
                 }
-                
+
                 return updatedRow;
             }
             return row;
@@ -358,13 +357,13 @@ const EditEstimates = ({ idd, onClose }) => {
         setTableData(updatedData);
         calculateTotal(updatedData, discountValue, discountType);
     };
-      
+
 
     return (
         <>
             <div>
                 <div className=' ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4'>
-                    <h2 className="mb-4 border-b pb-[30px] font-medium"></h2>
+                    <hr className="mb-4 border-b  font-medium"></hr>
                     <Form
                         form={form}
                         layout="vertical"
@@ -475,7 +474,7 @@ const EditEstimates = ({ idd, onClose }) => {
                                     <thead className="bg-gray-100">
                                         <tr>
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                            Item<span className="text-red-500">*</span>
+                                                Item<span className="text-red-500">*</span>
                                             </th>
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Quantity<span className="text-red-500">*</span>

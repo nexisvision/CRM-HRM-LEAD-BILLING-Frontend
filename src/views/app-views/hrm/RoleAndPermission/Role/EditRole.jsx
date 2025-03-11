@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, message, Checkbox } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { editRole, getRoles, roledata } from '../RoleAndPermissionReducers/RoleAndPermissionSlice';
 
@@ -17,45 +17,44 @@ const EditRole = ({ id, onClose }) => {
   const role = alldept?.role?.data?.find((item) => item.id === id);
 
 
-  const modules = [
+  const modules = React.useMemo(() => [
     'Staff',
     'CRM',
     'Project',
     'HRM',
     'Account',
-    
-  ];
+  ], []);
 
   const subModules = {
-   
+
     CRM: [
-      {key: 'dashboards-leadcards', title: 'LeadCards'},
-      {key: 'dashboards-lead', title: 'Leads'},
-      {key: 'dashboards-deal', title: 'Deals'},
-      {key: 'dashboards-proposal', title: 'Proposal'},
-      {key: 'dashboards-task', title: 'Task'},
-      {key: 'dashboards-TaskCalendar', title: 'Task Calendar'},
-      {key: 'dashboards-systemsetup', title: 'CRM System Setup'},
-      {key: 'dashboards-mail', title: 'Mail'},
-      {key: 'dashboards-chat', title: 'Chat'},
-      {key: 'dashboards-calendar', title: 'Calendar'},
-      {key: 'extra-pages-customersupports-ticket', title: 'Ticket Supports'},
+      { key: 'dashboards-leadcards', title: 'LeadCards' },
+      { key: 'dashboards-lead', title: 'Leads' },
+      { key: 'dashboards-deal', title: 'Deals' },
+      { key: 'dashboards-proposal', title: 'Proposal' },
+      { key: 'dashboards-task', title: 'Task' },
+      { key: 'dashboards-TaskCalendar', title: 'Task Calendar' },
+      { key: 'dashboards-systemsetup', title: 'CRM System Setup' },
+      { key: 'dashboards-mail', title: 'Mail' },
+      { key: 'dashboards-chat', title: 'Chat' },
+      { key: 'dashboards-calendar', title: 'Calendar' },
+      { key: 'extra-pages-customersupports-ticket', title: 'Ticket Supports' },
     ],
     Staff: [
-      {key: 'extra-users-list', title: 'Users'},
-      {key: 'extra-users-client-list', title: 'Clients'},
-     
+      { key: 'extra-users-list', title: 'Users' },
+      { key: 'extra-users-client-list', title: 'Clients' },
+
     ],
     Project: [
       { key: 'dashboards-project-list', title: 'Project' },
       { key: 'dashboards-project-Contract', title: 'Contract' },
-      
+
     ],
     HRM: [
       { key: 'extra-hrm-employee', title: 'Employee' },
       { key: 'extra-hrm-payroll-salary', title: 'Salary' },
       { key: 'extra-hrm-performance-indicator', title: 'Indicator' },
-      { key: 'extra-hrm-performance-appraisal', title: 'Appraisal' }, 
+      { key: 'extra-hrm-performance-appraisal', title: 'Appraisal' },
       { key: 'extra-hrm-role', title: 'Role' },
       { key: 'extra-hrm-designation', title: 'Designation' },
       { key: 'extra-hrm-department', title: 'Department' },
@@ -80,47 +79,52 @@ const EditRole = ({ id, onClose }) => {
       { key: 'dashboards-sales-revenue', title: 'Revenue' },
       { key: 'dashboards-sales-estimates', title: 'Estimates' },
       { key: 'dashboards-sales-creditnotes', title: 'Credit Notes' },
-      
+
     ],
-   
+
   };
-  
+
   const permissions = ['view', 'create', 'update', 'delete'];
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(roledata())
-  },[dispatch])
+  }, [dispatch])
 
   useEffect(() => {
     if (id && alldept?.role?.data) {
-        if (role) {
-            setSingleEmp(role);
-            form.setFieldsValue({
-                role_name: role.role_name,
-            });
+      if (role) {
+        setSingleEmp(role);
+        form.setFieldsValue({
+          role_name: role.role_name,
+        });
 
-            const rolePermissions = role.permissions;
-            const initialPermissions = {};
-            
-            Object?.keys(rolePermissions)?.forEach(moduleKey => {
-                const subModules = rolePermissions[moduleKey]; // Get the submodules for the current module key
-                if (Array?.isArray(subModules)) { // Ensure it's an array
-                    subModules?.forEach(subModule => {
-                        if (subModule?.key && subModule?.permissions) {
-                            initialPermissions[subModule?.key] = {};
-                            subModule?.permissions?.forEach(permission => {
-                                initialPermissions[subModule.key][permission] = true; // Set to true if permission exists
-                            });
-                        }
-                    });
-                } else {
-                    console.warn(`Expected an array for moduleKey: ${moduleKey}, but got:`, subModules);
-                }
+        const rolePermissions = role.permissions;
+        // Set initial module permissions based on the existing role permissions
+        const initialPermissions = {};
+        console.log("Role permissions:", rolePermissions); // Log the role permissions for debugging
+
+        // Iterate over the keys of role.permissions
+        Object?.keys(rolePermissions)?.forEach(moduleKey => {
+          const subModules = rolePermissions[moduleKey]; // Get the submodules for the current module key
+          if (Array?.isArray(subModules)) { // Ensure it's an array
+            subModules?.forEach(subModule => {
+              // Check if subModule has a key and permissions
+              if (subModule?.key && subModule?.permissions) {
+                initialPermissions[subModule?.key] = {};
+                subModule?.permissions?.forEach(permission => {
+                  initialPermissions[subModule.key][permission] = true; // Set to true if permission exists
+                });
+              }
             });
-            setModulePermissions(initialPermissions); // Set the permissions for the edit modal
-        }
+          } else {
+            console.warn(`Expected an array for moduleKey: ${moduleKey}, but got:`, subModules);
+          }
+        });
+        console.log("initialPermissions", initialPermissions); // Log the initial permissions
+        setModulePermissions(initialPermissions); // Set the permissions for the edit modal
+      }
     }
-  }, [id, alldept, form]);
+  }, [id, alldept, form, role]);
 
 
   useEffect(() => {
@@ -135,7 +139,7 @@ const EditRole = ({ id, onClose }) => {
       });
       setModulePermissions(initialPermissions);
     }
-  }, [singleEmp]);
+  }, [singleEmp, modules]);
 
   const handleModuleClick = (moduleName) => {
     setActiveTab(moduleName);
@@ -193,40 +197,40 @@ const EditRole = ({ id, onClose }) => {
 
   const onFinish = (values) => {
     const payload = {
-        role_name: values.role_name,
-        permissions: {}
+      role_name: values.role_name,
+      permissions: {}
     };
 
     // Format permissions for API
     Object.entries(modulePermissions).forEach(([submoduleKey, perms]) => {
-        const selectedPermissions = Object.entries(perms)
-            .filter(([perm, isSelected]) => isSelected)
-            .map(([perm]) => perm.toLowerCase());
+      const selectedPermissions = Object.entries(perms)
+        .filter(([perm, isSelected]) => isSelected)
+        .map(([perm]) => perm.toLowerCase());
 
-        if (selectedPermissions.length > 0) {
-            // Use the submodule key as the module name in the permissions object
-            const moduleName = activeTab.toLowerCase(); // Convert to lowercase for consistency
-            if (!payload.permissions[moduleName]) {
-                payload.permissions[moduleName] = []; // Initialize if it doesn't exist
-            }
-            payload.permissions[moduleName].push({
-                key: submoduleKey,
-                permissions: selectedPermissions
-            });
+      if (selectedPermissions.length > 0) {
+        // Use the submodule key as the module name in the permissions object
+        const moduleName = activeTab.toLowerCase(); // Convert to lowercase for consistency
+        if (!payload.permissions[moduleName]) {
+          payload.permissions[moduleName] = []; // Initialize if it doesn't exist
         }
+        payload.permissions[moduleName].push({
+          key: submoduleKey,
+          permissions: selectedPermissions
+        });
+      }
     });
 
     dispatch(editRole({ id, payload }))
-        .then(() => {
-            dispatch(getRoles());
-            message.success('Role edited successfully!');
-            onClose();
-            navigate("/app/hrm/role");
-        })
-        .catch((error) => {
-            message.error('Failed to edit role.');
-            console.error("Edit API error:", error);
-        });
+      .then(() => {
+        dispatch(getRoles());
+        message.success('Role edited successfully!');
+        onClose();
+        navigate("/app/hrm/role");
+      })
+      .catch((error) => {
+        message.error('Failed to edit role.');
+        console.error("Edit API error:", error);
+      });
   };
 
   return (
@@ -272,7 +276,7 @@ const EditRole = ({ id, onClose }) => {
             </tr>
           </thead>
           <tbody>
-          {subModules[activeTab].map(submodule => (
+            {subModules[activeTab].map(submodule => (
               <tr key={submodule.key} className="hover:bg-gray-50">
                 <td className="border p-2">
                   <Checkbox

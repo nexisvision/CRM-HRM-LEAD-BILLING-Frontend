@@ -12,7 +12,7 @@ const getUserRole = () => {
 	try {
 		const token = localStorage.getItem('auth_token');
 		if (token) {
-			const decodedToken = jwtDecode(token);  // Using jwtDecode instead of jwt_decode
+			const decodedToken = jwtDecode(token);
 			return decodedToken?.roleName || '';
 		}
 		return '';
@@ -22,8 +22,8 @@ const getUserRole = () => {
 	}
 };
 
-export const AUTHENTICATED_ENTRY = getUserRole() === 'super-admin' 
-	? `${APP_PREFIX_PATH}/superadmin/dashboard` 
+export const AUTHENTICATED_ENTRY = getUserRole() === 'super-admin'
+	? `${APP_PREFIX_PATH}/superadmin/dashboard`
 	: `${APP_PREFIX_PATH}/pages/profile`;
 
 export const UNAUTHENTICATED_ENTRY = '/login'

@@ -1,4 +1,4 @@
-  import axios from "axios";
+import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
 const getAppraisals = async () => {
@@ -24,7 +24,7 @@ const addAppraisal = async (values) => {
 
   try {
     const res = await axios.post(
-        `${env.API_ENDPOINT_URL}/appraisal/`,
+      `${env.API_ENDPOINT_URL}/appraisal/`,
       values,
       {
         headers: {
@@ -51,7 +51,7 @@ const deleteAppraisal = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -78,12 +78,14 @@ const editAppraisal = async (id, values) => {
   }
 };
 
+
+
 const AppraisalService = {
+
   getAppraisals,
   addAppraisal,
   deleteAppraisal,
   editAppraisal,
- 
 };
 
 export default AppraisalService;

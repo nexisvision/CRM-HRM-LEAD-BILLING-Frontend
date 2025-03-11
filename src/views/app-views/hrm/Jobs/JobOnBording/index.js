@@ -3,9 +3,17 @@ import JobBordingList from './JobBordingList';
 
 const JobOnBording = () => (
 
-<div className="mail">
-<JobBordingList />
-</div>
+	<div className="mail">
+		<JobBordingList />
+		{/* // mainContent={<AddEmployee {...this.props}/>} */}
+
+
+
+
+		{/* <AddEmployee /> */}
+
+		{/* <EditEmployee /> */}
+	</div>
 
 );
 

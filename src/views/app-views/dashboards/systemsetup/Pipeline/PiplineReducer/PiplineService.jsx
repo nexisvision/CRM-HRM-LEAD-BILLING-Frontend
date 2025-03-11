@@ -1,7 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
-
 const Getpip = async () => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -22,7 +21,7 @@ const Createpip = async (payload) => {
 
   try {
     const res = await axios.post(
-        `${env.API_ENDPOINT_URL}/pipelines/`,
+      `${env.API_ENDPOINT_URL}/pipelines/`,
       payload,
       {
         headers: {
@@ -75,13 +74,11 @@ const editpip = async (idd, values) => {
   }
 };
 
-
 const UserService = {
   Getpip,
   Createpip,
   Deletepip,
   editpip,
- 
 };
 
 export default UserService;

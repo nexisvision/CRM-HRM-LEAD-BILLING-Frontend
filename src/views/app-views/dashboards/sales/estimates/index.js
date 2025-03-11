@@ -1,10 +1,11 @@
 import React from 'react';
 import EstimatesList from './EstimatesList';
+
 const estimate = () => (
 
-<div className="mail">
-<EstimatesList />
-</div>
+	<div className="mail">
+		<EstimatesList />
+	</div>
 
 );
 

@@ -1,33 +1,21 @@
 import React, { useEffect, useState } from 'react'
-import { Row, Card, Col, Table, Select, Input, Button, Badge, Menu, Modal, Switch, message } from 'antd';
-import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Card, Table, Input, Button, Modal } from 'antd';
+import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex'
-import dayjs from 'dayjs';
-import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils'
 import { useDispatch, useSelector } from 'react-redux';
-// import { getallcurrencies } from './currenciesreducer/currenciesSlice';
 import AddCurrencies from './AddCurrencies';
-import EditCurrencies from './EditCurrencies';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import { deletecurren, getcurren } from './currenciesSlice/currenciesSlice';
+import { getcurren } from './currenciesSlice/currenciesSlice';
 import { getRoles } from 'views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice';
 
-const { Column } = Table;
-
-const { Option } = Select
-
 export const CurrenciesList = () => {
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [isAddCurrenciesModalVisible, setIsAddCurrenciesModalVisible] = useState(false);
-    const [isEditCurrenciesModalVisible, setIsEditCurrenciesModalVisible] = useState(false);
-    const [selectedCurrency, setSelectedCurrency] = useState(null);
     const dispatch = useDispatch();
     const filterdata = useSelector((state) => state.currencies?.currencies?.data);
-        
+
     // Get logged-in user data
-    const userData = useSelector((state) => state.user?.loggedInUser);
+    const userData = useSelector((state) => state.user?.loggedInUser)
     const roles = useSelector((state) => state.role?.role?.data);
 
     useEffect(() => {
@@ -45,12 +33,11 @@ export const CurrenciesList = () => {
         if (!filterdata || filterdata.length === 0) {
             dispatch(getcurren());
         }
-    }, [dispatch]); 
+    }, [dispatch, filterdata]);
 
     const allcurrdata = filterdata?.filter((item) => item?.created_by === userData?.username);
-   
 
-     useEffect(() => {
+    useEffect(() => {
         if (filterdata && Array.isArray(filterdata)) {
             setFilteredData(filterdata);
         } else {
@@ -62,61 +49,28 @@ export const CurrenciesList = () => {
         setIsAddCurrenciesModalVisible(true);
     };
 
-    const openEditCurrenciesModal = (currency) => {
-        setIsEditCurrenciesModalVisible(true);
-        setSelectedCurrency(currency);
-    };
-
     const handleModalClose = () => {
         setIsAddCurrenciesModalVisible(false);
-        setIsEditCurrenciesModalVisible(false);
-        setSelectedCurrency(null);
-    };
-
-    const handleDeleteCurrency = (id) => {
-       dispatch(deletecurren(id))
-        .then(()=>{
-            dispatch(getcurren())
-            message.success('Currency deleted successfully');
-            setFilteredData(filteredData.filter(item => item.id!== id));
-        })
     };
 
     const onSearch = e => {
         const value = e.currentTarget.value.toLowerCase();
-        
+
         // If search value is empty, show all data
         if (!value) {
             setFilteredData(allcurrdata);
             return;
         }
-        
+
         // Filter the data based on search value
-        const filtered = allcurrdata.filter(item => 
+        const filtered = allcurrdata.filter(item =>
             item.currencyName?.toLowerCase().includes(value) ||
             item.currencyIcon?.toLowerCase().includes(value) ||
             item.currencyCode?.toLowerCase().includes(value)
         );
-        
+
         setFilteredData(filtered);
     }
-
-    const dropdownMenu = (elm) => (
-        <Menu>
-            {/* <Menu.Item>
-                <Flex alignItems="center" onClick={() => openEditCurrenciesModal(elm)}>
-                    <EditOutlined />
-                    <span className="ml-2">Edit</span>
-                </Flex>
-            </Menu.Item> */}
-            {/* <Menu.Item>
-                <Flex alignItems="center" onClick={() => handleDeleteCurrency(elm.id)}>
-                    <DeleteOutlined />
-                    <span className="ml-2">Delete</span>
-                </Flex>
-            </Menu.Item> */}
-        </Menu>
-    );
 
     const tableColumns = [
         {
@@ -133,8 +87,7 @@ export const CurrenciesList = () => {
             title: 'Currency Code',
             dataIndex: 'currencyCode',
             sorter: (a, b) => utils.antdTableSorter(a, b, 'currencyCode')
-        },
-     
+        }
     ];
 
     return (
@@ -149,9 +102,9 @@ export const CurrenciesList = () => {
                     {/* Only show Add button if role_name is super-admin */}
                     {isSuperAdmin() && (
                         <Flex gap="7px" className="flex">
-                            <Button 
-                                type="primary" 
-                                className="flex items-center" 
+                            <Button
+                                type="primary"
+                                className="flex items-center"
                                 onClick={openAddCurrenciesModal}
                             >
                                 <PlusOutlined />
@@ -179,19 +132,8 @@ export const CurrenciesList = () => {
             >
                 <AddCurrencies onClose={handleModalClose} />
             </Modal>
-            <Modal
-                title="Edit Currencies"
-                visible={isEditCurrenciesModalVisible}
-                onCancel={handleModalClose}
-                footer={null}
-                width={700}
-                className='mt-[-70px]'
-            >
-                <EditCurrencies onClose={handleModalClose} currency={selectedCurrency} />
-            </Modal>
         </div>
     );
 }
 
 export default CurrenciesList
-     

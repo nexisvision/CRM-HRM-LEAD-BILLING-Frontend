@@ -1,12 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
-// const baseUrl = import.meta.env.VITE_BASE_URL;
-// import { getToken } from "../../../configs/axiosConfig"
 
-// const addUser = async (data) => {
-//     const res = await axios.post(`${baseUrl}users/add`, data, getToken());
-//     return res
-// };
 
 const getcurr = async () => {
   const token = localStorage.getItem("auth_token");
@@ -57,7 +51,7 @@ const delcurr = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -85,7 +79,9 @@ const editcurr = async (id, values) => {
 };
 
 
+
 const UserService = {
+
   getcurr,
   addcurr,
   delcurr,

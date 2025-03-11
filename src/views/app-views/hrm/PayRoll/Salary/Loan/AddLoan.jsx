@@ -3,7 +3,6 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import { Input, Select, Button, Col, message } from "antd";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { useSelector } from "react-redux";
-// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 import { useDispatch } from "react-redux";
 import { addloans, getloans } from "./loanReducer/loanSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
@@ -38,14 +37,14 @@ const AddLoan = ({ id, onClose }) => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(empdata());
-  }, []);
+  }, [dispatch]);
 
   const alldataemp = useSelector((state) => state.employee);
   const fnddata = alldataemp.employee?.data || [];
   const filteredEmployees = fnddata?.filter((employee) => employee.id === id);
   useEffect(() => {
     dispatch(getcurren());
-  }, []);
+  }, [dispatch]);
 
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies?.data;
@@ -72,7 +71,7 @@ const AddLoan = ({ id, onClose }) => {
           employeeId: id || "",
         }}
         validationSchema={validationSchema}
-        onSubmit={handleSubmit} 
+        onSubmit={handleSubmit}
       >
         {({ values, setFieldValue, resetForm }) => (
           <Form className="space-y-4">
@@ -166,8 +165,8 @@ const AddLoan = ({ id, onClose }) => {
                       {fnddatass && fnddatass?.length > 0 ? (
                         fnddatass?.map((client) => (
                           <Option key={client.id} value={client?.id}>
-                             {client?.currencyCode}
-                             ({client?.currencyIcon})
+                            {client?.currencyCode}
+                            ({client?.currencyIcon})
                           </Option>
                         ))
                       ) : (
@@ -187,7 +186,7 @@ const AddLoan = ({ id, onClose }) => {
             </Col>
 
             <div>
-                <label className="font-semibold">Amount <span className="text-red-500">*</span></label>
+              <label className="font-semibold">Amount <span className="text-red-500">*</span></label>
               <Field name="amount">
                 {({ field }) => <Input {...field} placeholder="Enter Amount" type="number" />}
               </Field>

@@ -1,46 +1,21 @@
 import React, { useEffect, useState } from "react";
 import {
-  Card,
-  Table,
-  Menu,
   Row,
   Col,
-  Tag,
   Input,
   message,
   Button,
   Modal,
   Select,
-  DatePicker,
 } from "antd";
 import {
-  EyeOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
-  FileExcelOutlined,
-  CopyOutlined,
-  EditOutlined,
-  LinkOutlined,
 } from "@ant-design/icons";
-// import { Card, Table,  Badge, Menu, Tag,Modal } from 'antd';
-import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-import ReactQuill from "react-quill";
-import OrderListData from "assets/data/order-list.data.json";
-import Flex from "components/shared-components/Flex";
-import utils from "utils";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-import userData from "assets/data/user-list.data.json";
-import dayjs from "dayjs";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  Addstages,
   Editstages,
   getstages,
 } from "../LeadStages/LeadsReducer/LeadsstageSlice";
@@ -50,23 +25,16 @@ import AddPipeLine from "../Pipeline/AddPipeLine";
 const { Option } = Select;
 
 const EditDealStages = ({ idd, onClose }) => {
-  const [users, setUsers] = useState(userData);
-
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const allpipline = useSelector((state) => state.StagesLeadsDeals);
   const fndpip = allpipline.StagesLeadsDeals.data;
-
   const allpiplines = useSelector((state) => state.Piplines);
   const fndpips = allpiplines.Piplines.data;
-
   const [isAddPipelineModalVisible, setAddPipelineModalVisible] = useState(false);
 
   useEffect(() => {
     dispatch(GetPip());
-  }, []);
-
+  }, [dispatch]);
   useEffect(() => {
     if (fndpip && idd) {
       const fndproperdata = fndpip.find((item) => item.id === idd);
@@ -79,7 +47,7 @@ const EditDealStages = ({ idd, onClose }) => {
         });
       }
     }
-  }, [fndpip, idd]);
+  }, [fndpip, idd, fndpips]);
 
   const onSubmit = (values, { resetForm }) => {
     const payload = { ...values, stageType: "deal" };
@@ -111,8 +79,8 @@ const EditDealStages = ({ idd, onClose }) => {
   return (
     <div>
       <div className="">
-        <h2 className="mb-1 border-b font-medium"></h2>
-        <div className="">
+        <hr className="mb-1 border-b font-medium"></hr>
+        <div className="p-2">
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
@@ -160,7 +128,7 @@ const EditDealStages = ({ idd, onClose }) => {
                             {...field}
                             className="w-full mt-1"
                             placeholder="Select Pipeline"
-                            value={values.pipeline} 
+                            value={values.pipeline}
                             onChange={(value) =>
                               setFieldValue("pipeline", value)
                             }

@@ -1,9 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./CompanyService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 
-// Async thunk for adding user
 export const addClient = createAsyncThunk(
   "users/addUser",
   async (userData, thunkAPI) => {
@@ -15,7 +13,7 @@ export const addClient = createAsyncThunk(
     }
   }
 );
-// Async thunk for user login
+
 
 export const ClientData = createAsyncThunk(
   "emp/getClient",
@@ -29,7 +27,7 @@ export const ClientData = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
+
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -42,7 +40,7 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
+
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -55,7 +53,7 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const deleteClient = createAsyncThunk(
   "users/deleteUser",
   async (userId, thunkAPI) => {
@@ -83,15 +81,7 @@ export const Editclient = createAsyncThunk(
 
 // Async thunk for updating a user
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const RoleAndPermissionSlice = createSlice({
   name: "SubClient",

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Modal, Input, Switch, Button, Row, Col, message } from "antd";
+import { Modal, Input, Button, Row, Col, message } from "antd";
 import { useDispatch } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
 import { addClient, ClientData } from "./CompanyReducers/CompanySlice";
 import axios from "axios";
 import { ReloadOutlined } from "@ant-design/icons";
@@ -12,16 +11,6 @@ const AddClient = ({ visible, onClose, onCreate }) => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpToken, setOtpToken] = useState(null);
   const [otp, setOtp] = useState("");
-
-  const validationSchema = Yup.object().shape({
-    username: Yup.string()
-      .required('Please enter the client name'),
-    email: Yup.string()
-      .email('Please enter a valid email address')
-      .required('Please enter the client email'),
-    password: Yup.string()
-      .required('Please enter the client password')
-  });
 
   const
 
@@ -96,10 +85,6 @@ const AddClient = ({ visible, onClose, onCreate }) => {
     } catch (error) {
       message.error("Failed to add client. Please try again.");
     }
-  };
-
-  const onOpenOtpModal = () => {
-    setShowOtpModal(true);
   };
   const onCloseOtpModal = () => {
     setShowOtpModal(false);

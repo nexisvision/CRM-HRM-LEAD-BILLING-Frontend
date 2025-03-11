@@ -23,14 +23,14 @@ const Pricing = () => {
 				</div>
 				<Row>
 					{
-						pricingData.map((elm , i) => {
+						pricingData.map((elm, i) => {
 							return (
-								<Col key={`price-column-${i}`} xs={24} sm={24} md={24/colCount} lg={24/colCount} className={colCount === (i + 1) || isMobile ? '' : 'border-right'}>
+								<Col key={`price-column-${i}`} xs={24} sm={24} md={24 / colCount} lg={24 / colCount} className={colCount === (i + 1) || isMobile ? '' : 'border-right'}>
 									<div className="p-3">
 										<div className="text-center">
 											<img className="img-fluid" src={elm.image} alt="" />
-											<h1 className="display-4 mt-4"> 
-												<span className="font-size-md d-inline-block mr-1" style={{transform: 'translate(0px, -17px)'}}>$</span>
+											<h1 className="display-4 mt-4">
+												<span className="font-size-md d-inline-block mr-1" style={{ transform: 'translate(0px, -17px)' }}>$</span>
 												<span>{elm.price}</span>
 											</h1>
 											<p className="mb-0">{elm.duration}</p>
@@ -41,7 +41,7 @@ const Pricing = () => {
 										<div className="d-flex justify-content-center mt-3">
 											<div>
 												{
-													elm.features.map((elm , i) => {
+													elm.features.map((elm, i) => {
 														return (
 															<p key={`pricing-feature-${i}`}>
 																<Badge color={'blue'} />
@@ -70,7 +70,7 @@ const Pricing = () => {
 							<h3 className="font-weight-semibold">Is it expensive?</h3>
 							<p>
 								Twitch tail in permanent irritation poop on grasses, drink water out of the faucet,
-								plays league of legends have my breakfast spaghetti yarn. 
+								plays league of legends have my breakfast spaghetti yarn.
 								Taco cat backwards spells taco cat stick butt in face.
 							</p>
 						</div>

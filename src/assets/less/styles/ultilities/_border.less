@@ -1,31 +1,68 @@
-.border         { border: @border-width-base solid @border-color-base !important; }
-.border-top     { border-top: @border-width-base solid @border-color-base !important; }
-.border-bottom  { border-bottom: @border-width-base solid @border-color-base !important; }
+.border {
+	border: @border-width-base solid @border-color-base !important;
+}
 
-& when (@rtl-enable = true) {
+.border-top {
+	border-top: @border-width-base solid @border-color-base !important;
+}
+
+.border-bottom {
+	border-bottom: @border-width-base solid @border-color-base !important;
+}
+
+& when (@rtl-enable =true) {
 	.dir-ltr {
-		.border-right   { border-right: @border-width-base solid @border-color-base !important; }
-		.border-left    { border-left: @border-width-base solid @border-color-base !important; }
+		.border-right {
+			border-right: @border-width-base solid @border-color-base !important;
+		}
+
+		.border-left {
+			border-left: @border-width-base solid @border-color-base !important;
+		}
 	}
-	
+
 
 	.dir-rtl {
-		.border-right   { border-left: @border-width-base solid @border-color-base !important; }
-		.border-left    { border-right: @border-width-base solid @border-color-base !important; }
+		.border-right {
+			border-left: @border-width-base solid @border-color-base !important;
+		}
+
+		.border-left {
+			border-right: @border-width-base solid @border-color-base !important;
+		}
 	}
 }
 
-& when (@rtl-enable = false) {
-	.border-right   { border-right: @border-width-base solid @border-color-base !important; }
-	.border-left    { border-left: @border-width-base solid @border-color-base !important; }
+& when (@rtl-enable =false) {
+	.border-right {
+		border-right: @border-width-base solid @border-color-base !important;
+	}
+
+	.border-left {
+		border-left: @border-width-base solid @border-color-base !important;
+	}
 }
 
 
-.border-0        { border: 0 !important; }
-.border-top-0    { border-top: 0 !important; }
-.border-right-0  { border-right: 0 !important; }
-.border-bottom-0 { border-bottom: 0 !important; }
-.border-left-0   { border-left: 0 !important; }
+.border-0 {
+	border: 0 !important;
+}
+
+.border-top-0 {
+	border-top: 0 !important;
+}
+
+.border-right-0 {
+	border-right: 0 !important;
+}
+
+.border-bottom-0 {
+	border-bottom: 0 !important;
+}
+
+.border-left-0 {
+	border-left: 0 !important;
+}
 
 
 

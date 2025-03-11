@@ -1,10 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./SalaryService";
-import { toast } from "react-toastify";
 import { message } from "antd";
 
 export const editSalaryss = createAsyncThunk(
-  "users/editSalaryss",
+  "salary/editSalaryss",
   async (payload, thunkAPI) => {
     try {
       const salaryData = {
@@ -30,7 +29,7 @@ export const editSalaryss = createAsyncThunk(
 );
 
 export const AddSalaryss = createAsyncThunk(
-  "users/AddSalaryss",
+  "salary/AddSalaryss",
   async (userData, thunkAPI) => {
     try {
       const response = await UserService.addsal(userData);
@@ -42,8 +41,8 @@ export const AddSalaryss = createAsyncThunk(
 );
 
 export const getSalaryss = createAsyncThunk(
-  "emp/getSalaryss",
-  async (thunkAPI) => {
+  "salary/getSalaryss",
+  async (_, thunkAPI) => {
     try {
       const response = await UserService.getsal();
       return response;
@@ -54,7 +53,7 @@ export const getSalaryss = createAsyncThunk(
 );
 
 export const deleteSalaryss = createAsyncThunk(
-  "users/deleteSalaryss",
+  "salary/deleteSalaryss",
   async (userId, thunkAPI) => {
     try {
       const response = await UserService.deletsal(userId);
@@ -68,12 +67,16 @@ export const deleteSalaryss = createAsyncThunk(
 const SalarySlice = createSlice({
   name: "salary",
   initialState: {
-    salary: [],
-    editItem: {},
+    salary: {
+      data: [],
+      loading: false,
+      error: null
+    },
     isLoading: false,
+    error: null,
     addModel: false,
     editModal: false,
-    error: null
+    editItem: {}
   },
   reducers: {
     toggleAddModal: (state, action) => {
@@ -97,20 +100,6 @@ const SalarySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Add salary
-      .addCase(AddSalaryss.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(AddSalaryss.fulfilled, (state, action) => {
-        state.isLoading = false;
-        message.success(action.payload?.message);
-      })
-      .addCase(AddSalaryss.rejected, (state, action) => {
-        state.isLoading = false;
-        message.error(action.payload?.message);
-      })
-
       // Get salaries
       .addCase(getSalaryss.pending, (state) => {
         state.isLoading = true;
@@ -118,11 +107,26 @@ const SalarySlice = createSlice({
       })
       .addCase(getSalaryss.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.salary = action?.payload;
+        state.salary = action.payload;
       })
       .addCase(getSalaryss.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload?.message;
+        message.error(action.payload?.message || "Failed to fetch salaries");
+      })
+
+      // Add salary
+      .addCase(AddSalaryss.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(AddSalaryss.fulfilled, (state, action) => {
+        state.isLoading = false;
+        message.success(action.payload?.message || "Salary added successfully");
+      })
+      .addCase(AddSalaryss.rejected, (state, action) => {
+        state.isLoading = false;
+        message.error(action.payload?.message || "Failed to add salary");
       })
 
       // Delete salary
@@ -132,11 +136,11 @@ const SalarySlice = createSlice({
       })
       .addCase(deleteSalaryss.fulfilled, (state, action) => {
         state.isLoading = false;
-        message.success(action.payload.message);
+        message.success(action.payload?.message || "Salary deleted successfully");
       })
       .addCase(deleteSalaryss.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.message);
+        message.error(action.payload?.message || "Failed to delete salary");
       })
 
       // Edit salary
@@ -146,7 +150,6 @@ const SalarySlice = createSlice({
       })
       .addCase(editSalaryss.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Update the salary in the state
         if (state.salary.data) {
           const index = state.salary.data.findIndex(
             (item) => item.id === action.payload.data.id
@@ -155,12 +158,10 @@ const SalarySlice = createSlice({
             state.salary.data[index] = action.payload.data;
           }
         }
-        state.editItem = action.payload.data;
         message.success(action.payload?.message || "Salary updated successfully");
       })
       .addCase(editSalaryss.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload?.message;
         message.error(action.payload?.message || "Failed to update salary");
       });
   },

@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { Input, Button, DatePicker, Select, Row, Col, Card, message } from 'antd';
+import { Input, Button, DatePicker, Select, Row, Col, message } from 'antd';
 import * as Yup from 'yup';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { createPayment } from './paymentReducer/PaymentSlice';
 import { getAccounts } from '../../banking/account/AccountReducer/AccountSlice';
 import dayjs from 'dayjs';
@@ -12,7 +11,8 @@ const { Option } = Select;
 
 const AddPayment = ({ onClose, billNumber }) => {
   const dispatch = useDispatch();
-  
+
+  // Get billing data
   const allBillingData = useSelector((state) => state?.salesbilling?.salesbilling?.data || []);
   const currentBill = allBillingData.find(bill => bill.billNumber === billNumber);
   const billAmount = currentBill?.total || 0;
@@ -21,8 +21,10 @@ const AddPayment = ({ onClose, billNumber }) => {
 
   useEffect(() => {
     dispatch(getAccounts());
-  }, []);
-  
+  }, [dispatch]);
+
+
+
   const initialValues = {
     billNumber: billNumber || '',
     date: null,
@@ -44,6 +46,7 @@ const AddPayment = ({ onClose, billNumber }) => {
       .typeError('Amount must be a number')
       .required('Amount is required')
       .min(0, 'Amount must be greater than or equal to 0'),
+    // .max(finalTotal, `Amount cannot exceed ${finalTotal}`),
     account: Yup.string()
       .required('Account is required'),
     paymentMode: Yup.string()  // Add validation for payment mode
@@ -56,7 +59,6 @@ const AddPayment = ({ onClose, billNumber }) => {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      
       const paymentData = {
         bill: currentBill.id,
         date: dayjs(values.date).format('YYYY-MM-DD'),
@@ -68,7 +70,7 @@ const AddPayment = ({ onClose, billNumber }) => {
       };
 
       const response = await dispatch(createPayment(paymentData)).unwrap();
-      
+
       if (response) {
         message.success('Payment added successfully!');
         resetForm();
@@ -80,7 +82,6 @@ const AddPayment = ({ onClose, billNumber }) => {
       setSubmitting(false);
     }
   };
-
 
   return (
     <div className="add-payment-form p-4">
@@ -125,7 +126,7 @@ const AddPayment = ({ onClose, billNumber }) => {
                 <div className="form-item mb-4">
                   <label className="block mb-1">
                     Amount <span className="text-red-500">*</span>
-                  
+
                   </label>
                   <Input
                     name="amount"
@@ -153,7 +154,7 @@ const AddPayment = ({ onClose, billNumber }) => {
                   >
                     {accounts && accounts.map((account) => (
                       <Option key={account.id} value={account.id}>
-                        {account.bankName} 
+                        {account.bankName}
                       </Option>
                     ))}
                   </Select>

@@ -16,7 +16,7 @@ const getfiless = async () => {
   }
 };
 
-const addfiless = async (id,values) => {
+const addfiless = async (id, values) => {
   const token = localStorage.getItem("auth_token");
 
   try {
@@ -73,13 +73,12 @@ const EditPro = async (id, values) => {
     throw error;
   }
 };
-
 const UserService = {
+
   getfiless,
   addfiless,
   DeletePro,
   EditPro,
-
 };
 
 export default UserService;

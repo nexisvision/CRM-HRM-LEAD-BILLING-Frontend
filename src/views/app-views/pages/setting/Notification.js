@@ -1,8 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-// import NotificationPopup from 'views/app-views/pages/setting/NotificationPopup';
-
-
+import { BrowserRouter as Router, Routes } from 'react-router-dom';
 
 const Notification = () => {
   return (
@@ -13,11 +10,9 @@ const Notification = () => {
         </header>
 
         <div className="p-4">
-          {/* <NotificationPopup/> */}
         </div>
 
         <Routes>
-          {/* <Route path="/notification" element={<NotificationPage/>} /> */}
         </Routes>
       </div>
     </Router>

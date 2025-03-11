@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PrinterOutlined, DownloadOutlined, CloseOutlined } from '@ant-design/icons';
-import { Card, Table, Button, Select } from 'antd';
+import { Table, Button, Select } from 'antd';
 import dayjs from 'dayjs';
 import { getAllInvoices } from "../invoice/invoicereducer/InvoiceSlice";
 import NumberFormat from 'react-number-format';
@@ -11,53 +11,39 @@ import { getsignaturesss } from 'views/app-views/setting/esignature/EsignatureRe
 import { getgeneralsettings } from '../../../setting/general/generalReducer/generalSlice';
 
 import { useParams } from 'react-router-dom';
-
 const { Option } = Select;
 
 const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
 
     const dispatch = useDispatch();
     const [template, setTemplate] = useState('rendertemplate');
-    const { id } = useParams(); // Get project ID from route
+    const { id } = useParams();
     const { invoices, loading, error } = useSelector((state) => state.invoice);
     const invoiceDataa = invoices.find(invoice => invoice.id === idd);
-
     const [parsedInvoice, setParsedInvoice] = useState({ items: [] });
-
     const [generalSettings, setGeneralSettings] = useState(null);
-
-
     const allloggeduser = useSelector((state) => state.user.loggedInUser)
-
     const allclient = useSelector((state) => state.SubClient.SubClient.data);
-
     const [selectedSignature, setSelectedSignature] = useState(null);
     const [selectedSignatureName, setSelectedSignatureName] = useState(null);
-    const [showSelector, setShowSelector] = useState(true);
     const [isSignatureConfirmed, setIsSignatureConfirmed] = useState(false);
-    
     const signatures = useSelector((state) => state?.esignature?.esignature?.data);
-
-
     const clientDataa = allclient.find((SubClient) => SubClient.id === invoiceDataa?.client);
-
     const generalSettingsData = useSelector((state) => state.generalsetting.generalsetting.data);
-
-     useEffect(() => {
+    useEffect(() => {
         dispatch(getgeneralsettings());
     }, [dispatch]);
 
     useEffect(() => {
-        dispatch(ClientData()); // Fetch all client data when the component mounts
+        dispatch(ClientData());
     }, [dispatch]);
 
 
     useEffect(() => {
-        dispatch(getAllInvoices(id)); // Fetch all invoices for invoice ID
+        dispatch(getAllInvoices(id));
     }, [dispatch, id]);
 
-
-     useEffect(() => {
+    useEffect(() => {
         if (generalSettingsData && generalSettingsData.length > 0) {
             setGeneralSettings(generalSettingsData[0]);
         }
@@ -96,13 +82,11 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
 
     const handleConfirmSignature = () => {
         setIsSignatureConfirmed(true);
-        setShowSelector(false);
     };
 
     const handleRemoveSignature = () => {
         setSelectedSignature(null);
         setSelectedSignatureName(null);
-        setShowSelector(true);
         setIsSignatureConfirmed(false);
     };
 
@@ -130,9 +114,9 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                     <div className='flex flex-col relative'>
                         <h4 className="font-semibold text-lg mb-2">Signature:</h4>
                         <div className='w-36 h-28 flex flex-col items-center justify-center relative'>
-                            <img 
-                                src={selectedSignature} 
-                                alt="Digital Signature" 
+                            <img
+                                src={selectedSignature}
+                                alt="Digital Signature"
                                 className='w-full h-full object-contain border-0'
                             />
                             {!isSignatureConfirmed && (
@@ -172,9 +156,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     }
 
     const handlePrint = () => {
-        const originalContent = document.body.innerHTML;
-        const printContent = document.getElementById('printable-content');
-    
         const printStyles = `
             @media print {
                 body * {
@@ -208,13 +189,16 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                 }
             }
         `;
-    
+
+        // Add print styles
         const styleSheet = document.createElement('style');
         styleSheet.innerHTML = printStyles;
         document.head.appendChild(styleSheet);
-    
+
+        // Print the specific content
         window.print();
-    
+
+        // Remove the print styles
         document.head.removeChild(styleSheet);
     };
 
@@ -241,10 +225,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     };
 
 
-    const calculateTotalDiscount = (subtotal, discountPercentage) => {
-        if (!subtotal || !discountPercentage) return 0;
-        return (subtotal * discountPercentage) / 100;
-    };
 
 
     const calculateSubtotal = () => {
@@ -254,20 +234,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
         );
     };
 
-    const calculateTotalTax = (subtotal) => {
-        if (!parsedInvoice) return 0;
-        const taxRate = invoiceData.tax ?? 0;
-        return (subtotal * taxRate) / 100;
-    };
-
-    const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
-        return subtotal - totalDiscount + totalTax;
-    };
-
-    const subtotal = calculateSubtotal(parsedInvoice.items);
-    const totalDiscount = calculateTotalDiscount(subtotal, parsedInvoice.discount);
-    const totalTax = calculateTotalTax(subtotal - totalDiscount); // Apply tax after discount
-
     const renderModernTemplate = () => {
         return (
             <div className="bg-white p-6">
@@ -276,22 +242,19 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                     <div className="flex justify-between items-center">
                         <h1 className="text-3xl text-gray-700">Invoice</h1>
                         <div className="flex items-center">
-                        {generalSettings?.companylogo ? (
-                        <img 
-                            src={generalSettings.companylogo} 
-                            alt="Company Logo" 
-                            className="h-16 mx-auto"
-                        />
-                    ) : (
-                        <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
-                    )}
+                            {generalSettings?.companylogo ? (
+                                <img
+                                    src={generalSettings.companylogo}
+                                    alt="Company Logo"
+                                    className="h-16 mx-auto"
+                                />
+                            ) : (
+                                <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                            )}
                         </div>
                     </div>
                 </div>
-
-                {/* Company & Invoice Details */}
                 <div className="flex justify-end mb-8">
-                   
                     <div>
                         <div className='flex items-center'>
                             <span className=" me-2 font-weight-semibold ">Invoice Num:</span>
@@ -345,7 +308,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                             {clientDataa ? (
                                 <address>
                                     <p>
-                                    <span> <span className="font-weight-semibold  ">Name: </span>{clientDataa.firstName}</span>
+                                        <span> <span className="font-weight-semibold  ">Name: </span>{clientDataa.firstName}</span>
                                         <p>
                                             <span className="font-weight-semibold">Address:</span> {clientDataa.address}
                                         </p>
@@ -517,21 +480,21 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         </div>
                     </div>
                     <div>
-                    <div className="flex justify-end items-center">
+                        <div className="flex justify-end items-center">
                             <div className=" rounded-lg p-8">
-                               
+
                                 {renderSignatureSection()}
                             </div>
-                    </div>
+                        </div>
                     </div>
                 </div>
-                    <div className='mt-4'>
-                        <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
-                        {generalSettings?.termsandconditions ? (
-                        <div 
-                            dangerouslySetInnerHTML={{ 
-                                __html: generalSettings.termsandconditions 
-                            }} 
+                <div className='mt-4'>
+                    <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
+                    {generalSettings?.termsandconditions ? (
+                        <div
+                            dangerouslySetInnerHTML={{
+                                __html: generalSettings.termsandconditions
+                            }}
                             className="text-gray-600 text-sm"
                         />
                     ) : (
@@ -540,7 +503,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                             <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
                         </ol>
                     )}
-                    </div>
+                </div>
 
                 <div className="text-center mt-8">
                     <p>Thanks for your Business</p>
@@ -558,10 +521,10 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
         return (
             <div className="bg-white rounded-lg shadow-lg p-8">
                 <div>
-                 {generalSettings?.companylogo ? (
-                        <img 
-                            src={generalSettings.companylogo} 
-                            alt="Company Logo" 
+                    {generalSettings?.companylogo ? (
+                        <img
+                            src={generalSettings.companylogo}
+                            alt="Company Logo"
                             className="h-16 "
                         />
                     ) : (
@@ -602,7 +565,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         {clientDataa ? (
                             <address>
                                 <p>
-                                <span> <span className="font-weight-semibold  ">Name: </span>{clientDataa.firstName}</span>
+                                    <span> <span className="font-weight-semibold  ">Name: </span>{clientDataa.firstName}</span>
                                     <p>
                                         <span className="font-weight-semibold">Address:</span> {clientDataa.address}
                                     </p>
@@ -783,20 +746,20 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         </div>
                     </div>
                     <div>
-                    <div className="flex justify-end items-center">
+                        <div className="flex justify-end items-center">
                             <div className=" rounded-lg p-8">
                                 {renderSignatureSection()}
                             </div>
-                    </div>
+                        </div>
                     </div>
                 </div>
-                    <div className='mt-4'>
-                        <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
-                        {generalSettings?.termsandconditions ? (
-                        <div 
-                            dangerouslySetInnerHTML={{ 
-                                __html: generalSettings.termsandconditions 
-                            }} 
+                <div className='mt-4'>
+                    <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
+                    {generalSettings?.termsandconditions ? (
+                        <div
+                            dangerouslySetInnerHTML={{
+                                __html: generalSettings.termsandconditions
+                            }}
                             className="text-gray-600 text-sm"
                         />
                     ) : (
@@ -805,7 +768,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                             <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
                         </ol>
                     )}
-                    </div>
+                </div>
 
                 <div className="text-center font-semibold mt-8">
                     <p>Thanks for your Business</p>
@@ -821,16 +784,16 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
             <div className="bg-white p-8 border-2 border-gray-200">
                 {/* Header Section */}
                 <div className="flex flex-col items-center mb-8 text-center">
-                   <div>
-                    { generalSettings?.companylogo ? (
-                        <img 
-                            src={generalSettings.companylogo} 
-                            alt="Company Logo" 
-                            className="h-16 mx-auto"
-                        />
-                    ) : (
-                        <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
-                    )}
+                    <div>
+                        {generalSettings?.companylogo ? (
+                            <img
+                                src={generalSettings.companylogo}
+                                alt="Company Logo"
+                                className="h-16 mx-auto"
+                            />
+                        ) : (
+                            <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                        )}
                     </div>
                     <div className="text-gray-600 mt-4">
                         <div className='flex items-center'>
@@ -888,7 +851,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                             {clientDataa ? (
                                 <address>
                                     <p>
-                                    <span> <span className="font-weight-semibold ">Name: </span>{clientDataa.firstName}</span><br />
+                                        <span> <span className="font-weight-semibold ">Name: </span>{clientDataa.firstName}</span><br />
                                         <p>
                                             <span className="font-weight-semibold">Address:</span> {clientDataa.address}
                                         </p>
@@ -961,49 +924,52 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
 
                         {/* Invoice Summary */}
                         {parsedInvoice && (
-                        <div className="d-flex justify-content-end mb-3 mt-3">
-                            <div className="text-start">
-                                <div className="border-bottom">
-                                    <p >
-                                        <span className="font-weight-semibold ">Sub-Total : </span>
+                            <div className="d-flex justify-content-end mb-3 mt-3">
+                                <div className="text-start">
+                                    <div className="border-bottom">
+                                        <p >
+                                            <span className="font-weight-semibold ">Sub-Total : </span>
+                                            <NumberFormat
+                                                displayType="text"
+                                                value={calculateSubtotal()}
+                                                // prefix="$"
+                                                thousandSeparator={true}
+                                            />
+                                        </p>
+                                        <p>
+                                            <span className="font-weight-semibold ">Total Discount : </span>
+                                            {`${parsedInvoice.discount || 0}%`}
+                                        </p>
+                                        <p>
+                                            <span className="font-weight-semibold ">Total Discount Amount: </span>
+                                            <NumberFormat
+                                                displayType="text"
+                                                value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
+                                                // prefix="₹"
+                                                thousandSeparator={true}
+                                            />
+                                        </p>
+                                        <p>
+                                            <span className="font-weight-semibold ">Total Tax Amount: </span>
+                                            <NumberFormat
+                                                displayType="text"
+                                                value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.tax_amount || 0), 0)}
+                                                thousandSeparator={true}
+                                            />
+                                        </p>
+                                    </div>
+                                    <h2 className="mt-3">
+                                        <span className="mr-1 font-weight-semibold ">Final Total: </span>
                                         <NumberFormat
                                             displayType="text"
-                                            value={calculateSubtotal()}
+                                            value={parsedInvoice.total}
+                                            // prefix="₹"
                                             thousandSeparator={true}
                                         />
-                                    </p>
-                                    <p>
-                                        <span className="font-weight-semibold ">Total Discount : </span>
-                                        {`${parsedInvoice.discount || 0}%`}
-                                    </p>
-                                    <p>
-                                        <span className="font-weight-semibold ">Total Discount Amount: </span>
-                                        <NumberFormat
-                                            displayType="text"
-                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
-                                            thousandSeparator={true}
-                                        />
-                                    </p>
-                                    <p>
-                                        <span className="font-weight-semibold ">Total Tax Amount: </span>
-                                        <NumberFormat
-                                            displayType="text"
-                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.tax_amount || 0), 0)}
-                                            thousandSeparator={true}
-                                        />
-                                    </p>
+                                    </h2>
                                 </div>
-                                <h2 className="mt-3">
-                                    <span className="mr-1 font-weight-semibold ">Final Total: </span>
-                                    <NumberFormat
-                                        displayType="text"
-                                        value={parsedInvoice.total}
-                                        thousandSeparator={true}
-                                    />
-                                </h2>
                             </div>
-                        </div>
-                    )}
+                        )}
                     </div>
                 </div>
                 <div className="grid grid-cols-2 gap-8">
@@ -1037,20 +1003,20 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         </div>
                     </div>
                     <div>
-                    <div className="flex justify-end items-center">
+                        <div className="flex justify-end items-center">
                             <div className=" rounded-lg p-8">
                                 {renderSignatureSection()}
                             </div>
-                    </div>
+                        </div>
                     </div>
                 </div>
-                    <div className='mt-4'>
-                        <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
-                        {generalSettings?.termsandconditions ? (
-                        <div 
-                            dangerouslySetInnerHTML={{ 
-                                __html: generalSettings.termsandconditions 
-                            }} 
+                <div className='mt-4'>
+                    <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
+                    {generalSettings?.termsandconditions ? (
+                        <div
+                            dangerouslySetInnerHTML={{
+                                __html: generalSettings.termsandconditions
+                            }}
                             className="text-gray-600 text-sm"
                         />
                     ) : (
@@ -1059,7 +1025,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                             <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
                         </ol>
                     )}
-                    </div>
+                </div>
                 <div className="text-center font-semibold mt-8">
                     <p>Thanks for your Business</p>
                 </div>
@@ -1075,30 +1041,30 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-12">
                     <div className='text-left'>
-                    <div>
-                    { generalSettings?.companylogo ? (
-                        <img 
-                            src={generalSettings.companylogo} 
-                            alt="Company Logo" 
-                            className="h-16"
-                        />
-                    ) : (
-                        <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
-                    )}
-                    </div>
+                        <div>
+                            {generalSettings?.companylogo ? (
+                                <img
+                                    src={generalSettings.companylogo}
+                                    alt="Company Logo"
+                                    className="h-16"
+                                />
+                            ) : (
+                                <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                            )}
+                        </div>
                         <div className="text-gray-600 mt-2">
-                        <div className='flex items-center'>
-                            <span className=" me-2 font-weight-semibold ">Invoice Num:</span>
-                            <p className='text-right'>{invoiceDataa?.invoiceNumber}</p>
-                        </div>
-                        <div className='flex items-center'>
-                            <span className="me-2 font-weight-semibold ">Issue Date:</span>
-                            <p>{invoiceDataa?.issueDate ? dayjs(invoiceDataa.issueDate).format('DD MMMM, YYYY') : ''}</p>
-                        </div>
-                        <div className='flex items-center'>
-                            <span className="me-2 font-weight-semibold ">Due Date:</span>
-                            <p>{invoiceDataa?.dueDate ? dayjs(invoiceDataa.dueDate).format('DD MMMM, YYYY') : ''}</p>
-                        </div>
+                            <div className='flex items-center'>
+                                <span className=" me-2 font-weight-semibold ">Invoice Num:</span>
+                                <p className='text-right'>{invoiceDataa?.invoiceNumber}</p>
+                            </div>
+                            <div className='flex items-center'>
+                                <span className="me-2 font-weight-semibold ">Issue Date:</span>
+                                <p>{invoiceDataa?.issueDate ? dayjs(invoiceDataa.issueDate).format('DD MMMM, YYYY') : ''}</p>
+                            </div>
+                            <div className='flex items-center'>
+                                <span className="me-2 font-weight-semibold ">Due Date:</span>
+                                <p>{invoiceDataa?.dueDate ? dayjs(invoiceDataa.dueDate).format('DD MMMM, YYYY') : ''}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1141,7 +1107,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                             {clientDataa ? (
                                 <address>
                                     <p>
-                                    <span> <span className="font-weight-semibold">Name: </span>{clientDataa.firstName}</span>
+                                        <span> <span className="font-weight-semibold">Name: </span>{clientDataa.firstName}</span>
                                         <p>
                                             <span className="font-weight-semibold">Address:</span> {clientDataa.address}
                                         </p>
@@ -1214,49 +1180,52 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
 
                         {/* Invoice Summary */}
                         {parsedInvoice && (
-                        <div className="d-flex justify-content-end mb-3 mt-3">
-                            <div className="text-start">
-                                <div className="border-bottom">
-                                    <p >
-                                        <span className="font-weight-semibold ">Sub-Total : </span>
+                            <div className="d-flex justify-content-end mb-3 mt-3">
+                                <div className="text-start">
+                                    <div className="border-bottom">
+                                        <p >
+                                            <span className="font-weight-semibold ">Sub-Total : </span>
+                                            <NumberFormat
+                                                displayType="text"
+                                                value={calculateSubtotal()}
+                                                // prefix="$"
+                                                thousandSeparator={true}
+                                            />
+                                        </p>
+                                        <p>
+                                            <span className="font-weight-semibold ">Total Discount : </span>
+                                            {`${parsedInvoice.discount || 0}%`}
+                                        </p>
+                                        <p>
+                                            <span className="font-weight-semibold ">Total Discount Amount: </span>
+                                            <NumberFormat
+                                                displayType="text"
+                                                value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
+                                                // prefix="₹"
+                                                thousandSeparator={true}
+                                            />
+                                        </p>
+                                        <p>
+                                            <span className="font-weight-semibold ">Total Tax Amount: </span>
+                                            <NumberFormat
+                                                displayType="text"
+                                                value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.tax_amount || 0), 0)}
+                                                thousandSeparator={true}
+                                            />
+                                        </p>
+                                    </div>
+                                    <h2 className="mt-3">
+                                        <span className="mr-1 font-weight-semibold ">Final Total: </span>
                                         <NumberFormat
                                             displayType="text"
-                                            value={calculateSubtotal()}
+                                            value={parsedInvoice.total}
+                                            // prefix="₹"
                                             thousandSeparator={true}
                                         />
-                                    </p>
-                                    <p>
-                                        <span className="font-weight-semibold ">Total Discount : </span>
-                                        {`${parsedInvoice.discount || 0}%`}
-                                    </p>
-                                    <p>
-                                        <span className="font-weight-semibold ">Total Discount Amount: </span>
-                                        <NumberFormat
-                                            displayType="text"
-                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
-                                            thousandSeparator={true}
-                                        />
-                                    </p>
-                                    <p>
-                                        <span className="font-weight-semibold ">Total Tax Amount: </span>
-                                        <NumberFormat
-                                            displayType="text"
-                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.tax_amount || 0), 0)}
-                                            thousandSeparator={true}
-                                        />
-                                    </p>
+                                    </h2>
                                 </div>
-                                <h2 className="mt-3">
-                                    <span className="mr-1 font-weight-semibold ">Final Total: </span>
-                                    <NumberFormat
-                                        displayType="text"
-                                        value={parsedInvoice.total}
-                                        thousandSeparator={true}
-                                    />
-                                </h2>
                             </div>
-                        </div>
-                    )}
+                        )}
                     </div>
                 </div>
                 <div className="grid grid-cols-2 gap-8">
@@ -1290,20 +1259,20 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         </div>
                     </div>
                     <div>
-                    <div className="flex justify-end items-center">
+                        <div className="flex justify-end items-center">
                             <div className=" rounded-lg p-8">
                                 {renderSignatureSection()}
                             </div>
-                    </div>
+                        </div>
                     </div>
                 </div>
-                    <div className='mt-4'>
-                        <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
-                        {generalSettings?.termsandconditions ? (
-                        <div 
-                            dangerouslySetInnerHTML={{ 
-                                __html: generalSettings.termsandconditions 
-                            }} 
+                <div className='mt-4'>
+                    <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
+                    {generalSettings?.termsandconditions ? (
+                        <div
+                            dangerouslySetInnerHTML={{
+                                __html: generalSettings.termsandconditions
+                            }}
                             className="text-gray-600 text-sm"
                         />
                     ) : (
@@ -1312,7 +1281,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                             <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
                         </ol>
                     )}
-                    </div>
+                </div>
                 <div className="text-center font-semibold mt-8">
                     <p>Thanks for your Business</p>
                 </div>

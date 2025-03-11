@@ -101,7 +101,7 @@ export class BasicArea extends Component {
 				options={this.state.options}
 				series={this.state.series}
 				type="area"
-				height= {300}
+				height={300}
 			/>
 		)
 	}

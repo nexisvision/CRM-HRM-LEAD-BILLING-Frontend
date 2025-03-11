@@ -76,7 +76,7 @@ const AddOtherPayment = ({ id, onClose }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <Col span={24} className="mt-4">
               <div className="form-item">
-                  <label className="font-semibold">Employee <span className="text-red-500">*</span></label>
+                <label className="font-semibold">Employee <span className="text-red-500">*</span></label>
                 <Field name="employeeId">
                   {({ field }) => (
                     <Select

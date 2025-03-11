@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Input, Button, Select, DatePicker, message, Row, Col, Modal } from "antd";
-import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import { PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { AddDeals, GetDeals } from "./DealReducers/DealSlice";
@@ -19,11 +17,8 @@ import AddPipeLine from "../systemsetup/Pipeline/AddPipeLine";
 import AddCurrencies from "views/app-views/setting/currencies/AddCurrencies";
 import AddCountries from "views/app-views/setting/countries/AddCountries";
 const { Option } = Select;
-const AddDeal = ({ onClose,setFieldValue }) => {
-  const navigate = useNavigate();
+const AddDeal = ({ onClose }) => {
   const dispatch = useDispatch();
-  const tabledata = useSelector((state) => state?.SubClient);
-  const { currencies } = useSelector((state) => state.currencies);
   const { data: Piplines = [] } = useSelector((state) => state.Piplines.Piplines || {});
   const allpipline = Piplines || [];
 
@@ -43,7 +38,6 @@ const AddDeal = ({ onClose,setFieldValue }) => {
     : [];
 
 
-
   const { data: Leadss = [] } = useSelector((state) => state.Leads.Leads || {});
 
   const Leads = logged && Array.isArray(Leadss)
@@ -59,8 +53,6 @@ const AddDeal = ({ onClose,setFieldValue }) => {
     : [];
 
 
-  const clientdata = tabledata?.SubClient?.data || [];
-
   const countries = useSelector((state) => state.countries?.countries || []);
 
   useEffect(() => {
@@ -72,37 +64,34 @@ const AddDeal = ({ onClose,setFieldValue }) => {
   const [categories, setCategories] = useState([]);
 
   const AllLoggedData = useSelector((state) => state.user);
-
-  const lid = AllLoggedData.loggedInUser.id;
-
-  const fetchLables = async (lableType, setter) => {
-    try {
-      const lid = AllLoggedData.loggedInUser.id;
-      const response = await dispatch(GetLable(lid));
-
-      if (response.payload && response.payload.data) {
-        const uniqueCategories = response.payload.data
-          .filter((label) => label && label.name) 
-          .map((label) => ({
-            id: label.id,
-            name: label.name.trim(),
-          }))
-          .filter(
-            (label, index, self) =>
-              index === self.findIndex((t) => t.name === label.name)
-          ); 
-
-        setCategories(uniqueCategories);
-      }
-    } catch (error) {
-      console.error("Failed to fetch categories:", error);
-      message.error("Failed to load categories");
-    }
-  };
-
   useEffect(() => {
-    fetchLables("category", setCategories);
-  }, []);
+    const fetchLables = async () => {
+      try {
+        const lid = AllLoggedData.loggedInUser.id;
+        const response = await dispatch(GetLable(lid));
+
+        if (response.payload && response.payload.data) {
+          const uniqueCategories = response.payload.data
+            .filter((label) => label && label.name) // Filter out invalid labels
+            .map((label) => ({
+              id: label.id,
+              name: label.name.trim(),
+            }))
+            .filter(
+              (label, index, self) =>
+                index === self.findIndex((t) => t.name === label.name)
+            ); // Remove duplicates
+
+          setCategories(uniqueCategories);
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+        message.error("Failed to load categories");
+      }
+    };
+
+    fetchLables();
+  }, [AllLoggedData.loggedInUser.id, dispatch]);
 
   const handleAddNewCategory = async (newValue, setter, modalSetter, setFieldValue) => {
     if (!newValue.trim()) {
@@ -172,20 +161,6 @@ const AddDeal = ({ onClose,setFieldValue }) => {
     closedDate: null,
     project: "",
   };
-  const validationSchema = Yup.object({
-    dealName: Yup.string().required("Please enter a Deal Name."),
-    phoneNumber: Yup.string()
-      .required("Phone number is required"),
-    phoneCode: Yup.string().required("Phone code is required"),
-    price: Yup.string().required("Please enter a Price."),
-    leadTitle: Yup.string().required("Please select a Lead Title."),
-    currency: Yup.string().required("Please select a Currency."),
-    category: Yup.string().optional("Please select a Category."),
-    pipeline: Yup.string().required("Please select a Pipeline."),
-    stage: Yup.string().required("Please select a Stage."),
-    closedDate: Yup.date().required("Please select a Closed Date."),
-    project: Yup.string().optional("Please select a Project."),
-  });
   const onSubmit = (values, { resetForm }) => {
     dispatch(AddDeals(values))
       .then(() => {

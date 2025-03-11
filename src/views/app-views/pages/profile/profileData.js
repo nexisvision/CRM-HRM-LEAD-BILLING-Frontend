@@ -1,5 +1,5 @@
-import { 
-	GlobalOutlined, 
+import {
+	GlobalOutlined,
 	FacebookOutlined,
 	InstagramOutlined,
 	DribbbleOutlined,
@@ -12,22 +12,22 @@ export const socialContactList = [
 	{
 		name: "http://ellarbae.io/",
 		icon: GlobalOutlined,
-		url: "/#"	
+		url: "/#"
 	},
 	{
 		name: "Ella Robinson",
 		icon: FacebookOutlined,
-		url: "/#"			
+		url: "/#"
 	},
 	{
 		name: "@ellarbae",
 		icon: InstagramOutlined,
-		url: "/#"			
+		url: "/#"
 	},
 	{
 		name: "EllaRobinson",
 		icon: DribbbleOutlined,
-		url: "/#"			
+		url: "/#"
 	}
 ]
 

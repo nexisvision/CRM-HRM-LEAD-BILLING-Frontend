@@ -1,16 +1,13 @@
 import React, { useState } from "react";
-
 import PipelineList from "./Pipeline/PipelineList";
 import LeadStagesList from "./LeadStages/LeadStagesList";
 import DealStagesList from "./DealStages/DealStagesList";
 import SourcesList from "./Sources/SourcesList";
 import LabelsList from "./Labels/LabelsList";
 import ContractTypeList from "./ContractType/ContractTypeList";
-import Flex from "components/shared-components/Flex";
 
 const SystemSetupList = () => {
   const [selectedSection, setSelectedSection] = useState("pipeline");
-
   const renderContent = () => {
     switch (selectedSection) {
       case "pipeline":
@@ -25,7 +22,6 @@ const SystemSetupList = () => {
         return <LabelsList />;
       case "contracttype":
         return <ContractTypeList />;
-  
       default:
         return <PipelineList />;
     }
@@ -38,67 +34,60 @@ const SystemSetupList = () => {
           <ul className="">
             <li
               onClick={() => setSelectedSection("pipeline")}
-              className={`cursor-pointer p-3 flex justify-between rounded-t-lg ${
-                selectedSection === "pipeline"
-                  ? "bg-blue-500 text-white"
-                  : "bg-white"
-              }`}
+              className={`cursor-pointer p-3 flex justify-between rounded-t-lg ${selectedSection === "pipeline"
+                ? "bg-blue-500 text-white"
+                : "bg-white"
+                }`}
             >
               Pipeline
             </li>
             <li
               onClick={() => setSelectedSection("leadstages")}
-              className={`cursor-pointer p-3 flex justify-between ${
-                selectedSection === "leadstages"
-                  ? "bg-blue-500 text-white"
-                  : "bg-white"
-              }`}
+              className={`cursor-pointer p-3 flex justify-between ${selectedSection === "leadstages"
+                ? "bg-blue-500 text-white"
+                : "bg-white"
+                }`}
             >
               Lead Stages
             </li>
             <li
               onClick={() => setSelectedSection("dealstages")}
-              className={`cursor-pointer p-3 flex justify-between ${
-                selectedSection === "dealstages"
-                  ? "bg-blue-500 text-white"
-                  : "bg-white"
-              }`}
+              className={`cursor-pointer p-3 flex justify-between ${selectedSection === "dealstages"
+                ? "bg-blue-500 text-white"
+                : "bg-white"
+                }`}
             >
               Deal Stages
             </li>
             <li
               onClick={() => setSelectedSection("sources")}
-              className={`cursor-pointer p-3 flex justify-between ${
-                selectedSection === "sources"
-                  ? "bg-blue-500 text-white"
-                  : "bg-white"
-              }`}
+              className={`cursor-pointer p-3 flex justify-between ${selectedSection === "sources"
+                ? "bg-blue-500 text-white"
+                : "bg-white"
+                }`}
             >
               Sources
             </li>
             <li
               onClick={() => setSelectedSection("labels")}
-              className={`cursor-pointer p-3 flex justify-between ${
-                selectedSection === "labels"
-                  ? "bg-blue-500 text-white"
-                  : "bg-white"
-              }`}
+              className={`cursor-pointer p-3 flex justify-between ${selectedSection === "labels"
+                ? "bg-blue-500 text-white"
+                : "bg-white"
+                }`}
             >
               Labels
             </li>
             <li
               onClick={() => setSelectedSection("contracttype")}
-              className={`cursor-pointer p-3 flex justify-between ${
-                selectedSection === "contracttype"
-                  ? "bg-blue-500 text-white"
-                  : "bg-white"
-              }`}
+              className={`cursor-pointer p-3 flex justify-between ${selectedSection === "contracttype"
+                ? "bg-blue-500 text-white"
+                : "bg-white"
+                }`}
             >
               Contract Type
             </li>
           </ul>
         </div>
-
         <div className="flex-1 lg:ml-[-23px] p-4 mt-[30px]">
           <div className="m-2 rounded-lg">{renderContent()}</div>
         </div>

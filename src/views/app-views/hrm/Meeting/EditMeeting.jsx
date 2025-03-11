@@ -98,7 +98,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
 
         setInitialValues({
           department: dataM.department || "",
-          employee: employeeIds, // Set the parsed array directly
+          employee: employeeIds,
           title: dataM.title || "",
           date: dataM.date ? moment(dataM.date, "YYYY-MM-DD") : null,
           startTime: dataM.startTime ? moment(dataM.startTime, "HH:mm:ss") : null,
@@ -109,7 +109,6 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
           client: dataM.client || "",
         });
 
-        // Set selected department to filter employees
         setSelectedDept(dataM.department);
 
       } catch (error) {
@@ -119,17 +118,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
     }
   }, [dataM]);
 
-  const getEmployeeNames = (employeeIds) => {
-    if (!employeeIds || !filteredEmpData) return [];
-
-    return employeeIds.map(id => {
-      const employee = filteredEmpData.find(emp => emp.id === id);
-      return employee ? employee.username : "Unknown Employee";
-    });
-  };
-
   const onSubmit = (values) => {
-    // Convert employee array back to JSON string
     const modifiedValues = {
       ...values,
       employee: JSON.stringify(values.employee)
@@ -163,7 +152,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
 
   return (
     <div className="edit-meeting-form">
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         enableReinitialize

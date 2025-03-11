@@ -29,12 +29,12 @@ const NotesList = () => {
 
   useEffect(() => {
     dispatch(getnotess(id));
-  }, []);
+  }, [dispatch, id]);
 
   const allnotedata = useSelector((state) => state.notes);
   const fnddata = allnotedata.notes?.data;
 
-  console.log("fnddata",fnddata); 
+  console.log("fnddata", fnddata);
 
   useEffect(() => {
     if (fnddata) {
@@ -42,20 +42,14 @@ const NotesList = () => {
     }
   }, [fnddata]);
 
-  // Open Add Job Modal
   const openAddNotesModal = () => {
     setIsAddNotesModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddNotesModal = () => {
     setIsAddNotesModalVisible(false);
   };
 
-  // Open Add Job Modal
-  const openEditNotesModal = () => {
-    setIsEditNotesModalVisible(true);
-  };
 
   // Close Add Job Modal
   const closeEditNotesModal = () => {
@@ -66,30 +60,30 @@ const NotesList = () => {
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
-    
+
     // If search value is empty, show all data
     if (!value) {
       setList(fnddata);
       return;
     }
-    
+
     // Filter the data based on note title
-    const filtered = fnddata.filter(note => 
+    const filtered = fnddata.filter(note =>
       note.note_title?.toLowerCase().includes(value)
     );
-    
+
     setList(filtered);
   };
 
   // Add filter function
   const getFilteredNotes = () => {
     if (!list) return [];
-    
+
     let filtered = list;
 
     // Apply search filter
     if (searchText) {
-      filtered = filtered.filter(note => 
+      filtered = filtered.filter(note =>
         note.note_title?.toLowerCase().includes(searchText.toLowerCase())
       );
     }
@@ -121,7 +115,7 @@ const NotesList = () => {
           </Flex>
         </Flex>
 
-        <ViewNotes 
+        <ViewNotes
           data={getFilteredNotes()}
           pagination={{
             total: getFilteredNotes().length,
@@ -130,7 +124,6 @@ const NotesList = () => {
             showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
           }}
         />
-
         <Modal
           title="Add Notes"
           visible={isAddNotesModalVisible}

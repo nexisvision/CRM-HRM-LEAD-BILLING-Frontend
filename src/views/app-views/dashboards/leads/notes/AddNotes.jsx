@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Input, Button, Select, message, Row, Col } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -22,17 +22,9 @@ const AddNotes = ({ onClose }) => {
 
   const employeeData = employee?.filter((item) => item.created_by === user) || [];
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     dispatch(empdata());
-  }, []);
-
-
-  const filterdata = useSelector((state) => state.employee.employee.data)
-
-  const loggeduesr = useSelector((state) => state.user.loggedInUser.username)
-
+  }, [dispatch]);
   const initialValues = {
     note_title: "",
     notetype: "public",
@@ -52,7 +44,6 @@ const AddNotes = ({ onClose }) => {
         values.employees.length > 0 ? { id: values.employees[0] } : null;
 
       values.employees = employeeObject;
-
 
       dispatch(AddNote({ id, values }))
         .then(() => {

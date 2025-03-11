@@ -78,7 +78,9 @@ const editint = async (idd, values) => {
 };
 
 
+
 const UserService = {
+
   getint,
   addint,
   deleteint,

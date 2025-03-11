@@ -22,7 +22,7 @@ const createEmp = async (payload) => {
 
   try {
     const res = await axios.post(
-        `${env.API_ENDPOINT_URL}/employees/`,
+      `${env.API_ENDPOINT_URL}/employees/`,
       payload,
       {
         headers: {
@@ -30,7 +30,7 @@ const createEmp = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -50,7 +50,7 @@ const Empdelete = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -78,7 +78,9 @@ const EditEmp = async (idd, updatedFormValues) => {
 };
 
 
+
 const UserService = {
+
   fetchEmpData,
   createEmp,
   Empdelete,

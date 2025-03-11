@@ -7,8 +7,8 @@ import {
   message,
   Button,
   Modal,
-  Select,
   Space,
+  Dropdown,
 } from "antd";
 import {
   DeleteOutlined,
@@ -16,22 +16,19 @@ import {
   PlusOutlined,
   FileExcelOutlined,
   EditOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import { utils, writeFile } from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteAccount, getAccounts } from "./AccountReducer/AccountSlice";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AddAccount from "./AddAccount";
 import EditAccount from "./EditAccount";
 import { debounce } from 'lodash';
 
-const { Option } = Select;
-
 const AccountList = () => {
   const dispatch = useDispatch();
   const [accounts, setAccounts] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddAccountModalVisible, setIsAddAccountModalVisible] = useState(false);
   const [isEditAccountModalVisible, setIsEditAccountModalVisible] = useState(false);
   const [idd, setIdd] = useState("");
@@ -40,7 +37,7 @@ const AccountList = () => {
 
   useEffect(() => {
     dispatch(getAccounts());
-  }, []);
+  }, [dispatch]);
 
   const allAccounts = useSelector((state) => state.account);
   const fndAccounts = allAccounts.account.data;
@@ -53,9 +50,9 @@ const AccountList = () => {
 
   const debouncedSearch = debounce((value, data, setAccounts) => {
     setIsSearching(true);
-    
+
     const searchValue = value.toLowerCase();
-    
+
     if (!searchValue) {
       setAccounts(fndAccounts || []);
       setIsSearching(false);
@@ -123,22 +120,21 @@ const AccountList = () => {
     }
   };
 
-  const dropdownMenu = (elm) => ({
-    items: [
-      {
-        key: 'edit',
-        icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => eidtfun(elm.id)
-      },
-      {
-        key: 'delete',
-        icon: <DeleteOutlined />,
-        label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }
-    ]
-  });
+  const getDropdownItems = (elm) => [
+    {
+      key: 'edit',
+      icon: <EditOutlined />,
+      label: 'Edit',
+      onClick: () => eidtfun(elm.id)
+    },
+    {
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      label: 'Delete',
+      onClick: () => deleteUser(elm.id),
+      danger: true
+    }
+  ];
 
   const tableColumns = [
     {
@@ -199,7 +195,22 @@ const AccountList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -244,6 +255,22 @@ const AccountList = () => {
           scroll={{ x: 1200 }}
         />
       </div>
+
+      <style jsx>{`
+        .ant-dropdown-menu {
+          border-radius: 6px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .ant-dropdown-menu-item {
+          padding: 8px 16px;
+        }
+        .ant-dropdown-menu-item:hover {
+          background-color: #f5f5f5;
+        }
+        .ant-dropdown-menu-item-danger:hover {
+          background-color: #fff1f0;
+        }
+      `}</style>
 
       <Modal
         title="Add Account"

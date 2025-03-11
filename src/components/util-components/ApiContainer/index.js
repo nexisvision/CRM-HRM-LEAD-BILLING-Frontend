@@ -11,22 +11,22 @@ const ApiContainer = props => {
 	const [markdown, setMarkdown] = useState('')
 
 	useEffect(() => {
-		let isMounted = true; 
+		let isMounted = true;
 		fetch(code).then(res => res.text()).then(
 			md => {
-				if(isMounted) {
+				if (isMounted) {
 					setMarkdown(md)
 				}
 			}
 		);
-		return () => { isMounted = false }; 
+		return () => { isMounted = false };
 	}, [code]);
 
 
 	return (
 		<Container>
 			{markdown && (
-				<Markdown 
+				<Markdown
 					children={markdown}
 					remarkPlugins={[remarkGfm]}
 					components={
@@ -34,8 +34,8 @@ const ApiContainer = props => {
 							h2: h => {
 
 								return (
-									<div className={`api-title h${h.level} ${h.children[0].includes('title: ')? '':h.children[0].split('').join('').replace(/\s/g, '-').toLowerCase()}`}>
-										{h.children[0].includes('title: ')? /title:(.+)/.exec(h.children[0])[1] : h.children}
+									<div className={`api-title h${h.level} ${h.children[0].includes('title: ') ? '' : h.children[0].split('').join('').replace(/\s/g, '-').toLowerCase()}`}>
+										{h.children[0].includes('title: ') ? /title:(.+)/.exec(h.children[0])[1] : h.children}
 									</div>
 								)
 							},
@@ -55,7 +55,7 @@ const ApiContainer = props => {
 										</SyntaxHighlighter>
 									</div>
 								)
-							} 
+							}
 						}
 					}
 				/>

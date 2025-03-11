@@ -3,34 +3,28 @@ import {
   Card,
   Table,
   Menu,
-  Tag,
   Input,
   message,
   Button,
   Modal,
-  Select,
   Space,
   DatePicker,
+  Dropdown,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
   FileExcelOutlined,
   EditOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { debounce } from 'lodash';
 
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import userData from "../../../../assets/data/user-list.data.json";
-import OrderListData from "../../../../assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
-import useSelection from "antd/es/table/hooks/useSelection";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import AddProposal from "./AddProposal";
@@ -40,33 +34,25 @@ import { GetLeads } from "../leads/LeadReducers/LeadSlice";
 import { GetDeals } from "../deals/DealReducers/DealSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
-const { Option } = Select;
 
 const ProposalList = () => {
   const [users, setUsers] = useState(userData);
   const dispatch = useDispatch();
-  const [userProfileVisible, setUserProfileVisible] = useState(false);
-  // const [viewApplicationVisible, setViewApplicationVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddProposalModalVisible, setIsAddProposalSetupModalVisible] =
     useState(false);
   const [isEditProposalModalVisible, setIsEditProposalModalVisible] =
     useState(false);
-
   const [id, setId] = useState("");
   const { data: Leads } = useSelector((state) => state.Leads.Leads);
   const { data: Deals } = useSelector((state) => state.Deals.Deals);
+
+
 
   const user = useSelector((state) => state.user.loggedInUser.username);
 
   const allproposal = useSelector((state) => state?.proposal);
   const fnddatas = allproposal?.proposal?.data;
 
-
-  const allempdata = useSelector((state) => state.Training);
-  const fnddata = allempdata.Training.data;
 
 
 
@@ -100,10 +86,13 @@ const ProposalList = () => {
   };
 
 
+
+
   useEffect(() => {
     if (fnddatas) {
       const filteredProposals = fnddatas.filter(proposal => proposal.created_by === user);
-      
+
+      // Enrich filtered proposals with lead and deal titles
       const enrichedData = filteredProposals.map((proposal) => {
         const lead = Leads?.find((l) => l.id === proposal.lead_title); // Match lead by ID
         const deal = Deals?.find((d) => d.id === proposal.deal_title);
@@ -120,34 +109,41 @@ const ProposalList = () => {
   }, [fnddatas, user, Leads, Deals]);
 
 
-              
-                        const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                        const roles = useSelector((state) => state.role?.role?.data);
-                        const roleData = roles?.find(role => role.id === roleId);
-                    
-                        const whorole = roleData.role_name;
-                    
-                        const parsedPermissions = Array.isArray(roleData?.permissions)
-                        ? roleData.permissions
-                        : typeof roleData?.permissions === 'string'
-                        ? JSON.parse(roleData.permissions)
-                        : [];
-                      
-                      
-                        let allpermisson;  
-                    
-                        if (parsedPermissions["dashboards-proposal"] && parsedPermissions["dashboards-proposal"][0]?.permissions) {
-                          allpermisson = parsedPermissions["dashboards-proposal"][0].permissions;
-                        
-                        } else {
-                        }
-                        
-                        const canCreateClient = allpermisson?.includes('create');
-                        const canEditClient = allpermisson?.includes('edit');
-                        const canDeleteClient = allpermisson?.includes('delete');
-                        const canViewClient = allpermisson?.includes('view');
-              
-                        ///endpermission
+
+
+
+
+
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+
+  let allpermisson;
+
+  if (parsedPermissions["dashboards-proposal"] && parsedPermissions["dashboards-proposal"][0]?.permissions) {
+    allpermisson = parsedPermissions["dashboards-proposal"][0].permissions;
+    console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    // console.log('dashboards-proposal is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
 
 
 
@@ -157,9 +153,9 @@ const ProposalList = () => {
 
   const debouncedSearch = debounce((value, date, data, setUsers) => {
     setIsSearching(true);
-    
+
     const searchValue = value.toLowerCase();
-    
+
     if (!fnddatas) {
       setUsers([]);
       setIsSearching(false);
@@ -230,63 +226,36 @@ const ProposalList = () => {
     }
   };
 
-  const showUserProfile = (userInfo) => {
-    setUserProfileVisible(true);
-    setSelectedUser(userInfo);
-  };
-
-  const closeUserProfile = () => {
-    setUserProfileVisible(false);
-    setSelectedUser(null);
-  };
-
- 
-
-  const getjobStatus = (status) => {
-    if (status === "active") {
-      return "blue";
-    }
-    if (status === "blocked") {
-      return "cyan";
-    }
-    return "";
-  };
-
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "status";
-      const data = utils.filterArray(userData, key, value);
-      setUsers(data);
-    } else {
-      setUsers(userData);
-    }
-  };
 
   const editfun = (id) => {
     openEditProposalModal();
     setId(id);
   };
- 
 
-  const jobStatusList = ["active", "blocked"];
+  const getDropdownItems = (elm) => {
+    const items = [];
 
-  const dropdownMenu = (elm) => ({
-    items: [
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
         onClick: () => editfun(elm.id)
-      }] : []),
+      });
+    }
 
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(elm.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -298,7 +267,7 @@ const ProposalList = () => {
           : '',
       sorter: (a, b) => a.lead_title.length - b.lead_title.length,
     },
-   
+
 
     {
       title: "Tax",
@@ -316,13 +285,34 @@ const ProposalList = () => {
       render: (date) => (date ? dayjs(date).format("DD-MM-YYYY") : "N/A"),
       sorter: (a, b) => a.valid_till.length - b.valid_till.length,
     },
-   
+
+    // {
+    //   title: "created_by ",
+    //   dataIndex: "created_by",
+    //   sorter: (a, b) => a.created_by.length - b.created_by.length,
+    // },
+
     {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -357,19 +347,19 @@ const ProposalList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-        
 
-            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                                <Button
-                                                                                                                                type="primary"
-                                                                                                                                className="ml-2"
-                                                                                                                                onClick={openAddProposalModal}
-                                                                                                                              >
-                                                                                                                                <PlusOutlined />
-                                                                                                                                <span>New</span>
-                                                                                                                              </Button>
-                                                                                                                
-                                                                                                                    ) : null}
+
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddProposalModal}
+            >
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+
+          ) : null}
 
 
           <Button
@@ -384,15 +374,15 @@ const ProposalList = () => {
       </Flex>
       <div className="table-responsive mt-4">
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                   <Table
-                                                                                                   columns={tableColumns}
-                                                                                                   dataSource={users}
-                                                                                                   rowKey="id"
-                                                                                                   scroll={{ x: 1200 }}
-                                                                                                 />
-                                                                                                  ) : null}
+          <Table
+            columns={tableColumns}
+            dataSource={users}
+            rowKey="id"
+            scroll={{ x: 1200 }}
+          />
+        ) : null}
 
-       
+
       </div>
       {/* <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} /> */}
 
@@ -430,6 +420,30 @@ const ProposalList = () => {
       >
         <ViewTrainingSetup onClose={closeViewTrainingSetupModal} idd={idd} />
       </Modal> */}
+
+      <style>{`
+        .ant-dropdown-menu {
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          padding: 4px;
+        }
+        .ant-dropdown-menu-item {
+          padding: 8px 16px;
+          border-radius: 4px;
+          margin: 2px 0;
+          transition: all 0.3s;
+        }
+        .ant-dropdown-menu-item:hover {
+          background-color: #f5f5f5;
+        }
+        .ant-dropdown-menu-item-danger:hover {
+          background-color: #fff1f0;
+        }
+        .ant-dropdown-menu-item .anticon {
+          font-size: 16px;
+          margin-right: 8px;
+        }
+      `}</style>
     </Card>
   );
 };

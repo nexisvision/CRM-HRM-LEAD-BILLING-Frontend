@@ -1,7 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
-
 const Getex = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -82,7 +81,6 @@ const UserService = {
   AddExpence,
   DeleteEx,
   EditEx,
- 
 };
 
 export default UserService;

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./LeadService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
+
 import { message } from "antd";
 
 export const LeadsAdd = createAsyncThunk(
@@ -76,15 +76,7 @@ export const LeadsEdit = createAsyncThunk(
 );
 
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const LeadSlice = createSlice({
   name: "Leads",
@@ -151,7 +143,7 @@ const LeadSlice = createSlice({
       })
 
       //getall
-      
+
       //delete
       .addCase(LeadsDelete.pending, (state) => {
         state.isLoading = true;

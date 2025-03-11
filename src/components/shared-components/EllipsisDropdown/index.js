@@ -10,16 +10,15 @@ const EllipsisDropdown = ({ menu, placement = 'bottomRight', trigger = ['click']
 			placement={placement}
 			trigger={trigger}
 		>
-			<div className="ellipsis-dropdown">
-				<EllipsisOutlined />
-			</div>
+			<EllipsisOutlined className="ellipsis-dropdown" />
 		</Dropdown>
 	)
 }
 
 EllipsisDropdown.propTypes = {
-	trigger: PropTypes.string,
-	placement: PropTypes.string
+	menu: PropTypes.object.isRequired,
+	placement: PropTypes.string,
+	trigger: PropTypes.array
 }
 
 export default EllipsisDropdown

@@ -2,9 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./InvoiceService";
 import { toast } from "react-toastify";
 import { message } from "antd";
-import { navigate } from "react-big-calendar/lib/utils/constants";
-
-// Async thunk for adding user
 
 export const AddInvoices = createAsyncThunk(
   "users/AddInvoices",
@@ -18,7 +15,6 @@ export const AddInvoices = createAsyncThunk(
   }
 );
 
-
 export const getInvoice = createAsyncThunk(
   "emp/getInvoice",
   async (thunkAPI) => {
@@ -31,8 +27,6 @@ export const getInvoice = createAsyncThunk(
   }
 );
 
-
-// Async thunk for deleting a user
 export const deleteInvoice = createAsyncThunk(
   "users/deleteInvoiceeet",
   async (userId, thunkAPI) => {
@@ -49,7 +43,7 @@ export const editInvoice = createAsyncThunk(
   async ({ idd, values }, thunkAPI) => {
     try {
       const response = await UserService.editinv(idd, values);
-      return response; // Return the updated data
+      return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data || "Error updating employee"
@@ -58,15 +52,7 @@ export const editInvoice = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const RoleAndPermissionSlice = createSlice({
   name: "salesInvoices",

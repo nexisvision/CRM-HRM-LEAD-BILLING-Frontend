@@ -17,10 +17,10 @@ import {
   ArrowUpOutlined,
   ArrowDownOutlined
 } from '@ant-design/icons';
-import { 
-  regionData, 
-  sessionData, 
-  sessionLabels, 
+import {
+  regionData,
+  sessionData,
+  sessionLabels,
   conbinedSessionData,
   sessionColor,
   pagesViewData,
@@ -32,11 +32,11 @@ import {
 import { useSelector } from 'react-redux'
 
 const socialMediaReferralIcon = [
-  <FacebookFilled style={{color: '#1774eb'}} />,
-  <TwitterSquareFilled style={{color: '#1c9deb'}}/>,
-  <YoutubeFilled style={{color: '#f00'}}/>,
-  <LinkedinFilled style={{color: '#0077b4'}} />,
-  <DribbbleSquareFilled  style={{color: '#e44a85'}} />
+  <FacebookFilled style={{ color: '#1774eb' }} />,
+  <TwitterSquareFilled style={{ color: '#1c9deb' }} />,
+  <YoutubeFilled style={{ color: '#f00' }} />,
+  <LinkedinFilled style={{ color: '#0077b4' }} />,
+  <DribbbleSquareFilled style={{ color: '#e44a85' }} />
 ]
 
 const { Option } = Select;
@@ -44,7 +44,7 @@ const { Option } = Select;
 const rederRegionTopEntrance = (
   <div className="mb-4">
     <div className="d-flex align-items-center">
-      <Avatar size={20} src="/img/flags/us.png"/>
+      <Avatar size={20} src="/img/flags/us.png" />
       <h2 className="mb-0 ml-2 font-weight-bold">37.61%</h2>
     </div>
     <span className="text-muted">Top entrance region</span>
@@ -77,23 +77,23 @@ export const AnalyticDashboard = () => {
     <>
       <Row gutter={16}>
         <Col xs={24} sm={24} md={24} lg={24} xxl={18}>
-          <RegiondataWidget 
+          <RegiondataWidget
             title="Entrance by region"
             data={regionData}
             content={rederRegionTopEntrance}
           />
         </Col>
         <Col xs={24} sm={24} md={24} lg={24} xxl={6}>
-          <DonutChartWidget 
-            series={sessionData} 
-            labels={sessionLabels} 
+          <DonutChartWidget
+            series={sessionData}
+            labels={sessionLabels}
             title="Sessions Device"
             bodyClass="my-3"
-            customOptions={{colors: sessionColor}}
+            customOptions={{ colors: sessionColor }}
             extra={
-              <Row  justify="center">
+              <Row justify="center">
                 <Col xs={20} sm={20} md={20} lg={24}>
-                  <div className="mt-4 mx-auto" style={{maxWidth: 200}}>
+                  <div className="mt-4 mx-auto" style={{ maxWidth: 200 }}>
                     {conbinedSessionData.map(elm => (
                       <Flex alignItems="center" justifyContent="space-between" className="mb-3" key={elm.label}>
                         <Flex gap={5}>
@@ -138,41 +138,41 @@ export const AnalyticDashboard = () => {
         </Col>
         <Col xs={24} sm={24} md={24} lg={12} xxl={6}>
           <Card title="Social media referrals">
-          <List
-            itemLayout="horizontal"
-            dataSource={socialMediaReferralData}
-            renderItem={(item, index) => (
-              <List.Item>
-                <div className="d-flex align-items-center justify-content-between w-100">
-                  <div className="d-flex align-items-center">
-                    <span className="font-size-xxl">{socialMediaReferralIcon[index]}</span>
-                    <div className="ml-3">
-                      <h4 className="font-weight-bold mb-0">{item.title}</h4>
-                      <span className="text-muted">Total: <span className="font-weight-bold">{item.amount}</span></span>
+            <List
+              itemLayout="horizontal"
+              dataSource={socialMediaReferralData}
+              renderItem={(item, index) => (
+                <List.Item>
+                  <div className="d-flex align-items-center justify-content-between w-100">
+                    <div className="d-flex align-items-center">
+                      <span className="font-size-xxl">{socialMediaReferralIcon[index]}</span>
+                      <div className="ml-3">
+                        <h4 className="font-weight-bold mb-0">{item.title}</h4>
+                        <span className="text-muted">Total: <span className="font-weight-bold">{item.amount}</span></span>
+                      </div>
+                    </div>
+                    <div className="d-flex align-items-center">
+                      <ApexChart
+                        options={{ ...apexSparklineChartDefultOption, ...{ colors: [utils.getSignNum(item.percentage, COLORS[1], COLORS[2])] } }}
+                        series={item.data}
+                        height={25}
+                        width={50}
+                      />
+                      <span className="ml-3 font-weight-bold">{item.percentage}%</span>
+                      <span className={`ml-1 ${utils.getSignNum(item.percentage, 'text-success', 'text-danger')}`}>
+                        {utils.getSignNum(item.percentage, <ArrowUpOutlined />, <ArrowDownOutlined />)}
+                      </span>
                     </div>
                   </div>
-                  <div className="d-flex align-items-center">
-                    <ApexChart 
-                      options={{...apexSparklineChartDefultOption, ...{colors: [utils.getSignNum(item.percentage, COLORS[1], COLORS[2])]}}} 
-                      series={item.data} 
-                      height={25} 
-                      width={50}
-                    />
-                    <span className="ml-3 font-weight-bold">{item.percentage}%</span>
-                    <span className={`ml-1 ${utils.getSignNum(item.percentage, 'text-success', 'text-danger')}`}>
-                      {utils.getSignNum(item.percentage, <ArrowUpOutlined />, <ArrowDownOutlined />)}
-                    </span>
-                  </div>
-                </div>
-              </List.Item>
+                </List.Item>
               )}
             />
           </Card>
         </Col>
         <Col xs={24} sm={24} md={24} lg={24} xxl={12}>
-          <ChartWidget 
-            series={uniqueVisitorsData.series} 
-            xAxis={uniqueVisitorsData.categories} 
+          <ChartWidget
+            series={uniqueVisitorsData.series}
+            xAxis={uniqueVisitorsData.categories}
             title="Unique Visitors"
             height={410}
             type="bar"

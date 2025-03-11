@@ -9,7 +9,6 @@ import * as Yup from 'yup';
 const { Option } = Select;
 
 const AddJobCandidate = () => {
-  // const [form] = Form.useForm();
   const navigate = useNavigate();
 
   const onSubmit = (values) => {
@@ -43,7 +42,6 @@ const AddJobCandidate = () => {
 
   return (
     <div className="add-job-form">
-
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

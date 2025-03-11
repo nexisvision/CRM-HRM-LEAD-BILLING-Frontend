@@ -1,4 +1,4 @@
-    import axios from "axios";
+import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
 
@@ -93,7 +93,9 @@ const editsal = async (idd, values) => {
 };
 
 
+
 const UserService = {
+
   getsal,
   addsal,
   deletsal,

@@ -7,34 +7,33 @@ import {
   Input,
   Button,
   Menu,
-  Tag,
   Modal,
   message,
   DatePicker,
+  Dropdown,
 } from "antd";
 import {
   FileExcelOutlined,
-  SearchOutlined,
-  DeleteOutlined,
   EditOutlined,
   PlusOutlined,
+  SearchOutlined,
+  DeleteOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import Flex from "components/shared-components/Flex";
-import dayjs from "dayjs";
-import { utils, writeFile } from "xlsx";
 import AddRevenue from "./AddRevenue";
-import EditRevenue from "./EditRevenue";
 import { deleteRevenue, getRevenue } from "./RevenueReducer/RevenueSlice";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { writeFile } from "xlsx";
+import utils from "utils";
+import dayjs from "dayjs";
+import EditRevenue from "./EditRevenue";
+import Flex from "components/shared-components/Flex";
 
 const { Option } = Select;
 
 const RevenueList = () => {
   const [list, setList] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddRevenueModalVisible, setIsAddRevenueModalVisible] =
     useState(false);
   const [isEditRevenueModalVisible, setIsEditRevenueModalVisible] =
@@ -56,7 +55,7 @@ const RevenueList = () => {
   useEffect(() => {
     dispatch(getRevenue());
     dispatch(Getcus());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (fnddata) {
@@ -86,49 +85,43 @@ const RevenueList = () => {
     setIsEditRevenueModalVisible(false);
   };
 
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "revenueStatus";
-      const data = utils.filterArray(list, key, value);
-      setList(data);
-    } else {
-      setList(fnddata);
-    }
-  };
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
 
-    
-              const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-              const roles = useSelector((state) => state.role?.role?.data);
-              const roleData = roles?.find(role => role.id === roleId);
-          
-              const whorole = roleData.role_name;
-          
-              const parsedPermissions = Array.isArray(roleData?.permissions)
-              ? roleData.permissions
-              : typeof roleData?.permissions === 'string'
-              ? JSON.parse(roleData.permissions)
-              : [];
-            
-            
-              let allpermisson;  
-          
-              if (parsedPermissions["dashboards-sales-revenue"] && parsedPermissions["dashboards-sales-revenue"][0]?.permissions) {
-                allpermisson = parsedPermissions["dashboards-sales-revenue"][0].permissions;
-              
-              } else {
-              }
-              
-              const canCreateClient = allpermisson?.includes('create');
-              const canEditClient = allpermisson?.includes('edit');
-              const canDeleteClient = allpermisson?.includes('delete');
-              const canViewClient = allpermisson?.includes('view');
-    
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+
+  let allpermisson;
+
+  if (parsedPermissions["dashboards-sales-revenue"] && parsedPermissions["dashboards-sales-revenue"][0]?.permissions) {
+    allpermisson = parsedPermissions["dashboards-sales-revenue"][0].permissions;
+    console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    console.log('dashboards-sales-revenue is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
+
+
 
   const exportToExcel = () => {
     try {
       const ws = utils.json_to_sheet(list);
-      const wb = utils.book_new(); // Create a new workbook
-      utils.book_append_sheet(wb, ws, "Revenue"); // Append the worksheet to the workbook
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, ws, "Revenue");
 
       writeFile(wb, "RevenueData.xlsx");
       message.success("Data exported successfully!");
@@ -150,26 +143,32 @@ const RevenueList = () => {
     setIdd(idd);
   };
 
-  const dropdownMenu = (row) => ({
-    items: [
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+  const getDropdownItems = (row) => {
+    const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
         onClick: () => editfun(row.id)
-      }] : []),
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => dletefun(row.id)
-      }] : [])
-    ]
-  });
+        onClick: () => dletefun(row.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
-   
     {
       title: "Amount",
       dataIndex: "amount",
@@ -209,38 +208,52 @@ const RevenueList = () => {
       sorter: (a, b) => utils.antdTableSorter(a, b, "date"),
     },
     {
-        title: "Description",
-        dataIndex: "description",
-        render: (description) => (
-            <div
-                dangerouslySetInnerHTML={{
-                    __html: description || 'N/A'
-                }}
-                style={{
-                    maxWidth: '300px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                }}
-            />
-        ),
-        sorter: (a, b) => {
-            const descA = a.description?.replace(/<[^>]+>/g, '') || '';
-            const descB = b.description?.replace(/<[^>]+>/g, '') || '';
-            return descA.localeCompare(descB);
-        }
+      title: "Description",
+      dataIndex: "description",
+      render: (description) => (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: description || 'N/A'
+          }}
+          style={{
+            maxWidth: '300px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}
+        />
+      ),
+      sorter: (a, b) => {
+        const descA = a.description?.replace(/<[^>]+>/g, '') || '';
+        const descB = b.description?.replace(/<[^>]+>/g, '') || '';
+        return descA.localeCompare(descB);
+      }
     },
     {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
   ];
-
   const filterRevenues = (text, date, category) => {
     if (!fnddata) return;
 
@@ -248,11 +261,11 @@ const RevenueList = () => {
 
     if (text) {
       filtered = filtered.filter(revenue => {
-        const customerName = fnddataCustomers?.find(cust => 
+        const customerName = fnddataCustomers?.find(cust =>
           cust.id === revenue.customer
         )?.name?.toLowerCase();
         const plainDescription = revenue.description?.replace(/<[^>]+>/g, '').toLowerCase() || '';
-        
+
         return customerName?.includes(text.toLowerCase()) || plainDescription.includes(text.toLowerCase());
       });
     }
@@ -267,7 +280,7 @@ const RevenueList = () => {
     }
 
     if (category !== 'All') {
-      filtered = filtered.filter(revenue => 
+      filtered = filtered.filter(revenue =>
         revenue.category === category
       );
     }
@@ -293,21 +306,21 @@ const RevenueList = () => {
 
   const getFilteredRevenues = () => {
     if (!list) return [];
-    
+
     let filtered = list;
 
     if (searchText) {
       filtered = filtered.filter(revenue => {
-        const customerName = fnddataCustomers?.find(cust => 
+        const customerName = fnddataCustomers?.find(cust =>
           cust.id === revenue.customer
         )?.name?.toLowerCase();
-        
+
         return customerName?.includes(searchText.toLowerCase());
       });
     }
 
     if (selectedCategory !== 'All') {
-      filtered = filtered.filter(revenue => 
+      filtered = filtered.filter(revenue =>
         revenue.category === selectedCategory
       );
     }
@@ -363,72 +376,72 @@ const RevenueList = () => {
             </div>
           </Flex>
           <Flex gap="7px" className="flex">
-        
 
-               {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                               <Button
-                                                               type="primary"
-                                                               className="ml-2"
-                                                               onClick={openAddRevenueModal}
-                                                             >
-                                                               <PlusOutlined />
-                                                               <span className="ml-2">New</span>
-                                                             </Button>
-                                                            ) : null}
+
+            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+              <Button
+                type="primary"
+                className="ml-2"
+                onClick={openAddRevenueModal}
+              >
+                <PlusOutlined />
+                <span className="ml-2">New</span>
+              </Button>
+            ) : null}
 
 
             <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} 
-                block
-              >
-                Export All
-              </Button>
+              type="primary"
+              icon={<FileExcelOutlined />}
+              onClick={exportToExcel} // Call export function when the button is clicked
+              block
+            >
+              Export All
+            </Button>
           </Flex>
         </Flex>
         <div className="table-responsive">
 
-           {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                    <Table
-                                                    columns={tableColumns}
-                                                    dataSource={getFilteredRevenues()}
-                                                    rowKey="id"
-                                                    pagination={{
-                                                      total: getFilteredRevenues().length,
-                                                      pageSize: 10,
-                                                      showSizeChanger: true,
-                                                      showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                                                    }}
-                                                  />
-                                                    ) : null}
+          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Table
+              columns={tableColumns}
+              dataSource={getFilteredRevenues()}
+              rowKey="id"
+              pagination={{
+                total: getFilteredRevenues().length,
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              }}
+            />
+          ) : null}
 
-          
+
         </div>
       </Card>
-      
-        <Modal
-          title="Create Revenue"
-          visible={isAddRevenueModalVisible}
-          onCancel={closeAddRevenueModal}
-          footer={null}
-          width={800}
-          className="mt-[-70px]"
-        >
-          <AddRevenue onClose={closeAddRevenueModal} />
-        </Modal>
 
-        <Modal
-          title="Edit Revenue"
-          visible={isEditRevenueModalVisible}
-          onCancel={closeEditRevenueModal}
-          footer={null}
-          width={800}
-          className="mt-[-70px]"
-        >
-          <EditRevenue onClose={closeEditRevenueModal} idd={idd} />
-        </Modal>
-      
+      <Modal
+        title="Create Revenue"
+        visible={isAddRevenueModalVisible}
+        onCancel={closeAddRevenueModal}
+        footer={null}
+        width={800}
+        className="mt-[-70px]"
+      >
+        <AddRevenue onClose={closeAddRevenueModal} />
+      </Modal>
+
+      <Modal
+        title="Edit Revenue"
+        visible={isEditRevenueModalVisible}
+        onCancel={closeEditRevenueModal}
+        footer={null}
+        width={800}
+        className="mt-[-70px]"
+      >
+        <EditRevenue onClose={closeEditRevenueModal} idd={idd} />
+      </Modal>
+
     </>
   );
 };
@@ -442,7 +455,7 @@ const styles = `
   .search-input:hover,
   .search-input:focus {
     border-color: #40a9ff;
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
   }
 
   .ant-select {
@@ -455,6 +468,28 @@ const styles = `
       width: 100%;
       margin-bottom: 1rem;
     }
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
   }
 `;
 

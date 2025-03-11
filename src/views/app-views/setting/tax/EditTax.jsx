@@ -1,22 +1,18 @@
 import React, { useEffect } from 'react';
 import { Input, Button, message, Row, Col } from 'antd';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { updateTax, getAllTaxes } from '../tax/taxreducer/taxSlice';
 
 const EditTax = ({ idd, tax, onClose }) => {
-    const navigate = useNavigate();
     const dispatch = useDispatch();
-    // const { id } = useParams();
     const { loading } = useSelector((state) => state.tax);
 
     const initialValues = {
         gstName: tax?.gstName || '',
         gstPercentage: tax?.gstPercentage || '',
     };
-
     const validationSchema = Yup.object().shape({
         gstName: Yup.string()
             .required('GST name is required')
@@ -26,8 +22,6 @@ const EditTax = ({ idd, tax, onClose }) => {
             .min(0, 'Percentage cannot be negative')
             .max(100, 'Percentage cannot exceed 100'),
     });
-
-    const alladats = useSelector((state) => state.tax.taxes);
 
     useEffect(() => {
         dispatch(getAllTaxes());
@@ -52,7 +46,6 @@ const EditTax = ({ idd, tax, onClose }) => {
 
     return (
         <div className="edit-tax-form">
-         <h2 className="mb-3 border-b pb-1 font-medium"></h2>
 
             <Formik
                 initialValues={initialValues}

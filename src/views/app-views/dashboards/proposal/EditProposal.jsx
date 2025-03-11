@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Form, Row, Col, Input, message, Button, Select, DatePicker } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import 'react-quill/dist/quill.snow.css';
-// import { getallcurrencies } from '../../../setting/currencies/currenciesreducer/currenciesSlice';
-import OrderListData from 'assets/data/order-list.data.json';
-import Flex from 'components/shared-components/Flex';
-// import { Getmins } from '../../../dashboards/project/milestone/minestoneReducer/minestoneSlice';
 import { useSelector, useDispatch } from 'react-redux';
-// import { Formik, Form, Field, ErrorMessage } from 'formik';
-// import { createInvoice } from '../../../dashboards/project/invoice/invoicereducer/InvoiceSlice';
 import * as Yup from 'yup';
 import { GetLeads } from '../leads/LeadReducers/LeadSlice';
 import { GetDeals } from '../deals/DealReducers/DealSlice';
@@ -21,21 +14,10 @@ import dayjs from 'dayjs';
 const { Option } = Select;
 
 const EditProposal = ({ id, onClose }) => {
-
   const [discountType, setDiscountType] = useState('percentage');
-  const [loading, setLoading] = useState(false);
   const [discountValue, setDiscountValue] = useState(0);
-  const [isAddProductModalVisible, setIsAddProductModalVisible] = useState(false);
-  const [list, setList] = useState(OrderListData)
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedMilestone, setSelectedMilestone] = useState(null);
-  const [singleEmp, setSingleEmp] = useState(null);
-
   const { taxes } = useSelector((state) => state.tax);
-
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
-
-
   const loggeduser = useSelector((state) => state.user.loggedInUser.username);
   const currencies = useSelector((state) => state.currencies?.currencies?.data || []);
   const [discountRate, setDiscountRate] = useState(10);
@@ -50,18 +32,10 @@ const EditProposal = ({ id, onClose }) => {
     ? Leadss.filter((item) => item?.created_by === loggeduser)
     : [];
 
-  const { data: Dealss } = useSelector((state) => state.Deals.Deals);
-
-  const Deals = loggeduser && Array.isArray(Dealss)
-    ? Dealss.filter((item) => item?.created_by === loggeduser)
-    : [];
 
   const allogged = useSelector((state) => state.user.loggedInUser.username);
 
   const fndlead = Leads.filter((item) => item?.created_by === allogged);
-
-
-  const [selectedLeadDetails, setSelectedLeadDetails] = useState(null);
 
   const [form] = Form.useForm();
   const [totals, setTotals] = useState({
@@ -76,8 +50,7 @@ const EditProposal = ({ id, onClose }) => {
   useEffect(() => {
     const empData = alldept?.proposal?.data || [];
     const data = empData.find((item) => item.id === id);
-    setSingleEmp(data || null);
-
+    console.log("data", data)
 
     if (data) {
       form.setFieldsValue({
@@ -128,7 +101,6 @@ const EditProposal = ({ id, onClose }) => {
   useEffect(() => {
     const empData = alldept?.proposal?.data || [];
     const data = empData.find((item) => item.id === id);
-    setSingleEmp(data || null);
 
     const setProposalData = async () => {
       if (data) {
@@ -192,11 +164,10 @@ const EditProposal = ({ id, onClose }) => {
     };
 
     setProposalData();
-  }, [alldept, form]);
+  }, [alldept, form, id]);
 
   const handleFinish = async (values) => {
     try {
-      setLoading(true);
       // Calculate the actual discount amount
       const subtotal = calculateSubTotal();
       const discountAmount = (subtotal * discountRate) / 100;
@@ -213,8 +184,7 @@ const EditProposal = ({ id, onClose }) => {
           item: item.item,
           quantity: parseFloat(item.quantity),
           price: parseFloat(item.price),
-          tax_name: selectedTaxDetails[item.id]?.
-            gstName || '',
+          tax_name: selectedTaxDetails[item.id]?.gstName || '',
           tax: parseFloat(item.tax) || 0,
           amount: parseFloat(item.amount),
           description: item.description,
@@ -237,24 +207,9 @@ const EditProposal = ({ id, onClose }) => {
         });
     } catch (error) {
       message.error("Failed to create proposal: " + error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const [rows, setRows] = useState([
-    {
-      id: Date.now(),
-      item: "",
-      quantity: "",
-      price: "",
-      discount: "",
-      tax: "",
-      amount: "0",
-      description: "",
-      isNew: false,
-    },
-  ]);
 
   // Function to handle adding a new row
   const handleAddRow = () => {
@@ -371,16 +326,6 @@ const EditProposal = ({ id, onClose }) => {
     calculateTotal(updatedData, discountValue, discountType);
   };
 
-  const initialValues = {
-    leadtitle: null,
-    // dealtitle: null,
-    description: "",
-    date: '',
-    currency: '',
-    // calculatedtax: "",
-
-  };
-
   const validationSchema = Yup.object({
     lead_title: Yup.date().nullable().required("Please select Lead Title ."),
     // deal_title: Yup.date().nullable().required("Please select Deal Title ."),
@@ -395,14 +340,14 @@ const EditProposal = ({ id, onClose }) => {
     <>
       <div>
         <div className=' ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4'>
-          <h2 className="mb-4 border-b pb-[30px] font-medium"></h2>
+          <hr className="mb-4 border-b  font-medium"></hr>
           <Form
             form={form}
             layout="vertical"
             onFinish={handleFinish}
             validationSchema={validationSchema}
 
-    
+
           >
             <div className="">
               <div className=" p-2">
@@ -429,9 +374,6 @@ const EditProposal = ({ id, onClose }) => {
                           // Find the selected lead
                           const selectedLead = fndlead.find(lead => lead.id === value);
                           if (selectedLead) {
-                            setSelectedLeadDetails(selectedLead);
-
-                            // Create new table data with lead details
                             const newTableData = [{
                               id: Date.now(),
                               item: selectedLead.leadTitle || '',
@@ -459,7 +401,7 @@ const EditProposal = ({ id, onClose }) => {
                       </Select>
                     </Form.Item>
                   </Col>
-               
+
 
                   <Col span={12}>
                     <Form.Item
@@ -502,7 +444,7 @@ const EditProposal = ({ id, onClose }) => {
                     </Form.Item>
                   </Col>
 
-           
+
                   <Col span={24}>
                     <Form.Item label="Description" name="description">
                       <Input.TextArea placeholder="Enter Description" />
@@ -696,7 +638,7 @@ const EditProposal = ({ id, onClose }) => {
           </Form>
         </div>
       </div>
-   
+
     </>
   );
 };

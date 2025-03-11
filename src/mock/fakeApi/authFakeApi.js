@@ -3,9 +3,9 @@ import uniqueId from 'lodash/uniqueId'
 import isEmpty from 'lodash/isEmpty'
 import { env } from 'configs/EnvironmentConfig'
 
-export default function authFakeApi (server, apiPrefix) {
-    
-    server.post(`${env.API_ENDPOINT_URL}/auth/login`, (schema, {requestBody}) => {
+export default function authFakeApi(server, apiPrefix) {
+
+    server.post(`${env.API_ENDPOINT_URL}/auth/login`, (schema, { requestBody }) => {
         const { email, password } = JSON.parse(requestBody)
         const user = schema.db.signInUserData.findBy({ email, password })
         if (user) {
@@ -30,7 +30,7 @@ export default function authFakeApi (server, apiPrefix) {
         return true
     })
 
-    server.post(`${env.API_ENDPOINT_URL}/register`, (schema, {requestBody}) => {
+    server.post(`${env.API_ENDPOINT_URL}/register`, (schema, { requestBody }) => {
         const { userName, password, email } = JSON.parse(requestBody)
         const emailUsed = schema.db.signInUserData.findBy({ email })
         const newUser = {
@@ -40,12 +40,12 @@ export default function authFakeApi (server, apiPrefix) {
 
         if (!isEmpty(emailUsed)) {
             const errors = [
-                {message: '', domain: "global", reason: "invalid"}
+                { message: '', domain: "global", reason: "invalid" }
             ]
             return new Response(400, { some: 'header' }, { errors, message: 'User already used' })
-        } 
+        }
 
-        schema.db.signInUserData.insert({...newUser, ...{id: uniqueId('user_'), password, accountUserName: userName}})
+        schema.db.signInUserData.insert({ ...newUser, ...{ id: uniqueId('user_'), password, accountUserName: userName } })
         return {
             data: {
                 token: 'wVYrxaeNa9OxdnULvde1Au5m5w63'

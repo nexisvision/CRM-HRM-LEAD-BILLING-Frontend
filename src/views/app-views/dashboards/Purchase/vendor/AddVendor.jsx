@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Row, Col, Input, Checkbox, message, Select, Modal } from 'antd';
+import { Button, Row, Col, Input, Select, Modal } from 'antd';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
@@ -68,11 +68,11 @@ const AddVendor = ({ onClose }) => {
     setLoading(true);
     try {
       await dispatch(vendordataeaddd(values))
-        .then(()=>{
+        .then(() => {
           dispatch(vendordataedata())
           onClose();
         })
-   
+
     } catch (error) {
     } finally {
       setLoading(false);
@@ -88,7 +88,7 @@ const AddVendor = ({ onClose }) => {
     >
       {({ values, errors, touched, handleChange, setFieldValue }) => (
         <Form className="create-vendor-form">
-             <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+          <hr className='border-b-2 border-gray-300 '></hr>
           <h2 className='text-2xl font-bold mt-2'> Basic Info</h2>
           <Row gutter={16}>
             <Col span={8}>

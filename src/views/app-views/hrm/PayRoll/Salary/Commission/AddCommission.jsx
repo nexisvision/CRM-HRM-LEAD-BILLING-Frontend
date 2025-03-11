@@ -1,9 +1,8 @@
 import React, { useEffect } from "react";
-import { Button, Col, Form, Input, Select } from "antd";
+import { Button, Col, Input, Select } from "antd";
 import { ErrorMessage, Field, Formik } from "formik";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { useSelector } from "react-redux";
-// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 import { useDispatch } from "react-redux";
 import { addcommi, getcommi } from "./commistionReducer/commitionSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
@@ -35,7 +34,7 @@ const AddCommission = ({ id, onClose }) => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(empdata());
-  }, []);
+  }, [dispatch]);
 
   const alldataemp = useSelector((state) => state.employee);
   const fnddata = alldataemp.employee.data;
@@ -44,7 +43,7 @@ const AddCommission = ({ id, onClose }) => {
 
   useEffect(() => {
     dispatch(getcurren());
-  }, []);
+  }, [dispatch]);
 
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies?.data;
@@ -60,12 +59,12 @@ const AddCommission = ({ id, onClose }) => {
     <div className="employee-salary">
      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
       <Formik
-        initialValues={{ 
+        initialValues={{
           employeeId: "",
-          title: "", 
-          type: "", 
-          currency: "", 
-          amount: "" 
+          title: "",
+          type: "",
+          currency: "",
+          amount: ""
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -111,9 +110,9 @@ const AddCommission = ({ id, onClose }) => {
               <label className="font-semibold">Title <span className="text-red-500">*</span></label>
               <Field name="title">
                 {({ field }) => (
-                  <Input 
-                    {...field} 
-                    placeholder="Enter Title" 
+                  <Input
+                    {...field}
+                    placeholder="Enter Title"
                     className={`${touched.title && errors.title ? 'border-red-500' : ''}`}
                   />
                 )}
@@ -128,9 +127,9 @@ const AddCommission = ({ id, onClose }) => {
               <label className="font-semibold">Type <span className="text-red-500">*</span></label>
               <Field name="type">
                 {({ field }) => (
-                  <Input 
-                    {...field} 
-                    placeholder="Enter Type" 
+                  <Input
+                    {...field}
+                    placeholder="Enter Type"
                     className={`${touched.type && errors.type ? 'border-red-500' : ''}`}
                   />
                 )}
@@ -157,7 +156,7 @@ const AddCommission = ({ id, onClose }) => {
                         fnddatass?.map((client) => (
                           <Option key={client.id} value={client?.id}>
                             {client?.currencyCode}
-                           ({client?.currencyIcon})
+                            ({client?.currencyIcon})
                           </Option>
                         ))
                       ) : (
@@ -179,9 +178,9 @@ const AddCommission = ({ id, onClose }) => {
               <label className="font-semibold">Amount <span className="text-red-500">*</span></label>
               <Field name="amount">
                 {({ field }) => (
-                  <Input 
-                    {...field} 
-                    placeholder="Enter Amount" 
+                  <Input
+                    {...field}
+                    placeholder="Enter Amount"
                     type="number"
                     className={`${touched.amount && errors.amount ? 'border-red-500' : ''}`}
                   />

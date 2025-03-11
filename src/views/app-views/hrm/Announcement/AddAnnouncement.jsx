@@ -30,8 +30,6 @@ const AddAnnouncement = ({ onClose }) => {
     dispatch(getBranch());
   }, [dispatch]);
 
-  const branchdata = useSelector((state) => state.Branch.Branch.data);
-
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
   const handleSubmit = (values, { resetForm }) => {

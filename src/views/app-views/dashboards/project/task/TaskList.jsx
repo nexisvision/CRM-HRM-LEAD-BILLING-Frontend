@@ -1,52 +1,36 @@
-import React, { Component, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useState } from "react";
-// import { PrinterOutlined } from '@ant-design/icons';
-import StatisticWidget from "components/shared-components/StatisticWidget";
 import {
-  Row,
   Card,
-  Col,
   Table,
   Select,
   Input,
   Button,
-  Badge,
   Menu,
   Modal,
   Tag,
   message,
   DatePicker,
+  Dropdown,
 } from "antd";
-import NumberFormat from "react-number-format";
 import {
-  EyeOutlined,
   FileExcelOutlined,
   SearchOutlined,
-  PushpinOutlined,
-  PlusCircleOutlined,
   EditOutlined,
   PlusOutlined,
   DeleteOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import { TiPinOutline } from "react-icons/ti";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-import { useNavigate, useParams } from "react-router-dom";
-// import NumberFormat from 'react-number-format';
+import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
-import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import { utils, writeFile } from "xlsx";
 import AddTask from "./AddTask";
 import EditTask from "./EditTask";
 import TaskView from "./TaskView";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteTasks, GetTasks } from "./TaskReducer/TaskSlice";
-import { AnnualStatisticData } from "../../default/DefaultDashboardData";
-import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
-
-const { Column } = Table;
 
 const { Option } = Select;
 
@@ -63,67 +47,35 @@ const getPaymentStatus = (status) => {
   return "";
 };
 
-const getShippingStatus = (status) => {
-  if (status === "Ready") {
-    return "blue";
-  }
-  if (status === "Shipped") {
-    return "cyan";
-  }
-  return "";
-};
-
-const paymentStatusList = ["Paid", "Pending", "Expired"];
-
 export const TaskList = () => {
   const [list, setList] = useState([]);
-  const [annualStatisticData] = useState(AnnualStatisticData);
-  const [pinnedTasks, setPinnedTasks] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [isAddTaskModalVisible, setIsAddTaskModalVisible] = useState(false);
   const [isEditTaskModalVisible, setIsEditTaskModalVisible] = useState(false);
   const [isViewTaskModalVisible, setIsViewTaskModalVisible] = useState(false);
-  const [statusFilter, setStatusFilter] = useState([]);
   const [idd, setIdd] = useState("");
-  const navigate = useNavigate();
-
   const dispatch = useDispatch();
   const { id } = useParams();
 
   const alldatatask = useSelector((state) => state.Tasks);
   const fnddata = alldatatask.Tasks.data;
   const employees = useSelector((state) => state.Users?.Users?.data || []);
-
-  const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedPriority, setSelectedPriority] = useState('all');
   const [searchText, setSearchText] = useState('');
-  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const [dateRange, setDateRange] = useState(null);
-
   const openAddTaskModal = () => {
     setIsAddTaskModalVisible(true);
   };
-
   const closeAddTaskModal = () => {
     setIsAddTaskModalVisible(false);
   };
-
   const openEditTaskModal = () => {
     setIsEditTaskModalVisible(true);
   };
-
   const closeEditTaskModal = () => {
     setIsEditTaskModalVisible(false);
-  };
-
-  const openViewTaskModal = () => {
-    navigate("/app/dashboards/project/task/TaskView", {
-      state: { user: selectedUser },
-    }); // Pass user data as state if needed
   };
   const closeViewTaskModal = () => {
     setIsViewTaskModalVisible(false);
@@ -143,6 +95,7 @@ export const TaskList = () => {
     }
   };
 
+  // Modify the existing useEffect to handle initial data loading
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
@@ -172,7 +125,8 @@ export const TaskList = () => {
           let assignToNames = 'Not Assigned';
           try {
             let assignToIds = [];
-            
+
+            // Handle different possible formats of assignTo data
             if (typeof task.assignTo === 'string') {
               try {
                 const parsed = JSON.parse(task.assignTo);
@@ -192,8 +146,8 @@ export const TaskList = () => {
                   const employee = employees.find(emp => emp.id === empId);
                   return employee?.firstName || 'Unknown';
                 })
-                .filter(name => name);
-              
+                .filter(name => name); // Remove any undefined/null values
+
               assignToNames = employeeNames.length > 0 ? employeeNames.join(', ') : 'Not Assigned';
             }
           } catch (error) {
@@ -212,10 +166,6 @@ export const TaskList = () => {
     }
   }, [fnddata, employees]);
 
-  useEffect(() => {
-    const storedPinnedTasks = JSON.parse(localStorage.getItem("pinnedTasks")) || [];
-    setPinnedTasks(storedPinnedTasks);
-  }, []);
 
   const DeleteFun = async (idd) => {
     try {
@@ -223,9 +173,9 @@ export const TaskList = () => {
       if (response.error) {
         throw new Error(response.error.message);
       }
-      const updatedData = await dispatch(GetTasks(id));
       setList(list.filter((item) => item.id !== idd));
 
+      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error.message || error);
     }
@@ -236,38 +186,42 @@ export const TaskList = () => {
     setIdd(idd);
   };
 
-
-  const togglePinTask = (taskId) => {
-    setPinnedTasks((prevPinned) => {
-      const newPinned = prevPinned.includes(taskId)
-        ? prevPinned.filter((id) => id !== taskId) 
-        : [...prevPinned, taskId]; 
-
-      localStorage.setItem("pinnedTasks", JSON.stringify(newPinned));
-      return newPinned;
-    });
+  const getDropdownItems = (row) => {
+    return [
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => EditTaskfun(row.id)
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => DeleteFun(row.id),
+        danger: true
+      }
+    ];
   };
 
-  const dropdownMenu = (row) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => EditTaskfun(row.id)}>
-          <EditOutlined />
-          <span className="ml-2">Edit</span>
-        </Flex>
-      </Menu.Item>
-    
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => DeleteFun(row.id)}>
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
-
   const tableColumns = [
-    
+    // {
+    //   title: "Code",
+    //   dataIndex: "id",
+    // },
+    // {
+    //   title: "Pinned",
+    //   dataIndex: "pinned",
+    //   render: (text, record) => (
+    //     <span>
+    //       {pinnedTasks.includes(record.id) ? (
+    //         <PushpinOutlined style={{ color: "gold" }} />
+    //       ) : (
+    //         <PushpinOutlined />
+    //       )}
+    //     </span>
+    //   ),
+    // },
     {
       title: "Task",
       dataIndex: "taskName",
@@ -275,7 +229,13 @@ export const TaskList = () => {
         compare: (a, b) => a.task.length - b.task.length,
       },
     },
-   
+    // {
+    //   title: "Completed On",
+    //   dataIndex: "taskDate",
+    //   sorter: {
+    //     compare: (a, b) => a.completedon.length - b.completedon.length,
+    //   },
+    // },
     {
       title: "Priority",
       dataIndex: "priority",
@@ -295,7 +255,16 @@ export const TaskList = () => {
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
       sorter: (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
     },
-    
+    // {
+    //   title: "Estimated Time",
+    //   dataIndex: "estimatedtime",
+    //   sorter: (a, b) => utils.antdTableSorter(a, b, "estimatedtime"),
+    // },
+    // {
+    //   title: "projectName ",
+    //   dataIndex: "projectName",
+    //   sorter: (a, b) => utils.antdTableSorter(a, b, "hourslogged"),
+    // },
     {
       title: "Assigned To",
       dataIndex: "assignTo",
@@ -328,7 +297,22 @@ export const TaskList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -336,21 +320,24 @@ export const TaskList = () => {
 
   const rowSelection = {
     onChange: (key, rows) => {
-      setSelectedRows(rows);
       setSelectedRowKeys(key);
     },
   };
 
+  // Handle date range change
   const handleDateRangeChange = (dates) => {
     setDateRange(dates);
-    handleFilters(dates); 
+    handleFilters(dates); // Pass the dates directly to handleFilters
   };
 
+  // Get unique priorities from task data
   const getUniquePriorities = () => {
     if (!fnddata) return [];
-    
+
+    // Get all unique priorities from the data
     const priorities = [...new Set(fnddata.map(item => item.priority))];
-    
+
+    // Create priority options array with 'All Priority' as first option
     return [
       { value: 'all', label: 'All Priority' },
       ...priorities.map(priority => ({
@@ -360,79 +347,77 @@ export const TaskList = () => {
     ];
   };
 
+  // Get priority options
   const priorityOptions = getUniquePriorities();
 
+  // Handle priority change
   const handlePriorityChange = (value) => {
     setSelectedPriority(value);
   };
 
-  const handleFilters = async (dates = dateRange) => {
+  // Update the filter function to handle priority
+  const handleFilters = useCallback(async (dates = dateRange) => {
     setLoading(true);
     try {
       let filtered = [...fnddata];
 
+      // Apply search text filter
       if (searchText) {
-        filtered = filtered.filter(item => 
+        filtered = filtered.filter(item =>
           item.taskName?.toLowerCase().includes(searchText.toLowerCase()) ||
           item.assignToName?.toLowerCase().includes(searchText.toLowerCase())
         );
       }
 
+      // Apply status filter
       if (selectedStatus && selectedStatus !== 'all') {
         filtered = filtered.filter(item => item.status === selectedStatus);
       }
 
+      // Apply priority filter
       if (selectedPriority && selectedPriority !== 'all') {
         filtered = filtered.filter(item => item.priority === selectedPriority);
       }
 
+      // Apply date range filter
       if (dates && dates[0] && dates[1]) {
         const startRange = dayjs(dates[0]).startOf('day');
         const endRange = dayjs(dates[1]).endOf('day');
-        
+
         filtered = filtered.filter(task => {
           const taskStartDate = dayjs(task.startDate);
           const taskEndDate = dayjs(task.dueDate);
-          
-          return taskStartDate.isSame(startRange, 'day') || 
-                 taskEndDate.isSame(endRange, 'day') || 
-                 (taskStartDate.isAfter(startRange) && taskStartDate.isBefore(endRange)) ||
-                 (taskEndDate.isAfter(startRange) && taskEndDate.isBefore(endRange));
+
+          return taskStartDate.isSame(startRange, 'day') ||
+            taskEndDate.isSame(endRange, 'day') ||
+            (taskStartDate.isAfter(startRange) && taskStartDate.isBefore(endRange)) ||
+            (taskEndDate.isAfter(startRange) && taskEndDate.isBefore(endRange));
         });
       }
-
-      setFilteredData(filtered);
       setList(filtered);
     } catch (error) {
       console.error('Error filtering data:', error);
       message.error('Failed to filter data');
     }
     setLoading(false);
-  };
+  }, [dateRange, fnddata, searchText, selectedPriority, selectedStatus]);
 
+  // Update useEffect to include selectedPriority
   useEffect(() => {
     if (fnddata) {
       handleFilters();
     }
-  }, [searchText, selectedStatus, selectedPriority, fnddata]);
+  }, [searchText, selectedStatus, selectedPriority, fnddata, handleFilters]);
 
-  const getFilteredTasks = () => {
-    return filteredData;
-  };
 
-  const onSearch = (e) => {
-    setSearchText(e.currentTarget.value);
-  };
-
-  const handleStatusFilter = (value) => {
-    setStatusFilter(value);
-  };
-
+  // Get unique statuses from task data
   const getUniqueStatuses = () => {
     if (!fnddata) return [];
-    
+
+    // Get all unique statuses from the data
     const statuses = [...new Set(fnddata.map(item => item.status))];
-    
+
+    // Create status options array with 'All Status' as first option
     return [
       { value: 'all', label: 'All Status' },
       ...statuses.map(status => ({
@@ -442,8 +427,10 @@ export const TaskList = () => {
     ];
   };
 
+  // Get status options
   const statusOptions = getUniqueStatuses();
 
+  // Handle status change
   const handleStatusChange = (value) => {
     setSelectedStatus(value);
   };
@@ -511,7 +498,15 @@ export const TaskList = () => {
                 value={dateRange}
               />
             </div>
-        
+            {/* <div className="mr-0 md:mr-3 mt-7 md:mb-0">
+              <Button 
+                type="primary" 
+                onClick={handleFilters}
+                icon={<SearchOutlined />}
+              >
+                Search
+              </Button>
+            </div> */}
           </Flex>
           <Flex gap="7px" className="flex">
             <Button
@@ -578,6 +573,29 @@ export const TaskList = () => {
         >
           <TaskView onClose={closeViewTaskModal} />
         </Modal>
+        <style>{`
+          .ant-dropdown-menu {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            padding: 4px;
+          }
+          .ant-dropdown-menu-item {
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin: 2px 0;
+            transition: all 0.3s;
+          }
+          .ant-dropdown-menu-item:hover {
+            background-color: #f5f5f5;
+          }
+          .ant-dropdown-menu-item-danger:hover {
+            background-color: #fff1f0;
+          }
+          .ant-dropdown-menu-item .anticon {
+            font-size: 16px;
+            margin-right: 8px;
+          }
+        `}</style>
       </Card>
     </div>
   );

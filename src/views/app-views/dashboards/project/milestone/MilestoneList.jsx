@@ -1,41 +1,28 @@
-import React, { Component, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
-import StatisticWidget from "components/shared-components/StatisticWidget";
-import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import {
-  Row,
   Card,
-  Col,
   Table,
   Select,
   Input,
   Button,
-  Badge,
   Menu,
   Modal,
   Tag,
   DatePicker,
-  Space,
   Progress,
+  Dropdown,
 } from "antd";
-import NumberFormat from "react-number-format";
-import OrderListData from "../../../../../assets/data/order-list.data.json";
 import {
-  EyeOutlined,
-  FileExcelOutlined,
   SearchOutlined,
-  PlusCircleOutlined,
   EditOutlined,
   PlusOutlined,
   DeleteOutlined,
   CalendarOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import { TiPinOutline } from "react-icons/ti";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
 import dayjs from "dayjs";
-import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import utils from "utils";
 import AddMilestone from "./AddMilestone";
 import EditMilestone from "./EditMilestone";
@@ -46,47 +33,16 @@ import { useParams } from "react-router-dom";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 
-const { Column } = Table;
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
-
-const getMilestoneStatus = (status) => {
-  if (status === "Paid") {
-    return "success";
-  }
-  if (status === "Pending") {
-    return "warning";
-  }
-  if (status === "Expired") {
-    return "error";
-  }
-  return "";
-};
-
-const getShippingStatus = (status) => {
-  if (status === "Ready") {
-    return "blue";
-  }
-  if (status === "Shipped") {
-    return "cyan";
-  }
-  return "";
-};
-
-const milestoneStatusList = ["Paid", "Pending", "Expired"];
 
 export const MilestoneList = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
 
-  const [annualStatisticData] = useState(AnnualStatisticData);
-  const [list, setList] = useState(OrderListData);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [isAddMilestoneModalVisible, setIsAddMilestoneModalVisible] = useState(false);
   const [isEditMilestoneModalVisible, setIsEditMilestoneModalVisible] = useState(false);
-  const [isViewMilestoneModalVisible, setIsViewMilestoneModalVisible] = useState(false);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [idd, setIdd] = useState("");
   const [searchText, setSearchText] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -140,15 +96,6 @@ export const MilestoneList = () => {
     setIsEditMilestoneModalVisible(false);
   };
 
-  // Open Add Job Modal
-  const openViewMilestoneModal = () => {
-    setIsViewMilestoneModalVisible(true);
-  };
-
-  // Close Add Job Modal
-  const closeViewMilestoneModal = () => {
-    setIsViewMilestoneModalVisible(false);
-  };
 
   // Add useEffect to fetch currencies and project data
   useEffect(() => {
@@ -157,11 +104,6 @@ export const MilestoneList = () => {
     dispatch(Getmins(id));
   }, [dispatch, id]);
 
-  useEffect(() => {
-    if (filtermin) {
-      setList(filtermin);
-    }
-  }, [filtermin]);
 
   const deleetfuc = (userId) => {
     dispatch(Deletemins(userId)).then(() => {
@@ -174,22 +116,22 @@ export const MilestoneList = () => {
     setIdd(id);
   };
   // console.log(idd,"idddd");
-  const dropdownMenu = (row) => ({
-    items: [
-      {
-        key: 'edit',
-        icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => Editfunc(row.id)
-      },
-      {
-        key: 'delete',
-        icon: <DeleteOutlined />,
-        label: 'Delete',
-        onClick: () => deleetfuc(row.id)
-      }
-    ]
-  });
+
+  const getDropdownItems = (row, Editfunc, deleetfuc) => [
+    {
+      key: 'edit',
+      icon: <EditOutlined />,
+      label: 'Edit',
+      onClick: () => Editfunc(row.id)
+    },
+    {
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      label: 'Delete',
+      onClick: () => deleetfuc(row.id),
+      danger: true
+    }
+  ];
 
   // Add currency formatting helper
   const formatCurrency = (value) => {
@@ -279,7 +221,6 @@ export const MilestoneList = () => {
       title: "Timeline",
       key: "timeline",
       render: (_, record) => {
-        const startDate = dayjs(record.milestone_start_date);
         const endDate = dayjs(record.milestone_end_date);
         const now = dayjs();
         const isOverdue = now.isAfter(endDate);
@@ -304,7 +245,7 @@ export const MilestoneList = () => {
         );
       },
     },
-  
+
     {
       title: "Status",
       dataIndex: "milestone_status",
@@ -332,7 +273,22 @@ export const MilestoneList = () => {
       key: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm, Editfunc, deleetfuc)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -341,17 +297,6 @@ export const MilestoneList = () => {
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
-
-    if (!value) {
-      setList(filtermin);
-      return;
-    }
-
-    const filtered = filtermin.filter(milestone =>
-      milestone.milestone_title?.toLowerCase().includes(value)
-    );
-
-    setList(filtered);
   };
 
   // Handle date range change
@@ -551,6 +496,20 @@ const styles = `
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+  }
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
   }
 `;
 

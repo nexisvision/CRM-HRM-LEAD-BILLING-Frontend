@@ -19,8 +19,6 @@ function ViewMilestone() {
                             </div>
                         </div>
                     </div>
-
-
                 </div>
             </div>
 

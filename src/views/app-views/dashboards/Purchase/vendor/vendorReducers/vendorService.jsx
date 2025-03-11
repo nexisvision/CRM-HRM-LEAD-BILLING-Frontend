@@ -21,7 +21,7 @@ const vendordataadd = async (payload) => {
 
   try {
     const res = await axios.post(
-        `${env.API_ENDPOINT_URL}/vendors/`,
+      `${env.API_ENDPOINT_URL}/vendors/`,
       payload,
       {
         headers: {
@@ -48,7 +48,7 @@ const vendordatadlete = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -77,12 +77,11 @@ const vendordataedit = async (idd, values) => {
 
 
 const UserService = {
-  // addUser,
+
   vendordata,
   vendordataadd,
   vendordatadlete,
   vendordataedit,
-
 };
 
 export default UserService;

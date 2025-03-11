@@ -12,15 +12,14 @@ const { Option } = Select;
 
 
 const AddIndicator = ({ onClose }) => {
-  const [form] = Form.useForm(); 
+  const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.loggedInUser.username);
 
   const fndbranchdata = useSelector((state) => state.Branch?.Branch?.data || []);
-  
 
   const fnddepartmentdata = useSelector((state) => state.Department?.Department?.data || []);
+
 
   const fnddesignationdata = useSelector((state) => state.Designation?.Designation?.data || []);
 
@@ -48,11 +47,10 @@ const AddIndicator = ({ onClose }) => {
       .then(() => {
         dispatch(getIndicators());
         // message.success('Indicator added successfully!');
-        onClose(); // Optional if provided
+        onClose();
         navigate('/app/hrm/performance/indicator');
       })
       .catch((error) => {
-        // message.error('Failed to add indicator.');
         console.error('Add API error:', error);
       });
   };
@@ -67,7 +65,7 @@ const AddIndicator = ({ onClose }) => {
     overallRating: "",
     allocatingResources: "",
     projectManagement: "",
-    
+
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -93,10 +91,10 @@ const AddIndicator = ({ onClose }) => {
         onFinish={handleSubmit}
         onFinishFailed={onFinishFailed}
       >
-        
-        <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+
+        <div className="mb-3 border-b pb-1 font-medium"></div>
         <Row gutter={16}>
-        <Col span={12}>
+          <Col span={12}>
             <Form.Item
               name="branch"
               label="Branch"
@@ -111,8 +109,8 @@ const AddIndicator = ({ onClose }) => {
                 dropdownRender={menu => (
                   <>
                     {menu}
-                    <Button 
-                      type="link" 
+                    <Button
+                      type="link"
                       block
                       onClick={openAddBranchModal}
                     >

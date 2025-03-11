@@ -6,7 +6,7 @@ import * as Yup from 'yup';
 import { AddUserss, GetUsers } from "../UserReducers/UserSlice"; // Custom Redux actions
 import { roledata } from "views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice"; // Role data action
 import axios from "axios";
-import { KeyOutlined, ReloadOutlined, SyncOutlined, ToTopOutlined, PlusOutlined } from "@ant-design/icons";
+import { ReloadOutlined } from "@ant-design/icons";
 import AddRole from "views/app-views/hrm/RoleAndPermission/Role/AddRole";
 import { env } from "configs/EnvironmentConfig";
 const { Option } = Select;

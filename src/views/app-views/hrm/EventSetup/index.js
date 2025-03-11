@@ -2,10 +2,9 @@ import React from 'react';
 import EventSetupList from './EventSetupList';
 
 const EventSetup = () => (
-
-<div className="mail">
-<EventSetupList/>
-</div>
+	<div className="mail">
+		<EventSetupList />
+	</div>
 
 );
 

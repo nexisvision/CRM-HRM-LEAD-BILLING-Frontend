@@ -17,13 +17,12 @@ import { useDispatch } from "react-redux";
 import {
   createEventData,
   fetchEventsData,
-} from "./EventSetupService/EventSetupSlice"; // Make sure the path is correct
+} from "./EventSetupService/EventSetupSlice";
 
 const { Option } = Select;
 
 const AddEventSetUp = ({ onSuccess }) => {
   const dispatch = useDispatch();
-  
 
   const onSubmit = async (values, { resetForm }) => {
     try {
@@ -56,7 +55,6 @@ const AddEventSetUp = ({ onSuccess }) => {
     EventManager: "",
     EventDate: "",
     EventTime: "",
-
   };
 
   const validationSchema = Yup.object({
@@ -87,7 +85,6 @@ const AddEventSetUp = ({ onSuccess }) => {
         <Form className="formik-form" onSubmit={handleSubmit}>
 
           <Row gutter={16}>
-          
             <Col span={12} className="mt-2">
               <div className="form-item">
                 <label className="font-semibold">Event Title"</label>
@@ -126,8 +123,6 @@ const AddEventSetUp = ({ onSuccess }) => {
                 />
               </div>
             </Col>
-
-            
             <Col span={12} className="mt-2">
               <div className="form-item">
                 <label className="font-semibold">Event Date</label>
@@ -167,7 +162,6 @@ const AddEventSetUp = ({ onSuccess }) => {
                 />
               </div>
             </Col>
-           
           </Row>
           <div className="form-buttons text-right mt-2">
             <Button type="default" htmlType="submit" className="me-2">

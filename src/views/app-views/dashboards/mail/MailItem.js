@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Avatar, Badge, Tooltip, Dropdown, Menu, Input } from 'antd';
 import { StarOutlined, StarFilled, DeleteOutlined, TagOutlined } from '@ant-design/icons';
-// import MailData from 'assets/data/mail.data.json';
 import { labels, getLabelColor } from './MailLabels';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -32,16 +31,16 @@ const MailItem = () => {
 		return body.replace(/<(?:.|\n)*?>/gm, ' ');
 	}
 
-	const loadMail = () => {
+	const loadMail = React.useCallback(() => {
 		const data = getCurrentCategory();
 
 		setMails(data);
 		setSelectedRowKeys([]);
-	}
+	}, []);
 
 	useEffect(() => {
 		loadMail();
-	}, [params])
+	}, [params, loadMail])
 
 	const massDeleted = selectedKey => {
 		let data = mails
@@ -78,15 +77,6 @@ const MailItem = () => {
 		});
 		setMails(data);
 		setSelectedRowKeys([]);
-	}
-
-	const onSelectEmail = elm => {
-		return {
-			onClick: e => {
-				e.preventDefault()
-				navigate(`/app/apps/mail/${elm.id}`)
-			}
-		};
 	}
 
 	const search = e => {

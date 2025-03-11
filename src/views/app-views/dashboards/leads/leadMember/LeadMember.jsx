@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Row, Card, Table, Button, Modal, message } from "antd";
+import { Card, Table, Button, Modal, message } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import AddLeadMember from "./AddLeadMember";
 
@@ -15,15 +15,10 @@ const LeadMember = () => {
   const dispatch = useDispatch();
   const [isAddLeadMemberModalVisible, setIsAddLeadMemberModalVisible] =
     useState(false);
-  
-  const AllLead = useSelector((state) => state.Lead);
   const AllEmployee = useSelector((state) => state.employee);
-
-  const leadData = AllLead?.Lead?.data || [];
-  const employeeData = AllEmployee?.employee?.data || [];
+  const employeeData = useMemo(() => AllEmployee?.employee?.data || [], [AllEmployee]);
 
   const { id } = useParams();
-
   useEffect(() => {
     dispatch(GetLeads());
     dispatch(empdata());
@@ -33,9 +28,6 @@ const LeadMember = () => {
   const fndrewduxxdaa = allproject.Leads.data;
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
 
-  
-
-  
   const DeletePro2 = async (payload) => {
     const token = localStorage.getItem("auth_token");
 
@@ -62,17 +54,13 @@ const LeadMember = () => {
     }
   };
 
-  const project = leadData[0]; // Accessing the first project as an example
   const leadMembers = fnddata?.lead_members || [];
-  let memberArray = [];
-  
-  try {
-    memberArray = typeof leadMembers === 'string' 
-      ? JSON.parse(leadMembers).lead_members 
-      : leadMembers;
-  } catch (error) {
-    console.error("Error parsing lead members:", error);
-  }
+  const memberArray = useMemo(() => [], []);
+
+  const parsedMembers = typeof leadMembers === 'string'
+    ? JSON.parse(leadMembers).lead_members
+    : leadMembers;
+  memberArray.push(...parsedMembers);
 
   const userEmployeeData = useMemo(() => {
     return memberArray
@@ -128,7 +116,7 @@ const LeadMember = () => {
 
       await DeletePro2(userId);
 
-      await dispatch(GetLeads  ()).unwrap();
+      await dispatch(GetLeads()).unwrap();
 
       message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
@@ -136,10 +124,10 @@ const LeadMember = () => {
     }
   };
 
- 
-  useEffect(()=>{
+
+  useEffect(() => {
     dispatch(GetLeads())
-  },[dispatch])
+  }, [dispatch])
 
   return (
     <div className="container">

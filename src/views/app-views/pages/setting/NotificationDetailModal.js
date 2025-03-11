@@ -1,7 +1,6 @@
 import React from 'react';
 import { Modal, Typography, Tag, Divider, Button } from 'antd';
 import {
-  BellOutlined,
   ClockCircleOutlined,
   WarningOutlined,
   InfoCircleOutlined,
@@ -104,8 +103,8 @@ const NotificationDetailModal = ({ visible, notification, onClose, onViewTask })
                   {notification.status && (
                     <Tag color={
                       notification.status === 'Completed' ? 'success' :
-                      notification.status === 'In Progress' ? 'processing' :
-                      notification.status === 'On Hold' ? 'warning' : 'default'
+                        notification.status === 'In Progress' ? 'processing' :
+                          notification.status === 'On Hold' ? 'warning' : 'default'
                     }>
                       {notification.status}
                     </Tag>

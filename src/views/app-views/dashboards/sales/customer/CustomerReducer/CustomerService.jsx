@@ -21,7 +21,7 @@ const creatrecustomers = async (payload) => {
 
   try {
     const res = await axios.post(
-        `${env.API_ENDPOINT_URL}/customers/`,
+      `${env.API_ENDPOINT_URL}/customers/`,
       payload,
       {
         headers: {
@@ -29,7 +29,6 @@ const creatrecustomers = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -49,7 +48,6 @@ const deletecustomers = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -82,7 +80,6 @@ const UserService = {
   creatrecustomers,
   deletecustomers,
   editcustomers,
-
 };
 
 export default UserService;

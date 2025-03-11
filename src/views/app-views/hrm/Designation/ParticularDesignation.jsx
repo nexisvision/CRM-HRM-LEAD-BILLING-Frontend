@@ -1,6 +1,6 @@
 import React from 'react';
-import { Table, Button, Dropdown, Menu, Space, Typography } from 'antd';
-import { EyeOutlined, EditOutlined, DeleteOutlined, DownOutlined } from '@ant-design/icons';
+import { Table, Button, Typography } from 'antd';
+import { EyeOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
 
@@ -47,13 +47,6 @@ const ParticularDesignation = () => {
   };
 
 
-  const menu = (
-    <Menu>
-      <Menu.Item key="1">Column 1</Menu.Item>
-      <Menu.Item key="2">Column 2</Menu.Item>
-      <Menu.Item key="3">Column 3</Menu.Item>
-    </Menu>
-  );
 
   return (
     <div style={{ padding: '20px' }}>
@@ -61,14 +54,14 @@ const ParticularDesignation = () => {
         <Title level={4}>
           ID : 1 | CEO
         </Title>
-       
+
       </div>
       <Title level={5} style={{ marginBottom: '20px' }}>
         Staffs Information
       </Title>
       <div style={{ display: 'flex', marginBottom: '20px' }}>
         <Button type="primary">Download CSV</Button>
-       
+
       </div>
       <Table
         columns={columns}

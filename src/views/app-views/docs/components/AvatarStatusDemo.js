@@ -46,39 +46,39 @@ const Demo = () => {
 
 	return (
 		<>
-		<div className="mb-3">
-			<AvatarStatus 
-				src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" 
-				name="Terrance Moreno"
-				subTitle="Software Engineer"
-			/>
-		</div>
-		<div className="mb-3">
-			<AvatarStatus 
-				icon={<FolderOutlined />}
-				name="Terrance Moreno"
-				type="cyan"
-				subTitle="Software Engineer"
-			/>
-		</div>
-		<div className="mb-3">
-			<AvatarStatus 
-				text="TM"
-				type="blue"
-				name="Terrance Moreno"
-				subTitle="Software Engineer"
-			/>
-		</div>
-		<div className="mb-3">
-			<AvatarStatus 
-				src="http://enlink.themenate.net/assets/images/avatars/thumb-3.jpg" 
-				name="Name Clickable"
-				subTitle="Software Engineer"
-				id={1}
-				onNameClick={e => handleClick(e)}
-			/>
-		</div>
-	</>
+			<div className="mb-3">
+				<AvatarStatus
+					src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+					name="Terrance Moreno"
+					subTitle="Software Engineer"
+				/>
+			</div>
+			<div className="mb-3">
+				<AvatarStatus
+					icon={<FolderOutlined />}
+					name="Terrance Moreno"
+					type="cyan"
+					subTitle="Software Engineer"
+				/>
+			</div>
+			<div className="mb-3">
+				<AvatarStatus
+					text="TM"
+					type="blue"
+					name="Terrance Moreno"
+					subTitle="Software Engineer"
+				/>
+			</div>
+			<div className="mb-3">
+				<AvatarStatus
+					src="http://enlink.themenate.net/assets/images/avatars/thumb-3.jpg"
+					name="Name Clickable"
+					subTitle="Software Engineer"
+					id={1}
+					onNameClick={e => handleClick(e)}
+				/>
+			</div>
+		</>
 	)
 }
 
@@ -87,8 +87,8 @@ const AvatarStatusDemo = () => {
 		<div>
 			<h2>AvatarStatus</h2>
 			<div className="mt-4">
-				<ComponentIntro name="Location" desc="src/components/shared-components/AvatarStatus.js"/>
-				<ComponentIntro name="Description" desc="AvatarStatus allow you to add additional info on top of Avatar component"/>
+				<ComponentIntro name="Location" desc="src/components/shared-components/AvatarStatus.js" />
+				<ComponentIntro name="Description" desc="AvatarStatus allow you to add additional info on top of Avatar component" />
 			</div>
 			<div className="mt-4">
 				<Card title="Example">

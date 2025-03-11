@@ -1,15 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./CompanyService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
-import { message } from "antd";
-
 
 export const sendmailupdateotp = createAsyncThunk(
   "users/sendmailupdateotp",
-  async ({idd,values}, thunkAPI) => {
+  async ({ idd, values }, thunkAPI) => {
     try {
-      const response = await UserService.sendemailotp(idd,values);
+      const response = await UserService.sendemailotp(idd, values);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -107,7 +104,7 @@ export const Editclients = createAsyncThunk(
   async ({ comnyid, formData }, thunkAPI) => {
     try {
       const response = await UserService.EditClientss(comnyid, formData);
-      return response; 
+      return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data || "Error updating employee"
@@ -115,17 +112,6 @@ export const Editclients = createAsyncThunk(
     }
   }
 );
-
-
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
-
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const CompanySlice = createSlice({
   name: "ClientData",
@@ -180,7 +166,7 @@ const CompanySlice = createSlice({
       })
 
 
-      
+
       .addCase(otpverifyemail.pending, (state) => {
         state.isLoading = true;
       })
@@ -286,5 +272,5 @@ const CompanySlice = createSlice({
 });
 
 export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-CompanySlice.actions;
+  CompanySlice.actions;
 export default CompanySlice.reducer;

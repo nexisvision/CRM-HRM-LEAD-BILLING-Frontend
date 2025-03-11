@@ -6,21 +6,21 @@ export class AreaChart extends Component {
 	render() {
 
 		const data = {
-      labels: ["16th", "17th", "18th", "19th", "20th", "21th", "22th"],
-      datasets: [
-        {
-          label: 'Series A',
-          data: [28, 48, 40, 55, 86, 55, 90],
-          backgroundColor: COLOR_1_LIGHT,
-          borderColor: COLOR_1,
-          pointBackgroundColor: COLOR_1,
-          pointHoverBackgroundColor: COLOR_1,
+			labels: ["16th", "17th", "18th", "19th", "20th", "21th", "22th"],
+			datasets: [
+				{
+					label: 'Series A',
+					data: [28, 48, 40, 55, 86, 55, 90],
+					backgroundColor: COLOR_1_LIGHT,
+					borderColor: COLOR_1,
+					pointBackgroundColor: COLOR_1,
+					pointHoverBackgroundColor: COLOR_1,
 					pointHoverBorderColor: COLOR_1
-        }
-      ]
-    };
-    const options = {
-      responsive: true,
+				}
+			]
+		};
+		const options = {
+			responsive: true,
 			hover: {
 				mode: 'nearest',
 				intersect: true
@@ -29,12 +29,12 @@ export class AreaChart extends Component {
 				line: {
 					tension: 0.5
 				},
-				point: { 
-					radius: 0 
+				point: {
+					radius: 0
 				}
 			},
 			scales: {
-				xAxes: [{ 
+				xAxes: [{
 					gridLines: [{
 						display: false,
 					}],
@@ -56,10 +56,10 @@ export class AreaChart extends Component {
 						scaleLabel: {
 							display: false,
 							labelString: 'Value'
-						}    
+						}
 					},
 					ticks: {
-						max: 100,                            
+						max: 100,
 						stepSize: 20,
 						display: true,
 						beginAtZero: true,
@@ -69,11 +69,11 @@ export class AreaChart extends Component {
 					}
 				}],
 			}
-    }
+		}
 		return (
 			<div>
-        <Line data={data} options={options} />
-      </div>
+				<Line data={data} options={options} />
+			</div>
 		)
 	}
 }

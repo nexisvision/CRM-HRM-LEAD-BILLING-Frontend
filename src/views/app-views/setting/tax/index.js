@@ -2,10 +2,9 @@ import React from 'react';
 import TaxList from './TaxList';
 
 const tax = () => (
-
-<div className="">
-<TaxList />
-</div>                                  
+	<div className="">
+		<TaxList />
+	</div>
 
 );
 

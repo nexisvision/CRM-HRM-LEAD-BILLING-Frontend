@@ -4,18 +4,18 @@ import { Breadcrumb } from 'antd';
 import navigationConfig from "configs/NavigationConfig";
 import IntlMessage from 'components/util-components/IntlMessage';
 
-let breadcrumbData = { 
-	'/app' : <IntlMessage id="home" />
+let breadcrumbData = {
+	'/app': <IntlMessage id="home" />
 };
 
 navigationConfig.forEach((elm, i) => {
 	const assignBreadcrumb = (obj) => breadcrumbData[obj.path] = <IntlMessage id={obj.title} />;
 	assignBreadcrumb(elm);
 	if (elm.submenu) {
-		elm.submenu.forEach( elm => {
+		elm.submenu.forEach(elm => {
 			assignBreadcrumb(elm)
-			if(elm.submenu) {
-				elm.submenu.forEach( elm => {
+			if (elm.submenu) {
+				elm.submenu.forEach(elm => {
 					assignBreadcrumb(elm)
 				})
 			}
@@ -32,7 +32,7 @@ const BreadcrumbRoute = props => {
 			title: <Link to={url}>{breadcrumbData[url]}</Link>
 		}
 	});
-  
+
 	return (
 		<Breadcrumb items={breadcrumbItems} />
 	);

@@ -9,9 +9,8 @@ import {
   Col,
   Upload,
 } from "antd";
-import { Formik, Field, Form as FormikForm, ErrorMessage } from "formik";
+import { Formik, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useNavigate, useParams } from "react-router-dom";
 import { UploadOutlined } from "@ant-design/icons";
 import moment from "moment";
 import dayjs from "dayjs";
@@ -32,8 +31,6 @@ const validationSchema = Yup.object().shape({
 });
 
 const EditTicket = ({ idd, onClose }) => {
-  const navigate = useNavigate();
-  const { ticketId } = useParams();
 
   const dispatch = useDispatch();
   const [fileList, setFileList] = useState([]);
@@ -55,7 +52,6 @@ const EditTicket = ({ idd, onClose }) => {
 
   const alldatat = useSelector((state) => state.Ticket);
   const fndfdata = alldatat.Ticket.data;
- 
 
   useEffect(() => {
     dispatch(GetUsers());
@@ -76,7 +72,8 @@ const EditTicket = ({ idd, onClose }) => {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const formData = new FormData();
-      
+
+      // Handle file upload
       if (values.file) {
         formData.append('file', values.file);
       }
@@ -103,7 +100,7 @@ const EditTicket = ({ idd, onClose }) => {
   return (
     <div className="">
       <div className="border-b border-gray-200 mb-2"></div>
-      
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -121,9 +118,9 @@ const EditTicket = ({ idd, onClose }) => {
                   </label>
                   <Field name="ticketSubject">
                     {({ field }) => (
-                      <Input 
-                        {...field} 
-                        placeholder="Enter subject" 
+                      <Input
+                        {...field}
+                        placeholder="Enter subject"
                         className="w-full rounded-md"
                       />
                     )}
@@ -266,7 +263,7 @@ const EditTicket = ({ idd, onClose }) => {
 
               {/* File Upload */}
               <Col span={24}>
-                  <div className="mt-3">
+                <div className="mt-3">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Attachment
                   </label>
@@ -287,8 +284,8 @@ const EditTicket = ({ idd, onClose }) => {
                       setFileList([]);
                     }}
                   >
-                    <Button 
-                      icon={<UploadOutlined />} 
+                    <Button
+                      icon={<UploadOutlined />}
                       className="bg-white"
                       disabled={fileList.length > 0}
                     >
@@ -301,14 +298,14 @@ const EditTicket = ({ idd, onClose }) => {
 
             {/* Form Actions */}
             <div className="flex justify-end space-x-2 mt-6">
-              <Button 
+              <Button
                 onClick={onClose}
                 className="bg-gray-100 hover:bg-gray-200"
               >
                 Cancel
               </Button>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 htmlType="submit"
                 loading={isSubmitting}
                 className="bg-blue-600 hover:bg-blue-700"

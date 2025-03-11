@@ -11,7 +11,7 @@ const { Option } = Select;
 
 const EditPaySlip = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // Assuming the route includes an ID, e.g., /edit-payslip/:id
+  const { id } = useParams();
 
   const [initialValues, setInitialValues] = useState({
     jobTitle: '',
@@ -27,7 +27,6 @@ const EditPaySlip = () => {
   });
 
   useEffect(() => {
-    // Mock API call to fetch payslip data. Replace with real API call.
     const fetchPaySlip = async () => {
       const mockData = {
         jobTitle: 'Software Engineer',

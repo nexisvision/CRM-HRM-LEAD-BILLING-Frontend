@@ -1,19 +1,16 @@
 import React from 'react'
-import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { useSelector } from 'react-redux';
-import { 
-	AUTH_PREFIX_PATH, 
-	UNAUTHENTICATED_ENTRY, 
-	REDIRECT_URL_KEY 
+import { Navigate, Outlet } from 'react-router-dom'
+import {
+	AUTH_PREFIX_PATH,
+	UNAUTHENTICATED_ENTRY,
 } from 'configs/AppConfig'
 
 const ProtectedRoute = () => {
-	
-	const token  = localStorage.getItem("auth_token")
-	const location = useLocation()
+
+	const token = localStorage.getItem("auth_token")
 
 
-	 if(!token) {
+	if (!token) {
 		return <Navigate to={`${AUTH_PREFIX_PATH}${UNAUTHENTICATED_ENTRY}`} replace />;
 	}
 

@@ -30,7 +30,8 @@ const ResetPassword = ({ onClose }) => {
 
   return (
     <div className=" bg-white max-w-2xl mx-auto">
-      
+      {/* <h1 className="text-2xl font-bold mb-6">Reset Password</h1> */}
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -41,9 +42,9 @@ const ResetPassword = ({ onClose }) => {
             <div className="border-t border-gray-200 my-6"></div>
 
             <Row gutter={[24, 24]}>
-                <Col xs={24} sm={24} >
+              <Col xs={24} sm={24} >
                 <div className="form-item">
-                <label className="font-semibold">New Password <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">New Password <span className="text-red-500">*</span></label>
                   <Field name="password">
                     {({ field }) => (
                       <Input.Password
@@ -64,7 +65,7 @@ const ResetPassword = ({ onClose }) => {
 
               <Col xs={24} sm={24} >
                 <div className="form-item">
-                <label className="font-semibold">Confirm Password <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Confirm Password <span className="text-red-500">*</span></label>
                   <Field name="confirmPassword">
                     {({ field }) => (
                       <Input.Password
@@ -85,7 +86,7 @@ const ResetPassword = ({ onClose }) => {
             </Row>
 
             <div className="flex justify-end space-x-4 mt-6">
-            <Button type="default" className="mr-2" onClick={onClose}>
+              <Button type="default" className="mr-2" onClick={onClose}>
                 Cancel
               </Button>
               <Button

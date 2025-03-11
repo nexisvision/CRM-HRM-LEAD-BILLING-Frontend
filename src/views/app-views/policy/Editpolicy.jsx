@@ -3,12 +3,10 @@ import {
   Input,
   Button,
   Select,
-  Radio,
   message,
   Row,
   Col,
   Upload,
-  DatePicker,
 } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -25,11 +23,11 @@ const EditpolicyList = ({ idd, onClose }) => {
 
   useEffect(() => {
     dispatch(getBranch());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(getpolicys());
-  }, []);
+  }, [dispatch]);
 
   const allbranch = useSelector((state) => state.Branch);
   const fndbranch = allbranch.Branch.data;
@@ -48,9 +46,7 @@ const EditpolicyList = ({ idd, onClose }) => {
         });
       }
     }
-  }, [fndpolicy]);
-
- 
+  }, [fndpolicy, idd]);
 
   const onSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
@@ -91,7 +87,7 @@ const EditpolicyList = ({ idd, onClose }) => {
   });
   return (
     <div>
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
 
       <Formik
         initialValues={initialValues}

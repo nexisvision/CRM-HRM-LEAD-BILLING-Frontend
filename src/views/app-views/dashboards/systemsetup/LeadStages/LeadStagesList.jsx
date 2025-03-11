@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { TiArrowMove } from "react-icons/ti";
 import EditLeadStages from "./EditLeadStages";
 import AddLeadStages from "./AddLeadStages";
@@ -16,13 +16,10 @@ const LeadStagesList = () => {
   const [isAddLeadStagesModalVisible, setIsAddLeadStagesModalVisible] =
     useState(false);
   const dispatch = useDispatch();
-
   const allfdata = useSelector((state) => state.StagesLeadsDeals);
-  const fnddata = allfdata?.StagesLeadsDeals?.data || [];
-
+  const fnddata = useMemo(() => allfdata?.StagesLeadsDeals?.data || [], [allfdata?.StagesLeadsDeals?.data]);
   const Allpipline = useSelector((state) => state.Piplines);
   const filterpipline = Allpipline?.Piplines?.data || [];
-
   const [leadadatafilter, setLeadadatafilter] = useState([]);
   const [idd, setIdd] = useState("");
   const [selectedPipeline, setSelectedPipeline] = useState("all");

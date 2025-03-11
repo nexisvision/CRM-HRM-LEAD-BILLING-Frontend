@@ -4,52 +4,40 @@ import {
   Table,
   Input,
   Tag,
-  Menu,
   Button,
   Select,
   Modal,
   message,
   Avatar,
+  Dropdown,
 } from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
-  MailOutlined,
-  RocketOutlined,
-  PushpinOutlined,
   SearchOutlined,
   EditOutlined,
   PlusOutlined,
   FileExcelOutlined,
-  UserOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-// import { useNavigate } from 'react-router-dom';
 import UserView from "./ViewClient";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
 import { utils, writeFile } from "xlsx";
-
 import ResetPassword from "./ResetPassword";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData, deleteClient } from "./CompanyReducers/CompanySlice";
 import ViewClient from "./ViewClient";
 import AddClient from "./AddClient";
 import EditClient from "./EditClient";
-import { useLocation, useNavigate } from "react-router-dom";
-import ProjectList from "views/app-views/dashboards/project/project-list/ProjectList";
+import { useLocation } from "react-router-dom";
 import { MdOutlineEmail } from "react-icons/md";
 import EmailVerification from "../../company/EmailVerification";
 
-const { Option } = Select;
-
 const ClientList = () => {
-  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState([]);
   const [isAddCompanyModalVisible, setIsAddCompanyModalVisible] =
     useState(false);
   const [isEditCompanyModalVisible, setIsEditCompanyModalVisible] =
@@ -67,9 +55,6 @@ const ClientList = () => {
   const tabledata = useSelector((state) => state.ClientData);
 
   const loggedInUser = useSelector((state) => state.user.loggedInUser);
-  // const rolesData = useSelector((state) => state.role.role.data);
-
-  const [idd, setIdd] = useState("");
 
   const dispatch = useDispatch();
 
@@ -120,9 +105,6 @@ const ClientList = () => {
     }
     return "";
   };
-  const comId = (id) => {
-    setCompnyid(id);
-  };
 
   useEffect(() => {
     dispatch(ClientData());
@@ -130,17 +112,17 @@ const ClientList = () => {
 
   const { state } = useLocation();
 
-  const allddata = useSelector((state) => state.SubClient.SubClient.data);
+  const alldata = useSelector((state) => state.SubClient.SubClient.data);
 
   useEffect(() => {
     setClientId(state?.idd)
-  }, [])
+  }, [state?.idd])
 
-  const matchingClients = allddata?.filter(client => client?.created_by === clientid);
+  const matchingClients = alldata?.filter(client => client?.created_by === clientid);
 
 
   useEffect(() => {
-    if (loggedInUser.username == "superadmin" && !state) {
+    if (loggedInUser.username === "superadmin" && !state) {
       setUsers(tabledata.ClientData.data);
     } else if (state && matchingClients) {
       setUsers(matchingClients)
@@ -152,7 +134,7 @@ const ClientList = () => {
         setUsers(filteredUsers);
       }
     }
-  }, [tabledata]);
+  }, [tabledata, loggedInUser.username, state, matchingClients]);
 
 
 
@@ -225,24 +207,14 @@ const ClientList = () => {
     setIsEditCompanyModalVisible(false);
   };
 
-  const openViewCompanyModal = () => {
-    setIsViewCompanyModalVisible(true);
-  };
 
   const closeViewCompanyModal = () => {
     setIsViewCompanyModalVisible(false);
   };
 
-  const openResetPasswordModal = () => {
-    setIsResetPasswordModalVisible(true);
-  };
 
   const closeResetPasswordModal = () => {
     setIsResetPasswordModalVisible(false);
-  };
-
-  const openUpgradePlanModal = () => {
-    setIsUpgradePlanModalVisible(true);
   };
 
   const closeUpgradePlanModal = () => {
@@ -259,54 +231,49 @@ const ClientList = () => {
     setSelectedUser(null);
   };
 
-  const ClickFun = (idd) => {
-    setIdd(idd);
+  const getDropdownItems = (record) => {
+    const items = [];
 
-    navigate("/app/dashboards/project/list", {
-      state: {
-        idd,
-      },
-    });
-  };
-
-  const dropdownMenu = (user) => ({
-    items: [
-      // View Details - conditional item
-      ...(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client") ? [{
+    if (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'view',
         icon: <EyeOutlined />,
         label: 'View Details',
-        onClick: () => showUserProfile(user)
-      }] : []),
-      
-      // Edit - conditional item
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        onClick: () => showUserProfile(record)
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
-        onClick: () => openEditCompanyModal(user.id)
-      }] : []),
-      
-      // Update Email - always visible
-      {
-        key: 'email',
-        icon: <MdOutlineEmail />,
-        label: 'Update Email',
-        onClick: () => {
-          setIsEmailVerificationModalVisible(true);
-          setCompnyid(user.id);
-        }
-      },
-      
-      // Delete - conditional item
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        onClick: () => openEditCompanyModal(record.id)
+      });
+    }
+
+    items.push({
+      key: 'email',
+      icon: <MdOutlineEmail />,
+      label: 'Update Email',
+      onClick: () => {
+        setIsEmailVerificationModalVisible(true);
+        setCompnyid(record.id);
+      }
+    });
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(user.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(record.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -377,9 +344,24 @@ const ClientList = () => {
     {
       title: "Action",
       dataIndex: "actions",
-      render: (_, user) => (
+      render: (_, record) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(user)} />
+          <Dropdown
+            menu={{ items: getDropdownItems(record) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -518,4 +500,73 @@ const ClientList = () => {
   );
 };
 
-export default ClientList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 250px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
+  }
+
+  .ant-btn-text:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .ant-btn-text:active {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  @media (max-width: 768px) {
+    .search-input {
+      width: 100%;
+      min-width: unset;
+    }
+    
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const ClientListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <ClientList />
+  </>
+);
+
+export default ClientListWithStyles;

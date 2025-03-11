@@ -12,7 +12,7 @@ const Demo = () => {
 	)
 }
 
-const  usageStr = `import React, { useState } from 'react'
+const usageStr = `import React, { useState } from 'react'
 import Loading from 'components/shared-components/Loading'
 
 export default const Demo = () =>  {
@@ -27,8 +27,8 @@ const LoadingDemo = () => {
 		<div>
 			<h2>Loading</h2>
 			<div className="mt-4">
-				<ComponentIntro name="Location" desc="src/components/shared-components/Loading.js"/>
-				<ComponentIntro name="Description" desc="Loading component"/>
+				<ComponentIntro name="Location" desc="src/components/shared-components/Loading.js" />
+				<ComponentIntro name="Description" desc="Loading component" />
 				<div className="mt-4">
 					<Card title="Example">
 						<Demo />

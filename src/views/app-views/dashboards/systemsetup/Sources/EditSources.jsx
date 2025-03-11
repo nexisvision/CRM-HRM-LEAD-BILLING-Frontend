@@ -1,56 +1,21 @@
 import React, { useEffect, useState } from "react";
 import {
-  Card,
-  Table,
-  Menu,
   Row,
   Col,
-  Tag,
   Input,
   message,
   Button,
-  Modal,
-  Select,
-  DatePicker,
 } from "antd";
-import {
-  EyeOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-  MailOutlined,
-  PlusOutlined,
-  PushpinOutlined,
-  FileExcelOutlined,
-  CopyOutlined,
-  EditOutlined,
-  LinkOutlined,
-} from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-import ReactQuill from "react-quill";
-import OrderListData from "assets/data/order-list.data.json";
-import Flex from "components/shared-components/Flex";
-import utils from "utils";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-import userData from "assets/data/user-list.data.json";
-import dayjs from "dayjs";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import {
-  AddLable,
   Editmins,
   GetLable,
 } from "../../project/milestone/LableReducer/LableSlice";
 import { useDispatch, useSelector } from "react-redux";
-import Item from "antd/es/list/Item";
-
-const { Option } = Select;
 
 const EditSources = ({ idd, onClose }) => {
-  const [users, setUsers] = useState(userData);
-
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const allloggeddata = useSelector((state) => state.user);
@@ -95,7 +60,7 @@ const EditSources = ({ idd, onClose }) => {
     <>
       <div>
         <div className="">
-          <h2 className="mb-1 border-b font-medium"></h2>
+          <hr className="mb-1 border-b font-medium"></hr>
 
           <div className="">
             <div className="">

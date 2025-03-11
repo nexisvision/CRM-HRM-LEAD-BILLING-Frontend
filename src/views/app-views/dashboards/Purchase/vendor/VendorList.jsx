@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal ,Select} from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, EditOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
+import { Card, Table, Menu, Input, Button, Modal, Select } from 'antd';
+import { DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
 import UserView from '../../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import StatisticWidget from 'components/shared-components/StatisticWidget';
-import { AnnualStatisticData } from '../../../dashboards/default/DefaultDashboardData';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import { useNavigate } from 'react-router-dom';
-import userData from 'assets/data/user-list.data.json';
-import utils from 'utils';
 import AddVendor from './AddVendor';
 import EditVendor from './Editvendor';
 import { vendordatadeletee, vendordataedata } from './vendorReducers/vendorSlice';
@@ -18,69 +11,37 @@ import { useDispatch, useSelector } from 'react-redux';
 const { Option } = Select
 
 const VendorList = () => {
-  const [users, setUsers] = useState(userData);
   const [list, setList] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false);
-  const [isEditJobModalVisible, setIsEditJobModalVisible] = useState(false);
-  const [isAddAccountModalVisible, setIsAddAccountModalVisible] = useState(false);
-  const [isEditAccountModalVisible, setIsEditAccountModalVisible] = useState(false);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [annualStatisticData] = useState(AnnualStatisticData);
-  const [selectedAccount, setSelectedAccount] = useState(null);
   const [accountType, setAccountType] = useState('All');
-  const [isAddTransferModalVisible, setIsAddTransferModalVisible] = useState(false);
-  const [isEditTransferModalVisible, setIsEditTransferModalVisible] = useState(false);
-  const [selectedTransfer, setSelectedTransfer] = useState(null);
   const [isAddVendorModalVisible, setIsAddVendorModalVisible] = useState(false);
   const [isEditVendorModalVisible, setIsEditVendorModalVisible] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [idd, setIdd] = useState("");
+  const accountTypeList = ['All', 'Salary', 'Savings', 'Current'];
 
- 
-
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(vendordataedata())
-  },[dispatch])
+  }, [dispatch])
 
-  const alllloggeduser = useSelector((state)=>state.user.loggedInUser.username);
-  const allvendordata = useSelector((state)=>state?.vendors?.vendors?.data);
+  const alllloggeduser = useSelector((state) => state.user.loggedInUser.username);
+  const allvendordata = useSelector((state) => state?.vendors?.vendors?.data);
 
-  const fnsddta = allvendordata?.filter((item)=>item?.created_by === alllloggeduser)
+  const fnsddta = allvendordata?.filter((item) => item?.created_by === alllloggeduser)
 
-  useEffect(()=>{
-    if(fnsddta){
+  useEffect(() => {
+    if (fnsddta) {
       setList(fnsddta)
     }
-  },[allvendordata])
+  }, [allvendordata, fnsddta])
 
-  // Open Add Job Modal
-  const openAddJobModal = () => {
-    setIsAddJobModalVisible(true);
-  };
-  // Close Add Job Modal
-  const closeAddJobModal = () => {
-    setIsAddJobModalVisible(false);
-  };
-  const handleJob = () => {
-    navigate('/app/hrm/jobs/viewjob', { state: { user: selectedUser } }); // Pass user data as state if needed
-  };
-   // Open Add Job Modal
-   const openEditJobModal = () => {
-    setIsEditJobModalVisible(true);
-  };
-  // Close Add Job Modal
-  const closeEditJobModal = () => {
-    setIsEditJobModalVisible(false);
-  };
   // Handle account type filter
   const handleAccountTypeFilter = value => {
     setAccountType(value);
     if (value !== 'All') {
-      const filteredData = list.filter(item => 
+      const filteredData = list.filter(item =>
         item.accounttype && item.accounttype.toLowerCase() === value.toLowerCase()
       );
       setList(filteredData);
@@ -92,69 +53,65 @@ const VendorList = () => {
   const onSearch = (e) => {
     const value = e.currentTarget.value.toLowerCase();
     if (!value) {
-        setList(fnsddta);
-        return;
+      setList(fnsddta);
+      return;
     }
-    
-    const searchArray = fnsddta.filter(item => 
-        item.name?.toLowerCase().includes(value) ||
-        item.address?.toLowerCase().includes(value) ||
-        item.city?.toLowerCase().includes(value) ||
-        item.state?.toLowerCase().includes(value) ||
-        item.country?.toLowerCase().includes(value)
+
+    const searchArray = fnsddta.filter(item =>
+      item.name?.toLowerCase().includes(value) ||
+      item.address?.toLowerCase().includes(value) ||
+      item.city?.toLowerCase().includes(value) ||
+      item.state?.toLowerCase().includes(value) ||
+      item.country?.toLowerCase().includes(value)
     );
-    
+
     setList(searchArray);
-    setSelectedRowKeys([]);
   };
   // Delete user
   const deleteUser = (userId) => {
     dispatch(vendordatadeletee(userId))
-      .then(()=>{
+      .then(() => {
         dispatch(vendordataedata())
         setList(list.filter((item) => item.id !== userId));
       })
-  
-  };
-  // Show user profile
-  const showUserProfile = (userInfo) => {
-    setSelectedUser(userInfo);
-    setUserProfileVisible(true);
+
   };
   // Close user profile
   const closeUserProfile = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);
   };
-  const getjobStatus = status => {
-    if (status === 'active') {
-      return 'blue'
-    }
-    if (status === 'blocked') {
-      return 'cyan'
-    }
-    return ''
-  }
-  
- 
-  
-  const jobStatusList = ['active', 'blocked']
-  const dropdownMenu = (record) => ({
-    items: [
-      {
-        key: 'edit',
-        icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => openEditVendorModal(record)
-      },
-      {
-        key: 'delete',
-        icon: <DeleteOutlined />,
-        label: 'Delete',
-        onClick: () => deleteUser(record.id)
-      }
-    ]
-  });
+
+  const dropdownMenu = (record) => (
+    <Menu>
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className=""
+            icon={<EditOutlined />}
+            onClick={() => openEditVendorModal(record)}
+            size="small"
+          >
+            <span className="ml-2">Edit</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className=""
+            icon={<DeleteOutlined />}
+            onClick={() => deleteUser(record.id)}
+            size="small"
+          >
+            <span className="">Delete</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
+    </Menu>
+  );
   const tableColumns = [
     {
       title: 'Name',
@@ -213,56 +170,7 @@ const VendorList = () => {
       ),
     },
   ];
-  // Open Add Account Modal
-  const openAddAccountModal = () => {
-    setIsAddAccountModalVisible(true);
-  };
 
-  // Close Add Account Modal
-  const closeAddAccountModal = () => {
-    setIsAddAccountModalVisible(false);
-  };
-
-  // Add these handler functions
-  const openEditAccountModal = (account) => {
-    setSelectedAccount(account);
-    setIsEditAccountModalVisible(true);
-  };
-
-  const closeEditAccountModal = () => {
-    setIsEditAccountModalVisible(false);
-  };
-
-  const getAccountTypeColor = type => {
-    switch (type?.toLowerCase()) {
-      case 'salary':
-        return 'green';
-      case 'savings':
-        return 'blue';
-      case 'current':
-        return 'purple';
-      default:
-        return 'default';
-    }
-  };
-
-  const openAddTransferModal = () => {
-    setIsAddTransferModalVisible(true);
-  };
-
-  const closeAddTransferModal = () => {
-    setIsAddTransferModalVisible(false);
-  };
-
-  const openEditTransferModal = (transfer) => {
-    setSelectedTransfer(transfer);
-    setIsEditTransferModalVisible(true);
-  };
-
-  const closeEditTransferModal = () => {
-    setIsEditTransferModalVisible(false);
-    setSelectedTransfer(null);
-  };
 
   const openAddVendorModal = () => {
     setIsAddVendorModalVisible(true);
@@ -285,18 +193,7 @@ const VendorList = () => {
 
   return (
     <Card bodyStyle={{ padding: '-3px' }}>
-      {/* <Row gutter={16}>
-        {annualStatisticData.map((elm, i) => (
-          <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-            <StatisticWidget
-              title={elm.title}
-              value={elm.value}
-              status={elm.status}
-              subtitle={elm.subtitle}
-            />
-          </Col>
-        ))}
-      </Row> */}
+
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
@@ -322,7 +219,6 @@ const VendorList = () => {
         />
       </div>
       <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
-      {/* Add Account Modal */}
       <Modal
         title="Create Vendor"
         visible={isAddVendorModalVisible}
@@ -340,10 +236,9 @@ const VendorList = () => {
         footer={null}
         width={1000}
         className='mt-[-70px]'
-        // height={1000}
       >
-        <EditVendor 
-          onClose={closeEditVendorModal} 
+        <EditVendor
+          onClose={closeEditVendorModal}
           vendorData={selectedVendor}
           idd={idd}
         />

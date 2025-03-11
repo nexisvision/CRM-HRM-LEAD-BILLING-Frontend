@@ -1,44 +1,33 @@
-/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
   Select,
   Input,
-  Row,
-  Col,
   Button,
-  Badge,
-  Menu,
-  Tag,
   Modal,
   message,
   Space,
   DatePicker,
   Avatar,
   Tooltip,
+  Menu,
+  Dropdown,
 } from "antd";
 import {
   EyeOutlined,
   FileExcelOutlined,
   SearchOutlined,
-  PlusCircleOutlined,
-  DeleteOutlined,
   EditOutlined,
   PlusOutlined,
   PushpinOutlined,
+  DeleteOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-import StatisticWidget from "components/shared-components/StatisticWidget";
-import { TiPinOutline } from "react-icons/ti";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-import NumberFormat from "react-number-format";
 import dayjs from "dayjs";
-import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import { utils, writeFile } from "xlsx";
 import ViewTask from "./ViewTask";
-import { useNavigate } from "react-router-dom";
 import AddTask from "./AddTask";
 import EditTask from "./EditTask";
 import { useSelector, useDispatch } from "react-redux";
@@ -49,7 +38,6 @@ import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-const orderStatusList = ["Normal", "Expired"];
 
 const stripHtmlTags = (html) => {
   if (!html) return '';
@@ -70,12 +58,12 @@ const UserAvatarGroup = ({ users, maxCount = 3 }) => {
   };
 
   const colors = [
-    { bg: '#E3F2FD', text: '#1976D2' }, // Light Blue
-    { bg: '#F3E5F5', text: '#7B1FA2' }, // Light Purple
-    { bg: '#E8F5E9', text: '#388E3C' }, // Light Green
-    { bg: '#FFF3E0', text: '#F57C00' }, // Light Orange
-    { bg: '#E1F5FE', text: '#0288D1' }, // Light Sky Blue
-    { bg: '#FCE4EC', text: '#C2185B' }, // Light Pink
+    { bg: '#E3F2FD', text: '#1976D2' },
+    { bg: '#F3E5F5', text: '#7B1FA2' },
+    { bg: '#E8F5E9', text: '#388E3C' },
+    { bg: '#FFF3E0', text: '#F57C00' },
+    { bg: '#E1F5FE', text: '#0288D1' },
+    { bg: '#FCE4EC', text: '#C2185B' },
   ];
 
   const displayUsers = users.slice(0, maxCount);
@@ -134,7 +122,6 @@ const UserAvatarGroup = ({ users, maxCount = 3 }) => {
 const TaskList = () => {
 
   const [list, setList] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [pinnedTasks, setPinnedTasks] = useState([]);
   const [showPinnedOnly, setShowPinnedOnly] = useState(false);
@@ -142,7 +129,7 @@ const TaskList = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [dateRange, setDateRange] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState('All');
-  const [selectedPriority, setSelectedPriority] = useState('All');
+  const [selectedPriority] = useState('All');
 
   const dispatch = useDispatch();
   const allempdata = useSelector((state) => state.Users);
@@ -174,8 +161,6 @@ const TaskList = () => {
 
   const alldatas = useSelector((state) => state.Tasks);
   const fnddata = alldatas.Tasks.data;
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(GetTasks(id));
@@ -228,9 +213,6 @@ const TaskList = () => {
     setIsEditTaskModalVisible(false);
   };
 
-  const openviewTaskModal = () => {
-    navigate("/app/dashboards/project/task/viewtask");
-  };
 
   const getUniqueStatuses = () => {
     if (!fnddata) return ['All'];
@@ -251,6 +233,8 @@ const TaskList = () => {
     applyFilters(value, selectedPriority);
   };
 
+
+  // Add combined filter function
   const applyFilters = (status, priority) => {
     if (!fnddata) return;
 
@@ -317,7 +301,6 @@ const TaskList = () => {
   };
 
   const getPinnedTasks = () => list.filter((task) => pinnedTasks.includes(task.id));
-  const getUnpinnedTasks = () => list.filter((task) => !pinnedTasks.includes(task.id));
 
   const [isViewTaskModalVisible, setIsViewTaskModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -332,32 +315,33 @@ const TaskList = () => {
     setIsViewTaskModalVisible(false);
   };
 
-  const dropdownMenu = (row) => ({
-    items: [
-      {
-        key: 'pin',
-        icon: <PushpinOutlined style={{ 
-          color: pinnedTasks.includes(row.id) ? "#1890ff" : undefined 
-        }} />,
-        label: pinnedTasks.includes(row.id) ? "Unpin" : "Pin",
-        onClick: () => togglePinTask(row.id)
-      },
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
-        key: 'edit',
-        icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editfubn(row.id)
-      }] : []),
-      
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
-        key: 'delete',
-        icon: <DeleteOutlined />,
-        label: 'Delete',
-        onClick: () => deleytfun(row.id)
-      }] : [])
-    ]
-  });
+  const getDropdownItems = (row) => [
+    {
+      key: 'view',
+      icon: <EyeOutlined />,
+      label: 'View Details',
+      onClick: () => openViewTaskModal(row)
+    },
+    {
+      key: 'pin',
+      icon: <PushpinOutlined style={{ color: pinnedTasks.includes(row.id) ? "#1890ff" : undefined }} />,
+      label: pinnedTasks.includes(row.id) ? "Unpin" : "Pin",
+      onClick: () => togglePinTask(row.id)
+    },
+    ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+      key: 'edit',
+      icon: <EditOutlined />,
+      label: 'Edit',
+      onClick: () => editfubn(row.id)
+    }] : []),
+    ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      label: 'Delete',
+      onClick: () => deleytfun(row.id),
+      danger: true
+    }] : [])
+  ];
 
   const tableColumns = [
     {
@@ -604,15 +588,29 @@ const TaskList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center" onClick={(e) => e.stopPropagation()}>
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
-      ),
+      )
     },
   ];
 
   const rowSelection = {
     onChange: (key, rows) => {
-      setSelectedRows(rows);
       setSelectedRowKeys(key);
     },
   };
@@ -785,6 +783,37 @@ const TaskList = () => {
     return pinnedTasks.includes(record.id) ? 'pinned-row' : '';
   };
 
+  // Update the Action column in the existing tableColumns array
+  const updatedTableColumns = [...tableColumns];
+  const actionColumnIndex = updatedTableColumns.findIndex(col => col.dataIndex === 'actions');
+
+  if (actionColumnIndex !== -1) {
+    updatedTableColumns[actionColumnIndex] = {
+      title: "Action",
+      dataIndex: "actions",
+      render: (_, elm) => (
+        <div className="text-center" onClick={(e) => e.stopPropagation()}>
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
+        </div>
+      )
+    };
+  }
+
   return (
     <>
       <Card>
@@ -871,7 +900,7 @@ const TaskList = () => {
             <Button
               type="primary"
               icon={<FileExcelOutlined />}
-              onClick={exportToExcel} 
+              onClick={exportToExcel}
               block
             >
               Export All
@@ -882,7 +911,7 @@ const TaskList = () => {
         <div className="table-responsive">
           {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
             <Table
-              columns={tableColumns}
+              columns={updatedTableColumns}
               dataSource={showPinnedOnly ? getPinnedTasks() : [...list].sort((a, b) => {
                 const isPinnedA = pinnedTasks.includes(a.id) ? 1 : 0;
                 const isPinnedB = pinnedTasks.includes(b.id) ? 1 : 0;

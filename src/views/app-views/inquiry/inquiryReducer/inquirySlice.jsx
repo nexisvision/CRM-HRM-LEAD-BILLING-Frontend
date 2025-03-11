@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./inquiryService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
-import { message } from "antd";
 
 
 export const addinqu = createAsyncThunk(
@@ -76,15 +74,7 @@ export const editinqu = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const RoleAndPermissionSlice = createSlice({
   name: "inquiry",
@@ -154,7 +144,7 @@ const RoleAndPermissionSlice = createSlice({
       })
 
       //getall
-      
+
       //delete
       .addCase(deleteinqu.pending, (state) => {
         state.isLoading = true;

@@ -5,8 +5,8 @@ import AvatarStatus from 'components/shared-components/AvatarStatus';
 import DataDisplayWidget from 'components/shared-components/DataDisplayWidget';
 import DonutChartWidget from 'components/shared-components/DonutChartWidget'
 import NumberFormat from 'react-number-format';
-import { 
-	CloudDownloadOutlined, 
+import {
+	CloudDownloadOutlined,
 	ArrowUpOutlined,
 	ArrowDownOutlined,
 	UserSwitchOutlined,
@@ -16,17 +16,17 @@ import {
 } from '@ant-design/icons';
 import ChartWidget from 'components/shared-components/ChartWidget';
 import { COLORS } from 'constants/ChartConstant';
-import { 
-	weeklyRevenueData, 
-	topProductData, 
+import {
+	weeklyRevenueData,
+	topProductData,
 	customerChartData,
-	sessionData, 
-  sessionLabels, 
-  conbinedSessionData,
+	sessionData,
+	sessionLabels,
+	conbinedSessionData,
 	sessionColor,
 	recentOrderData
 } from './SalesDashboardData'
-import dayjs from 'dayjs'; 
+import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils'
 import { useSelector } from 'react-redux'
@@ -34,23 +34,23 @@ import { useSelector } from 'react-redux'
 const { Option } = Select;
 
 const getPaymentStatus = status => {
-	if(status === 'Paid') {
+	if (status === 'Paid') {
 		return 'success'
 	}
-	if(status === 'Pending') {
+	if (status === 'Pending') {
 		return 'warning'
 	}
-	if(status === 'Expired') {
+	if (status === 'Expired') {
 		return 'error'
 	}
 	return ''
 }
 
 const getShippingStatus = status => {
-	if(status === 'Ready') {
+	if (status === 'Ready') {
 		return 'blue'
 	}
-	if(status === 'Shipped') {
+	if (status === 'Shipped') {
 		return 'cyan'
 	}
 	return ''
@@ -81,16 +81,16 @@ const WeeklyRevenue = () => {
 			</Col>
 			<Col xs={24} sm={24} md={24} lg={16}>
 				<div className="mb-3 text-right">
-					<Button icon={<CloudDownloadOutlined/>}>Download Report</Button>
+					<Button icon={<CloudDownloadOutlined />}>Download Report</Button>
 				</div>
-				<ChartWidget 
+				<ChartWidget
 					card={false}
-					series={weeklyRevenueData.series} 
-					xAxis={weeklyRevenueData.categories} 
+					series={weeklyRevenueData.series}
+					xAxis={weeklyRevenueData.categories}
 					title="Unique Visitors"
 					height={250}
 					type="bar"
-					customOptions={{colors: COLORS}}
+					customOptions={{ colors: COLORS }}
 					direction={direction}
 				/>
 			</Col>
@@ -101,36 +101,36 @@ const WeeklyRevenue = () => {
 const DisplayDataSet = () => (
 	<Row gutter={16}>
 		<Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
-			<DataDisplayWidget 
-				icon={<FileDoneOutlined />} 
+			<DataDisplayWidget
+				icon={<FileDoneOutlined />}
 				value="11,831"
-				title="Total order"	
+				title="Total order"
 				color="cyan"
 				vertical={true}
 				avatarSize={55}
 			/>
-			<DataDisplayWidget 
-				icon={<BarChartOutlined />} 
+			<DataDisplayWidget
+				icon={<BarChartOutlined />}
 				value="$6,922"
-				title="Total profit"	
+				title="Total profit"
 				color="gold"
 				vertical={true}
 				avatarSize={55}
 			/>
 		</Col>
 		<Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
-			<DataDisplayWidget 
-				icon={<SyncOutlined />} 
+			<DataDisplayWidget
+				icon={<SyncOutlined />}
 				value="26.9%"
-				title="Conversion rate"	
+				title="Conversion rate"
 				color="blue"
 				vertical={true}
 				avatarSize={55}
 			/>
-			<DataDisplayWidget 
-				icon={<UserSwitchOutlined />} 
+			<DataDisplayWidget
+				icon={<UserSwitchOutlined />}
 				value="873"
-				title="Daily visitors"	
+				title="Daily visitors"
 				color="volcano"
 				vertical={true}
 				avatarSize={55}
@@ -140,10 +140,10 @@ const DisplayDataSet = () => (
 )
 
 const TopProduct = () => (
-	<Card 
-		title="Top Product" 
+	<Card
+		title="Top Product"
 		extra={
-			<Select defaultValue="week" size="small" style={{minWidth: 110}}>
+			<Select defaultValue="week" size="small" style={{ minWidth: 110 }}>
 				<Option value="week">This Week</Option>
 				<Option value="month">This Month</Option>
 				<Option value="year">This Year</Option>
@@ -152,13 +152,13 @@ const TopProduct = () => (
 	>
 		{topProductData.map(elm => (
 			<Flex className="w-100 py-3" justifyContent="space-between" alignItems="center" key={elm.name}>
-				<AvatarStatus shape="square" src={elm.image} name={elm.name} subTitle={elm.category}/>
+				<AvatarStatus shape="square" src={elm.image} name={elm.name} subTitle={elm.category} />
 				<Flex>
 					<div className="mr-3 text-right">
 						<span className="text-muted">Sales</span>
 						<div className="mb-0 h5 font-weight-bold">
 							<NumberFormat prefix={'$'} value={elm.sales} thousandSeparator={true} displayType="text" />
-							{elm.status === 'up' ? <ArrowUpOutlined className="text-success"/> : <ArrowDownOutlined className="text-danger"/>}
+							{elm.status === 'up' ? <ArrowUpOutlined className="text-success" /> : <ArrowDownOutlined className="text-danger" />}
 						</div>
 					</div>
 				</Flex>
@@ -168,16 +168,16 @@ const TopProduct = () => (
 )
 
 const SalesByCategory = () => (
-	<DonutChartWidget 
-		series={sessionData} 
-		labels={sessionLabels} 
+	<DonutChartWidget
+		series={sessionData}
+		labels={sessionLabels}
 		title="Sales by Category"
-		customOptions={{colors: sessionColor}}
+		customOptions={{ colors: sessionColor }}
 		bodyClass="mb-2 mt-3"
 		extra={
-			<Row  justify="center">
+			<Row justify="center">
 				<Col xs={20} sm={20} md={20} lg={24}>
-					<div className="mt-4 mx-auto" style={{maxWidth: 200}}>
+					<div className="mt-4 mx-auto" style={{ maxWidth: 200 }}>
 						{conbinedSessionData.map(elm => (
 							<Flex alignItems="center" justifyContent="space-between" className="mb-3" key={elm.label}>
 								<Flex gap={5}>
@@ -197,10 +197,10 @@ const SalesByCategory = () => (
 const Customers = () => {
 	const { direction } = useSelector(state => state.theme)
 	return (
-		<Card 
+		<Card
 			title="Customers"
 			extra={
-				<Select defaultValue="week" size="small" style={{minWidth: 110}}>
+				<Select defaultValue="week" size="small" style={{ minWidth: 110 }}>
 					<Option value="week">This Week</Option>
 					<Option value="month">This Month</Option>
 					<Option value="year">This Year</Option>
@@ -211,22 +211,22 @@ const Customers = () => {
 				<div className="mr-5">
 					<h2 className="font-weight-bold mb-1">523,201</h2>
 					<p>
-						<Badge color={COLORS[6]}/>
+						<Badge color={COLORS[6]} />
 						<span className="mx-2">Store Customers</span>
 					</p>
 				</div>
 				<div>
 					<h2 className="font-weight-bold mb-1">379,237</h2>
 					<p>
-						<Badge color={COLORS[0]}/>
+						<Badge color={COLORS[0]} />
 						<span className="mx-2">Online Customers</span>
 					</p>
 				</div>
 			</Flex>
 			<div>
-				<ChartWidget 
+				<ChartWidget
 					card={false}
-					series={customerChartData} 
+					series={customerChartData}
 					xAxis={weeklyRevenueData.categories}
 					height={280}
 					direction={direction}
@@ -258,7 +258,7 @@ const tableColumns = [
 		dataIndex: 'name',
 		render: (_, record) => (
 			<Flex>
-				<AvatarStatus size={30} src={record.image} name={record.name}/>
+				<AvatarStatus size={30} src={record.image} name={record.name} />
 			</Flex>
 		),
 		sorter: (a, b) => utils.antdTableSorter(a, b, 'name')
@@ -296,10 +296,10 @@ const tableColumns = [
 		render: (_, record) => (
 			<span className="font-weight-semibold">
 				<NumberFormat
-					displayType={'text'} 
-					value={(Math.round(record.amount * 100) / 100).toFixed(2)} 
-					prefix={'$'} 
-					thousandSeparator={true} 
+					displayType={'text'}
+					value={(Math.round(record.amount * 100) / 100).toFixed(2)}
+					prefix={'$'}
+					thousandSeparator={true}
 				/>
 			</span>
 		),
@@ -311,8 +311,8 @@ const RecentOrder = () => (
 	<Card title="Recent Order">
 		<Table
 			pagination={false}
-			columns={tableColumns} 
-			dataSource={recentOrderData} 
+			columns={tableColumns}
+			dataSource={recentOrderData}
 			rowKey='id'
 		/>
 	</Card>

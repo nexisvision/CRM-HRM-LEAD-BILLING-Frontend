@@ -1,12 +1,10 @@
 import React from 'react';
 import CreditNotesList from './CreditNotesList';
 
-
 const creditnotes = () => (
-
-<div className="mail">
-<CreditNotesList />
-</div>
+	<div className="mail">
+		<CreditNotesList />
+	</div>
 
 );
 

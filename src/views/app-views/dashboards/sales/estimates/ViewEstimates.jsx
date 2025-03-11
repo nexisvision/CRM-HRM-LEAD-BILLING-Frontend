@@ -7,27 +7,27 @@ import NumberFormat from 'react-number-format';
 
 function ViewEstimates({ quotationId, onClose }) {
     const dispatch = useDispatch();
-    
     const { currentQuotation, loading } = useSelector((state) => state.salesquotation);
-    
-    const [tableData, setTableData] = useState([]);
+    console.log('Current Quotation:', currentQuotation);
 
+    const [tableData, setTableData] = useState([]);
     useEffect(() => {
         if (quotationId) {
             dispatch(getquotationsById(quotationId));
         }
     }, [dispatch, quotationId]);
-
     useEffect(() => {
         if (currentQuotation?.items) {
             try {
                 const itemsObj = JSON.parse(currentQuotation.items);
+                console.log('Parsed Items:', itemsObj);
 
                 const itemsArray = Object.entries(itemsObj).map(([key, item]) => ({
                     key,
                     ...item
                 }));
 
+                console.log('Items Array:', itemsArray);
                 setTableData(itemsArray);
             } catch (error) {
                 console.error('Error processing items:', error);
@@ -127,14 +127,14 @@ function ViewEstimates({ quotationId, onClose }) {
 
     return (
         <div className="bg-white rounded-lg">
-             <h2 className="mb-3 border-b pb-[5px] font-medium"></h2>
+            <hr className="mb-3 border-b pb-[5px] font-medium"></hr>
             <div className="">
                 <Card bordered={false} >
                     {/* Header Section */}
                     <div className="mb-6">
 
                         {/* Quotation Info */}
-                            <div className="flex justify-end gap-8">
+                        <div className="flex justify-end gap-8">
                             <div className="space-y-3 ">
                                 <div className="flex items-center text-lg">
                                     <span className="text-gray-600 font-semibold ">Quotation Number:</span>

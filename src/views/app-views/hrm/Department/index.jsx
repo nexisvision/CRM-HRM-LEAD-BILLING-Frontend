@@ -2,10 +2,9 @@ import React from 'react';
 import DepartmentList from './DepartmentList';
 
 const Department = () => (
-
-<div className="mail">
-<DepartmentList />
-</div>
+	<div className="mail">
+		<DepartmentList />
+	</div>
 
 );
 

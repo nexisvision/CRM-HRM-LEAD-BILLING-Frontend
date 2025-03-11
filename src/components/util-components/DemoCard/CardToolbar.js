@@ -22,7 +22,7 @@ const CardToolbar = ({ code, expand, isExpand }) => {
 	const handleCodeCopied = () => {
 		setCopied(true)
 	}
-	
+
 	const handleCopyTooltipVisibleChange = (visible) => {
 		setCopyTooltipVisible(visible);
 		if (visible) {
@@ -33,8 +33,8 @@ const CardToolbar = ({ code, expand, isExpand }) => {
 
 	return (
 		<div css={codeBoxActionCss(token)}>
-			<span css={codeBoxIconCss(token, (copied && copyTooltipVisible))}> 
-				<Tooltip 
+			<span css={codeBoxIconCss(token, (copied && copyTooltipVisible))}>
+				<Tooltip
 					title={copied ? 'Copied' : 'Copy code'}
 					open={copyTooltipVisible}
 					onOpenChange={handleCopyTooltipVisibleChange}
@@ -44,8 +44,8 @@ const CardToolbar = ({ code, expand, isExpand }) => {
 					</CopyToClipboard>
 				</Tooltip>
 			</span>
-			<span css={codeBoxIconCss(token)} onClick={expand}> 
-				<Tooltip title={isExpand? 'Hide code' : 'Show code'}>
+			<span css={codeBoxIconCss(token)} onClick={expand}>
+				<Tooltip title={isExpand ? 'Hide code' : 'Show code'}>
 					{isExpand ? <UpSquareOutlined /> : <DownSquareOutlined />}
 				</Tooltip>
 			</span>

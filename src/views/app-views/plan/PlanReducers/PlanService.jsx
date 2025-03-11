@@ -1,5 +1,7 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
+
+
 const Getplan = async () => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -49,7 +51,7 @@ const DeletePlan = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -100,16 +102,13 @@ const planbuy = async (payload) => {
 
 
 const UserService = {
-  // addUser,
+
   Getplan,
   AddPlan,
   DeletePlan,
   EditP,
   planbuy,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default UserService;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 import { Col, Button, message } from 'antd';
@@ -47,7 +47,8 @@ const validationSchema = Yup.object({
 const handleSubmit = async (values, { setSubmitting }) => {
   try {
     const formData = new FormData();
-    
+
+    // Add all form fields to formData
     Object.keys(values).forEach(key => {
       if (values[key] !== undefined && values[key] !== null) {
         if (key === 'profilePic') {
@@ -148,16 +149,16 @@ const EditCompany = ({ initialValues, onClose }) => {
 
           {/* Form Buttons */}
           <div className="form-buttons text-right mt-4">
-            <Button 
-              type="default" 
-              className="mr-2" 
+            <Button
+              type="default"
+              className="mr-2"
               onClick={onClose}
               disabled={isSubmitting}
             >
               Cancel
             </Button>
-            <Button 
-              type="primary" 
+            <Button
+              type="primary"
               htmlType="submit"
               loading={isSubmitting}
             >

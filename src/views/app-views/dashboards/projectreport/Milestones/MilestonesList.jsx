@@ -1,20 +1,8 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import userData from 'assets/data/user-list.data.json';
-import OrderListData from 'assets/data/order-list.data.json';
-
+import React from 'react';
+import { Card } from 'antd';
 
 
 const MilestonsList = () => {
-    const [users, setUsers] = useState(userData);
-    const [list, setList] = useState(OrderListData);
-
-
     return (
         <Card>
             <div className="overflow-x-auto">

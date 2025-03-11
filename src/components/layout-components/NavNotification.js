@@ -1,21 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, Avatar, List, Popover, Tabs, Modal } from 'antd';
 import {
-  MailOutlined,
   WarningOutlined,
-  CheckCircleOutlined,
-  CheckCircleFilled,
-  InboxOutlined,
   ClockCircleOutlined,
-  UserAddOutlined,
-  FileTextOutlined,
-  SettingOutlined,
   BellOutlined,
-  TeamOutlined,
   ShoppingOutlined,
-  SafetyOutlined,
-  DollarOutlined
 } from '@ant-design/icons';
 import NavItem from './NavItem';
 import Flex from 'components/shared-components/Flex';
@@ -101,35 +91,7 @@ const notificationStyles = `
   }
 `;
 
-const getIcon = (type) => {
-  const iconMap = {
-    mail: { icon: <MailOutlined />, color: '#1890ff', bg: '#e6f7ff' },
-    alert: { icon: <WarningOutlined />, color: '#ff4d4f', bg: '#fff2f0' },
-    check: { icon: <CheckCircleOutlined />, color: '#52c41a', bg: '#f6ffed' },
-    user: { icon: <UserAddOutlined />, color: '#722ed1', bg: '#f9f0ff' },
-    file: { icon: <FileTextOutlined />, color: '#faad14', bg: '#fffbe6' },
-    team: { icon: <TeamOutlined />, color: '#13c2c2', bg: '#e6fffb' },
-    payment: { icon: <DollarOutlined />, color: '#52c41a', bg: '#f6ffed' },
-    security: { icon: <SafetyOutlined />, color: '#eb2f96', bg: '#fff0f6' },
-    shopping: { icon: <ShoppingOutlined />, color: '#fa8c16', bg: '#fff7e6' },
-    default: { icon: <BellOutlined />, color: '#1890ff', bg: '#e6f7ff' }
-  };
-  return iconMap[type] || iconMap.default;
-};
-
-const formatTime = (timestamp) => {
-  const date = dayjs(timestamp);
-  const now = dayjs();
-
-  if (now.diff(date, 'day') < 1) {
-    return date.fromNow(); // e.g., "2 hours ago"
-  } else if (now.diff(date, 'day') < 7) {
-    return date.format('ddd HH:mm'); // e.g., "Mon 14:30"
-  } else {
-    return date.format('DD MMM, YYYY'); // e.g., "15 Jan, 2024"
-  }
-};
-
+// Update the renderNotificationItem function
 const renderNotificationItem = (item, handleNotificationClick, getNotificationIcon, formatTime) => {
   const iconConfig = getNotificationIcon(item);
   const isNew = dayjs().diff(dayjs(item.createdAt), 'hour') < 6; // Consider "new" if less than 6 hours old
@@ -181,95 +143,6 @@ const renderNotificationItem = (item, handleNotificationClick, getNotificationIc
   );
 };
 
-const getNotificationBody = (notifications, handleNotificationClick, getNotificationIcon, formatTime) => {
-  const reminders = notifications.filter(n => n.notification_type === 'reminder');
-  const normalNotifications = notifications.filter(n => n.notification_type === 'normal');
-
-  if (notifications?.length === 0) {
-    return (
-      <div className="empty-notification py-6 px-4">
-        <div className="flex flex-col items-center">
-          <div className="relative mb-4">
-            <div className="absolute inset-0 bg-blue-50 rounded-full animate-pulse"
-              style={{ transform: 'scale(1.2)' }}
-            />
-            <div className="relative">
-              <InboxOutlined
-                className="text-blue-500"
-                style={{
-                  fontSize: '40px',
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="absolute mt-[-10px] ml-[40px]">
-            <div className="bg-green-500 rounded-full p-1">
-              <CheckCircleFilled className="text-white" style={{ fontSize: '16px' }} />
-            </div>
-          </div>
-
-          <div className="text-center mt-4">
-            <h4 className="text-lg font-semibold text-gray-800 mb-2">
-              Inbox Zero Hero! 🏆
-            </h4>
-            <p className="text-gray-500 text-sm mb-4 max-w-[200px] mx-auto leading-relaxed">
-              No notifications = No stress 😌
-            </p>
-          </div>
-
-          <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-blue-400 to-transparent mb-4" />
-
-          <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <span className="text-xs text-gray-600 font-medium">
-              Peace & quiet ✌️
-            </span>
-          </div>
-        </div>
-
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50" />
-      </div>
-    );
-  }
-
-  return (
-    <>
-      {normalNotifications.length > 0 && (
-        <div className="notification-section">
-          <div className="px-4 py-2 bg-gray-50 border-b border-gray-100">
-            <Flex alignItems="center" justifyContent="space-between">
-              <span className="text-sm font-medium text-gray-600">Notifications <Badge count={normalNotifications.length} style={{ backgroundColor: '#1890ff' }} /></span>
-            </Flex>
-          </div>
-          <List
-            size="small"
-            itemLayout="horizontal"
-            dataSource={normalNotifications}
-            renderItem={(item) => renderNotificationItem(item, handleNotificationClick, getNotificationIcon, formatTime)}
-          />
-        </div>
-      )}
-
-      {reminders.length > 0 && (
-        <div className="reminder-section">
-          <div className="px-4 py-2 bg-gray-50 border-b border-gray-100">
-            <Flex alignItems="center" justifyContent="space-between">
-              <span className="text-sm font-medium text-gray-600">Reminders <Badge count={reminders.length} style={{ backgroundColor: '#faad14' }} /></span>
-            </Flex>
-          </div>
-          <List
-            size="small"
-            itemLayout="horizontal"
-            dataSource={reminders}
-            renderItem={(item) => renderNotificationItem(item, handleNotificationClick, getNotificationIcon, formatTime)}
-          />
-        </div>
-      )}
-    </>
-  );
-};
-
 const NavNotification = ({ mode }) => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [list, setList] = useState([]);
@@ -282,7 +155,7 @@ const NavNotification = ({ mode }) => {
   const dispatch = useDispatch();
 
   const allnotidat = useSelector((state) => state.Notifications);
-  const fnddatra = allnotidat?.Notifications?.data || [];
+  const fnddatra = useMemo(() => allnotidat?.Notifications?.data || [], [allnotidat?.Notifications?.data]);
 
   useEffect(() => {
     dispatch(GetAllNotifications());
@@ -602,10 +475,10 @@ const NavNotification = ({ mode }) => {
         className="mt-[-70px]"
       >
         {selectedTask && (
-          <ViewTask 
-            filterdatass={noti} 
-            notificationData={selectedTask.notificationData} 
-            onClose={handleTaskModalClose} 
+          <ViewTask
+            filterdatass={noti}
+            notificationData={selectedTask.notificationData}
+            onClose={handleTaskModalClose}
           />
         )}
       </Modal>
@@ -616,9 +489,9 @@ const NavNotification = ({ mode }) => {
         plan={selectedPlan}
         currencyData={[]} // Add your currency data here
         isAdmin={false} // Set based on user role
-        onEdit={(id) => {/* Handle edit */}}
-        onDelete={(id) => {/* Handle delete */}}
-        onBuy={(plan) => {/* Handle buy */}}
+        onEdit={(id) => {/* Handle edit */ }}
+        onDelete={(id) => {/* Handle delete */ }}
+        onBuy={(plan) => {/* Handle buy */ }}
       />
     </>
   );

@@ -8,8 +8,8 @@ import ApiContainer from 'components/util-components/ApiContainer/Container';
 
 const Demo = () => {
 	return (
-		<GoalWidget 
-			title="Monthly Target" 
+		<GoalWidget
+			title="Monthly Target"
 			value={87}
 			subtitle="You need abit more effort to hit monthly target"
 			extra={<Button type="primary">Learn More</Button>}
@@ -17,7 +17,7 @@ const Demo = () => {
 	)
 }
 
-const  usageStr = `import React, { useState } from 'react'
+const usageStr = `import React, { useState } from 'react'
 import GoalWidget from 'components/shared-components/GoalWidget'
 
 export default const Demo = () =>  {
@@ -37,8 +37,8 @@ const GoalWidgetDemo = () => {
 		<div>
 			<h2>GoalWidget</h2>
 			<div className="mt-4">
-				<ComponentIntro name="Location" desc="src/components/shared-components/GoalWidget.js"/>
-				<ComponentIntro name="Description" desc="Prgression bar inside a widget"/>
+				<ComponentIntro name="Location" desc="src/components/shared-components/GoalWidget.js" />
+				<ComponentIntro name="Description" desc="Prgression bar inside a widget" />
 				<div className="mt-4">
 					<Card title="Example">
 						<Demo />

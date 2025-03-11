@@ -3,8 +3,6 @@ import UserService from "./policyService";
 import { toast } from "react-toastify";
 import { message } from "antd";
 
-// Async thunk for adding user
-
 export const Addpolicys = createAsyncThunk(
   "users/Addpolicys",
   async (userData, thunkAPI) => {
@@ -17,7 +15,7 @@ export const Addpolicys = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
+
 
 export const getpolicys = createAsyncThunk(
   "emp/getpolicys",
@@ -31,7 +29,7 @@ export const getpolicys = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
+
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -44,7 +42,7 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
+
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -57,7 +55,7 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const deletepolicys = createAsyncThunk(
   "users/deletepolicys",
   async (userId, thunkAPI) => {
@@ -84,15 +82,7 @@ export const editpolicys = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const policySlice = createSlice({
   name: "policy",

@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./currenciesService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
+
 import { message } from "antd";
 
-// Async thunk for adding user
+
 
 export const addcurren = createAsyncThunk(
     "users/addcurren",
@@ -18,7 +18,7 @@ export const addcurren = createAsyncThunk(
     }
 );
 
-// Async thunk for user login
+
 
 
 export const getcurren = createAsyncThunk(
@@ -45,7 +45,7 @@ export const getAllUsers = createAsyncThunk(
     }
 );
 
-// Async thunk for getting user by id
+
 export const getUserById = createAsyncThunk(
     "users/getUserById",
     async (userId, thunkAPI) => {
@@ -58,7 +58,7 @@ export const getUserById = createAsyncThunk(
     }
 );
 
-// Async thunk for deleting a user
+
 export const deletecurren = createAsyncThunk(
     "users/deletecurren",
     async (userId, thunkAPI) => {
@@ -73,35 +73,25 @@ export const deletecurren = createAsyncThunk(
 export const editscurren = createAsyncThunk(
     "users/editscurren",
     async ({ id, values }, thunkAPI) => {
-      try {
-        const response = await UserService.editcurr(id, values);
-        return response; // Return the updated data
-      } catch (error) {
-        return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
-      }
+        try {
+            console.log("idinslice", id)
+            const response = await UserService.editcurr(id, values);
+            return response; // Return the updated data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
+        }
     }
-  );
+);
 
 
 
 
 
-// Async thunk for updating a user
-
-const initialUser = () => {
-    const item = window.localStorage.getItem("USER");
-    return item ? JSON.parse(item) : null;
-};
-
-const initialIsAuth = () => {
-    const item = window.localStorage.getItem("isAuth");
-    return item ? JSON.parse(item) : false;
-};
 
 const currenciesSlice = createSlice({
     name: "currencies",
     initialState: {
-        currencies:[],
+        currencies: [],
         editItem: {},
         isLoading: false,
         addModel: false,
@@ -153,19 +143,19 @@ const currenciesSlice = createSlice({
 
 
             .addCase(getcurren.pending, (state, action) => {
-                        state.isLoading = true;
-                    })
-                    .addCase(getcurren.fulfilled, (state, action) => {
-                        state.currencies = action.payload;
-                        state.isLoading = false;
-                        toast.success(action.payload?.message);
-                    })
-                    .addCase(getcurren.rejected, (state, action) => {
-                        state.isLoading = false;
-                        message.error(action.payload?.message);
-                    })
+                state.isLoading = true;
+            })
+            .addCase(getcurren.fulfilled, (state, action) => {
+                state.currencies = action.payload;
+                state.isLoading = false;
+                toast.success(action.payload?.message);
+            })
+            .addCase(getcurren.rejected, (state, action) => {
+                state.isLoading = false;
+                message.error(action.payload?.message);
+            })
 
-           
+
             // 
             //delete
             .addCase(deletecurren.pending, (state) => {
@@ -185,18 +175,18 @@ const currenciesSlice = createSlice({
             .addCase(editscurren.pending, (state) => {
                 state.isLoading = false;
                 state.error = null;
-              })
-              .addCase(editscurren.fulfilled, (state, action) => {
+            })
+            .addCase(editscurren.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
                 // message.success(action.payload?.message);
-              })
+            })
 
-              .addCase(editscurren.rejected, (state, action) => {
+            .addCase(editscurren.rejected, (state, action) => {
                 state.isLoading = false;
                 // state.error = action.payload;
                 // message.error(action.payload?.response?.data?.message);
-              });
+            });
     },
 });
 

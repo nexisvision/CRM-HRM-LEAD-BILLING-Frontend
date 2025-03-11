@@ -13,7 +13,7 @@ export const createestimate = createAsyncThunk(
       return rejectWithValue(error.message || 'Failed to create estimate');
     }
   }
-);    
+);
 
 // Fetch all estimates
 export const getallestimate = createAsyncThunk(
@@ -59,7 +59,7 @@ export const deleteestimate = createAsyncThunk(
   "estimate/deleteEstimate",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await EstimateService.deleteEstimate(id);
+      await EstimateService.deleteEstimate(id);
       return id; // Return the ID for filtering
     } catch (error) {
       return rejectWithValue(
@@ -124,8 +124,8 @@ const estimateSlice = createSlice({
         state.error = action.payload;
       })
 
-       // Fetch single invoice
-       .addCase(getestimateById.pending, (state) => {
+      // Fetch single invoice
+      .addCase(getestimateById.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -138,8 +138,8 @@ const estimateSlice = createSlice({
         state.error = action.payload;
       })
 
-       // Update estimate
-       .addCase(updateestimate.pending, (state) => {
+      // Update estimate
+      .addCase(updateestimate.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -162,9 +162,9 @@ const estimateSlice = createSlice({
         message.error(action.payload?.message);
 
       })
-      
+
       // Delete estimate
-        .addCase(deleteestimate.pending, (state) => {
+      .addCase(deleteestimate.pending, (state) => {
         state.loading = true;
         state.error = null;
       })

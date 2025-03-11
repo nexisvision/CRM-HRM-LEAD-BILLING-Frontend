@@ -10,11 +10,11 @@ import { useSelector } from 'react-redux';
 
 const { Sider } = Layout;
 
-export const SideNav = ({navCollapsed, routeInfo, hideGroupTitle, currentTheme }) => {
+export const SideNav = ({ navCollapsed, routeInfo, hideGroupTitle, currentTheme }) => {
   const sideNavTheme = useSelector(state => state.theme.sideNavTheme);
-  const props = { sideNavTheme, routeInfo , hideGroupTitle }
+  const props = { sideNavTheme, routeInfo, hideGroupTitle }
   return (
-    <Sider 
+    <Sider
       css={css`
         height: calc(100vh - ${TEMPLATE.HEADER_HEIGHT}px); 
         position: fixed !important;
@@ -22,16 +22,16 @@ export const SideNav = ({navCollapsed, routeInfo, hideGroupTitle, currentTheme }
         box-shadow: 0 1px 4px -1px rgba(0,0,0,.15);
         z-index: 999;
         direction: ltr;
-        ${currentTheme === 'light' && sideNavTheme !== SIDE_NAV_DARK ? `background-color: ${GRAY_SCALE.WHITE} !important;`  : `background-color: ${TEMPLATE.SIDE_NAV_DARK_BG_COLOR} !important;`}
-        ${currentTheme === 'dark' && sideNavTheme !== SIDE_NAV_DARK ? `background-color: ${DARK_MODE.BG_COLOR} !important`  : ``}
-        ${currentTheme === 'dark' && sideNavTheme === SIDE_NAV_DARK ? `background-color: ${TEMPLATE.SIDE_NAV_DARK_BG_COLOR} !important`  : ``}
+        ${currentTheme === 'light' && sideNavTheme !== SIDE_NAV_DARK ? `background-color: ${GRAY_SCALE.WHITE} !important;` : `background-color: ${TEMPLATE.SIDE_NAV_DARK_BG_COLOR} !important;`}
+        ${currentTheme === 'dark' && sideNavTheme !== SIDE_NAV_DARK ? `background-color: ${DARK_MODE.BG_COLOR} !important` : ``}
+        ${currentTheme === 'dark' && sideNavTheme === SIDE_NAV_DARK ? `background-color: ${TEMPLATE.SIDE_NAV_DARK_BG_COLOR} !important` : ``}
       `}
-      className={`side-nav ${sideNavTheme === SIDE_NAV_DARK? 'side-nav-dark' : ''}`} 
-      width={SIDE_NAV_WIDTH} 
+      className={`side-nav ${sideNavTheme === SIDE_NAV_DARK ? 'side-nav-dark' : ''}`}
+      width={SIDE_NAV_WIDTH}
       collapsed={navCollapsed}
     >
       <Scrollbars autoHide>
-        <MenuContent 
+        <MenuContent
           type={NAV_TYPE_SIDE}
           {...props}
         />
@@ -41,7 +41,7 @@ export const SideNav = ({navCollapsed, routeInfo, hideGroupTitle, currentTheme }
 }
 
 const mapStateToProps = ({ theme }) => {
-  const { navCollapsed, sideNavTheme, currentTheme } =  theme;
+  const { navCollapsed, sideNavTheme, currentTheme } = theme;
   return { navCollapsed, sideNavTheme, currentTheme }
 };
 

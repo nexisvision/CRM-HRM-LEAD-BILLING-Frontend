@@ -1,7 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
-
 const getallmaildata = async () => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -80,15 +79,12 @@ const editbra = async (idd, values) => {
 
 
 const UserService = {
-  // addUser,
+
   getallmaildata,
   sendmail,
   deletebra,
   editbra,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default UserService;

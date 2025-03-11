@@ -3,9 +3,9 @@ import TicketList from './TicketList';
 
 const Ticket = () => (
 
-<div className="mail">
-<TicketList />
-</div>
+	<div className="mail">
+		<TicketList />
+	</div>
 
 );
 

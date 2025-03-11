@@ -1,28 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Input,
   Button,
-  DatePicker,
   TimePicker,
-  Select,
   message,
-  Row,
-  Col,
   Modal,
   Form,
 } from "antd";
-import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-import ReactQuill from "react-quill";
-import utils from "utils";
-import OrderListData from "assets/data/order-list.data.json";
-import { ErrorMessage } from "formik";
-import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { useDispatch } from "react-redux";
 import { AddTask, GetTaskdata } from "./TaskCalendarReducer/TaskCalendarSlice";
 import moment from 'moment';
-
-const { Option } = Select;
 
 const AddTaskcalendar = ({ open, onCancel, selectedDate }) => {
   const [form] = Form.useForm();
@@ -57,24 +45,24 @@ const AddTaskcalendar = ({ open, onCancel, selectedDate }) => {
     >
       <h2 className="mb-4 border-b pb-2 font-medium"></h2>
       <Form form={form} layout="vertical" name="new-task" preserve={false} onFinish={onSubmit}>
-        <Form.Item 
-          name="title" 
-          label="Title" 
+        <Form.Item
+          name="title"
+          label="Title"
           rules={[{ required: true, message: 'Please input the task title!' }]}
         >
           <Input autoComplete="off" />
         </Form.Item>
 
-        <Form.Item 
-          name="start" 
-          label="Time" 
+        <Form.Item
+          name="start"
+          label="Time"
           rules={[{ required: true, message: 'Please select time!' }]}
         >
           <TimePicker className="w-100" format="HH:mm" />
         </Form.Item>
 
-        <Form.Item 
-          name="taskDescription" 
+        <Form.Item
+          name="taskDescription"
           label="Task Description"
           rules={[{ required: true, message: 'Please enter task description!' }]}
         >

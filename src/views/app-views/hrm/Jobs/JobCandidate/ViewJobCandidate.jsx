@@ -1,6 +1,5 @@
 import React from "react";
-import { Row, Col, Button, Card } from "antd";
-// import JobOnBoarding from "./JobOnBoarding";
+import { Row, Col, Card } from "antd";
 import BasicInfo from "./BasicInfo/index";
 import AdditionalDetails from "./AdditionalDetails/index";
 import JobCandidateDetails from "./JobCandidateDetails/index";
@@ -16,21 +15,18 @@ const ViewJobApplication = () => {
         </Col>
 
         <Col span={12}>
-            <JobCandidateDetails />
+          <JobCandidateDetails />
         </Col>
         <Col span={12}>
           <Card>
             <BasicInfo />
           </Card>
         </Col>
-
         <Col span={24}>
           <Card>
             <AdditionalDetails />
           </Card>
         </Col>
-
-       
       </Row>
     </div>
   );

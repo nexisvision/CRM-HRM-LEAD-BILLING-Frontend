@@ -7,178 +7,176 @@ import Loading from 'components/shared-components/Loading';
 const url = '/app/docs'
 
 const menuList = [
-	{ 
-		name: 'Introduction', 
+	{
+		name: 'Introduction',
 		key: 'introduction',
 		sub: []
 	},
-	{ 
-		name: 'Product Content', 
+	{
+		name: 'Product Content',
 		key: 'product-content',
 		sub: []
 	},
-	{ 
-		name: 'Folder Structure', 
+	{
+		name: 'Folder Structure',
 		key: 'folder-structure',
 		sub: []
 	},
-	{ 
-		name: 'Layout Overview', 
+	{
+		name: 'Layout Overview',
 		key: 'layout-overview',
 		sub: []
 	},
-	{ 
-		name: 'Installation', 
+	{
+		name: 'Installation',
 		key: 'installation',
 		sub: []
 	},
-	{ 
-		name: 'Development', 
+	{
+		name: 'Development',
 		key: 'development',
 		sub: []
 	},
-	{ 
-		name: 'Updating', 
+	{
+		name: 'Updating',
 		key: 'updating',
 		sub: []
 	},
-	{ 
-		name: 'TemplateSetting', 
+	{
+		name: 'TemplateSetting',
 		key: 'template-setting',
 		sub: []
 	},
-	{ 
-		name: 'Routing', 
+	{
+		name: 'Routing',
 		key: 'routing',
-		sub: [] 
+		sub: []
 	},
-	{ 
-		name: 'Redux', 
+	{
+		name: 'Redux',
 		key: 'redux',
-		sub: [] 
+		sub: []
 	},
 	{
 		name: 'Api Integration',
 		key: 'apiIntegration',
-		sub: [] 
+		sub: []
 	},
 	{
 		name: 'Mock Api',
 		key: 'mockApi',
-		sub: [] 
+		sub: []
 	},
-	{ 
-		name: 'Authentication', 
+	{
+		name: 'Authentication',
 		key: 'authentication',
 		sub: [
 			{
-				name: 'JWT', 
+				name: 'JWT',
 				key: 'jwt',
-				sub: [] 
+				sub: []
 			},
 			{
-				name: 'Firebase', 
+				name: 'Firebase',
 				key: 'firebase',
-				sub: [] 
+				sub: []
 			}
-		] 
+		]
 	},
-	{ 
-		name: 'Localization', 
+	{
+		name: 'Localization',
 		key: 'localization',
-		sub: [] 
+		sub: []
 	},
-	{ 
-		name: 'Components', 
+	{
+		name: 'Components',
 		key: 'components',
 		sub: [
 			{
-				name: 'AvatarStatusDemo', 
+				name: 'AvatarStatusDemo',
 				key: 'avatar-status-demo',
-				sub: [] 
+				sub: []
 			},
 			{
-				name: 'ChartWidgetDemo', 
+				name: 'ChartWidgetDemo',
 				key: 'chart-widget-demo',
-				sub: [] 
+				sub: []
 			},
 			{
-				name: 'CustomStatisticDemo', 
+				name: 'CustomStatisticDemo',
 				key: 'custom-statistic-demo',
-				sub: [] 
+				sub: []
 			},
 			{
-				name: 'ColorPickerDemo', 
+				name: 'ColorPickerDemo',
 				key: 'color-picker-demo',
-				sub: [] 
+				sub: []
 			},
 			{
-				name: 'DataDisplayWidgetDemo', 
+				name: 'DataDisplayWidgetDemo',
 				key: 'data-display-demo',
-				sub: [] 
+				sub: []
 			},
 			{
-				name: 'DonutChartWidgetDemo', 
+				name: 'DonutChartWidgetDemo',
 				key: 'donut-chart-Widget-demo',
-				sub: [] 
+				sub: []
 			},
 			{
-				name: 'EllipsisDropdownDemo', 
+				name: 'EllipsisDropdownDemo',
 				key: 'ellipsis-dropdown-demo',
-				sub: [] 
+				sub: []
 			},
 			{
-				name: 'FlexDemo', 
+				name: 'FlexDemo',
 				key: 'flex-demo',
-				sub: [] 
+				sub: []
 			},
 			{
-				name: 'GoalWidgetDemo', 
+				name: 'GoalWidgetDemo',
 				key: 'goal-widget-demo',
-				sub: [] 
+				sub: []
 			},
 			{
-				name: 'LoadingDemo', 
+				name: 'LoadingDemo',
 				key: 'loading-demo',
-				sub: [] 
+				sub: []
 			},
 			{
-				name: 'RegiondataWidgetDemo', 
+				name: 'RegiondataWidgetDemo',
 				key: 'regiondata-widget-demo',
-				sub: [] 
+				sub: []
 			},
 			{
-				name: 'StatisticWidgetDemo', 
+				name: 'StatisticWidgetDemo',
 				key: 'statistic-widget-demo',
-				sub: [] 
+				sub: []
 			},
 			{
-				name: 'CustomIconDemo', 
+				name: 'CustomIconDemo',
 				key: 'custom-icon-demo',
-				sub: [] 
+				sub: []
 			}
-		] 
+		]
 	},
-	{ 
-		name: 'UtilityClasses', 
+	{
+		name: 'UtilityClasses',
 		key: 'utility-classes',
-		sub: [] 
+		sub: []
 	},
-	{ 
-		name: 'Changelog', 
+	{
+		name: 'Changelog',
 		key: 'changelog',
-		sub: [] 
+		sub: []
 	}
 ]
 
-const prefix = 'documentation/'
-
-const MenuItem = ({title, path}) => {
+const MenuItem = ({ title, path }) => {
 
 	return (
 		<>
 			<span>{title}</span>
-			<Link to={`${path}`}/>
+			<Link to={`${path}`} />
 		</>
 	)
 }
@@ -188,7 +186,7 @@ const getMenuItem = (navItem) => navItem.map(nav => {
 	return {
 		key: nav.key,
 		label: nav.sub.length > 0 ? nav.name : <MenuItem title={nav.name} path={nav.key} />,
-		...(nav.sub.length > 0 ? {children: getMenuItem(nav.sub)} : {})
+		...(nav.sub.length > 0 ? { children: getMenuItem(nav.sub) } : {})
 	}
 })
 
@@ -224,8 +222,8 @@ const ElementRoute = ({ component: Component, routeKey, ...props }) => {
 
 const Docs = props => {
 	return (
-		<InnerAppLayout 
-			sideContent={<DocsMenu {...props}/>}
+		<InnerAppLayout
+			sideContent={<DocsMenu {...props} />}
 			mainContent={
 				<div className="p-4">
 					<div className="container-fluid">
@@ -233,27 +231,27 @@ const Docs = props => {
 							<Routes>
 								{menuList.map(elm => (
 									elm.sub.length === 0 ?
-									<Route 
-										key={elm.key}
-										path={`${elm.key}`} 
-										element={
-											<ElementRoute 
-												component={lazy(() => import(`./components/${elm.name.replace(/\s/g, '')}`))}
-											/>
-										}	
-									/>
-									:
-									elm.sub.map(item => (
-										<Route 
-											key={item.key}
-											path={`${item.key}`} 
+										<Route
+											key={elm.key}
+											path={`${elm.key}`}
 											element={
-												<ElementRoute 
-													component={lazy(() => import(`./components/${item.name.replace(/\s/g, '')}`))}
+												<ElementRoute
+													component={lazy(() => import(`./components/${elm.name.replace(/\s/g, '')}`))}
 												/>
-											}	
+											}
 										/>
-									))
+										:
+										elm.sub.map(item => (
+											<Route
+												key={item.key}
+												path={`${item.key}`}
+												element={
+													<ElementRoute
+														component={lazy(() => import(`./components/${item.name.replace(/\s/g, '')}`))}
+													/>
+												}
+											/>
+										))
 								))}
 								<Route path="*" element={<Navigate to="introduction" replace />} />
 							</Routes>

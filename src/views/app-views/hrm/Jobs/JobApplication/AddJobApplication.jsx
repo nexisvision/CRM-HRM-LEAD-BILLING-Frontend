@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, Select, Radio, message, Row, Col, Upload,Modal } from "antd";
+import { Input, Button, Select, Radio, message, Row, Col, Modal } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import ReactQuill from "react-quill";
@@ -10,7 +10,7 @@ import {
 } from "./JobapplicationReducer/JobapplicationSlice";
 import { GetJobdata } from "../JobReducer/JobSlice";
 import { getallcountries } from "../../../setting/countries/countriesreducer/countriesSlice";
-import { UploadOutlined,PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import AddCountries from "views/app-views/setting/countries/AddCountries";
 
 const { Option } = Select;
@@ -19,9 +19,9 @@ const AddJobApplication = ({ onClose }) => {
 
   useEffect(() => {
     dispatch(GetJobdata());
-  }, []);
+  }, [dispatch]);
 
-const user = useSelector((state) => state.user.loggedInUser.username);
+  const user = useSelector((state) => state.user.loggedInUser.username);
 
   const customerdata = useSelector((state) => state.Jobs);
   const fnddata = customerdata.Jobs.data || [];
@@ -97,7 +97,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
   });
   return (
     <div>
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <hr style={{ marginBottom: "-10px", border: "1px solid #e8e8e8", marginTop: "20px" }} />
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -117,6 +117,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
 
               <Col span={12}>
                 <div className="form-item">
+                  {/* <hr className="border-b-2 border-gray-300"></hr> */}
                   <label className="font-semibold">job <span className="text-red-500">*</span></label>
                   <Field name="job">
                     {({ field }) => (
@@ -154,7 +155,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
               <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Name <span className="text-red-500">*</span></label>
-                  <Field name="name" as={Input} placeholder="Enter Name"  className="w-full mt-1"/>
+                  <Field name="name" as={Input} placeholder="Enter Name" className="w-full mt-1" />
                   <ErrorMessage
                     name="name"
                     component="div"
@@ -165,7 +166,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
               <Col span={12}>
                 <div className="form-item mt-2">
                   <label className="font-semibold">Email <span className="text-red-500">*</span></label>
-                  <Field name="email" as={Input} placeholder="Enter Email"  className="w-full mt-2"/>
+                  <Field name="email" as={Input} placeholder="Enter Email" className="w-full mt-2" />
                   <ErrorMessage
                     name="email"
                     component="div"
@@ -240,6 +241,13 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                           type="number"
                           placeholder="Enter phone number"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                        // prefix={
+                        //   values.phoneCode && (
+                        //     <span className="text-gray-600 font-medium mr-1">
+                        //       {values.phoneCode}
+                        //     </span>
+                        //   )
+                        // }
                         />
                       )}
                     </Field>
@@ -252,7 +260,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                 <div className="form-item mt-2">
                   <label className="font-semibold">Location <span className="text-red-500">*</span></label>
                   <Field
-                   className="w-full mt-1"
+                    className="w-full mt-1"
                     name="location"
                     as={Input}
                     placeholder="Enter Location"
@@ -269,13 +277,13 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                 <div className="form-item mt-2">
                   <label className="font-semibold">Total Experience <span className="text-red-500">*</span></label>
                   <Select
-                   className="w-full mt-1"
+                    className="w-full mt-1"
                     placeholder="Select Total Experience"
                     value={values.total_experience}
                     onChange={(value) =>
                       setFieldValue("total_experience", value)
                     }
-                  
+
                   >
                     <Option value="0-1">0-1 Years</Option>
                     <Option value="1-3">1-3 Years</Option>
@@ -294,7 +302,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                 <div className="form-item mt-2">
                   <label className="font-semibold">Current Location <span className="text-red-500">*</span></label>
                   <Field
-                   className="w-full mt-1"
+                    className="w-full mt-1"
                     name="current_location"
                     as={Input}
                     placeholder="Enter Current Location"
@@ -314,7 +322,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                     placeholder="Select Notice Period"
                     value={values.notice_period}
                     onChange={(value) => setFieldValue("notice_period", value)}
-                     className="w-full mt-1"
+                    className="w-full mt-1"
                   >
                     <Option value="immediate">Immediate</Option>
                     <Option value="15 days">15 Days</Option>
@@ -333,7 +341,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                 <div className="form-item mt-2">
                   <label className="font-semibold grid grid-cols-1">Status </label>
                   <Radio.Group
-                   className="w-full mt-2"
+                    className="w-full mt-2"
                     value={values.status}
                     onChange={(e) => setFieldValue("status", e.target.value)}
                   >
@@ -352,7 +360,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                 <div className="form-item mt-2">
                   <label className="font-semibold">Applied Sources <span className="text-red-500">*</span></label>
                   <Field
-                   className="w-full mt-1"
+                    className="w-full mt-1"
                     name="applied_source"
                     as={Input}
                     placeholder="Enter Applied Sources"
@@ -364,12 +372,12 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                   />
                 </div>
               </Col>
-             
+
               <Col span={24}>
                 <div className="form-item mt-2">
                   <label className="font-semibold">Cover Letter <span className="text-red-500">*</span> </label>
                   <ReactQuill
-                   className="w-full mt-1"
+                    className="w-full mt-1"
                     value={values.cover_letter}
                     onChange={(value) => setFieldValue("cover_letter", value)}
                     onBlur={() => setFieldTouched("cover_letter", true)}
@@ -382,7 +390,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                   />
                 </div>
               </Col>
-             
+
             </Row>
             <div style={{ textAlign: "right", marginTop: "16px" }}>
               <Button style={{ marginRight: 8 }} onClick={onClose}>

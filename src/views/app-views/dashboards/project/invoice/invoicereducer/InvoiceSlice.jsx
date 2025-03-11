@@ -64,7 +64,7 @@ export const deleteInvoice = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await InvoiceService.deleteInvoice(id);
-      return id; // Return the ID for filtering
+      return response; // Return the ID for filtering
     } catch (error) {
       return rejectWithValue(
         error.response?.data || "Failed to delete invoice"

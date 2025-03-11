@@ -24,7 +24,7 @@ const Demo = () => {
 	}
 
 	return (
-		<ColorPicker color={'#3e82f7'} colorChange={onColorChange}/>
+		<ColorPicker color={'#3e82f7'} colorChange={onColorChange} />
 	)
 }
 
@@ -33,8 +33,8 @@ const ColorPickerDemo = () => {
 		<div>
 			<h2>AvatarStatus</h2>
 			<div className="mt-4">
-				<ComponentIntro name="Location" desc="src/components/shared-components/ColorPicker.js"/>
-				<ComponentIntro name="Description" desc="ColorPicker allow you select & get the color info from color palette."/>
+				<ComponentIntro name="Location" desc="src/components/shared-components/ColorPicker.js" />
+				<ComponentIntro name="Description" desc="ColorPicker allow you select & get the color info from color palette." />
 			</div>
 			<div className="mt-4">
 				<Card title="Example">

@@ -1,42 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Badge, Card, Row, Col, Modal, Form, Input, Select, TimePicker, Button, Tooltip, message } from 'antd';
+import { Card, Modal, Button, Tooltip, message } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { GetTaskdata, DeleteTask, AddTask } from './TaskCalendarReducer/TaskCalendarSlice';
+import { GetTaskdata, DeleteTask } from './TaskCalendarReducer/TaskCalendarSlice';
 import moment from 'moment';
 import AddTaskcalendar from './AddTaskcalendar';
 
-const { Option } = Select;
-
-const badgeColors = [
-  'pink', 'red', 'yellow', 'orange', 'cyan', 'green', 'blue', 'purple', 'geekblue', 'magenta', 'volcano', 'gold', 'lime',
-];
-
-const initialFormValues = {
-  title: '',
-  start: moment('00:00:00', 'HH:mm:ss'),
-  end: moment('00:00:00', 'HH:mm:ss'),
-  bullet: badgeColors[0],
-  taskDescription: ""
-};
-
-const TaskCard = ({ task }) => (
-  <div className="task-card mb-3" style={{ borderLeft: `4px solid ${task.color}` }}>
-    <h5 className="task-card-title">{task.taskName}</h5>
-    <div className="task-card-time">
-      <div>{moment(task.taskDate).format('MMM DD, YYYY')}</div>
-      <div className="text-muted">
-        {moment(task.taskTime).format('HH:mm')} - {moment(task.taskDate).format('HH:mm')}
-      </div>
-    </div>
-  </div>
-);
 
 const SidebarTasks = ({ tasks, onDeleteTask }) => {
-  const sortedTasks = Array.isArray(tasks)
-    ? [...tasks].sort((a, b) => moment(a.taskDate).valueOf() - moment(b.taskDate).valueOf())
-    : [];
-
 
   const handleDelete = (task) => {
     Modal.confirm({
@@ -58,8 +29,6 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find(role => role.id === roleId);
 
-  const whorole = roleData.role_name;
-
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === 'string'
@@ -75,24 +44,16 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
   } else {
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
 
   useEffect(() => {
     dispatch(GetTaskdata());
-  }, []);
-
-
-  const user = useSelector((state) => state.user.loggedInUser.username);
-
+  }, [dispatch]);
 
   const allTaskData = useSelector((state) => state.TaskCalander);
   const taskData = allTaskData?.TaskCalander.data || [];
 
-  const alllogeed = useSelector((state)=>state.user.loggedInUser.username);
-  const fnddata = taskData.filter((item)=>item.created_by === alllogeed)
+  const alllogeed = useSelector((state) => state.user.loggedInUser.username);
+  const fnddata = taskData.filter((item) => item.created_by === alllogeed)
 
   return (
     <div className="sidebar-tasks">
@@ -102,7 +63,7 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
       ) : (
         fnddata.map((task) => (
           <div key={task.id} className="task-card-wrapper">
-            <Tooltip 
+            <Tooltip
               title={
                 <div>
                   <div><strong>{task.taskName}</strong></div>
@@ -111,9 +72,9 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
                 </div>
               }
             >
-              <div 
-                className="task-card mb-3" 
-                style={{ 
+              <div
+                className="task-card mb-3"
+                style={{
                   borderLeft: `4px solid ${task.color || '#5B5FC7'}`,
                   paddingLeft: '12px',
                   cursor: 'pointer'
@@ -150,7 +111,7 @@ const CustomCalendar = ({ taskData, onDeleteTask, onDateSelect }) => {
     const endDate = moment(lastDay).endOf('week');
     const calendar = [];
     let week = [];
-    
+
     for (let day = moment(startDate); day.isSameOrBefore(endDate); day.add(1, 'day')) {
       week.push({
         date: moment(day),
@@ -175,7 +136,7 @@ const CustomCalendar = ({ taskData, onDeleteTask, onDateSelect }) => {
   const renderTaskBadge = (task) => {
     const timeStr = formatTaskTime(task.taskTime);
     return (
-      <Tooltip 
+      <Tooltip
         title={
           <div>
             <div><strong>{task.taskName}</strong></div>
@@ -184,10 +145,10 @@ const CustomCalendar = ({ taskData, onDeleteTask, onDateSelect }) => {
           </div>
         }
       >
-        <div 
-          key={task.id} 
-          className="task-badge" 
-          style={{ 
+        <div
+          key={task.id}
+          className="task-badge"
+          style={{
             backgroundColor: task.color || '#5B5FC7',
             color: 'white',
             height: '24px'

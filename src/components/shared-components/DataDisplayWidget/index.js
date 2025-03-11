@@ -9,9 +9,9 @@ const DataDisplayWidget = props => {
 	return (
 		<Card>
 			<Flex alignItems="center" flexDirection={vertical ? 'column' : 'row'}>
-				<Avatar size={avatarSize} shape="square" icon={icon} className={`ant-avatar-${color}`}/>
+				<Avatar size={avatarSize} shape="square" icon={icon} className={`ant-avatar-${color}`} />
 				<div className={vertical ? 'mt-3 text-center' : 'ml-3'}>
-					<CustomStatistic {...customStatisticProps}/>
+					<CustomStatistic {...customStatisticProps} />
 				</div>
 			</Flex>
 		</Card>

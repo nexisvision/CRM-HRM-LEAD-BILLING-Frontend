@@ -3,7 +3,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import ApiContainer from 'components/util-components/ApiContainer/Container';
 
-const newRouteStr =  `export const protectedRoutes = [
+const newRouteStr = `export const protectedRoutes = [
 	{
 		key: 'a-unique-id-for-this-view'
         path: 'my-new-view-path',
@@ -131,16 +131,16 @@ const Routing = () => {
 			<h2 className="mt-4">Menu Navigation</h2>
 			<div className="mt-4">
 				<h4 className="font-weight-bold">Navigating</h4>
-				<p>You can config your navigation bar in <code>configs/NavigationConfig.js</code>. 
-				We grouped up the navigation tree as an array, add object as the code below to the array for new menu item.</p>
+				<p>You can config your navigation bar in <code>configs/NavigationConfig.js</code>.
+					We grouped up the navigation tree as an array, add object as the code below to the array for new menu item.</p>
 				<SyntaxHighlighter className="hl-code" language="javascript" style={atomDark}>
-          {navTreeStr}
-        </SyntaxHighlighter>
+					{navTreeStr}
+				</SyntaxHighlighter>
 				<h4 className="font-weight-bold mt-4">Nested</h4>
 				<p>Refer below code to create a nested menu item:</p>
 				<SyntaxHighlighter className="hl-code" language="javascript" style={atomDark}>
-          {nestedNavTreeStr}
-        </SyntaxHighlighter>
+					{nestedNavTreeStr}
+				</SyntaxHighlighter>
 			</div>
 			<br />
 			<br />

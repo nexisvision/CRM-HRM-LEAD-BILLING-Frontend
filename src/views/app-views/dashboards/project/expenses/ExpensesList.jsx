@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     Card,
     Table,
-    Select,
     Input,
     Button,
-    Badge,
     Menu,
-    Tag,
     Modal,
     message,
     DatePicker,
+    Dropdown,
 } from "antd";
 import {
     EyeOutlined,
@@ -19,12 +17,10 @@ import {
     DeleteOutlined,
     EditOutlined,
     PlusOutlined,
+    MoreOutlined,
 } from "@ant-design/icons";
-import { TiPinOutline } from "react-icons/ti";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
 import dayjs from "dayjs";
-import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteExp, Getexp } from "./Expencereducer/ExpenseSlice";
 import { useParams } from "react-router-dom";
@@ -35,16 +31,12 @@ import ViewExpenss from "./ViewExpenss";
 import { GetProject } from '../project-list/projectReducer/ProjectSlice';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
-
-const { Option } = Select;
 const { RangePicker } = DatePicker;
-
 const ExpensesList = () => {
     const dispatch = useDispatch();
     const { id } = useParams();
-    
+
     const [list, setList] = useState([]);
-    const [selectedRows, setSelectedRows] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
     const [idd, setIdd] = useState("");
@@ -61,12 +53,12 @@ const ExpensesList = () => {
 
     const [filteredData, setFilteredData] = useState([]);
     const [searchText, setSearchText] = useState('');
-    const [selectedStatus, setSelectedStatus] = useState('all');
+    const selectedStatus = 'all';
     const [loading, setLoading] = useState(false);
     const [dateRange, setDateRange] = useState(null);
 
     const projectData = useSelector((state) => state.Project);
-    const projects = projectData.Project.data || [];
+    const projects = useMemo(() => projectData.Project.data || [], [projectData.Project.data]);
 
     const allempdatass = useSelector((state) => state.currencies);
     const fnddatass = allempdatass?.currencies?.data;
@@ -113,14 +105,8 @@ const ExpensesList = () => {
         loadInitialData();
     }, [dispatch, id]);
 
-    useEffect(() => {
-        if (filtermin) {
-            setList(filtermin);
-            handleFilters(filtermin); // Initialize filtered data
-        }
-    }, [filtermin]);
 
-    const handleFilters = (data = list) => {
+    const handleFilters = React.useCallback((data = list) => {
         setLoading(true);
         try {
             let filtered = [...data];
@@ -130,9 +116,9 @@ const ExpensesList = () => {
                 filtered = filtered.filter(item => {
                     const projectName = projects.find(p => p.id === item.project)?.project_name || '';
                     const currency = fnddatass?.find(c => c.id === item.currency);
-                    const currencyInfo = currency ? 
+                    const currencyInfo = currency ?
                         `${currency.currencyName} ${currency.currencyCode} ${currency.currencyIcon}` : '';
-                    
+
                     return (
                         item.item?.toLowerCase().includes(searchText.toLowerCase()) ||
                         projectName.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -146,8 +132,8 @@ const ExpensesList = () => {
             if (dateRange && dateRange.length === 2) {
                 filtered = filtered.filter(item => {
                     const purchaseDate = dayjs(item.purchase_date);
-                    return purchaseDate.isAfter(dateRange[0].startOf('day')) && 
-                           purchaseDate.isBefore(dateRange[1].endOf('day'));
+                    return purchaseDate.isAfter(dateRange[0].startOf('day')) &&
+                        purchaseDate.isBefore(dateRange[1].endOf('day'));
                 });
             }
 
@@ -157,12 +143,18 @@ const ExpensesList = () => {
             message.error('Failed to filter data');
         }
         setLoading(false);
-    };
+    }, [list, searchText, dateRange, projects, fnddatass]);
 
     useEffect(() => {
         handleFilters();
-    }, [searchText, selectedStatus, list, dateRange]);
+    }, [searchText, selectedStatus, list, dateRange, handleFilters]);
 
+    useEffect(() => {
+        if (filtermin) {
+            setList(filtermin);
+            handleFilters(filtermin); // Initialize filtered data
+        }
+    }, [filtermin, handleFilters]);
     const onSearch = (e) => {
         const value = e.currentTarget.value.toLowerCase();
         setSearchText(value);
@@ -175,9 +167,9 @@ const ExpensesList = () => {
         const filtered = list.filter(item => {
             const projectName = projects.find(p => p.id === item.project)?.project_name || '';
             const currency = fnddatass?.find(c => c.id === item.currency);
-            const currencyInfo = currency ? 
+            const currencyInfo = currency ?
                 `${currency.currencyName} ${currency.currencyCode} ${currency.currencyIcon}` : '';
-            
+
             return (
                 item.item?.toLowerCase().includes(value) ||
                 projectName.toLowerCase().includes(value) ||
@@ -189,25 +181,13 @@ const ExpensesList = () => {
         setFilteredData(filtered);
     };
 
-    const getUniqueStatuses = () => {
-        if (!list) return [];
-        
-        const statuses = [...new Set(list.map(item => item.status))];
-        return [
-            { value: 'all', label: 'All Status' },
-            ...statuses.map(status => ({
-                value: status,
-                label: status
-            }))
-        ];
-    };
 
     const exportToExcel = () => {
         try {
             const formattedData = list.map(row => {
                 const currency = fnddatass?.find(c => c.id === row.currency);
                 const projectName = projects.find(p => p.id === row.project)?.project_name || 'N/A';
-                
+
                 return {
                     ItemName: row.item,
                     Project: projectName,
@@ -232,7 +212,7 @@ const ExpensesList = () => {
     const DeleteFun = async (exid) => {
         try {
             await dispatch(DeleteExp(exid));
-             await dispatch(Getexp(id));
+            await dispatch(Getexp(id));
 
             setList(list.filter((item) => item.id !== exid));
 
@@ -247,31 +227,30 @@ const ExpensesList = () => {
         setIdd(exid);
     };
 
-    const dropdownMenu = (row) => ({
-        items: [
-            {
-                key: 'view',
-                icon: <EyeOutlined />,
-                label: 'View Details',
-                onClick: () => {
-                    setSelectedExpense(row);
-                    openviewExpensesModal();
-                }
-            },
-            {
-                key: 'edit',
-                icon: <EditOutlined />,
-                label: 'Edit',
-                onClick: () => EditFun(row.id)
-            },
-            {
-                key: 'delete',
-                icon: <DeleteOutlined />,
-                label: 'Delete',
-                onClick: () => DeleteFun(row.id)
+    const getDropdownItems = (row, EditFun, DeleteFun, setSelectedExpense, openviewExpensesModal) => [
+        {
+            key: 'view',
+            icon: <EyeOutlined />,
+            label: 'View Details',
+            onClick: () => {
+                setSelectedExpense(row);
+                openviewExpensesModal();
             }
-        ]
-    });
+        },
+        {
+            key: 'edit',
+            icon: <EditOutlined />,
+            label: 'Edit',
+            onClick: () => EditFun(row.id)
+        },
+        {
+            key: 'delete',
+            icon: <DeleteOutlined />,
+            label: 'Delete',
+            onClick: () => DeleteFun(row.id),
+            danger: true
+        }
+    ];
 
     const tableColumns = [
         {
@@ -307,8 +286,8 @@ const ExpensesList = () => {
             title: "Description",
             dataIndex: "description",
             render: (description) => (
-                <div 
-                    dangerouslySetInnerHTML={{ __html: description }} 
+                <div
+                    dangerouslySetInnerHTML={{ __html: description }}
                     className="max-w-md truncate"
                     title={description?.replace(/<[^>]*>/g, '')}
                 />
@@ -328,7 +307,7 @@ const ExpensesList = () => {
             },
             sorter: (a, b) => (a.price || 0) - (b.price || 0),
         },
-       
+
         {
             title: "Purchase Date",
             dataIndex: "purchase_date",
@@ -344,17 +323,46 @@ const ExpensesList = () => {
             dataIndex: "actions",
             render: (_, elm) => (
                 <div className="text-center">
-                    <EllipsisDropdown menu={dropdownMenu(elm)} />
+                    <Dropdown
+                        overlay={<Menu items={getDropdownItems(elm, EditFun, DeleteFun, setSelectedExpense, openviewExpensesModal)} />}
+                        trigger={['click']}
+                        placement="bottomRight"
+                    >
+                        <Button
+                            type="text"
+                            className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+                            style={{
+                                borderRadius: '10px',
+                                padding: 0
+                            }}
+                        >
+                            <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+                        </Button>
+                    </Dropdown>
                 </div>
             ),
         },
     ];
     const rowSelection = {
         onChange: (key, rows) => {
-            setSelectedRows(rows);
             setSelectedRowKeys(key);
         },
     };
+    const styles = `
+        .ant-dropdown-menu {
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .ant-dropdown-menu-item {
+            padding: 8px 16px;
+        }
+        .ant-dropdown-menu-item:hover {
+            background-color: #f5f5f5;
+        }
+        .ant-dropdown-menu-item-danger:hover {
+            background-color: #fff1f0;
+        }
+    `;
     return (
         <>
             <Flex
@@ -419,41 +427,41 @@ const ExpensesList = () => {
                     />
                 </div>
             </Card>
-    
-                <Modal
-                    title="Add Expenses"
-                    visible={isAddExpensesModalVisible}
-                    onCancel={closeAddExpensesModal}
-                    footer={null}
-                    width={1000}
-                    className="mt-[-70px]"
-                >
-                    <AddExpenses onClose={closeAddExpensesModal} />
-                </Modal>
-                <Modal
-                    title="Edit Expenses"
-                    visible={isEditExpensesModalVisible}
-                    onCancel={closeEditExpensesModal}
-                    footer={null}
-                    width={1000}
-                    className="mt-[-70px]"
-                >
-                    <EditExpenses onClose={closeEditExpensesModal} idd={idd} />
-                </Modal>
-                <Modal
-                    title="Expenses Details"
-                    visible={isViewExpensesModalVisible}
-                    onCancel={() => {
-                        closeViewExpensesModal();
-                        setSelectedExpense(null);
-                    }}
-                    footer={null}
-                    width={800}
-                    className='mt-[-70px]'
-                >
-                    <ViewExpenss data={selectedExpense} onClose={closeViewExpensesModal} />
-                </Modal>
-        
+
+            <Modal
+                title="Add Expenses"
+                visible={isAddExpensesModalVisible}
+                onCancel={closeAddExpensesModal}
+                footer={null}
+                width={1000}
+                className="mt-[-70px]"
+            >
+                <AddExpenses onClose={closeAddExpensesModal} />
+            </Modal>
+            <Modal
+                title="Edit Expenses"
+                visible={isEditExpensesModalVisible}
+                onCancel={closeEditExpensesModal}
+                footer={null}
+                width={1000}
+                className="mt-[-70px]"
+            >
+                <EditExpenses onClose={closeEditExpensesModal} idd={idd} />
+            </Modal>
+            <Modal
+                title="Expenses"
+                visible={isViewExpensesModalVisible}
+                onCancel={() => {
+                    closeViewExpensesModal();
+                    setSelectedExpense(null);
+                }}
+                footer={null}
+                width={800}
+                className='mt-[-70px]'
+            >
+                <ViewExpenss data={selectedExpense} onClose={closeViewExpensesModal} />
+            </Modal>
+            <style jsx>{styles}</style>
         </>
     );
 };

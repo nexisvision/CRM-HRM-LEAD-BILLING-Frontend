@@ -74,7 +74,6 @@ const EditMin = async (idd, data) => {
   }
 };
 
-
 const UserService = {
   GetLable,
   AddLable,

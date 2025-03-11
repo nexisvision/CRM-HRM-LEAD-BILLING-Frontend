@@ -7,8 +7,7 @@ import {
   message,
   Row,
   Col,
-  Modal,
-  Checkbox,
+  Modal
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +20,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AddRevenues, getRevenue } from "./RevenueReducer/RevenueSlice";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
-import { useParams } from "react-router-dom";
 import AddCustomer from "../customer/AddCustomer";
 import AddCurrencies from '../../../setting/currencies/AddCurrencies';
 
@@ -29,10 +27,7 @@ const { Option } = Select;
 
 const AddRevenue = ({ onClose }) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const { id } = useParams();
-
+  const dispatch = useDispatch()
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
@@ -51,7 +46,7 @@ const AddRevenue = ({ onClose }) => {
   };
   const AllLoggedData = useSelector((state) => state.user);
 
-  const fetchLables = async (lableType, setter) => {
+  const fetchLables = React.useCallback(async (lableType, setter) => {
     try {
       const lid = AllLoggedData.loggedInUser.id;
       const response = await dispatch(GetLable(lid));
@@ -65,11 +60,11 @@ const AddRevenue = ({ onClose }) => {
       console.error(`Failed to fetch ${lableType}:`, error);
       message.error(`Failed to load ${lableType}`);
     }
-  };
+  }, [AllLoggedData.loggedInUser.id, dispatch]);
 
   useEffect(() => {
     fetchLables("category", setCategories);
-  }, []);
+  }, [fetchLables]);
 
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
     if (!newValue.trim()) {
@@ -83,24 +78,26 @@ const AddRevenue = ({ onClose }) => {
         name: newValue.trim(),
         lableType,
       };
-      
+
       const response = await dispatch(AddLable({ lid, payload }));
-      
+
       if (response.payload && response.payload.success) {
         message.success(`${lableType} added successfully.`);
-        
+
+        // Refresh the labels immediately after adding
         const labelsResponse = await dispatch(GetLable(lid));
         if (labelsResponse.payload && labelsResponse.payload.data) {
           const filteredLables = labelsResponse.payload.data
             .filter((lable) => lable.lableType === lableType)
             .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
-          
+
           setCategories(filteredLables);
           if (setFieldValue) {
             setFieldValue("category", newValue.trim());
           }
         }
-        
+
+        // Reset input and close modal
         setter("");
         modalSetter(false);
       } else {
@@ -115,7 +112,7 @@ const AddRevenue = ({ onClose }) => {
 
   useEffect(() => {
     dispatch(Getcus());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchCurrencies = async () => {
@@ -202,7 +199,7 @@ const AddRevenue = ({ onClose }) => {
 
   return (
     <div className="add-job-form">
-      <h2 className="mb-2 border-b font-medium"></h2>
+      <hr className="mb-2 border-b font-medium"></hr>
       <div className="">
         <div className="p-2">
           <Formik
@@ -313,7 +310,7 @@ const AddRevenue = ({ onClose }) => {
                                   }
                                 }}
                                 onBlur={() => setFieldTouched("amount", true)}
-                                
+
                                 onKeyPress={(e) => {
                                   const charCode = e.which ? e.which : e.keyCode;
                                   if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
@@ -502,6 +499,23 @@ const AddRevenue = ({ onClose }) => {
                       </div>
                     </Col>
 
+
+                    {/* <Col span={12}>
+                      <div className="form-item mt-2">
+                        <label className="font-semibold">Reference</label>
+                        <Field
+                          name="reference"
+                          as={Input}
+                          placeholder="Enter Reference"
+                          type="number"
+                        />
+                        <ErrorMessage
+                          name="reference"
+                          component="div"
+                          className="error-message text-red-500 my-1"
+                        />
+                      </div>
+                    </Col> */}
                     <Col span={12} className="mt-3">
                       <div className="form-item">
                         <label className="font-semibold">Payment Receipt <span className="text-red-500">*</span></label>
@@ -518,7 +532,7 @@ const AddRevenue = ({ onClose }) => {
                         />
                       </div>
                     </Col>
-                      <Col span={24} className="">
+                    <Col span={24} className="">
                       <div className="form-item mt-3">
                         <label className="font-semibold">Description <span className="text-red-500">*</span>  </label>
                         <Field name="description" >
@@ -597,7 +611,7 @@ const AddRevenue = ({ onClose }) => {
         <AddCurrencies
           onClose={() => {
             setIsAddCurrencyModalVisible(false);
-            dispatch(getcurren()); 
+            dispatch(getcurren());
           }}
         />
       </Modal>

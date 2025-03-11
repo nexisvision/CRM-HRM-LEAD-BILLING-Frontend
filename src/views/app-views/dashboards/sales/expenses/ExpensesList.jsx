@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react'
-import { Card, Table, Select, Input, Row, Col, Button, Badge, Menu, Tag, Modal } from 'antd';
+import { Card, Table, Select, Input, Row, Col, Button, Menu, Tag, Modal } from 'antd';
 import OrderListData from "../../../../../assets/data/order-list.data.json"
 import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
@@ -53,7 +53,7 @@ const ExpensesList = () => {
 	const debouncedSearch = debounce((value, data, setList) => {
 		setIsSearching(true);
 		const searchValue = value.toLowerCase();
-		
+
 		if (!searchValue) {
 			setList(OrderListData); // Reset to original data
 			setIsSearching(false);
@@ -111,9 +111,9 @@ const ExpensesList = () => {
 		<Menu>
 			<Menu.Item>
 				<Flex alignItems="center" onClick={openviewExpensesModal}>
-						{<EyeOutlined />}
-						
-						<span className="ml-2">View Details</span>
+					{<EyeOutlined />}
+
+					<span className="ml-2">View Details</span>
 				</Flex>
 			</Menu.Item>
 			<Menu.Item>
@@ -125,7 +125,7 @@ const ExpensesList = () => {
 
 			<Menu.Item>
 				<Flex alignItems="center" onClick={openEditExpensesModal}>
-					<EditOutlined />			
+					<EditOutlined />
 					<span className="ml-2">Edit</span>
 				</Flex>
 			</Menu.Item>
@@ -260,9 +260,9 @@ const ExpensesList = () => {
 				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
 					<Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false} >
 						<div className="mr-0 md:mr-3 mb-3 md:mb-0">
-							<Input 
-								placeholder="Search expenses..." 
-								prefix={<SearchOutlined />} 
+							<Input
+								placeholder="Search expenses..."
+								prefix={<SearchOutlined />}
 								onChange={onSearch}
 								value={searchValue}
 								allowClear
@@ -298,7 +298,7 @@ const ExpensesList = () => {
 						columns={tableColumns}
 						dataSource={list}
 						rowKey='id'
-						scroll={{x:1200}}
+						scroll={{ x: 1200 }}
 						loading={isSearching}
 						rowSelection={{
 							selectedRowKeys: selectedRowKeys,

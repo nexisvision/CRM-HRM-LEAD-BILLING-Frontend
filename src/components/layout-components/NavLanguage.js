@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
-import { CheckOutlined, GlobalOutlined, DownOutlined  } from '@ant-design/icons';
-import { Menu, Dropdown } from 'antd';
+import { CheckOutlined, GlobalOutlined, DownOutlined } from '@ant-design/icons';
+import { Dropdown } from 'antd';
 import NavItem from './NavItem'
 import lang from 'assets/data/language.data.json';
 import { useSelector, useDispatch } from 'react-redux';
@@ -11,7 +11,7 @@ import { baseTheme } from 'configs/ThemeConfig';
 import Flex from "components/shared-components/Flex";
 import { css } from '@emotion/react';
 
-function getLanguageDetail (locale) {
+function getLanguageDetail(locale) {
 	const data = lang.filter(elm => (elm.langId === locale))
 	return data[0]
 }
@@ -21,12 +21,12 @@ const SelectedLanguage = () => {
 	const locale = useSelector(state => state.theme.locale)
 
 	const language = getLanguageDetail(locale);
-	const {langName, icon} = language;
+	const { langName, icon } = language;
 
 	return (
 		<Flex alignItems="center">
-			<img style={{maxWidth: '20px'}} src={`/img/flags/${icon}.png`} alt={langName}/>
-			<span className="font-weight-semibold ml-2">{langName} <DownOutlined className="font-size-xs"/></span>
+			<img style={{ maxWidth: '20px' }} src={`/img/flags/${icon}.png`} alt={langName} />
+			<span className="font-weight-semibold ml-2">{langName} <DownOutlined className="font-size-xs" /></span>
 		</Flex>
 	)
 }
@@ -44,14 +44,14 @@ const MenuItem = (props) => {
 
 	return (
 		<span>
-			<Flex 
-				alignItems="center" 
+			<Flex
+				alignItems="center"
 				justifyContent="space-between"
 				gap={SPACER[4]}
 				onClick={() => handleLocaleChange(props.langId)}
 			>
 				<Flex alignItems="center" gap={SPACER[2]}>
-					<img style={{maxWidth: '20px'}} src={`/img/flags/${props.icon}.png`} alt={props.langName}/>
+					<img style={{ maxWidth: '20px' }} src={`/img/flags/${props.icon}.png`} alt={props.langName} />
 					<span className="font-weight-normal ml-2">{props.langName}</span>
 				</Flex>
 				{locale === props.langId ? <CheckOutlined css={css`color: ${baseTheme.colorSuccess}`} /> : null}
@@ -83,20 +83,20 @@ const items = [
 export const NavLanguage = ({ configDisplay, mode }) => {
 
 	return (
-		<Dropdown placement="bottomRight" menu={{items}} trigger={["click"]}>
+		<Dropdown placement="bottomRight" menu={{ items }} trigger={["click"]}>
 			{
 				configDisplay ?
-				(
-					<a href="#/" className="text-gray" onClick={e => e.preventDefault()}>
-						<SelectedLanguage />
-					</a>
-				)
-				:
-				(
-					<NavItem mode={mode}>
-						<GlobalOutlined className="nav-icon mr-0" />
-					</NavItem>
-				)
+					(
+						<a href="#/" className="text-gray" onClick={e => e.preventDefault()}>
+							<SelectedLanguage />
+						</a>
+					)
+					:
+					(
+						<NavItem mode={mode}>
+							<GlobalOutlined className="nav-icon mr-0" />
+						</NavItem>
+					)
 			}
 		</Dropdown>
 	)

@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./indicatorService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
 
@@ -70,7 +69,7 @@ export const editIndicator = createAsyncThunk(
   async ({ id, values }, thunkAPI) => {
     try {
       const response = await UserService.editIndicator(id, values);
-      return response; 
+      return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data || "Error updating Indicator"
@@ -79,15 +78,7 @@ export const editIndicator = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const IndicatorSlice = createSlice({
   name: "Indicator",

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { FaUser, FaSearch, FaTimes } from "react-icons/fa";
-import { BsDot, BsPersonPlus, BsPeople, BsSearch, BsThreeDotsVertical, BsX } from "react-icons/bs";
+import { FaUser } from "react-icons/fa";
+import { BsPeople, BsSearch, BsThreeDotsVertical, BsX } from "react-icons/bs";
 import { GetUsers } from 'views/app-views/Users/UserReducers/UserSlice';
 import { getRoles } from 'views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice';
 import socketService from 'services/SocketService';
@@ -11,7 +11,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 	const dispatch = useDispatch();
 	const [searchTerm, setSearchTerm] = useState('');
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
-	const [onlineUsers, setOnlineUsers] = useState(new Set());
 	const allUserData = useSelector((state) => state.Users);
 	const users = allUserData.Users?.data || [];
 	const loggedInUser = useSelector((state) => state.user.loggedInUser);
@@ -22,8 +21,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 	const [typingUsers, setTypingUsers] = useState(new Map());
 	const [showCreateGroup, setShowCreateGroup] = useState(false);
 	const [groups, setGroups] = useState([]);
-	const [selectedUsers, setSelectedUsers] = useState([]);
-	const [groupName, setGroupName] = useState('');
 	const [socket, setSocket] = useState(null);
 	const [showOptions, setShowOptions] = useState(false);
 	const optionsMenuRef = useRef(null);
@@ -45,8 +42,7 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		}
 
 		newSocket.on('users_status', (data) => {
-			const { activeUsers, userStatus } = data;
-			setOnlineUsers(new Set(activeUsers));
+			const { userStatus } = data;
 			setUsersStatus(new Map(Object.entries(userStatus)));
 		});
 
@@ -170,10 +166,7 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		}
 	}, [selectedUserId, loggedInUser.id]);
 
-	const isUserOnline = (userId) => {
-		return usersStatus.get(userId)?.isOnline || false;
-	};
-
+	// Get role name from role_id
 	const getRoleName = (roleId) => {
 		const role = roles.find(role => role.id === roleId);
 		return role?.role_name || 'User';

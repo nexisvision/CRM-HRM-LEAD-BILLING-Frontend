@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
 import { Input, Button, Row, Col, message, Select } from "antd";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { AiFillAndroid } from "react-icons/ai";
 import { editBranch, getBranch } from "./BranchReducer/BranchSlice";
 import { GetUsers } from '../../Users/UserReducers/UserSlice';
 
@@ -24,7 +22,6 @@ const validationSchema = Yup.object().shape({
 });
 
 const EditBranch = ({ idd, onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [initialValues, setInitialValues] = useState({

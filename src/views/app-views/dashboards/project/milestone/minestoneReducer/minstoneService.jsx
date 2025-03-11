@@ -1,7 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
-
 const GetMin = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -34,7 +33,7 @@ const AddMin = async (id, values) => {
         },
       }
     );
-    //    dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -54,7 +53,7 @@ const Deletemin = async (userId) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -82,17 +81,12 @@ const EditMin = async (idd, data) => {
 };
 
 
-
 const UserService = {
-  // addUser,
   GetMin,
   AddMin,
   Deletemin,
   EditMin,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default UserService;

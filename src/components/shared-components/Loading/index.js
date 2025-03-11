@@ -12,7 +12,7 @@ const LoadingWrapper = styled('div')`
 		left: 50%;
 		top: 50%;
 		transform: translate(-50%, -50%);
-	` : '' }
+	` : ''}
 
 	${props => props.cover === 'page' ? `
 		position: fixed;
@@ -21,7 +21,7 @@ const LoadingWrapper = styled('div')`
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	` : '' }
+	` : ''}
 `
 
 const Loading = (props) => {

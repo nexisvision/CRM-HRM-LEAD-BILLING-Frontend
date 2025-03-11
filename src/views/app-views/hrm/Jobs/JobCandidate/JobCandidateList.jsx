@@ -2,101 +2,56 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Menu,
-  Row,
-  Col,
   Tag,
   Input,
   message,
-  Button,
   Modal,
   Select,
 } from "antd";
 import {
-  EyeOutlined,
-  DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
-  PlusOutlined,
-  FilePdfOutlined,
-  PushpinOutlined,
-  FileExcelOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
 import UserView from "../../../Users/user-list/UserView";
-import { utils, writeFile } from "xlsx";
+import { utils } from "xlsx";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import StatisticWidget from "components/shared-components/StatisticWidget";
-import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddJobCandidate from "./AddJobCandidate";
-import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { GetJobdata } from '../JobReducer/JobSlice';  // Import the jobs action
-
+import { GetJobdata } from '../JobReducer/JobSlice';
 import { getjobapplication } from "../JobApplication/JobapplicationReducer/JobapplicationSlice";
 
 const { Option } = Select;
 
 const JobCandidateList = () => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddJobCandidateModalVisible, setIsAddJobCandidateModalVisible] =
     useState(false);
-  const [annualStatisticData] = useState(AnnualStatisticData);
   const [users, setUsers] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [uniqueStatuses, setUniqueStatuses] = useState(['All']);
-  const navigate = useNavigate();
 
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser.username);
   const alldata = useSelector((state) => state.jobapplications);
-  const fnddta = alldata.jobapplications.data || [];
+  const fnddta = React.useMemo(() => alldata.jobapplications.data || [], [alldata.jobapplications.data]);
 
   const filteredData = fnddta.filter((item) => item.created_by === user);
-    // Get jobs data from Redux store
-    const jobsData = useSelector((state) => state.Jobs?.Jobs?.data || []);
-
+  const jobsData = useSelector((state) => state.Jobs?.Jobs?.data || []);
   useEffect(() => {
     dispatch(getjobapplication());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (fnddta) {
       setUsers(filteredData);
-      // Collect unique statuses
       const statuses = ['All', ...new Set(filteredData.map(item => item.status).filter(Boolean))];
       setUniqueStatuses(statuses);
     }
   }, [fnddta, filteredData]);
-
-  // Open Add Job Modal
-  const openAddJobCandidateModal = () => {
-    setIsAddJobCandidateModalVisible(true);
-  };
-
-  // Close Add Job Modal
   const closeAddJobCandidateModal = () => {
     setIsAddJobCandidateModalVisible(false);
-  };
-
-  const exportToExcel = () => {
-    const ws = utils.json_to_sheet(filteredData);
-    const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, "Candidates");
-    writeFile(wb, "JobCandidates.xlsx");
-  };
-
-  const handleJob = () => {
-    navigate("/app/hrm/jobs/jobcandidate/viewjobcandidate", {
-      state: { user: selectedUser },
-    });
   };
 
   const onSearch = (e) => {
@@ -106,10 +61,8 @@ const JobCandidateList = () => {
 
   const getFilteredCandidates = () => {
     if (!users) return [];
-    
-    let filtered = [...users];
 
-    // Text search filter
+    let filtered = [...users];
     if (searchText) {
       filtered = filtered.filter(candidate => {
         return (
@@ -125,7 +78,7 @@ const JobCandidateList = () => {
 
     // Status filter from dropdown
     if (selectedStatus && selectedStatus !== 'All') {
-      filtered = filtered.filter(candidate => 
+      filtered = filtered.filter(candidate =>
         candidate.status?.toLowerCase() === selectedStatus.toLowerCase()
       );
     }
@@ -137,22 +90,16 @@ const JobCandidateList = () => {
     message.success('Search completed');
   };
 
-  // Delete user
-  const deleteUser = (userId) => {
-    setUsers(filteredData.filter((item) => item.id !== userId));
-  };
+  useEffect(() => {
+    dispatch(GetJobdata());
+  }, [dispatch]);
 
-    // Fetch jobs data when component mounts
-    useEffect(() => {
-      dispatch(GetJobdata());
-    }, [dispatch]);
+  useEffect(() => {
+    console.log('Jobs Data:', jobsData);
+    console.log('Job Application Data:', fnddta);
+  }, [jobsData, fnddta]);
 
-   // Debug logs
-   useEffect(() => {
-   }, [jobsData, fnddta]);
-
-   // Function to get job name from job id
-   const getJobName = (jobId) => {
+  const getJobName = (jobId) => {
     const job = jobsData.find(job => job.id === jobId);
     if (job) {
       return job.title;
@@ -160,101 +107,29 @@ const JobCandidateList = () => {
     return 'N/A';
   };
 
-  // Show user profile
-  const showUserProfile = (userInfo) => {
-    setSelectedUser(userInfo);
-    setUserProfileVisible(true);
-  };
-
-  // Close user profile
   const closeUserProfile = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);
   };
 
-                                    
-                      const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                      const roles = useSelector((state) => state.role?.role?.data);
-                      const roleData = roles?.find(role => role.id === roleId);
-                   
-                      const whorole = roleData.role_name;
-                   
-                      const parsedPermissions = Array.isArray(roleData?.permissions)
-                      ? roleData.permissions
-                      : typeof roleData?.permissions === 'string'
-                      ? JSON.parse(roleData.permissions)
-                      : [];
-                    
-                      let allpermisson;  
-                   
-                      if (parsedPermissions["extra-hrm-jobs-jobcandidate"] && parsedPermissions["extra-hrm-jobs-jobcandidate"][0]?.permissions) {
-                        allpermisson = parsedPermissions["extra-hrm-jobs-jobcandidate"][0].permissions;
-                      
-                      } else {
-                      }
-                      
-                      const canCreateClient = allpermisson?.includes('create');
-                      const canEditClient = allpermisson?.includes('edit');
-                      const canDeleteClient = allpermisson?.includes('delete');
-                      const canViewClient = allpermisson?.includes('view');
-                   
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            onClick={handleJob}
-            size="small"
-          >
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<MailOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="">Send Mail</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<FilePdfOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="ml-2">Download Cv</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<DeleteOutlined />}
-            onClick={() => deleteUser(elm.id)}
-            size="small"
-          >
-            <span className="">Delete</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-jobs-jobcandidate"] && parsedPermissions["extra-hrm-jobs-jobcandidate"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-jobs-jobcandidate"][0].permissions;
+  }
+  const canViewClient = allpermisson?.includes('view');
 
   const getjobStatus = (status) => {
     if (status === "active") {
@@ -390,9 +265,9 @@ const JobCandidateList = () => {
       </Flex>
       <div className="table-responsive mt-2">
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-          <Table 
-            columns={tableColumns} 
-            dataSource={getFilteredCandidates()} 
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredCandidates()}
             rowKey="id"
             pagination={{
               total: getFilteredCandidates().length,

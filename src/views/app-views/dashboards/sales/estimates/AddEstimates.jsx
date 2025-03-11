@@ -1,38 +1,25 @@
 import React, { useState, useEffect } from "react";
 import {
-  Card,
   Form,
-  Menu,
   Row,
   Col,
-  Tag,
   Input,
   message,
   Button,
-  Upload,
   Select,
   DatePicker,
   Modal,
 } from "antd";
 import {
   DeleteOutlined,
-  CloudUploadOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
-  FileExcelOutlined,
-  FilterOutlined,
-  EditOutlined,
-  LinkOutlined,
-  SearchOutlined,
 } from "@ant-design/icons";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import { useSelector, useDispatch } from "react-redux";
 import { createquotations } from "./estimatesReducer/EstimatesSlice";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
-import * as Yup from "yup";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 
 const { Option } = Select;
@@ -41,13 +28,10 @@ const AddEstimates = ({ onClose }) => {
   const [discountType, setDiscountType] = useState('percentage');
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [newTag, setNewTag] = useState("");
-  
+
   const [tags, setTags] = useState([]);
   const AllLoggeddtaa = useSelector((state) => state.user);
-  
-  const [loading, setLoading] = useState(false);
   const [discountValue, setDiscountValue] = useState(0);
-  const [discountRate, setDiscountRate] = useState();
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [totals, setTotals] = useState({
@@ -58,11 +42,11 @@ const AddEstimates = ({ onClose }) => {
   });
 
 
-  
+
   useEffect(() => {
     dispatch(Getcus());
     dispatch(getAllTaxes());
-  }, []);
+  }, [dispatch]);
   const { taxes } = useSelector((state) => state.tax);
   const customerdata = useSelector((state) => state.customers);
   const fnddata = customerdata.customers.data;
@@ -82,15 +66,13 @@ const AddEstimates = ({ onClose }) => {
     },
   ]);
 
-  const lid = AllLoggeddtaa.loggedInUser.id;
 
 
   const handleFinish = async (values) => {
     try {
-      setLoading(true);
-  
+
       const items = {};
-      
+
       tableData.forEach((item, index) => {
         items[`item_${index + 1}`] = {
           item: item.item,
@@ -102,28 +84,26 @@ const AddEstimates = ({ onClose }) => {
           amount: parseFloat(item.amount) || 0
         };
       });
-  
+
       const quotationData = {
-      customer: values.customer,
-      issueDate: values.issueDate.format('YYYY-MM-DD'),
-      category: values.category,
-      items: items,
-      total: totals.finalTotal,
-      tax: totals.totalTax,
-      discountType: discountType,
-      discountValue: parseFloat(discountValue) || 0,
-      discount: parseFloat(totals.discount) || 0, 
-      discountAmount: parseFloat(totals.discount) || 0
-    };
-    
+        customer: values.customer,
+        issueDate: values.issueDate.format('YYYY-MM-DD'),
+        category: values.category,
+        items: items,
+        total: totals.finalTotal,
+        tax: totals.totalTax,
+        discountType: discountType,
+        discountValue: parseFloat(discountValue) || 0,
+        discount: parseFloat(totals.discount) || 0, // Changed from discountAmount to discount
+        discountAmount: parseFloat(totals.discount) || 0
+      };
+
       await dispatch(createquotations(quotationData));
       message.success('Quotation created successfully!');
       onClose();
     } catch (error) {
       console.error('Error creating quotation:', error);
       message.error('Failed to create quotation');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -152,14 +132,6 @@ const AddEstimates = ({ onClose }) => {
 
   const navigate = useNavigate();
 
-  const calculateSubTotal = () => {
-    return tableData.reduce((sum, row) => {
-      const quantity = parseFloat(row.quantity) || 0;
-      const price = parseFloat(row.price) || 0;
-      return sum + (quantity * price);
-    }, 0);
-  };
-
   const calculateTotal = (data = tableData, discountVal = discountValue, type = discountType) => {
     if (!Array.isArray(data)) {
       console.error('Invalid data passed to calculateTotal');
@@ -170,7 +142,8 @@ const AddEstimates = ({ onClose }) => {
       return sum + (parseFloat(row.amount) || 0);
     }, 0);
 
-    const discountAmount = type === 'percentage' 
+    // Calculate discount amount based on type
+    const discountAmount = type === 'percentage'
       ? (subtotal * (parseFloat(discountVal) || 0)) / 100
       : parseFloat(discountVal) || 0;
 
@@ -204,7 +177,7 @@ const AddEstimates = ({ onClose }) => {
     const updatedData = tableData.map((row) => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
-        
+
         if (field === 'tax' && taxes?.data) {
           const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
           if (selectedTax) {
@@ -221,14 +194,14 @@ const AddEstimates = ({ onClose }) => {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
           const tax = parseFloat(field === 'tax' ? value : row.tax) || 0;
-          
+
           const baseAmount = quantity * price;
           const taxAmount = (baseAmount * tax) / 100;
           const totalAmount = baseAmount + taxAmount;
-          
+
           updatedRow.amount = totalAmount.toFixed(2);
         }
-        
+
         return updatedRow;
       }
       return row;
@@ -239,7 +212,7 @@ const AddEstimates = ({ onClose }) => {
   };
 
 
-  
+
   const fetchTags = async () => {
     try {
       const lid = AllLoggeddtaa.loggedInUser.id;
@@ -247,7 +220,7 @@ const AddEstimates = ({ onClose }) => {
 
       if (response.payload && response.payload.data) {
         const uniqueTags = response.payload.data
-          .filter((label) => label && label.name) 
+          .filter((label) => label && label.name)
           .map((label) => ({
             id: label.id,
             name: label.name.trim(),
@@ -255,7 +228,7 @@ const AddEstimates = ({ onClose }) => {
           .filter(
             (label, index, self) =>
               index === self.findIndex((t) => t.name === label.name)
-          ); 
+          );
 
         setTags(uniqueTags);
       }
@@ -296,7 +269,7 @@ const AddEstimates = ({ onClose }) => {
     <>
       <div>
         <div className=" ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4">
-          <h2 className="mb-4 border-b pb-[30px] font-medium"></h2>
+          <hr className="mb-4 border-b  font-medium"></hr>
           <Form
             form={form}
             layout="vertical"
@@ -309,32 +282,32 @@ const AddEstimates = ({ onClose }) => {
               <div className=" p-2">
                 <Row gutter={16}>
                   <Col span={24} className="mt-1">
-                               <Form.Item
-                                 label="Customer"
-                                 name="customer"
-                                 rules={[
-                                   { required: true, message: "Please select a customer" },
-                                 ]}
-                               >
-                                 <Select
-                                   style={{ width: "100%" }}
-                                   placeholder="Select Client"
-                                   loading={!fnddata}
-                                 >
-                                   {fnddata && fnddata.length > 0 ? (
-                                     fnddata.map((client) => (
-                                       <Option key={client.id} value={client.id}>
-                                         {client.name || "Unnamed Client"}
-                                       </Option>
-                                     ))
-                                   ) : (
-                                     <Option value="" disabled>
-                                       No customers available
-                                     </Option>
-                                   )}
-                                 </Select>
-                               </Form.Item>
-                             </Col>
+                    <Form.Item
+                      label="Customer"
+                      name="customer"
+                      rules={[
+                        { required: true, message: "Please select a customer" },
+                      ]}
+                    >
+                      <Select
+                        style={{ width: "100%" }}
+                        placeholder="Select Client"
+                        loading={!fnddata}
+                      >
+                        {fnddata && fnddata.length > 0 ? (
+                          fnddata.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.name || "Unnamed Client"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No customers available
+                          </Option>
+                        )}
+                      </Select>
+                    </Form.Item>
+                  </Col>
 
                   <Col span={12}>
                     <Form.Item
@@ -348,8 +321,8 @@ const AddEstimates = ({ onClose }) => {
                     </Form.Item>
                   </Col>
 
-                  
-                              <Col span={12} className="">
+
+                  <Col span={12} className="">
                     <Form.Item
                       label="Category"
                       name="category"
@@ -392,7 +365,7 @@ const AddEstimates = ({ onClose }) => {
             <div>
               <div className="overflow-x-auto">
                 <div className="form-buttons text-left mb-2 justify-end flex">
-                  <Button 
+                  <Button
                     type="primary"
                     onClick={handleAddRow}
                     icon={<PlusOutlined />}
@@ -405,7 +378,7 @@ const AddEstimates = ({ onClose }) => {
                   <thead className="bg-gray-100">
                     <tr>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      Item<span className="text-red-500">*</span>
+                        Item<span className="text-red-500">*</span>
                       </th>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                         Quantity<span className="text-red-500">*</span>
@@ -458,19 +431,19 @@ const AddEstimates = ({ onClose }) => {
                             />
                           </td>
                           <td className="px-4 py-2 border-b">
-                          <select
-                            value={row.tax}
-                            onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                            className="w-full p-2 border"
-                          >
-                            <option value="0">Nothing Selected</option>
-                            {taxes && taxes.data && taxes.data.map(tax => (
-                              <option key={tax.id} value={tax.gstPercentage}>
-                                {tax.gstName}: {tax.gstPercentage}%
-                              </option>
-                            ))}
-                          </select>
-                        </td>
+                            <select
+                              value={row.tax}
+                              onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
+                              className="w-full p-2 border"
+                            >
+                              <option value="0">Nothing Selected</option>
+                              {taxes && taxes.data && taxes.data.map(tax => (
+                                <option key={tax.id} value={tax.gstPercentage}>
+                                  {tax.gstName}: {tax.gstPercentage}%
+                                </option>
+                              ))}
+                            </select>
+                          </td>
                           <td className="px-4 py-2 border-b">
                             <span>{row.amount}</span>
                           </td>
@@ -575,21 +548,21 @@ const AddEstimates = ({ onClose }) => {
               </Row>
             </Form.Item>
           </Form>
-          
+
         </div>
-         <Modal
-                    title="Add New Category"
-                    open={isTagModalVisible}
-                    onCancel={() => setIsTagModalVisible(false)}
-                    onOk={handleAddNewTag}
-                    okText="Add Category"
-                  >
-                    <Input
-                      placeholder="Enter new Category"
-                      value={newTag}
-                      onChange={(e) => setNewTag(e.target.value)}
-                    />
-                  </Modal>
+        <Modal
+          title="Add New Category"
+          open={isTagModalVisible}
+          onCancel={() => setIsTagModalVisible(false)}
+          onOk={handleAddNewTag}
+          okText="Add Category"
+        >
+          <Input
+            placeholder="Enter new Category"
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value)}
+          />
+        </Modal>
       </div>
     </>
   );

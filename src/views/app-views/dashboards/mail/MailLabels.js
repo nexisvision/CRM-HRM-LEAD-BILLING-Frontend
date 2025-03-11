@@ -27,13 +27,13 @@ export const getFileType = fileType => {
 		case 'doc':
 			return <FileWordOutlined className="text-primary" />
 		case 'xls':
-			return <FileExcelOutlined className="text-success"/>;
+			return <FileExcelOutlined className="text-success" />;
 		case 'pdf':
-			return <FilePdfOutlined className="text-danger"/>;
+			return <FilePdfOutlined className="text-danger" />;
 		case 'jpg':
-			return <FileImageOutlined className="text-warning"/>;
+			return <FileImageOutlined className="text-warning" />;
 		case 'png':
-			return <FileImageOutlined className="text-warning"/>;
+			return <FileImageOutlined className="text-warning" />;
 		default:
 			return null;
 	}

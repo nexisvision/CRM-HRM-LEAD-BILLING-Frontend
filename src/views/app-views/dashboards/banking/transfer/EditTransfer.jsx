@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, DatePicker, Select, Row, Col, Checkbox, message, Modal } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Input, Button, Select, Row, Col, message, Modal } from 'antd';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
 import { Formik, Field, Form as FormikForm, ErrorMessage } from 'formik';
@@ -14,7 +13,6 @@ import AddAccount from '../account/AddAccount';
 const { Option } = Select;
 
 const EditTransfer = ({ onClose, initialData, idd }) => {
-    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [isAddAccountModalVisible, setIsAddAccountModalVisible] = useState(false);
 

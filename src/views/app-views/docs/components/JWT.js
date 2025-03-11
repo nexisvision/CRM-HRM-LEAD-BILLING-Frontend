@@ -24,16 +24,16 @@ const jwt = () => {
 			<p>We are using <code>localStorage</code> &amp; Redux to store tokens info and authenticate the user.</p>
 			<div className="mt-4">
 				<h4>Interceptor</h4>
-				<p>We provided a request & response interceptor built by 
-					<a href="https://github.com/axios/axios"> axios</a>, 
+				<p>We provided a request & response interceptor built by
+					<a href="https://github.com/axios/axios"> axios</a>,
 					which able to found in <code>src/auth/FetchInterceptor.js</code>.
-					With this interceptor, every API call from client side will contain access token inside requeest header. You can customize your request config or error handling in this file. 
+					With this interceptor, every API call from client side will contain access token inside requeest header. You can customize your request config or error handling in this file.
 				</p>
 			</div>
 			<div className="mt-4">
 				<h4>Services</h4>
-				<p>In order to facilitate manage and maintain, we placed all API 
-				integrations related files in <code>src/services/</code> folder. Linked up with interceptor above, you can found a preset <code>AuthService.js</code> under the directory, code as below:</p>
+				<p>In order to facilitate manage and maintain, we placed all API
+					integrations related files in <code>src/services/</code> folder. Linked up with interceptor above, you can found a preset <code>AuthService.js</code> under the directory, code as below:</p>
 				<SyntaxHighlighter className="hl-code" language="javascript" style={atomDark}>
 					{setupService}
 				</SyntaxHighlighter>

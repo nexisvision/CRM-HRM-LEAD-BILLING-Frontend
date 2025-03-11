@@ -76,7 +76,9 @@ const editdedu = async (meetid, values) => {
 };
 
 
+
 const UserService = {
+
   gtededu,
   adddedu,
   deldedu,

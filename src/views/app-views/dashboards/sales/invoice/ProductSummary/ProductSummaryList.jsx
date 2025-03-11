@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
-// import { DealStatisticViewData } from '../../../dashboards/default/DefaultDashboardData';
-import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
+import React from 'react';
+import { Card } from 'antd';
 
 
 function ProductSummaryList() {
@@ -64,7 +62,6 @@ function ProductSummaryList() {
                             </tbody>
                         </table>
                     </div>
-
                     <div className="mt-3 flex flex-col items-end space-y-2 text-xs">
                         <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
                             <span className="text-gray-700">Sub Total</span>
@@ -101,10 +98,6 @@ function ProductSummaryList() {
                     </div>
                 </div>
             </Card>
-
-           
-
-        
         </>
     )
 }

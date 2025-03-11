@@ -3,15 +3,15 @@ import NotificationPage from './NotificationPage';
 
 
 
-const ViewNotification = ()=>{
-return(
-    <>
-            <NotificationPage/>
-         
-         
-       
-    </>
-);
+const ViewNotification = () => {
+    return (
+        <>
+            <NotificationPage />
+
+
+
+        </>
+    );
 };
 
 export default ViewNotification;

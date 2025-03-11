@@ -16,12 +16,12 @@ const Development = () => {
 				<h4>Production</h4>
 				<p>Run the following command to build the application into <code>/build</code> directory</p>
 				<SyntaxHighlighter className="hl-code" language="javascript" style={atomDark}>
-          {appConfigStr}
-        </SyntaxHighlighter>
+					{appConfigStr}
+				</SyntaxHighlighter>
 			</div>
 			<div className="mt-4">
 				<h4>Deployment</h4>
-				<p>If you having issue about server configuration, try to checkout the guide from the create-react-app  
+				<p>If you having issue about server configuration, try to checkout the guide from the create-react-app
 					<a rel="noopener noreferrer" href="https://create-react-app.dev/docs/deployment/" target="_blank">
 						<u> doc</u>
 					</a>.

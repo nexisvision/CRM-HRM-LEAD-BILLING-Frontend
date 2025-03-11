@@ -14,7 +14,7 @@ const validationSchema = Yup.object().shape({
     is: true,
     then: Yup.string().required('Secret Key is required')
   }),
-  
+
   // PhonePay Validation
   phonePayEnabled: Yup.boolean(),
   phonePayMerchantId: Yup.string().when('phonePayEnabled', {
@@ -54,7 +54,7 @@ const PaymentList = () => {
             <Row gutter={[24, 24]}>
               {/* Razorpay Section */}
               <Col xs={24} lg={12}>
-                <Card 
+                <Card
                   title={
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-semibold">Razorpay Settings</span>
@@ -76,11 +76,9 @@ const PaymentList = () => {
                         name="razorpayKeyId"
                         type="text"
                         disabled={!values.razorpayEnabled}
-                        className={`w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${
-                          !values.razorpayEnabled ? 'bg-gray-100' : 'bg-white'
-                        } ${
-                          errors.razorpayKeyId && touched.razorpayKeyId ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${!values.razorpayEnabled ? 'bg-gray-100' : 'bg-white'
+                          } ${errors.razorpayKeyId && touched.razorpayKeyId ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
                       {errors.razorpayKeyId && touched.razorpayKeyId && (
                         <div className="text-red-500 text-sm mt-1">{errors.razorpayKeyId}</div>
@@ -95,11 +93,9 @@ const PaymentList = () => {
                         name="razorpaySecretKey"
                         type="password"
                         disabled={!values.razorpayEnabled}
-                        className={`w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${
-                          !values.razorpayEnabled ? 'bg-gray-100' : 'bg-white'
-                        } ${
-                          errors.razorpaySecretKey && touched.razorpaySecretKey ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${!values.razorpayEnabled ? 'bg-gray-100' : 'bg-white'
+                          } ${errors.razorpaySecretKey && touched.razorpaySecretKey ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
                       {errors.razorpaySecretKey && touched.razorpaySecretKey && (
                         <div className="text-red-500 text-sm mt-1">{errors.razorpaySecretKey}</div>
@@ -111,7 +107,7 @@ const PaymentList = () => {
 
               {/* PhonePay Section */}
               <Col xs={24} lg={12}>
-                <Card 
+                <Card
                   title={
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-semibold">PhonePay Settings</span>
@@ -133,11 +129,9 @@ const PaymentList = () => {
                         name="phonePayMerchantId"
                         type="text"
                         disabled={!values.phonePayEnabled}
-                        className={`w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${
-                          !values.phonePayEnabled ? 'bg-gray-100' : 'bg-white'
-                        } ${
-                          errors.phonePayMerchantId && touched.phonePayMerchantId ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${!values.phonePayEnabled ? 'bg-gray-100' : 'bg-white'
+                          } ${errors.phonePayMerchantId && touched.phonePayMerchantId ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
                       {errors.phonePayMerchantId && touched.phonePayMerchantId && (
                         <div className="text-red-500 text-sm mt-1">{errors.phonePayMerchantId}</div>
@@ -152,11 +146,9 @@ const PaymentList = () => {
                         name="phonePaySecretKey"
                         type="password"
                         disabled={!values.phonePayEnabled}
-                        className={`w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${
-                          !values.phonePayEnabled ? 'bg-gray-100' : 'bg-white'
-                        } ${
-                          errors.phonePaySecretKey && touched.phonePaySecretKey ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${!values.phonePayEnabled ? 'bg-gray-100' : 'bg-white'
+                          } ${errors.phonePaySecretKey && touched.phonePaySecretKey ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
                       {errors.phonePaySecretKey && touched.phonePaySecretKey && (
                         <div className="text-red-500 text-sm mt-1">{errors.phonePaySecretKey}</div>

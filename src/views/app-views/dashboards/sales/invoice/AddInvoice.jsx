@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Card,
   Button,
@@ -27,16 +27,9 @@ const { Option } = Select;
 const AddInvoice = ({ onClose }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
-  const [newTag, setNewTag] = useState("");
   const [selectedCurrencyIcon, setSelectedCurrencyIcon] = useState('₹');
-
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
-  const [tags, setTags] = useState([]);
-  const AllLoggeddtaa = useSelector((state) => state.user);
-
   const [globalDiscountType, setGlobalDiscountType] = useState('percentage');
   const [globalDiscountValue, setGlobalDiscountValue] = useState(0);
 
@@ -58,15 +51,10 @@ const AddInvoice = ({ onClose }) => {
 
   const { taxes } = useSelector((state) => state.tax);
 
-
-  const [loading, setLoading] = useState(false);
-
   const productsData = useSelector((state) => state.Product.Product);
-
   useEffect(() => {
     dispatch(getcurren());
   }, [dispatch]);
-
   useEffect(() => {
     dispatch(getAllTaxes());
   }, [dispatch]);
@@ -90,7 +78,7 @@ const AddInvoice = ({ onClose }) => {
 
   useEffect(() => {
     dispatch(Getcus());
-  }, []);
+  }, [dispatch]);
 
   const customerdata = useSelector((state) => state.customers);
   const fnddata = customerdata.customers.data;
@@ -107,209 +95,186 @@ const AddInvoice = ({ onClose }) => {
 
   const handleTableDataChange = (id, field, value) => {
     const updatedData = tableData.map((row) => {
-        if (row.id === id) {
-            const updatedRow = { ...row };
-            
-            if (field === 'price' || field === 'discountValue') {
-                updatedRow[field] = value === '' ? '0' : value;
-            } else if (field === 'quantity') {
-                updatedRow[field] = value === '' ? 1 : parseFloat(value);
-            } else {
-                updatedRow[field] = value;
-            }
-            
-            if (field === 'quantity' || field === 'price' || field === 'tax' || field === 'discountType' || field === 'discountValue') {
-                const quantity = parseFloat(updatedRow.quantity) || 0;
-                const price = parseFloat(updatedRow.price) || 0;
-                const baseAmount = quantity * price;
-                
-                let itemDiscountAmount = 0;
-                const discountValue = parseFloat(updatedRow.discountValue) || 0;
-                if (updatedRow.discountType === 'percentage') {
-                    itemDiscountAmount = (baseAmount * discountValue) / 100;
-                } else {
-                    itemDiscountAmount = Math.min(discountValue, baseAmount);
-                }
+      if (row.id === id) {
+        const updatedRow = { ...row };
 
-                const amountAfterDiscount = baseAmount - itemDiscountAmount;
-                const tax = field === 'tax' ? 
-                    (value ? parseFloat(value.gstPercentage) : 0) : 
-                    (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
-                const taxAmount = (amountAfterDiscount * tax) / 100;
-                
-                const finalAmount = amountAfterDiscount + taxAmount;
-                updatedRow.amount = finalAmount.toFixed(2);
-            }
-            
-            return updatedRow;
+        // Handle empty values for numeric fields
+        if (field === 'price' || field === 'discountValue') {
+          updatedRow[field] = value === '' ? '0' : value;
+        } else if (field === 'quantity') {
+          updatedRow[field] = value === '' ? 1 : parseFloat(value);
+        } else {
+          updatedRow[field] = value;
         }
-        return row;
+
+        // Calculate amount if quantity, price, or tax changes
+        if (field === 'quantity' || field === 'price' || field === 'tax' || field === 'discountType' || field === 'discountValue') {
+          const quantity = parseFloat(updatedRow.quantity) || 0;
+          const price = parseFloat(updatedRow.price) || 0;
+          const baseAmount = quantity * price;
+
+          // Calculate item discount
+          let itemDiscountAmount = 0;
+          const discountValue = parseFloat(updatedRow.discountValue) || 0;
+          if (updatedRow.discountType === 'percentage') {
+            itemDiscountAmount = (baseAmount * discountValue) / 100;
+          } else {
+            itemDiscountAmount = Math.min(discountValue, baseAmount);
+          }
+
+          // Calculate tax on amount after discount
+          const amountAfterDiscount = baseAmount - itemDiscountAmount;
+          const tax = field === 'tax' ?
+            (value ? parseFloat(value.gstPercentage) : 0) :
+            (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
+          const taxAmount = (amountAfterDiscount * tax) / 100;
+
+          // Calculate final amount
+          const finalAmount = amountAfterDiscount + taxAmount;
+          updatedRow.amount = finalAmount.toFixed(2);
+        }
+
+        return updatedRow;
+      }
+      return row;
     });
 
     setTableData(updatedData);
     calculateTotal(updatedData, globalDiscountValue, globalDiscountType);
-};
+  };
 
 
   const calculateTotal = (data, globalDiscountValue, discountType) => {
     const calculations = data.reduce((acc, row) => {
-        const quantity = parseFloat(row.quantity) || 0;
-        const price = row.price === '' ? 0 : (parseFloat(row.price) || 0);
-        const baseAmount = quantity * price;
-        
-        let itemDiscountAmount = 0;
-        const discountValue = row.discountValue === '' ? 0 : (parseFloat(row.discountValue) || 0);
-        if (row.discountType === 'percentage') {
-            itemDiscountAmount = (baseAmount * discountValue) / 100;
-        } else {
-            itemDiscountAmount = Math.min(discountValue, baseAmount);
-        }
+      const quantity = parseFloat(row.quantity) || 0;
+      const price = row.price === '' ? 0 : (parseFloat(row.price) || 0);
+      const baseAmount = quantity * price;
 
-        const amountAfterDiscount = baseAmount - itemDiscountAmount;
-        const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
-        const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
+      // Calculate item discount
+      let itemDiscountAmount = 0;
+      const discountValue = row.discountValue === '' ? 0 : (parseFloat(row.discountValue) || 0);
+      if (row.discountType === 'percentage') {
+        itemDiscountAmount = (baseAmount * discountValue) / 100;
+      } else {
+        itemDiscountAmount = Math.min(discountValue, baseAmount);
+      }
 
-        return {
-            totalBaseAmount: acc.totalBaseAmount + baseAmount,
-            totalItemDiscount: acc.totalItemDiscount + itemDiscountAmount,
-            totalTax: acc.totalTax + taxAmount,
-            subtotal: acc.subtotal + amountAfterDiscount + taxAmount
-        };
+      // Calculate tax
+      const amountAfterDiscount = baseAmount - itemDiscountAmount;
+      const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
+      const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
+
+      return {
+        totalBaseAmount: acc.totalBaseAmount + baseAmount,
+        totalItemDiscount: acc.totalItemDiscount + itemDiscountAmount,
+        totalTax: acc.totalTax + taxAmount,
+        subtotal: acc.subtotal + amountAfterDiscount + taxAmount
+      };
     }, { totalBaseAmount: 0, totalItemDiscount: 0, totalTax: 0, subtotal: 0 });
 
     let globalDiscountAmount = 0;
     const validGlobalDiscountValue = globalDiscountValue === '' ? 0 : (parseFloat(globalDiscountValue) || 0);
-    
+
     if (discountType === 'percentage') {
-        globalDiscountAmount = (calculations.subtotal * validGlobalDiscountValue) / 100;
+      globalDiscountAmount = (calculations.subtotal * validGlobalDiscountValue) / 100;
     } else {
-        globalDiscountAmount = validGlobalDiscountValue;
+      globalDiscountAmount = validGlobalDiscountValue;
     }
 
     const finalTotal = Math.max(0, calculations.subtotal - globalDiscountAmount);
 
     setTotals({
-        subtotal: calculations.subtotal.toFixed(2),
-        itemDiscount: calculations.totalItemDiscount.toFixed(2),
-        globalDiscount: globalDiscountAmount.toFixed(2),
-        totalTax: calculations.totalTax.toFixed(2),
-        finalTotal: finalTotal.toFixed(2)
+      subtotal: calculations.subtotal.toFixed(2),
+      itemDiscount: calculations.totalItemDiscount.toFixed(2),
+      globalDiscount: globalDiscountAmount.toFixed(2),
+      totalTax: calculations.totalTax.toFixed(2),
+      finalTotal: finalTotal.toFixed(2)
     });
   };
 
   const [totals, setTotals] = useState({
     subtotal: "0.00",
     itemDiscount: "0.00",
-    globalDiscount: "0.00", 
+    globalDiscount: "0.00",
     totalTax: "0.00",
     finalTotal: "0.00"
   });
 
   const handleFinish = async () => {
     try {
-        setLoading(true);
-        const formValues = await form.validateFields();
-        
-        const items = {};
-        tableData.forEach((item, index) => {
-            const quantity = parseFloat(item.quantity) || 0;
-            const price = parseFloat(item.price) || 0;
-            const baseAmount = quantity * price;
-            
-            let itemDiscountAmount = 0;
-            const discountValue = parseFloat(item.discountValue) || 0;
-            if (item.discountType === 'percentage') {
-                itemDiscountAmount = (baseAmount * discountValue) / 100;
-            } else {
-                itemDiscountAmount = Math.min(discountValue, baseAmount);
-            }
+      const formValues = await form.validateFields();
 
-            const amountAfterDiscount = baseAmount - itemDiscountAmount;
-            const taxPercentage = item.tax ? parseFloat(item.tax.gstPercentage) || 0 : 0;
-            const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
-            
-            items[`item_${index + 1}`] = {
-                item: item.item,
-                description: item.description || '',
-                quantity: quantity,
-                price: price,
-                tax_name: item.tax?.gstName || '',
-                tax_percentage: taxPercentage,
-                tax_amount: taxAmount,
-                discount_type: item.discountType,
-                discount_percentage: item.discountType === 'percentage' ? discountValue : 0,
-                discount_amount: itemDiscountAmount,
-                base_amount: baseAmount,
-                amount_after_discount: amountAfterDiscount,
-                final_amount: amountAfterDiscount + taxAmount,
-                hsn_sac: item.hsn_sac || ''
-            };
-        });
+      const items = {};
+      tableData.forEach((item, index) => {
+        const quantity = parseFloat(item.quantity) || 0;
+        const price = parseFloat(item.price) || 0;
+        const baseAmount = quantity * price;
 
-        // Calculate final values from totals state
-        const subtotal = Object.values(items).reduce((sum, item) => sum + item.final_amount, 0);
-        const itemDiscount = parseFloat(totals.itemDiscount);
-        const globalDiscount = parseFloat(totals.globalDiscount);
-        const totalTax = parseFloat(totals.totalTax);
-        const finalTotal = parseFloat(totals.finalTotal);
+        // Calculate item discount
+        let itemDiscountAmount = 0;
+        const discountValue = parseFloat(item.discountValue) || 0;
+        if (item.discountType === 'percentage') {
+          itemDiscountAmount = (baseAmount * discountValue) / 100;
+        } else {
+          itemDiscountAmount = Math.min(discountValue, baseAmount);
+        }
 
-        const updatedValues = {
-            ...formValues,
-            issueDate: formValues.issueDate.format('YYYY-MM-DD'),
-            dueDate: formValues.dueDate.format('YYYY-MM-DD'),
-            items: items,
-            discountType: globalDiscountType,
-            discountValue: parseFloat(globalDiscountValue) || 0,
-            discount: globalDiscount,
-            itemDiscount: itemDiscount,
-            tax: totalTax,
-            subtotal: subtotal,
-            total: finalTotal // This will now store the actual final total
+        // Calculate tax
+        const amountAfterDiscount = baseAmount - itemDiscountAmount;
+        const taxPercentage = item.tax ? parseFloat(item.tax.gstPercentage) || 0 : 0;
+        const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
+
+        items[`item_${index + 1}`] = {
+          item: item.item,
+          description: item.description || '',
+          quantity: quantity,
+          price: price,
+          tax_name: item.tax?.gstName || '',
+          tax_percentage: taxPercentage,
+          tax_amount: taxAmount,
+          discount_type: item.discountType,
+          discount_percentage: item.discountType === 'percentage' ? discountValue : 0,
+          discount_amount: itemDiscountAmount,
+          base_amount: baseAmount,
+          amount_after_discount: amountAfterDiscount,
+          final_amount: amountAfterDiscount + taxAmount,
+          hsn_sac: item.hsn_sac || ''
         };
+      });
 
-        await dispatch(AddInvoices(updatedValues));
-        message.success("Invoice created successfully!");
-        dispatch(getInvoice());
-        resetForm();
-        onClose();
+      const updatedValues = {
+        ...formValues,
+        issueDate: formValues.issueDate.format('YYYY-MM-DD'),
+        dueDate: formValues.dueDate.format('YYYY-MM-DD'),
+        items: items,
+        discountType: globalDiscountType,
+        discountValue: parseFloat(globalDiscountValue) || 0,
+        discount: parseFloat(totals.globalDiscount) || 0,
+        itemDiscount: parseFloat(totals.itemDiscount) || 0,
+        tax: parseFloat(totals.totalTax) || 0,
+        subtotal: parseFloat(totals.subtotal) || 0,
+        total: parseFloat(totals.finalTotal) || 0
+      };
+
+      await dispatch(AddInvoices(updatedValues));
+      message.success("Invoice created successfully!");
+      dispatch(getInvoice());
+      resetForm();
+      onClose();
     } catch (error) {
-        console.error('Error creating invoice:', error);
-        message.error("Failed to create invoice: " + (error.message || "Unknown error"));
-    } finally {
-        setLoading(false);
-    }
-};
-
-  const fetchTags = async () => {
-    try {
-      const lid = AllLoggeddtaa.loggedInUser.id;
-      const response = await dispatch(GetLable(lid));
-
-      if (response.payload && response.payload.data) {
-        const uniqueTags = response.payload.data
-          .filter((label) => label && label.name) 
-          .map((label) => ({
-            id: label.id,
-            name: label.name.trim(),
-          }))
-          .filter(
-            (label, index, self) =>
-              index === self.findIndex((t) => t.name === label.name)
-          ); 
-
-        setTags(uniqueTags);
-      }
-    } catch (error) {
-      console.error("Failed to fetch tags:", error);
-      message.error("Failed to load tags");
+      console.error('Error creating invoice:', error);
+      message.error("Failed to create invoice: " + (error.message || "Unknown error"));
     }
   };
 
+
+  // Fetch products when component mounts
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await dispatch(GetAllProdu());
-        
+        console.log("Products response:", response); // Debug log
+
         if (response?.payload?.data) {
           setProducts(response.payload.data);
         }
@@ -329,39 +294,42 @@ const AddInvoice = ({ onClose }) => {
   }, [productsData]);
 
   const handleProductChange = (productId) => {
-    
-    if (productId) {
-        const selectedProd = products.find(p => p.id === productId);
-        
-        if (selectedProd) {
-            const updatedData = tableData.map((row, index) => {
-                if (index === tableData.length - 1) {
-                    // Calculate initial amount based on product price and default quantity
-                    const quantity = 1;
-                    const price = selectedProd.price || 0;
-                    const baseAmount = quantity * price;
-                    
-                    const taxPercentage = selectedProd.tax ? parseFloat(selectedProd.tax.gstPercentage) || 0 : 0;
-                    const taxAmount = (baseAmount * taxPercentage) / 100;
-                    
-                    return {
-                        ...row,
-                        item: selectedProd.name,
-                        description: selectedProd.description || "",
-                        price: price,
-                        quantity: quantity,
-                        hsn_sac: selectedProd.hsn_sac || "",
-                        tax: selectedProd.tax || null,
-                        amount: (baseAmount + taxAmount).toFixed(2)
-                    };
-                }
-                return row;
-            });
+    // console.log("Selected product ID:", productId);
 
-            setTableData(updatedData);
-            setSelectedProduct(productId);
-            calculateTotal(updatedData, globalDiscountValue, globalDiscountType);
-        }
+    if (productId) {
+      const selectedProd = products.find(p => p.id === productId);
+      console.log("Found product:", selectedProd);
+
+      if (selectedProd) {
+        const updatedData = tableData.map((row, index) => {
+          if (index === tableData.length - 1 && !row.item) {
+            // Calculate initial amount based on product price and default quantity
+            const quantity = 1;
+            const price = selectedProd.price || 0;
+            const baseAmount = quantity * price;
+
+            // Calculate tax if available
+            const taxPercentage = selectedProd.tax ? parseFloat(selectedProd.tax.gstPercentage) || 0 : 0;
+            const taxAmount = (baseAmount * taxPercentage) / 100;
+
+            return {
+              ...row,
+              item: selectedProd.name,
+              description: selectedProd.description || "",
+              price: price,
+              quantity: quantity,
+              hsn_sac: selectedProd.hsn_sac || "",
+              tax: selectedProd.tax || null,
+              amount: (baseAmount + taxAmount).toFixed(2)
+            };
+          }
+          return row;
+        });
+
+        setTableData(updatedData);
+        setSelectedProduct(productId);
+        calculateTotal(updatedData, globalDiscountValue, globalDiscountType);
+      }
     }
   };
 
@@ -399,7 +367,8 @@ const AddInvoice = ({ onClose }) => {
 
   const AllLoggedData = useSelector((state) => state.user);
 
-  const fetchLables = async (lableType, setter) => {
+  // Add fetchLables function
+  const fetchLables = useCallback(async (lableType, setter) => {
     try {
       const lid = AllLoggedData.loggedInUser.id;
       const response = await dispatch(GetLable(lid));
@@ -413,11 +382,11 @@ const AddInvoice = ({ onClose }) => {
       console.error(`Failed to fetch ${lableType}:`, error);
       message.error(`Failed to load ${lableType}`);
     }
-  };
+  }, [AllLoggedData.loggedInUser.id, dispatch]);
 
   useEffect(() => {
     fetchLables("category", setCategories);
-  }, []);
+  }, [fetchLables]);
 
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
     if (!newValue.trim()) {
@@ -431,21 +400,24 @@ const AddInvoice = ({ onClose }) => {
         name: newValue.trim(),
         lableType,
       };
-      
+
       const response = await dispatch(AddLable({ lid, payload }));
-      
+
       if (response.payload && response.payload.success) {
         message.success(`${lableType} added successfully.`);
-        
+
+        // Refresh the labels immediately after adding
         const labelsResponse = await dispatch(GetLable(lid));
         if (labelsResponse.payload && labelsResponse.payload.data) {
           const filteredLables = labelsResponse.payload.data
             .filter((lable) => lable.lableType === lableType)
             .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
-          
+
           setCategories(filteredLables);
           form.setFieldValue("category", newValue.trim());
         }
+
+        // Reset input and close modal
         setter("");
         modalSetter(false);
       } else {
@@ -460,7 +432,7 @@ const AddInvoice = ({ onClose }) => {
   return (
     <div>
       <Form form={form} layout="vertical">
-      <h2 className="mb-2 border-b pb-[20px] font-medium"></h2>
+        <hr className="mb-2 border-b pb-[20px] font-medium"></hr>
         <Card className="border-0">
           <Row gutter={16}>
             <Col span={12} className="mt-1">
@@ -491,7 +463,7 @@ const AddInvoice = ({ onClose }) => {
                           className="w-full"
                           onClick={() => setIsAddCustomerModalVisible(true)}
                         >
-                         + Add Customer
+                          + Add Customer
                         </Button>
                       </div>
                     </div>
@@ -520,9 +492,9 @@ const AddInvoice = ({ onClose }) => {
                   { required: true, message: "Please select issue date" },
                 ]}
               >
-                <DatePicker 
-                  className="w-full" 
-                  format="DD-MM-YYYY" 
+                <DatePicker
+                  className="w-full"
+                  format="DD-MM-YYYY"
                   onChange={(date) => {
                     form.setFieldsValue({ issueDate: date });
                     const dueDate = form.getFieldValue('dueDate');
@@ -540,8 +512,8 @@ const AddInvoice = ({ onClose }) => {
                 name="dueDate"
                 rules={[{ required: true, message: "Please select due date" }]}
               >
-                <DatePicker 
-                  className="w-full" 
+                <DatePicker
+                  className="w-full"
                   format="DD-MM-YYYY"
                   disabledDate={(current) => {
                     const issueDate = form.getFieldValue('issueDate');
@@ -549,7 +521,7 @@ const AddInvoice = ({ onClose }) => {
                   }}
                 />
 
-            
+
               </Form.Item>
             </Col>
 
@@ -592,7 +564,7 @@ const AddInvoice = ({ onClose }) => {
                 rules={[
                   { required: true, message: "Please enter reference number" },
                 ]}
-               
+
               >
                 <Input placeholder="Enter Reference Number" />
               </Form.Item>
@@ -616,8 +588,8 @@ const AddInvoice = ({ onClose }) => {
                       key={currency.id}
                       value={currency.currencyCode}
                     >
-                       {currency.currencyCode}
-                       ({currency.currencyIcon})
+                      {currency.currencyCode}
+                      ({currency.currencyIcon})
                     </Option>
                   ))}
                 </Select>
@@ -665,7 +637,7 @@ const AddInvoice = ({ onClose }) => {
                     <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Item<span className="text-red-500">*</span>
                     </th>
-                    
+
                     <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Quantity<span className="text-red-500">*</span>
                     </th>
@@ -702,7 +674,7 @@ const AddInvoice = ({ onClose }) => {
                             className="w-full p-2 border rounded-s"
                           />
                         </td>
-                       
+
                         <td className="px-2 py-2 border-b">
                           <input
                             type="number"
@@ -768,29 +740,30 @@ const AddInvoice = ({ onClose }) => {
                           </div>
                         </td>
                         <td className="px-2 py-2 border-b">
-                            <Select
-                                value={row.tax?.gstPercentage ? `${row.tax.gstName}|${row.tax.gstPercentage}` : '0'}
-                                onChange={(value) => {
-                                    if (!value || value === '0') {
-                                        handleTableDataChange(row.id, "tax", null);
-                                        return;
-                                    }
-                                    const [gstName, gstPercentage] = value.split('|');
-                                    handleTableDataChange(row.id, "tax", {
-                                        gstName,
-                                        gstPercentage: parseFloat(gstPercentage) || 0
-                                    });
-                                }}
-                                placeholder="Select Tax"
-                                className="w-[100px]"
-                                allowClear
-                            >
-                                {taxes && taxes.data && taxes.data.map(tax => (
-                                    <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
-                                        {tax.gstName} ({tax.gstPercentage}%)
-                                    </Option>
-                                ))}
-                            </Select>
+                          <Select
+                            value={row.tax?.gstPercentage ? `${row.tax.gstName}|${row.tax.gstPercentage}` : '0'}
+                            onChange={(value) => {
+                              if (!value || value === '0') {
+                                handleTableDataChange(row.id, "tax", null);
+                                return;
+                              }
+                              const [gstName, gstPercentage] = value.split('|');
+                              handleTableDataChange(row.id, "tax", {
+                                gstName,
+                                gstPercentage: parseFloat(gstPercentage) || 0
+                              });
+                            }}
+                            placeholder="Select Tax"
+                            className="w-[100px]"
+                            allowClear
+                          >
+                            {/* <Option value="0">0</Option> */}
+                            {taxes && taxes.data && taxes.data.map(tax => (
+                              <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
+                                {tax.gstName} ({tax.gstPercentage}%)
+                              </Option>
+                            ))}
+                          </Select>
                         </td>
                         <td className="px-2 py-2 border-b">
                           <span>{selectedCurrencyIcon} {parseFloat(row.amount || 0).toFixed(2)}</span>
@@ -802,25 +775,25 @@ const AddInvoice = ({ onClose }) => {
                         </td>
                       </tr>
                       <tr>
-                         <td colSpan={8} className="px-2 py-2 border-b">
-                        <textarea
+                        <td colSpan={8} className="px-2 py-2 border-b">
+                          <textarea
                             rows={2}
                             value={row.description ? row.description.replace(/<[^>]*>/g, '') : ''} // Remove HTML tags
                             onChange={(e) => handleTableDataChange(row.id, "description", e.target.value)}
                             placeholder="Description"
                             className="w-[70%] p-2 border"
-                        />
-                    </td>
+                          />
+                        </td>
                       </tr>
                     </React.Fragment>
                   ))}
                 </tbody>
               </table>
               <div className="form-buttons text-left mt-2">
-              <Button type="primary" onClick={handleAddRow}>
-                <PlusOutlined /> Add Items
-              </Button>
-            </div>
+                <Button type="primary" onClick={handleAddRow}>
+                  <PlusOutlined /> Add Items
+                </Button>
+              </div>
             </div>
           </div>
 

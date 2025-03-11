@@ -1,4 +1,4 @@
-    import axios from "axios";
+import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
 
@@ -77,6 +77,8 @@ const editotherpayment = async (meetid, values) => {
     throw error;
   }
 };
+
+
 
 const UserService = {
   getotherpayment,

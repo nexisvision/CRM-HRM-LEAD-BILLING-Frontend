@@ -1,11 +1,10 @@
 import React from 'react';
 import DocumentList from './documentList';
 
-const Document= () => (
-
-<div className="mail">
-<DocumentList/>
-</div>
+const Document = () => (
+	<div className="mail">
+		<DocumentList />
+	</div>
 
 );
 

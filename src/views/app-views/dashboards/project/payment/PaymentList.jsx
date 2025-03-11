@@ -6,9 +6,9 @@ import {
   Select,
   Input,
   Button,
-  Badge,
   Menu,
-  Modal
+  Modal,
+  Dropdown,
 } from "antd";
 import {
   EyeOutlined,
@@ -16,8 +16,8 @@ import {
   SearchOutlined,
   DeleteOutlined,
   PlusOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
 import NumberFormat from "react-number-format";
 import dayjs from "dayjs";
@@ -31,14 +31,9 @@ import { useDispatch } from "react-redux";
 import { GetProject } from '../project-list/projectReducer/ProjectSlice';
 import { getAllInvoices } from '../invoice/invoicereducer/InvoiceSlice';
 
-
 const PaymentList = () => {
   const [list, setList] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddPaymentModalVisible, setIsAddPaymentModalVisible] =
-    useState(false);
-  const [isEditPaymentModalVisible, setIsEditPaymentModalVisible] =
     useState(false);
   const [isViewPaymentModalVisible, setIsViewPaymentModalVisible] =
     useState(false);
@@ -49,10 +44,9 @@ const PaymentList = () => {
 
   const allempdata = useSelector((state) => state.Payment);
   const filtermin = allempdata.Payment.data;
-
-  const [projectsList, setProjectsList] = useState([]);
   const [invoicesList, setInvoicesList] = useState([]);
-  
+
+  // Get data from redux store
   const projectsData = useSelector((state) => state.Project.Project.data || []);
   const invoicesData = useSelector((state) => state.invoice);
   const tabledata = useSelector((state) => state.Payment);
@@ -78,17 +72,14 @@ const PaymentList = () => {
     setIsViewPaymentModalVisible(false);
   };
 
- useEffect(() => {
+
+  useEffect(() => {
+    // Fetch payments, projects and invoices data
     dispatch(Getpay(id));
     dispatch(GetProject());
     dispatch(getAllInvoices(id));
   }, [dispatch, id]);
 
-  useEffect(() => {
-    if (projectsData && projectsData.length > 0) {
-      setProjectsList(projectsData);
-    }
-  }, [projectsData]);
 
   useEffect(() => {
     if (invoicesData && invoicesData.invoices) {
@@ -118,33 +109,31 @@ const PaymentList = () => {
     }
   };
 
-  const dropdownMenu = (row) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => {
-          setSelectedPayment(row);
-          openViewPaymentModal();
-        }}>
-          <EyeOutlined />
-          <span className="ml-2">View Details</span>
-        </Flex>
-      </Menu.Item>
-
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => DeleteFun(row.id)}>
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const getDropdownItems = (row) => [
+    {
+      key: 'view',
+      icon: <EyeOutlined />,
+      label: 'View Details',
+      onClick: () => {
+        setSelectedPayment(row);
+        openViewPaymentModal();
+      }
+    },
+    {
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      label: 'Delete',
+      onClick: () => DeleteFun(row.id),
+      danger: true
+    }
+  ];
 
   const tableColumns = [
     {
       title: "Project",
       dataIndex: "project_name",
       render: (_, record) => (
-        <span 
+        <span
           className=" cursor-pointer hover:underline"
           onClick={() => {
             setSelectedPayment(record);
@@ -202,39 +191,49 @@ const PaymentList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
   ];
 
-  const rowSelection = {
-    onChange: (key, rows) => {
-      setSelectedRows(rows);
-      setSelectedRowKeys(key);
-    },
-  };
-
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
-    
+
+    // If search value is empty, show all data
     if (!value) {
       setList(filtermin);
       return;
     }
-    
+
+    // Filter the data based on project name
     const filtered = filtermin.filter(payment => {
       const projectName = getProjectName(payment.project_name)?.toLowerCase();
       return projectName?.includes(value);
     });
-    
+
     setList(filtered);
   };
 
   const getFilteredPayments = () => {
     if (!list) return [];
-    
+
     let filtered = list;
 
     if (searchText) {
@@ -255,36 +254,52 @@ const PaymentList = () => {
 
   return (
     <>
-    <Card>
-      <Flex
-        alignItems="center"
-        justifyContent="space-between"
-        mobileFlex={false}
-        className="flex flex-wrap  gap-4"
-      >
-        <Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
-          <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
-            <Input
-              placeholder="Search by project name..."
-              prefix={<SearchOutlined />}
-              onChange={onSearch}
-              value={searchText}
-              allowClear
-              className="search-input"
-            />
-          </div>
+      <Card>
+        <Flex
+          alignItems="center"
+          justifyContent="space-between"
+          mobileFlex={false}
+          className="flex flex-wrap  gap-4"
+        >
+          <Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
+            <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
+              <Input
+                placeholder="Search by project name..."
+                prefix={<SearchOutlined />}
+                onChange={onSearch}
+                value={searchText}
+                allowClear
+                className="search-input"
+              />
+            </div>
+            {/* <div className="w-full md:w-48">
+            <Select
+              defaultValue="All"
+              className="w-full"
+              style={{ minWidth: 180 }}
+              onChange={handleShowStatus}
+              placeholder="method"
+            >
+              <Option value="All">All method </Option>
+              {paymentStatusList.map((elm) => (
+                <Option key={elm} value={elm}>
+                  {elm}
+                </Option>
+              ))}
+            </Select>
+          </div> */}
+          </Flex>
+          <Flex gap="7px" className="flex">
+            <Button type="primary" className="ml-2" onClick={openAddPaymentModal}>
+              <PlusOutlined />
+              <span className="ml-2">New</span>
+            </Button>
+            <Button type="primary" icon={<FileExcelOutlined />} block>
+              Export All
+            </Button>
+          </Flex>
         </Flex>
-        <Flex gap="7px" className="flex">
-          <Button type="primary" className="ml-2" onClick={openAddPaymentModal}>
-            <PlusOutlined />
-            <span className="ml-2">New</span>
-          </Button>
-          <Button type="primary" icon={<FileExcelOutlined />} block>
-            Export All
-          </Button>
-        </Flex>
-      </Flex>
-      {/* <Card> */}
+        {/* <Card> */}
         <div className="table-responsive">
           <Table
             columns={tableColumns}
@@ -298,32 +313,45 @@ const PaymentList = () => {
             }}
           />
         </div>
+        {/* </Card> */}
       </Card>
-     
-        <Modal
-          title="Add Payment"
-          visible={isAddPaymentModalVisible}
-          onCancel={closeAddPaymentModal}
-          footer={null}
-          width={800}
-          className="mt-[-70px]"
-        >
-          <AddPayment onClose={closeAddPaymentModal} />
-        </Modal>
 
-        <Modal
-          title="View Payment"
-          visible={isViewPaymentModalVisible}
-          onCancel={closeViewPaymentModal}
-          footer={null}
-          width={800}
-        >
-          <ViewPayment 
-            data={selectedPayment} 
-            onClose={closeViewPaymentModal} 
-          />
-        </Modal>
-   
+      <Modal
+        title="Add Payment"
+        visible={isAddPaymentModalVisible}
+        onCancel={closeAddPaymentModal}
+        footer={null}
+        width={800}
+        className="mt-[-70px]"
+      >
+        <AddPayment onClose={closeAddPaymentModal} />
+      </Modal>
+
+      {/* <Modal
+					title="Edit Payment"
+					visible={isEditPaymentModalVisible}
+					onCancel={closeEditPaymentModal}
+					footer={null}
+					width={800}
+					className='mt-[-70px]'
+
+				>
+					<EditPayment onClose={closeEditPaymentModal} />
+				</Modal> */}
+
+      <Modal
+        title="View Payment"
+        visible={isViewPaymentModalVisible}
+        onCancel={closeViewPaymentModal}
+        footer={null}
+        width={800}
+      >
+        <ViewPayment
+          data={selectedPayment}
+          onClose={closeViewPaymentModal}
+        />
+      </Modal>
+
     </>
   );
 };
@@ -346,6 +374,20 @@ const styles = `
       width: 100%;
       margin-bottom: 1rem;
     }
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+  }
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
   }
 `;
 

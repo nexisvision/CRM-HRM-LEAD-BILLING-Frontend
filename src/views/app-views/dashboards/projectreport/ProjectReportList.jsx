@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag,Select, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
+import { Card, Table, Menu, Tag, Select, Input, message, Button, Modal } from 'antd';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
@@ -16,13 +15,8 @@ const { Option } = Select
 const ProjectReportList = () => {
   const [users, setUsers] = useState(userData);
   const [list, setList] = useState(OrderListData);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [userProfileVisible, setUserProfileVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [isAddProjectReportModalVisible, setIsAddProjectReportModalVisible] = useState(false);
   const [isEditProjectReportModalVisible, setIsEditProjectReportModalVisible] = useState(false);
-
-
   // Open Add Job Modal
   const openAddProjectReportModal = () => {
     setIsAddProjectReportModalVisible(true);
@@ -43,8 +37,11 @@ const ProjectReportList = () => {
   };
 
   const [isViewProjectReportModalVisible, setIsViewProjecReportModalVisible] = useState(false);
-	const openViewProjectReportModal = () => setIsViewProjecReportModalVisible(true);
-	const closeViewProjectReportModal = () => setIsViewProjecReportModalVisible(false);
+  // const [isEditProjectModalVisible, setIsEditProjectModalVisible] = useState(false);
+
+  // Open Add Project Modal
+  const openViewProjectReportModal = () => setIsViewProjecReportModalVisible(true);
+  const closeViewProjectReportModal = () => setIsViewProjecReportModalVisible(false);
   const dropdownMenu = (elm) => (
     <Menu>
       <Menu.Item>
@@ -73,7 +70,6 @@ const ProjectReportList = () => {
           </Button>
         </Flex>
       </Menu.Item>
-   
       <Menu.Item>
         <Flex alignItems="center">
           <Button
@@ -96,7 +92,6 @@ const ProjectReportList = () => {
     const searchArray = value ? list : OrderListData;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
-    setSelectedRowKeys([]);
   };
 
   // Delete user
@@ -106,7 +101,7 @@ const ProjectReportList = () => {
   };
 
 
-  
+
 
   const getProjectReportStatus = status => {
     if (status === 'active') {
@@ -119,14 +114,14 @@ const ProjectReportList = () => {
   }
 
   const handleShowStatus = value => {
-		if (value !== 'All') {
-			const key = 'status';
-			const data = utils.filterArray(userData, key, value)
-			setUsers(data)
-		} else {
-			setUsers(userData)
-		}
-	}
+    if (value !== 'All') {
+      const key = 'status';
+      const data = utils.filterArray(userData, key, value)
+      setUsers(data)
+    } else {
+      setUsers(userData)
+    }
+  }
 
   const orderStatusList = ['active', 'blocked']
 
@@ -157,7 +152,7 @@ const ProjectReportList = () => {
       dataIndex: 'member',
       render: (_, record) => (
         <div className="d-flex">
-          <AvatarStatus size={30} src={record.image}/>
+          <AvatarStatus size={30} src={record.image} />
         </div>
       ),
       sorter: {
@@ -201,17 +196,17 @@ const ProjectReportList = () => {
             <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => onSearch(e)} />
           </div>
           <div className="mb-3">
-							<Select
-								defaultValue="All"
-								className="w-100"
-								style={{ minWidth: 180 }}
-								onChange={handleShowStatus}
-								placeholder="Status"
-							>
-								<Option value="All">All Status </Option>
-								{orderStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
-							</Select>
-						</div>
+            <Select
+              defaultValue="All"
+              className="w-100"
+              style={{ minWidth: 180 }}
+              onChange={handleShowStatus}
+              placeholder="Status"
+            >
+              <Option value="All">All Status </Option>
+              {orderStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
+            </Select>
+          </div>
         </Flex>
         <Flex gap="7px">
           <Button type="primary" className="ml-2" onClick={openAddProjectReportModal}>
@@ -263,11 +258,11 @@ const ProjectReportList = () => {
         width={1000}
         className='mt-[-70px]'
         bodyStyle={{
-          backgroundColor: "#f5f5f5", 
-          padding:"20px"
+          backgroundColor: "#f5f5f5",
+          padding: "20px"
         }}
       >
-        <ViewProjectReport onClose={closeViewProjectReportModal} className="bg-slate-100"/>
+        <ViewProjectReport onClose={closeViewProjectReportModal} className="bg-slate-100" />
       </Modal>
     </Card>
   );

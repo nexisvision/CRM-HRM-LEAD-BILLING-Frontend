@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, DatePicker, Select } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
+import { Card, Table, Menu, Tag, Input, message, Button, Modal, DatePicker, Select } from 'antd';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import UserView from '../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import StatisticWidget from 'components/shared-components/StatisticWidget';
-// import { DealStatisticData } from '../../dashboards/default/DefaultDashboardData';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
 import AddMeeting from './AddMeeting';
-import userData from 'assets/data/user-list.data.json';
-import OrderListData from 'assets/data/order-list.data.json';
 import { utils, writeFile } from "xlsx";
 import EditMeeting from './EditMeeting';
 import { deleteM, MeetData } from './MeetingReducer/MeetingSlice';
@@ -18,9 +12,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import ViewMeeting from './ViewMeeting';
 
 const MeetingList = () => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [userProfileVisible, setUserProfileVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [isAddMeetingModalVisible, setIsAddMeetingModalVisible] = useState(false);
   const [isEditMeetingModalVisible, setIsEditMeetingModalVisible] = useState(false);
   const [meetid, setMeetid] = useState("");
@@ -34,8 +25,6 @@ const MeetingList = () => {
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Meeting?.Meeting?.data || []);
   const filteredData = tabledata.filter((item) => item.created_by === user) || [];
-
-  //   const [dealStatisticData] = useState(DealStatisticData);
 
   // Open Add Job Modal
   const openAddMeetingModal = () => {
@@ -76,8 +65,6 @@ const MeetingList = () => {
 
   if (parsedPermissions["extra-hrm-meeting"] && parsedPermissions["extra-hrm-meeting"][0]?.permissions) {
     allpermisson = parsedPermissions["extra-hrm-meeting"][0].permissions;
-
-  } else {
   }
 
   const canCreateClient = allpermisson?.includes('create');
@@ -85,12 +72,6 @@ const MeetingList = () => {
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
 
-  ///endpermission
-
-
-
-
-  // Search functionality
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
@@ -128,7 +109,7 @@ const MeetingList = () => {
 
     // Apply status filter
     if (selectedStatus) {
-      result = result.filter(meeting => 
+      result = result.filter(meeting =>
         meeting.status?.toLowerCase() === selectedStatus.toLowerCase()
       );
     }
@@ -136,19 +117,9 @@ const MeetingList = () => {
     return result;
   };
 
-  // Add search button handler
-  const handleSearch = () => {
-    message.success('Search completed');
-  };
-
   const deleteUser = async (userId) => {
     try {
       await dispatch(deleteM(userId));
-
-      const updatedData = await dispatch(MeetData());
-
-      setSelectedUser(null);
-      setUserProfileVisible(false);
 
       message.success({ content: 'Deleted meeting successfully.', duration: 2 });
     } catch (error) {
@@ -157,17 +128,6 @@ const MeetingList = () => {
     }
   };
 
-  // Show user profile
-  const showUserProfile = (userInfo) => {
-    setSelectedUser(userInfo);
-    setUserProfileVisible(true);
-  };
-
-  // Close user profile
-  const closeUserProfile = () => {
-    setSelectedUser(null);
-    setUserProfileVisible(false);
-  };
 
   const exportToExcel = () => {
     try {
@@ -186,11 +146,6 @@ const MeetingList = () => {
     dispatch(MeetData());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (filteredData) {
-      setSelectedUser(filteredData[0]);
-    }
-  }, [tabledata]);
 
   const EditMeet = (id) => {
     openEditMeetingModal();

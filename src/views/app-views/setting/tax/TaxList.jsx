@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Menu, Row, Col, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, FileExcelOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { Card, Table, Input, message, Button, Modal } from 'antd';
+import { DeleteOutlined, SearchOutlined, FileExcelOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllTaxes,deleteTax } from '../tax/taxreducer/taxSlice';
+import { getAllTaxes, deleteTax } from '../tax/taxreducer/taxSlice';
 import AddTax from './AddTax';
 import EditTax from './EditTax';
 
 const TaxList = () => {
   const dispatch = useDispatch();
-  const { taxes, loading } = useSelector((state) => state.tax);
+  const { taxes } = useSelector((state) => state.tax);
   const [isAddTaxModalVisible, setIsAddTaxModalVisible] = useState(false);
   const [isEditTaxModalVisible, setIsEditTaxModalVisible] = useState(false);
   const [selectedTax, setSelectedTax] = useState(null);
@@ -63,22 +63,20 @@ const TaxList = () => {
   const onSearch = (e) => {
     const value = e.currentTarget.value.toLowerCase();
     const taxesToFilter = Array.isArray(taxes?.data) ? taxes.data : Array.isArray(taxes) ? taxes : [];
-    
+
     const filtered = taxesToFilter.filter(
-      tax => 
-        tax?.gstName?.toLowerCase().includes(value) || 
+      tax =>
+        tax?.gstName?.toLowerCase().includes(value) ||
         tax?.gstPercentage?.toString().includes(value)
     );
     setFilteredTaxes(filtered);
   };
 
-
-
-const delfun = (idd) => {
+  const delfun = (idd) => {
     dispatch(deleteTax(idd)).then(() => {
       dispatch(getAllTaxes());
       message.success('Tax deleted successfully');
-    //   setList(list.filter((item) => item.id !== idd));
+      //   setList(list.filter((item) => item.id !== idd));
     });
   };
 
@@ -127,9 +125,9 @@ const delfun = (idd) => {
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input 
-              placeholder="Search" 
-              prefix={<SearchOutlined />} 
+            <Input
+              placeholder="Search"
+              prefix={<SearchOutlined />}
               onChange={onSearch}
             />
           </div>
@@ -150,7 +148,7 @@ const delfun = (idd) => {
           columns={tableColumns}
           dataSource={filteredTaxes}
           rowKey="id"
-          // loading={loading}
+        // loading={loading}
         />
       </div>
 

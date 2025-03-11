@@ -1,5 +1,5 @@
 import axios from "axios";
-import { env } from "configs/EnvironmentConfig";    
+import { env } from "configs/EnvironmentConfig";
 const GetAllPayment = async () => {
   const token = localStorage.getItem("auth_token");
   try {

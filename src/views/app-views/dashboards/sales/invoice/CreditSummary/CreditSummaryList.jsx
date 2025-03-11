@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
+import { Card, Table, Menu, Col, message, Button, Modal } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import userData from '../../../../../../assets/data/user-list.data.json';
@@ -9,12 +9,7 @@ import ViewEditInvoice from '../ViewEditInvoice';
 
 
 function CreditSummaryList() {
-
-    const [users, setUsers] = useState(userData);
     const [list, setList] = useState(OrderListData);
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-    const [userProfileVisible, setUserProfileVisible] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
     const [isEditInvoiceModalVisible, setIsEditInvoiceModalVisible] = useState(false);
 
     const openEditInvoiceModal = () => {
@@ -99,7 +94,7 @@ function CreditSummaryList() {
 
     return (
         <>
-        
+
             <Card bodyStyle={{ padding: '-3px' }}>
                 <Col span={24}>
                     <h4 className='font-medium'>Credit Note Summary</h4>
@@ -111,7 +106,7 @@ function CreditSummaryList() {
                         rowKey="id"
                     />
                 </div>
-                
+
                 <Modal
                     title=""
                     visible={isEditInvoiceModalVisible}

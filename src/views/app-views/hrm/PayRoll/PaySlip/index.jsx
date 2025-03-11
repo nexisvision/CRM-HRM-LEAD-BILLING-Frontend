@@ -3,9 +3,9 @@ import PaySlipList from './PaySlipList';
 
 const payslip = () => (
 
-<div className="mail">
-<PaySlipList />
-</div>
+	<div className="mail">
+		<PaySlipList />
+	</div>
 
 );
 

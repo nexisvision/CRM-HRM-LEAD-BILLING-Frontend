@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Input,
   Button,
@@ -7,23 +7,17 @@ import {
   message,
   Row,
   Col,
-  Switch,
   Upload,
   Modal,
-  Checkbox,
 } from "antd";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
-
-import { useNavigate, useParams } from "react-router-dom";
-
+import { useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { AddTaskk, GetTasks } from "./TaskReducer/TaskSlice";
 import { useDispatch, useSelector } from "react-redux";
-import useSelection from "antd/es/table/hooks/useSelection";
-import { assign, values } from "lodash";
 import { AddLable, GetLable } from "./LableReducer/LableSlice";
 import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
@@ -33,39 +27,22 @@ import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 const { Option } = Select;
 
 const AddTask = ({ onClose }) => {
-
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [isWithoutDueDate, setIsWithoutDueDate] = useState(false);
-  const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
-  const [showReceiptUpload, setShowReceiptUpload] = useState(false);
-
-   const [isPriorityModalVisible, setIsPriorityModalVisible] = useState(false);
-    const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
-    const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
-    const [newPriority, setNewPriority] = useState("");
-    const [newCategory, setNewCategory] = useState("");
-    const [newStatus, setNewStatus] = useState("");
-  
-    const [priorities, setPriorities] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [statuses, setStatuses] = useState([]);
-
-    const [fileList, setFileList] = useState([]);
-
-
+  const [isPriorityModalVisible, setIsPriorityModalVisible] = useState(false);
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
+  const [newPriority, setNewPriority] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [newStatus, setNewStatus] = useState("");
+  const [priorities, setPriorities] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [statuses, setStatuses] = useState([]);
+  const [fileList, setFileList] = useState([]);
   const { id } = useParams();
-
-  const user = useSelector((state) => state.user.loggedInUser.username);
-
-  const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads || []);
-
+  useSelector((state) => state.Leads.Leads || []);
   const allproject = useSelector((state) => state.Project);
   const fndrewduxxdaa = allproject.Project.data
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
-  
-  const AllLoggedData = useSelector((state) => state.user);
-
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
   const loggedInUser = useSelector((state) => state.user.loggedInUser);
@@ -79,22 +56,17 @@ const AddTask = ({ onClose }) => {
       return emp.client_id === loggedInUser.client_id;
     }
   });
-
-  const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
-
-  const [selectedLead, setSelectedLead] = useState(null);
-
   const initialValues = {
     taskName: "",
     category: "",
-    project: fnddata?.id || "", 
-    lead:"",
+    project: fnddata?.id || "",
+    lead: "",
     startDate: null,
     dueDate: null,
     assignTo: [],
     description: "",
     task_reporter: "",
-    files: [] // Add files to initial values
+    files: []
   };
 
   const validationSchema = Yup.object({
@@ -120,18 +92,18 @@ const AddTask = ({ onClose }) => {
       .required("Priority is required"),
     status: Yup.string()
       .required("Status is required"),
-      task_reporter: Yup.string().required("Please select a Task Reporter."),
+    task_reporter: Yup.string().required("Please select a Task Reporter."),
   });
 
-    useEffect(() => {
+  useEffect(() => {
     dispatch(GetUsers());
 
-         dispatch(GetLeads());
+    dispatch(GetLeads());
 
-    }, [dispatch]);
+  }, [dispatch]);
 
 
-  const fetchLables = async (lableType, setter) => {
+  const fetchLables = useCallback(async (lableType, setter) => {
     try {
       const response = await dispatch(GetLable(id));
       if (response.payload && response.payload.data) {
@@ -144,25 +116,19 @@ const AddTask = ({ onClose }) => {
       console.error(`Failed to fetch ${lableType}:`, error);
       message.error(`Failed to load ${lableType}`);
     }
-  };
-  
+  }, [dispatch, id]);
   useEffect(() => {
     fetchLables("category", setCategories);
     fetchLables("priority", setPriorities);
     fetchLables("status", setStatuses);
-  }, []);
+  }, [fetchLables]);
 
-
-
-
-
-  
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
     if (!newValue.trim()) {
       message.error(`Please enter a ${lableType} name.`);
       return;
     }
-  
+
     try {
       const payload = {
         name: newValue.trim(),
@@ -178,7 +144,7 @@ const AddTask = ({ onClose }) => {
         const filteredLables = response.payload.data
           .filter((lable) => lable.lableType === lableType)
           .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
-        
+
         if (lableType === "category") {
           setCategories(filteredLables);
           setFieldValue("category", newValue.trim());
@@ -196,6 +162,7 @@ const AddTask = ({ onClose }) => {
     }
   };
 
+  // File upload props configuration
   const uploadProps = {
     onRemove: (file) => {
       const index = fileList.indexOf(file);
@@ -212,48 +179,46 @@ const AddTask = ({ onClose }) => {
   };
 
   const onSubmit = async (values, { resetForm }) => {
+    // Create FormData to handle file upload
     const formData = new FormData();
-    
+
+    // Append all regular fields
     Object.keys(values).forEach(key => {
       if (key !== 'files') {
         formData.append(key, values[key]);
       }
     });
 
+    // Append files with the key 'task_file'
     fileList.forEach((file) => {
       formData.append('task_file', file);
     });
 
+
+    // Dispatch AddTasks with updated values
     dispatch(AddTaskk({ id, values })).then(() => {
-        dispatch(GetTasks(id))
-          .then(() => {
-            resetForm();
-            setFileList([]); // Reset file list
-            onClose();
-          })
-          .catch((error) => {
-            console.error("Task API error:", error);
-          });
-      })
+      // message.success("Task added successfully!");
+      // Fetch updated tasks after successfully adding
+      dispatch(GetTasks(id))
+        .then(() => {
+          resetForm();
+          setFileList([]); // Reset file list
+          onClose();
+        })
+        .catch((error) => {
+          // message.error("Failed to fetch the latest Task data.");
+          console.error("Task API error:", error);
+        });
+    })
       .catch((error) => {
         message.error("Failed to add Task.");
         console.error("AddTask API error:", error);
       });
   };
 
-
-
-  const handleCheckboxChange = () => {
-    setIsWithoutDueDate(!isWithoutDueDate);
-  };
-
-  const toggleOtherDetails = () => {
-    setIsOtherDetailsVisible(!isOtherDetailsVisible);
-  };
-
   return (
     <div className="add-expenses-form">
-      <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -344,6 +309,7 @@ const AddTask = ({ onClose }) => {
                     </div>
                   </Col>
                 )}
+
                 <Col span={12} className="mt-4">
                   <div className="form-item">
                     <label className="font-semibold ">StartDate <span className="text-red-500">*</span></label>
@@ -351,9 +317,9 @@ const AddTask = ({ onClose }) => {
                       name="startDate"
                       className="w-full mt-1"
                       placeholder="Select startDate"
-                      format="DD-MM-YYYY"
                       onChange={(date) => {
                         setFieldValue("startDate", date);
+                        // Clear end date if it's before the new start date
                         if (values.dueDate && date && values.dueDate.isBefore(date)) {
                           setFieldValue("dueDate", null);
                         }
@@ -378,9 +344,9 @@ const AddTask = ({ onClose }) => {
                       placeholder="Select DueDate"
                       onChange={(value) => setFieldValue("dueDate", value)}
                       value={values.dueDate}
-                         format="DD-MM-YYYY"
                       onBlur={() => setFieldTouched("dueDate", true)}
                       disabledDate={(current) => {
+                        // Disable dates before start date
                         return values.startDate ? current && current < values.startDate.startOf('day') : false;
                       }}
                     />
@@ -391,8 +357,6 @@ const AddTask = ({ onClose }) => {
                     />
                   </div>
                 </Col>
-
-
 
                 <Col span={12} className="mt-4">
                   <div className="form-item">
@@ -433,38 +397,38 @@ const AddTask = ({ onClose }) => {
                 </Col>
 
                 <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Task Reporter <span className="text-rose-500">*</span></label>
-                  <Field name="task_reporter">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Select Task Reporter"
-                        onChange={(value) => setFieldValue("task_reporter", value)}
-                        value={values.task_reporter}
-                      >
-                        {Array.isArray(fnduserdatas) && fnduserdatas.length > 0 ? (
-                          fnduserdatas.map((client) => (
-                            <Option key={client.id} value={client.id}>
-                              {client.firstName || client.username || "Unnamed Client"}
+                  <div className="form-item">
+                    <label className="font-semibold">Task Reporter <span className="text-rose-500">*</span></label>
+                    <Field name="task_reporter">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-1"
+                          placeholder="Select Task Reporter"
+                          onChange={(value) => setFieldValue("task_reporter", value)}
+                          value={values.task_reporter}
+                        >
+                          {Array.isArray(fnduserdatas) && fnduserdatas.length > 0 ? (
+                            fnduserdatas.map((client) => (
+                              <Option key={client.id} value={client.id}>
+                                {client.firstName || client.username || "Unnamed Client"}
+                              </Option>
+                            ))
+                          ) : (
+                            <Option value="" disabled>
+                              No Employee Available
                             </Option>
-                          ))
-                        ) : (
-                          <Option value="" disabled>
-                            No Employee Available
-                          </Option>
-                        )}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="task_reporter"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                          )}
+                        </Select>
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="task_reporter"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
                 <Col span={24} className="mt-4">
                   <div className="form-item">
@@ -482,7 +446,7 @@ const AddTask = ({ onClose }) => {
                             <Button
                               type="link"
                               icon={<PlusOutlined />}
-                               className="w-full mt-2"
+                              className="w-full mt-2"
                               onClick={() => setIsStatusModalVisible(true)}
                             >
                               Add New Status
@@ -521,7 +485,7 @@ const AddTask = ({ onClose }) => {
                             <Button
                               type="link"
                               icon={<PlusOutlined />}
-                               className="w-full mt-2"
+                              className="w-full mt-2"
                               onClick={() => setIsPriorityModalVisible(true)}
                             >
                               Add New priority
@@ -540,7 +504,7 @@ const AddTask = ({ onClose }) => {
                   </div>
                 </Col>
 
-                
+
                 <Col span={24} className="mt-4">
                   <div className="form-item">
                     <label className="font-semibold">Description <span className="text-red-500">*</span></label>
@@ -558,7 +522,6 @@ const AddTask = ({ onClose }) => {
                     />
                   </div>
                 </Col>
-
                 <Col span={24} className="mt-4">
                   <div className="form-item">
                     <label className="text-sm font-semibold mb-2 block">Attachments <span className="text-red-500">*</span></label>
@@ -583,6 +546,7 @@ const AddTask = ({ onClose }) => {
               </div>
             </Form>
 
+            {/* Move Modals inside Formik render props to access setFieldValue */}
             <Modal
               title="Add New priority"
               open={isPriorityModalVisible}
@@ -596,7 +560,7 @@ const AddTask = ({ onClose }) => {
                 onChange={(e) => setNewPriority(e.target.value)}
               />
             </Modal>
-            
+
             <Modal
               title="Add New Category"
               open={isCategoryModalVisible}

@@ -42,7 +42,6 @@ const AddPaySlip = () => {
 
   return (
     <div className="add-job-form">
-
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

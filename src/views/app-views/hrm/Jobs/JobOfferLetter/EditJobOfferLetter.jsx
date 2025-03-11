@@ -16,14 +16,12 @@ import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import { GetJobdata } from "../JobReducer/JobSlice";
 import { getjobapplication } from "../JobApplication/JobapplicationReducer/JobapplicationSlice";
-import { QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined } from "@ant-design/icons";
 
 import {
-  Addjobofferss,
   editjobofferss,
   getjobofferss,
 } from "./jobOfferletterReducer/jobofferlateerSlice";
-import moment from "moment/moment";
 const { Option } = Select;
 
 const EditJobOfferLetter = ({ idd, onClose }) => {
@@ -135,7 +133,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
 
   return (
     <div>
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <hr style={{ border: "1px solid #E8E8E8" }} />
 
       <Formik
         initialValues={initialValues}
@@ -233,7 +231,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-             
+
               <Col span={12} className='mt-3'>
                 <div className="form-item">
                   <label className='font-semibold'>Offer Expire On <span className="text-red-500">*</span></label>
@@ -266,7 +264,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                     disabledDate={(current) => {
                       const offerExpiryDate = values.offer_expiry ? dayjs(values.offer_expiry) : null;
                       return current && (
-                        current < dayjs().startOf('day') || 
+                        current < dayjs().startOf('day') ||
                         (offerExpiryDate && current < offerExpiryDate)
                       );
                     }}
@@ -284,7 +282,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
               </Col>
 
               <Col span={12}>
-                  <div className="form-item mt-3">
+                <div className="form-item mt-3">
                   <label className="font-semibold">Salary <span className="text-red-500">*</span></label>
                   <Field
                     className="mt-1 w-full"
@@ -337,9 +335,9 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
               </Col>
 
               <Col span={24} className="mt-3">
-                  <div className="mb-4">
+                <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Attachment 
+                    Attachment
                   </label>
                   <Upload
                     beforeUpload={(file) => {
@@ -363,7 +361,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                     <Button icon={<UploadOutlined />} className="bg-white">
                       Select File
                     </Button>
-                   
+
                   </Upload>
                 </div>
               </Col>

@@ -25,12 +25,10 @@ const AddCurrencies = ({ onClose }) => {
     try {
       await dispatch(addcurren(values)).unwrap();
       await dispatch(getcurren());
-     
       message.success('Currency added successfully.');
       resetForm();
       onClose();
     } catch (error) {
-    
       message.error('Failed to add currency.');
     } finally {
       setSubmitting(false);
@@ -39,7 +37,7 @@ const AddCurrencies = ({ onClose }) => {
 
   return (
     <div>
- <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
 
       <Formik
         initialValues={initialValues}

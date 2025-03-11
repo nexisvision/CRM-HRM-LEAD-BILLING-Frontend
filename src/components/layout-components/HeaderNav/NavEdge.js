@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-const NavEdge = styled.div(({left, right}) => {
+const NavEdge = styled.div(({ left, right }) => {
 
 	if (left) {
 		return {

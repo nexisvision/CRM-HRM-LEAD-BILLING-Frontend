@@ -36,7 +36,7 @@ const TopNvContent = styled('div')`
 				color: rgba(255, 255, 255, 0.75)
 			}
 		}
-    ` : '' }
+    ` : ''}
 
 	${props => props.mode === 'dark' ? `
 		.ant-menu {
@@ -48,16 +48,16 @@ const TopNvContent = styled('div')`
 				color: rgba(0, 0, 0, 0.75)
 			}
 		}
-    ` : '' }
+    ` : ''}
 `
 
-export const TopNav = ({topNavColor }) => {
+export const TopNav = ({ topNavColor }) => {
 	const props = { topNavColor }
 	return (
 		<TopNvContent mode={utils.getColorContrast(topNavColor)} backgroundColor={topNavColor}>
 			<div className="top-nav-wrapper">
 				<MenuContent
-					type={NAV_TYPE_TOP} 
+					type={NAV_TYPE_TOP}
 					{...props}
 				/>
 			</div>
@@ -66,8 +66,8 @@ export const TopNav = ({topNavColor }) => {
 }
 
 const mapStateToProps = ({ theme }) => {
-  const { topNavColor } =  theme;
-  return { topNavColor }
+	const { topNavColor } = theme;
+	return { topNavColor }
 };
 
 export default connect(mapStateToProps)(TopNav);

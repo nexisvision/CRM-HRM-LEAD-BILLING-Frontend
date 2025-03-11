@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Input, Button, DatePicker, Select, message, Row, Col, Modal } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
-import utils from "utils";
-import OrderListData from "assets/data/order-list.data.json";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector } from "react-redux";
@@ -21,15 +18,13 @@ import AddCountries from "views/app-views/setting/countries/AddCountries";
 const { Option } = Select;
 
 const EditContract = ({ id, onClose }) => {
-  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
-  const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
+  const allloggeduser = useSelector((state) => state.user.loggedInUser.username)
 
 
   const countries = useSelector((state) => state.countries.countries);
-  const { currencies } = useSelector((state) => state.currencies);
 
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
@@ -64,13 +59,19 @@ const EditContract = ({ id, onClose }) => {
 
   useEffect(() => {
     dispatch(getcurren());
-  }, []);
+  }, [dispatch]);
 
-  useEffect(() => {
-    fetchLables("contracttype", setContracttypes);
-  }, []);
+  useCallback((type, setterFunction) => {
+    dispatch(GetLable(type)).then((response) => {
+      if (response.payload) {
+        setterFunction(response.payload);
+      }
+    });
+  }, [dispatch]);
 
- 
+
+
+
 
   const [initialValues, setInitialValues] = useState({
     subject: "",
@@ -114,7 +115,6 @@ const EditContract = ({ id, onClose }) => {
   });
 
   const onSubmit = (values) => {
-    
 
     dispatch(Editcon({ id, values }))
       .then(() => {
@@ -227,9 +227,9 @@ const EditContract = ({ id, onClose }) => {
         onSubmit={onSubmit}
         enableReinitialize
       >
-        {({ values, setFieldValue, handleSubmit, handleChange,setFieldTouched }) => (
+        {({ values, setFieldValue, handleSubmit, handleChange, setFieldTouched }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
-            <h2 className="mb-4 border-b pb-2 font-medium"></h2>
+            <hr className="mb-4 border-b pb-2 font-medium"></hr>
 
             <Row gutter={16}>
               <Col span={12}>
@@ -249,24 +249,7 @@ const EditContract = ({ id, onClose }) => {
                   />
                 </div>
               </Col>
-
-              {/* <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Contract Number</label>
-                  <Field
-                    name="contract_number"
-                    as={Input}
-                    placeholder="Enter Contract Number"
-                  />
-                  <ErrorMessage
-                    name="contract_number"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
-
-<Col span={12}>
+              <Col span={12}>
                 <div className="form-group">
                   <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
                   <div className="flex gap-0">
@@ -332,7 +315,13 @@ const EditContract = ({ id, onClose }) => {
                           type="number"
                           placeholder="Enter phone number"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                          
+                        // prefix={
+                        //   values.phoneCode && (
+                        //     <span className="text-gray-600 font-medium mr-1">
+                        //       {values.phoneCode}
+                        //     </span>
+                        //   )
+                        // }
                         />
                       )}
                     </Field>
@@ -342,18 +331,18 @@ const EditContract = ({ id, onClose }) => {
               </Col>
 
               <Col span={24} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">address <span className="text-rose-500">*</span></label>
-                    <Field name="address" as={Input} placeholder="Enter address" className="mt-1" />
-                    <ErrorMessage
-                      name="address"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
+                <div className="form-item">
+                  <label className="font-semibold">address <span className="text-rose-500">*</span></label>
+                  <Field name="address" as={Input} placeholder="Enter address" className="mt-1" />
+                  <ErrorMessage
+                    name="address"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
-                <Col span={12} className="mt-4">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">City <span className="text-rose-500">*</span></label>
                   <Field
@@ -465,102 +454,102 @@ const EditContract = ({ id, onClose }) => {
               </Col>
 
               <Col span={12} className="mt-4">
-                      <div className="form-group">
-                        <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
-                        <div className="flex gap-0">
-                          <Field name="currency">
-                            {({ field }) => (
-                              <Select
-                                {...field}
-                                className="currency-select"
-                                style={{
-                                  width: '60px',
-                                  borderTopRightRadius: 0,
-                                  borderBottomRightRadius: 0,
-                                  borderRight: 0,
-                                  backgroundColor: '#f8fafc',
-                                }}
-                                placeholder={<span className="text-gray-400">$</span>}
-                                onChange={(value) => {
-                                  if (value === 'add_new') {
-                                    setIsAddCurrencyModalVisible(true);
-                                  } else {
-                                    setFieldValue("currency", value);
-                                  }
-                                }}
-                                value={values.currency}
-                                dropdownStyle={{ minWidth: '180px' }}
-                                suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                                loading={!fnddatass}
-                                dropdownRender={menu => (
-                                  <div>
-                                    <div
-                                      className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                      onClick={() => setIsAddCurrencyModalVisible(true)}
-                                    >
-                                      <PlusOutlined className="mr-2" />
-                                      <span className="text-sm">Add New</span>
-                                    </div>
-                                    {menu}
-                                  </div>
-                                )}
+                <div className="form-group">
+                  <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
+                  <div className="flex gap-0">
+                    <Field name="currency">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="currency-select"
+                          style={{
+                            width: '60px',
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRight: 0,
+                            backgroundColor: '#f8fafc',
+                          }}
+                          placeholder={<span className="text-gray-400">$</span>}
+                          onChange={(value) => {
+                            if (value === 'add_new') {
+                              setIsAddCurrencyModalVisible(true);
+                            } else {
+                              setFieldValue("currency", value);
+                            }
+                          }}
+                          value={values.currency}
+                          dropdownStyle={{ minWidth: '180px' }}
+                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          loading={!fnddatass}
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddCurrencyModalVisible(true)}
                               >
-                                {fnddatass?.map((currency) => (
-                                  <Option key={currency.id} value={currency.id}>
-                                    <div className="flex items-center w-full px-1">
-                                      <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
-                                      <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
-                                      <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
-                                    </div>
-                                  </Option>
-                                ))}
-                              </Select>
-                            )}
-                          </Field>
-                          <Field name="value">
-                            {({ field, form }) => (
-                              <Input
-                                {...field}
-                                className="price-input"
-                                style={{
-                                  borderTopLeftRadius: 0,
-                                  borderBottomLeftRadius: 0,
-                                  borderLeft: '1px solid #d9d9d9',
-                                  width: 'calc(100% - 80px)'
-                                }}
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                placeholder="0.00"
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                                    form.setFieldValue('value', value);
-                                  }
-                                }}
-                                onKeyPress={(e) => {
-                                  const charCode = e.which ? e.which : e.keyCode;
-                                  if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-                                    e.preventDefault();
-                                  }
-                                  if (charCode === 46 && field.value.includes('.')) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                                prefix={
-                                  values.currency && (
-                                    <span className="text-gray-600 font-medium mr-1">
-                                      {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
-                                    </span>
-                                  )
-                                }
-                              />
-                            )}
-                          </Field>
-                        </div>
-                        <ErrorMessage name="value" component="div" className="text-red-500 mt-1 text-sm" />
-                      </div>
-                    </Col>
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
+                          )}
+                        >
+                          {fnddatass?.map((currency) => (
+                            <Option key={currency.id} value={currency.id}>
+                              <div className="flex items-center w-full px-1">
+                                <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                              </div>
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
+                    <Field name="value">
+                      {({ field, form }) => (
+                        <Input
+                          {...field}
+                          className="price-input"
+                          style={{
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeft: '1px solid #d9d9d9',
+                            width: 'calc(100% - 80px)'
+                          }}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="0.00"
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                              form.setFieldValue('value', value);
+                            }
+                          }}
+                          onKeyPress={(e) => {
+                            const charCode = e.which ? e.which : e.keyCode;
+                            if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                              e.preventDefault();
+                            }
+                            if (charCode === 46 && field.value.includes('.')) {
+                              e.preventDefault();
+                            }
+                          }}
+                          prefix={
+                            values.currency && (
+                              <span className="text-gray-600 font-medium mr-1">
+                                {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                              </span>
+                            )
+                          }
+                        />
+                      )}
+                    </Field>
+                  </div>
+                  <ErrorMessage name="value" component="div" className="text-red-500 mt-1 text-sm" />
+                </div>
+              </Col>
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
@@ -685,22 +674,15 @@ const EditContract = ({ id, onClose }) => {
 
               <Col span={12} className="mt-3">
                 <div className="form-item">
-                    <label className="font-semibold ">EndDate <span className="text-rose-500">*</span></label>
-                  <Field name="endDate">
-                    {({ field }) => (
-                      <Input
-                        {...field}
-                        type="date"
-                        className="w-full mt-1"
-                        onChange={(e) => {
-                          const date = e.target.value;
-                          setFieldValue("endDate", moment(date));
-                        }}
-                        value={values.endDate ? moment(values.endDate).format('YYYY-MM-DD') : ''}
-                        onBlur={() => setFieldTouched("endDate", true)}
-                      />
-                    )}
-                  </Field>
+                  <label className="font-semibold ">EndDate <span className="text-rose-500">*</span></label>
+                  <DatePicker
+                    name="endDate"
+                    className="w-full mt-1"
+                    placeholder="Select endDate"
+                    onChange={(value) => setFieldValue("endDate", value)}
+                    value={values.endDate}
+                    onBlur={() => setFieldTouched("endDate", true)}
+                  />
                   <ErrorMessage
                     name="endDate"
                     component="div"
@@ -728,27 +710,27 @@ const EditContract = ({ id, onClose }) => {
               </Col>
 
               <Col span={24} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">Notes <span className="text-rose-500">*</span></label>
-                    <Field name="notes">
-                      {({ field }) => (
-                        <ReactQuill
-                          {...field}
-                          className="mt-1"
-                          value={values.notes}
-                          onChange={(value) =>
-                            setFieldValue("notes", value)
-                          }
-                        />
-                      )}
-                    </Field>
-                    <ErrorMessage
-                      name="notes"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
+                <div className="form-item">
+                  <label className="font-semibold">Notes <span className="text-rose-500">*</span></label>
+                  <Field name="notes">
+                    {({ field }) => (
+                      <ReactQuill
+                        {...field}
+                        className="mt-1"
+                        value={values.notes}
+                        onChange={(value) =>
+                          setFieldValue("notes", value)
+                        }
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="notes"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
             </Row>
 

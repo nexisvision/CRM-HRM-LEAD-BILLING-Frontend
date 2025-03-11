@@ -14,14 +14,14 @@ const AppLayout = lazy(() => import('./AppLayout'));
 const AuthLayout = lazy(() => import('./AuthLayout'));
 
 const Layouts = () => {
-const dispatch = useDispatch();
+	const dispatch = useDispatch();
 
-	
+
 	useEffect(() => {
 		dispatch(getRoles());
 		dispatch(getgeneralsettings());
-	  }, [dispatch]);
-	  
+	}, [dispatch]);
+
 
 	const token = useSelector(state => state.auth.token);
 	const blankLayout = useSelector(state => state.theme.blankLayout);
@@ -38,11 +38,11 @@ const dispatch = useDispatch();
 
 	useBodyClass(`dir-${direction}`);
 
-	const themeConfig = currentTheme === 'light' ? {...lightTheme} : {...darkTheme}
+	const themeConfig = currentTheme === 'light' ? { ...lightTheme } : { ...darkTheme }
 
 	return (
 		<ConfigProvider theme={themeConfig} direction={direction} locale={currentAppLocale.antd}>
-			<Suspense fallback={<Loading cover="content"/>}>
+			<Suspense fallback={<Loading cover="content" />}>
 				<Layout>
 					<Routes />
 				</Layout>

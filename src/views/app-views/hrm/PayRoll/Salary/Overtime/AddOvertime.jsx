@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Form, Input, Select, Row, Col, Button, message } from "antd";
+import { Input, Select, Col, Button, message } from "antd";
 import { ErrorMessage, Field, Formik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from 'yup';
@@ -57,12 +57,12 @@ const AddOvertime = ({ id, onClose }) => {
     <div className="employee-salary">
       <h2 className="mb-3 border-b pb-1 font-medium"></h2>
       <Formik
-        initialValues={{ 
+        initialValues={{
           employeeId: "",
-          title: "", 
-          days: "", 
-          Hours: "", 
-          rate: "" 
+          title: "",
+          days: "",
+          Hours: "",
+          rate: ""
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}

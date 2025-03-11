@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from "react";
 import {
-  Card,
   Form,
   Row,
   Col,
   Select,
-  DatePicker,
   Button,
-  message,
 } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import { ErrorMessage, Field, Formik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { GetPlan } from "../plan/PlanReducers/PlanSlice";
 import { addassignplan } from "./CompanyReducers/CompanySlice";
-import moment from "moment"; // Import moment.js for date formatting
+import moment from "moment";
 import { getsubplandata } from "../subscribeduserplans/subplanReducer/subplanSlice";
 
 const { Option } = Select;
@@ -53,13 +49,13 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
     }
 
     let endDate = moment(startDate);
-    
+
     const durationMatch = duration.match(/^(\d+)\s*(Month|Year)s?$/i);
-    
+
     if (durationMatch) {
       const value = parseInt(durationMatch[1], 10);
       const unit = durationMatch[2].toLowerCase();
-      
+
       switch (unit) {
         case 'month':
           endDate = endDate.add(value, 'months');
@@ -68,10 +64,11 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
           endDate = endDate.add(value, 'years');
           break;
         default:
+        // console.error('Unsupported duration unit:', unit);
       }
     } else {
     }
-    
+
     return endDate;
   };
 
@@ -79,8 +76,8 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
     try {
       setLoading(true);
 
-      const selectedPlan = fnsfdtaf.find(plan => plan.id === values.plan_id);
-      
+
+      // Convert the date values to strings in YYYY-MM-DD format using moment
       const payload = {
         ...values,
         start_date: moment(values.start_date).format("YYYY-MM-DD"),
@@ -132,7 +129,8 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                             onChange={(value) => {
                               const selectedPlan = fnsfdtaf.find(plan => plan.id === value);
                               form.setFieldValue("plan_id", value);
-                              
+
+                              // If start date is selected, automatically calculate end date
                               if (selectedPlan && form.values.start_date) {
                                 const startDate = moment(form.values.start_date);
                                 const endDate = calculateEndDate(startDate, selectedPlan.duration);
@@ -173,7 +171,8 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                         onChange={(e) => {
                           const date = e.target.value;
                           setFieldValue("start_date", date);
-                          
+
+                          // If plan is selected, automatically calculate end date
                           if (date && values.plan_id) {
                             const selectedPlan = fnsfdtaf.find(plan => plan.id === values.plan_id);
                             if (selectedPlan) {

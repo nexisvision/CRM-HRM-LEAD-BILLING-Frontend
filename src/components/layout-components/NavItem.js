@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { 
+import {
     GRAY_SCALE,
 } from 'constants/ThemeConstant'
 import { baseTheme, rgba } from 'configs/ThemeConfig'
@@ -15,14 +15,14 @@ const NavItem = styled('div')`
     line-height: 1.5;
     cursor: pointer;
     padding: 0 1rem;
-    color: ${props => isDark(props.mode) ?  GRAY_SCALE.GRAY : rgba(GRAY_SCALE.WHITE, 0.85) };
+    color: ${props => isDark(props.mode) ? GRAY_SCALE.GRAY : rgba(GRAY_SCALE.WHITE, 0.85)};
 
     @media ${MEDIA_QUERIES.MOBILE} {
 		padding: 0 0.75rem;
 	}
 
     .ant-badge {
-        color: ${props => isDark(props.mode) ?  GRAY_SCALE.GRAY : rgba(GRAY_SCALE.WHITE, 0.85) };
+        color: ${props => isDark(props.mode) ? GRAY_SCALE.GRAY : rgba(GRAY_SCALE.WHITE, 0.85)};
     }
 
     .nav-icon {

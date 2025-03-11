@@ -10,8 +10,8 @@ import ApiContainer from 'components/util-components/ApiContainer/Container';
 const Demo = () => {
 	return (
 		<div className="d-flex align-items-center flex-column">
-			<div style={{width: 300}}>
-				<DataDisplayWidget 
+			<div style={{ width: 300 }}>
+				<DataDisplayWidget
 					icon={<BarChartOutlined />}
 					value="$11,388"
 					title="Revenue"
@@ -21,8 +21,8 @@ const Demo = () => {
 					vertical={false}
 				/>
 			</div>
-			<div style={{width: 300}}>
-				<DataDisplayWidget 
+			<div style={{ width: 300 }}>
+				<DataDisplayWidget
 					icon={<BarChartOutlined />}
 					value="$37,212"
 					title="Net Profit"
@@ -36,7 +36,7 @@ const Demo = () => {
 	)
 }
 
-const  usageStr = `import React from 'react'
+const usageStr = `import React from 'react'
 import DataDisplayWidget from 'components/shared-components/DataDisplayWidget'
 import { BarChartOutlined } from '@ant-design/icons';
 
@@ -74,8 +74,8 @@ const DataDisplayWidgetDemo = () => {
 		<div>
 			<h2>DataDisplayWidget</h2>
 			<div className="mt-4">
-				<ComponentIntro name="Location" desc="src/components/shared-components/DataDisplayWidget.js"/>
-				<ComponentIntro name="Description" desc="Display highlight with icon"/>
+				<ComponentIntro name="Location" desc="src/components/shared-components/DataDisplayWidget.js" />
+				<ComponentIntro name="Description" desc="Display highlight with icon" />
 				<div className="mt-4">
 					<Card title="Example">
 						<Demo />

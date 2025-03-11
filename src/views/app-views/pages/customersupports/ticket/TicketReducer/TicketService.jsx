@@ -49,7 +49,7 @@ const Deleteticket = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -76,13 +76,15 @@ const Editticket = async (idd, formData) => {
   }
 };
 
+
+
 const UserService = {
- 
+
+  GetTicket,
   CreateTicket,
   Deleteticket,
   Editticket,
-  GetTicket,
-  
+
 };
 
 export default UserService;

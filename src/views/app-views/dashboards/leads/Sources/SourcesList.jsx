@@ -49,7 +49,6 @@ const SourcesList = () => {
           type="text"
           icon={<DeleteOutlined />}
           danger
-          //   style={{ background: '#ffefef', color: '#ff4d4f', borderRadius: '5px' }}
           onClick={() => deleteUser(record.id)}
         />
       ),
@@ -62,7 +61,6 @@ const SourcesList = () => {
       extra={
         <Button type="primary" className="ml-2" onClick={openAddSourcesModal}>
           <PlusOutlined />
-          {/* <span>New</span> */}
         </Button>
       }
       bodyStyle={{ padding: "0" }}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Select, Rate, Row, Col, message, Modal } from 'antd';
+import { Form, Button, Select, Rate, Row, Col, message, Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { getBranch } from '../../Branch/BranchReducer/BranchSlice';
 import { getDept } from '../../Department/DepartmentReducers/DepartmentSlice';
@@ -14,19 +14,15 @@ const EditIndicator = ({ id, onClose }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const user = useSelector((state) => state.user.loggedInUser.username);
   const alldept = useSelector((state) => state.indicator);
   const fndbranchdata = useSelector((state) => state.Branch?.Branch?.data || []);
   const fnddepartmentdata = useSelector((state) => state.Department?.Department?.data || []);
   const fnddesignationdata = useSelector((state) => state.Designation?.Designation?.data || []);
-  const [singleEmp, setSingleEmp] = useState(null);
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
   useEffect(() => {
     const empData = alldept?.Indicators?.data || [];
     const data = empData.find((item) => item.id === id);
-    setSingleEmp(data || null);
 
     if (data) {
       form.setFieldsValue({
@@ -87,7 +83,7 @@ const EditIndicator = ({ id, onClose }) => {
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
-        <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+        <div className="mb-3 border-b pb-1 font-medium"></div>
 
         <Row gutter={16}>
           <Col span={12}>

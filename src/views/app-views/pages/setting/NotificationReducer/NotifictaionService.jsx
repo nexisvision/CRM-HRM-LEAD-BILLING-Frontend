@@ -1,4 +1,4 @@
-  import axios from "axios";
+import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
 
@@ -30,7 +30,7 @@ const CreateTicket = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -50,7 +50,7 @@ const Deleteticket = async (id) => {
         },
       }
     );
-    //   dispatch(empdata());
+
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -80,15 +80,12 @@ const Editticket = async (idd, values) => {
 
 
 const UserService = {
-  // addUser,
+
   GetNoti,
   CreateTicket,
   Deleteticket,
   Editticket,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default UserService;

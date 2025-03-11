@@ -17,20 +17,19 @@ import { useParams } from "react-router-dom";
 import {
   fetchEventsData,
   UpdateEventsetUp,
-} from "./EventSetupService/EventSetupSlice"; // Make sure the path is correct
+} from "./EventSetupService/EventSetupSlice";
 
 const { Option } = Select;
 
 const EditEventSetUp = ({ initialEventData, onCancel, id, onSuccess }) => {
   const dispatch = useDispatch();
-
   const onSubmit = async (values, { setSubmitting }) => {
     try {
       const eventData = {
         EventTitle: values.EventTitle,
         EventManager: values.EventManager,
-        EventDate: values.EventDate.format("YYYY-MM-DD"), // Ensure date format is consistent
-        EventTime: values.EventTime, // Ensure time format is consistent
+        EventDate: values.EventDate.format("YYYY-MM-DD"),
+        EventTime: values.EventTime,
       };
 
       dispatch(UpdateEventsetUp({ id, eventData })).then(() => {
@@ -49,10 +48,10 @@ const EditEventSetUp = ({ initialEventData, onCancel, id, onSuccess }) => {
     EventTitle: initialEventData?.EventTitle || "",
     EventManager: initialEventData?.EventManager || "",
     EventDate: initialEventData?.EventDate
-      ? moment(initialEventData?.EventDate) // Ensure it's a moment object
+      ? moment(initialEventData?.EventDate)
       : null,
     EventTime: initialEventData?.EventTime
-      ? moment(initialEventData?.EventTime, "HH:mm") // Ensure it's a moment object
+      ? moment(initialEventData?.EventTime, "HH:mm")
       : null,
   });
 
@@ -72,7 +71,6 @@ const EditEventSetUp = ({ initialEventData, onCancel, id, onSuccess }) => {
           return moment(value).isAfter(moment(StartTime));
         }
       ),
-   
   });
 
   useEffect(() => {

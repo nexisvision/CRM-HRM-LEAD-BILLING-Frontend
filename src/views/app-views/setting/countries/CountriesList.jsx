@@ -1,48 +1,34 @@
 import React, { useEffect, useState } from 'react'
-import { Row, Card, Col, Table, Select, Input, Button, Badge, Menu, Modal, message, Switch } from 'antd';
-import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Card, Table, Input, Button, Modal, message } from 'antd';
+import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex'
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import utils from 'utils'
-import axios from 'axios';
-import { useDispatch,useSelector } from 'react-redux';
-import { DeletePs, getallcountries } from './countriesreducer/countriesSlice';
-import { deleteCountries } from './countriesreducer/countriesSlice';
-import userData from 'assets/data/user-list.data.json';
+import { useDispatch, useSelector } from 'react-redux';
+import { getallcountries } from './countriesreducer/countriesSlice';
 import AddCountries from './AddCountries';
 import EditCountries from './EditCountries';
 import { getRoles } from 'views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice';
-const { Column } = Table;
-const { Option } = Select
+
 export const CountriesList = () => {
-    // const [countries, setCountries] = useState([]);
-
-
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [isAddCountriesModalVisible, setIsAddCountriesModalVisible] = useState(false);
     const [isEditCountriesModalVisible, setIsEditCountriesModalVisible] = useState(false);
     const dispatch = useDispatch();
-    const [selectedCountry, setSelectedCountry] = useState(null);
-    const [idd, setIdd] = useState("");
+    const idd = ""
     const [searchText, setSearchText] = useState('');
 
-      // Get logged-in user data
-      const userData = useSelector((state) => state.user?.loggedInUser);
-      const roles = useSelector((state) => state.role?.role?.data);
+    // Get logged-in user data
+    const userData = useSelector((state) => state.user?.loggedInUser);
+    const roles = useSelector((state) => state.role?.role?.data);
 
     useEffect(() => {
         dispatch(getallcountries());
     }, [dispatch]);
 
+    const countries = useSelector((state) => state.countries.countries);
 
-    const countries = useSelector((state)=>state.countries.countries);
-
-    const loggedIndata = useSelector((state)=>state.user.loggedInUser.username)
-
-
-     useEffect(() => {
-        if(countries){
+    useEffect(() => {
+        if (countries) {
             setFilteredData(countries);
         }
     }, [countries]);
@@ -55,28 +41,22 @@ export const CountriesList = () => {
         const userRole = roles?.find(role => role.id === userData?.role_id);
         return userRole?.role_name === 'super-admin';
     };
-  
+
+    // Open Add Job Modal
     const openAddCountriesModal = () => {
         setIsAddCountriesModalVisible(true);
-    };
-
-    const openEditCountriesModal = (country) => {
-        setIsEditCountriesModalVisible(true);
-        setSelectedCountry(country);
-        setIdd(country.id)
     };
 
     const handleModalClose = () => {
         setIsAddCountriesModalVisible(false);
         setIsEditCountriesModalVisible(false);
-        setSelectedCountry(null);
     };
 
-     // Search function
-     const onSearch = (e) => {
+    // Search function
+    const onSearch = (e) => {
         const value = e.target.value.toLowerCase();
         setSearchText(value);
-        
+
         // If search value is empty, show all data
         if (!value) {
             setFilteredData(countries);
@@ -84,52 +64,13 @@ export const CountriesList = () => {
         }
 
         // Filter the data based on country name
-        const filtered = countries.filter(country => 
+        const filtered = countries.filter(country =>
             country.countryName?.toLowerCase().includes(value)
         );
-        
+
         setFilteredData(filtered);
     };
-    const handleDeleteCountry = (id) => {
-        Modal.confirm({
-            title: 'Are you sure you want to delete this country?',
-            content: 'This action cannot be undone.',
-            okText: 'Yes',
-            okType: 'danger',
-            cancelText: 'No',
-            onOk: () => {
-                return new Promise((resolve, reject) => {
-                    dispatch(DeletePs(id))
-                        .unwrap()
-                        .then(() => {
-                            message.success('Country deleted successfully');
-                            resolve();
-                        })
-                        .catch((error) => {
-                            message.error(error.message || 'Failed to delete country');
-                            reject();
-                        });
-                });
-            }
-        });
-    };
 
-    const dropdownMenu = (elm) => (
-        <Menu>
-            {/* <Menu.Item>
-                <Flex alignItems="center" onClick={() => openEditCountriesModal(elm)}>
-                    <EditOutlined />
-                    <span className="ml-2">Edit</span>
-                </Flex>
-            </Menu.Item> */}
-            {/* <Menu.Item>
-                <Flex alignItems="center" onClick={() => handleDeleteCountry(elm.id)}>
-                    <DeleteOutlined />
-                    <span className="ml-2">Delete</span>
-                </Flex>
-            </Menu.Item> */}
-        </Menu>
-    );
     const tableColumns = [
         {
             title: 'Name',
@@ -145,10 +86,9 @@ export const CountriesList = () => {
             title: 'Phone Code',
             dataIndex: 'phoneCode',
             sorter: (a, b) => utils.antdTableSorter(a, b, 'phoneCode')
-        },
-        
+        }
     ];
-   
+
     return (
         <div className="container">
             <Card>
@@ -168,12 +108,12 @@ export const CountriesList = () => {
                             </Input.Group>
                         </div>
                     </Flex>
-                   {/* Only show Add button if role_name is super-admin */}
-                   {isSuperAdmin() && (
+                    {/* Only show Add button if role_name is super-admin */}
+                    {isSuperAdmin() && (
                         <Flex gap="7px" className="flex">
-                            <Button 
-                                type="primary" 
-                                className="flex items-center" 
+                            <Button
+                                type="primary"
+                                className="flex items-center"
                                 onClick={openAddCountriesModal}
                             >
                                 <PlusOutlined />
@@ -215,18 +155,8 @@ export const CountriesList = () => {
                 width={700}
                 className='mt-[-70px]'
             >
-                <EditCountries onClose={handleModalClose} idd={idd}/>
+                <EditCountries onClose={handleModalClose} idd={idd} />
             </Modal>
-            {/* <Modal
-                    title="Subscribed Plans Details"
-                    visible={isViewCountriesModalVisible}
-                    onCancel={closeViewCountriesModal}
-                    footer={null}
-                    width={700}
-                    className='mt-[-70px]'
-                >
-                    <ViewCountries onClose={closeViewCountriesModal} />
-                </Modal> */}
         </div>
     );
 }

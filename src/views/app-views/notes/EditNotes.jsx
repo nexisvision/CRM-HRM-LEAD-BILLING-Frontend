@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Input, Button, Select, message, Row, Col } from "antd";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect} from "react";
+import { Input, Button, Select, Row, Col } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import "react-quill/dist/quill.snow.css";
@@ -9,7 +8,7 @@ import { addnotess, getnotess } from "./notesReducer/notesSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "../hrm/Employee/EmployeeReducers/EmployeeSlice";
 const { Option } = Select;
-// Validation Schema
+  // Validation Schema
 const validationSchema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
   description: Yup.string().required("Description is required"),
@@ -18,13 +17,11 @@ const validationSchema = Yup.object().shape({
 });
 const EditNotes = ({ onClose }) => {
   const dispatch = useDispatch();
-  const [selectedType, setSelectedType] = useState("Personal");
-  const navigate = useNavigate();
   const alllogeddata = useSelector((state) => state.user);
   const id = alllogeddata.loggedInUser.id;
   useEffect(() => {
     dispatch(empdata());
-  }, []);
+  }, [dispatch]);
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data;
   const initialValues = {
@@ -104,7 +101,6 @@ const EditNotes = ({ onClose }) => {
                         placeholder="Select Type"
                         onChange={(value) => {
                           setFieldValue("type", value);
-                          setSelectedType(value);
                           if (value !== "Shared") {
                             setFieldValue("assignto", []);
                           }

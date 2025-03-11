@@ -359,9 +359,9 @@ const UtilityClasses = () => {
 															<Flex alignItems="center">
 																{
 																	elm.title === 'Background' && <span
-																	className={`mr-2 d-inline-block ${list.class}`}
-																	style={{height: 12, width: 12}}>
-																</span> 
+																		className={`mr-2 d-inline-block ${list.class}`}
+																		style={{ height: 12, width: 12 }}>
+																	</span>
 																}
 																<span>{list.props}</span>
 															</Flex>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Input,
   Button,
@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AddPro, GetProject } from "./projectReducer/ProjectSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { PlusOutlined } from "@ant-design/icons";
-import { GetTagspro, AddTags } from "./tagReducer/TagSlice";
+import { GetTagspro } from "./tagReducer/TagSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { AddLablee, GetLablee } from "../milestone/LableReducer/LableSlice";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
@@ -87,20 +87,13 @@ const AddProject = ({ onClose }) => {
   }, [dispatch]);
 
   const allloggeduser = useSelector((state) => state.user.loggedInUser.username)
-
-
   const alluserdatas = useSelector((state) => state.Users);
   const fnadat = alluserdatas?.Users?.data;
 
   const fnd = fnadat?.filter((item) => item?.created_by === allloggeduser)
-
   const AllEmployee = useSelector((state) => state.SubClient);
   const employeedata = AllEmployee.SubClient.data;
-
-
   const fnd2 = employeedata?.filter((item) => item?.created_by === allloggeduser)
-
-
   const AllLoggeddtaa = useSelector((state) => state.user);
 
   const initialValues = {
@@ -159,17 +152,17 @@ const AddProject = ({ onClose }) => {
       .then(() => {
         dispatch(GetProject())
           .then(() => {
-           
+
             resetForm();
             onClose();
           })
           .catch((error) => {
             console.error("Project Data API error:", error);
-           
+
           });
       })
       .catch((error) => {
-       
+
         console.error("AddProject API error:", error);
       });
   };
@@ -179,9 +172,9 @@ const AddProject = ({ onClose }) => {
     const lid = AllLoggeddtaa.loggedInUser.role_id;
 
     GetLablee(lid);
-  }, []);
+  }, [AllLoggeddtaa]);
 
-  const fetchLables = async (lableType, setter) => {
+  const fetchLables = useCallback(async (lableType, setter) => {
     try {
       const lid = AllLoggedData.loggedInUser.id; // User ID to fetch specific labels
       const response = await dispatch(GetLablee(lid)); // Fetch all labels
@@ -193,15 +186,15 @@ const AddProject = ({ onClose }) => {
       }
     } catch (error) {
       console.error(`Failed to fetch ${lableType}:`, error);
-      message.error(`Failed to load $ {lableType}`);
+      message.error(`Failed to load ${lableType}`);
     }
-  };
+  }, [AllLoggedData.loggedInUser.id, dispatch]);
 
   useEffect(() => {
     fetchLables("tag", setTags);
     fetchLables("category", setCategories);
     fetchLables("status", setStatuses);
-  }, []);
+  }, [fetchLables]);
 
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
     if (!newValue.trim()) {
@@ -239,6 +232,8 @@ const AddProject = ({ onClose }) => {
               setStatuses(filteredLables);
               if (setFieldValue) setFieldValue("status", newValue.trim());
               break;
+            default:
+              break;
           }
         }
 
@@ -275,7 +270,7 @@ const AddProject = ({ onClose }) => {
           setFieldTouched,
         }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
-            <h2 className="mb-4 border-b pb-2 font-medium"></h2>
+            <hr className="mb-4 border-b pb-2 font-medium"></hr>
 
             <Row gutter={16}>
               <Col span={24}>

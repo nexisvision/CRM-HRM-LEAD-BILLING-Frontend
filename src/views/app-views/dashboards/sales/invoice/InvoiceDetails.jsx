@@ -1,24 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { PrinterOutlined, DownloadOutlined } from '@ant-design/icons';
-import { Card, Table, Button, Select } from 'antd';
+import { Table, Button, Select } from 'antd';
 import { invoiceData } from '../../../pages/invoice/invoiceData';
 import NumberFormat from 'react-number-format';
 import html2pdf from 'html2pdf.js';
-import { useDispatch, useSelector } from 'react-redux';
-
-import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const { Column } = Table;
 const { Option } = Select;
 
-const InvoiceDetails = ({idd, onClose}) => {
-    
+const InvoiceDetails = ({ idd, onClose }) => {
     const [template, setTemplate] = useState('rendertemplate');
-
-    const { id } = useParams();
-
-  const { invoices } = useSelector((state) => state.invoice);
-  const invoiceDataa = invoices.find(invoice => invoice.id === idd)
+    const { invoices } = useSelector((state) => state.invoice);
+    const invoiceDataa = invoices.find(invoice => invoice.id === idd);
 
     const handlePrint = () => {
         const printContent = document.getElementById('printable-content');
@@ -83,15 +77,15 @@ const InvoiceDetails = ({idd, onClose}) => {
             margin: 1,
             filename: 'invoice.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
+            html2canvas: {
                 scale: 2,
                 useCORS: true,
                 logging: false
             },
-            jsPDF: { 
-                unit: 'mm', 
-                format: 'a4', 
-                orientation: 'portrait' 
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
             }
         };
 
@@ -126,7 +120,7 @@ const InvoiceDetails = ({idd, onClose}) => {
                         <p className="text-gray-600">Address: 15 Hodges Mews,High Wycomb HP123JL,United Kingdom</p>
                     </div>
                     <div className="text-right">
-                            <p>Invoice Num: {invoiceDataa?.invoiceNumber}</p>
+                        <p>Invoice Num: {invoiceDataa?.invoiceNumber}</p>
                         <p>Invoice Date: {invoiceDataa?.issueDate}</p>
                     </div>
                 </div>
@@ -188,7 +182,6 @@ const InvoiceDetails = ({idd, onClose}) => {
                             )}
                             key="total"
                         />
-                        
                     </Table>
                     <div className="d-flex justify-content-end">
                         <div className="text-center">
@@ -220,7 +213,7 @@ const InvoiceDetails = ({idd, onClose}) => {
                 {/* Footer Section */}
                 <div className="grid grid-cols-2 gap-8">
                     <div className="flex gap-4">
-                        
+
                         <div>
                             <h4 className="font-medium mb-2">Payment Info:</h4>
                             <p>Debit Card : 465 ************645</p>
@@ -327,7 +320,7 @@ const InvoiceDetails = ({idd, onClose}) => {
                     </div>
                     <div className="grid grid-cols-2 gap-8">
                         <div className="flex gap-4">
-                            
+
                             <div>
                                 <h4 className="font-medium mb-2">Payment Info:</h4>
                                 <p>Debit Card : 465 ************645</p>
@@ -443,7 +436,7 @@ const InvoiceDetails = ({idd, onClose}) => {
                     </div>
                     <div className="grid grid-cols-2 gap-8">
                         <div className="flex gap-4">
-                            
+
                             <div>
                                 <h4 className="font-medium mb-2">Payment Info:</h4>
                                 <p>Debit Card : 465 ************645</p>

@@ -3,12 +3,12 @@ import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
-  Select,
   Input,
   Button,
   Menu,
   Modal,
   message,
+  Dropdown,
 } from "antd";
 import {
   FileExcelOutlined,
@@ -16,8 +16,8 @@ import {
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
 import { utils, writeFile } from "xlsx";
 import AddProduct from "./AddProduct";
@@ -29,22 +29,21 @@ import { DeleteProdu, GetProdu } from "./ProductReducer/ProductsSlice";
 const ProductList = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
-
   const allempdata = useSelector((state) => state.Product);
-
   const filtermin = allempdata.Product.data;
   const [list, setList] = useState([]);
-
   const [idd, setIdd] = useState("");
   const [isAddProductModalVisible, setIsAddProductModalVisible] =
     useState(false);
   const [isEditProductModalVisible, setIsEditProductModalVisible] =
     useState(false);
+  const [isViewProductModalVisible, setIsViewProductModalVisible] =
+    useState(false);
   const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     dispatch(GetProdu(id));
-  }, [dispatch]);
+  }, [dispatch, id]);
 
   useEffect(() => {
     if (filtermin) {
@@ -72,13 +71,18 @@ const ProductList = () => {
     setIsEditProductModalVisible(false);
   };
 
+  // Close Add Job Modal
+  const closeViewProductModal = () => {
+    setIsViewProductModalVisible(false);
+  };
+
+
   const Deletefun = async (exid) => {
     try {
       const response = await dispatch(DeleteProdu(exid));
       if (response.error) {
         throw new Error(response.error.message);
       }
-      const updatedData = await dispatch(GetProdu(id));
       setList(list.filter((item) => item.id !== exid));
 
     } catch (error) {
@@ -88,9 +92,8 @@ const ProductList = () => {
   const exportToExcel = () => {
     try {
       const ws = utils.json_to_sheet(list);
-      const wb = utils.book_new(); // Create a new workbook
-      utils.book_append_sheet(wb, ws, "Product"); // Append the worksheet to the workbook
-
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, ws, "Product");
       writeFile(wb, "ProductData.xlsx");
       message.success("Data exported successfully!");
     } catch (error) {
@@ -103,22 +106,21 @@ const ProductList = () => {
     setIdd(idd);
   };
 
-  const dropdownMenu = (row) => ({
-    items: [
-      {
-        key: 'edit',
-        icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editFun(row.id)
-      },
-      {
-        key: 'delete',
-        icon: <DeleteOutlined />,
-        label: 'Delete',
-        onClick: () => Deletefun(row.id)
-      }
-    ]
-  });
+  const getDropdownItems = (row) => [
+    {
+      key: 'edit',
+      icon: <EditOutlined />,
+      label: 'Edit',
+      onClick: () => editFun(row.id)
+    },
+    {
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      label: 'Delete',
+      onClick: () => Deletefun(row.id),
+      danger: true
+    }
+  ];
 
   const tableColumns = [
     {
@@ -141,7 +143,7 @@ const ProductList = () => {
       title: 'HSN/SAC',
       dataIndex: 'hsn_sac',
       sorter: (a, b) => utils.antdTableSorter(a, b, "hsn_sac"),
-  },
+    },
     {
       title: "Sku",
       dataIndex: "sku",
@@ -160,36 +162,54 @@ const ProductList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
   ];
 
+
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
-    
+
+    // If search value is empty, show all data
     if (!value) {
       setList(filtermin);
       return;
     }
-    
-    const filtered = filtermin.filter(product => 
+
+    // Filter the data based on product name
+    const filtered = filtermin.filter(product =>
       product.name?.toLowerCase().includes(value)
     );
-    
+
     setList(filtered);
   };
 
   const getFilteredProducts = () => {
     if (!list) return [];
-    
+
     let filtered = list;
 
     // Apply search filter
     if (searchText) {
-      filtered = filtered.filter(product => 
+      filtered = filtered.filter(product =>
         product.name?.toLowerCase().includes(searchText.toLowerCase())
       );
     }
@@ -248,29 +268,28 @@ const ProductList = () => {
           />
         </div>
       </Card>
-     
-        <Modal
-          title="Add Product"
-          visible={isAddProductModalVisible}
-          onCancel={closeAddProductModal}
-          footer={null}
-          width={800}
-          className="mt-[-70px]"
-        >
-          <AddProduct onClose={closeAddProductModal} idd={idd} />
-        </Modal>
 
-        <Modal
-          title="Edit Product"
-          visible={isEditProductModalVisible}
-          onCancel={closeEditProductModal}
-          footer={null}
-          width={800}
-          className="mt-[-70px]"
-        >
-          <EditProduct onClose={closeEditProductModal} idd={idd} />
-        </Modal>
-     
+      <Modal
+        title="Add Product"
+        visible={isAddProductModalVisible}
+        onCancel={closeAddProductModal}
+        footer={null}
+        width={800}
+        className="mt-[-70px]"
+      >
+        <AddProduct onClose={closeAddProductModal} idd={idd} />
+      </Modal>
+
+      <Modal
+        title="Edit Product"
+        visible={isEditProductModalVisible}
+        onCancel={closeEditProductModal}
+        footer={null}
+        width={800}
+        className="mt-[-70px]"
+      >
+        <EditProduct onClose={closeEditProductModal} idd={idd} />
+      </Modal>
     </>
   );
 };
@@ -293,6 +312,20 @@ const styles = `
       width: 100%;
       margin-bottom: 1rem;
     }
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+  }
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
   }
 `;
 

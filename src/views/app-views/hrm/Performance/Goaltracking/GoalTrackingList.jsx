@@ -2,26 +2,25 @@ import React, { useState } from "react";
 import {
   Card,
   Table,
-  Menu,
   Input,
   message,
   Button,
   Modal,
+  Dropdown,
 } from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
   PushpinOutlined,
   FileExcelOutlined,
   EditOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import UserView from "../../../Users/user-list/UserView";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AddGoalTracking from "./AddGoalTracking";
 import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
@@ -36,7 +35,6 @@ const GoalTrackingList = () => {
   const [isAddGoalTrackingModalVisible, setAddGoalTrackingModalVisible] = useState(false);
   const [isEditGoalTrackingModalVisible, setEditGoalTrackingModalVisible] = useState(false);
 
-
   const openAddGoalTrackingModal = () => {
     setAddGoalTrackingModalVisible(true);
   };
@@ -45,8 +43,6 @@ const GoalTrackingList = () => {
     setAddGoalTrackingModalVisible(false);
   };
 
-
-
   const openEditGoalTrackingModal = () => {
     setEditGoalTrackingModalVisible(true);
   };
@@ -54,8 +50,6 @@ const GoalTrackingList = () => {
   const closeEditGoalTrackingModal = () => {
     setEditGoalTrackingModalVisible(false);
   };
-
-
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
@@ -79,85 +73,61 @@ const GoalTrackingList = () => {
     setSelectedUser(null);
   };
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      <Menu.Item>
-      <Flex alignItems="center">
-        <Button
-        type=""
-          icon={<EyeOutlined />}
-          onClick={() => showUserProfile(elm)}
-          size="small"
-        >
-          View Details
-          
-        </Button>
-      </Flex>
-      </Menu.Item>
-      <Menu.Item>
-      <Flex alignItems="center">
-        <Button
-        type=""
-          icon={<EditOutlined />}
-          onClick={openEditGoalTrackingModal}
-          size="small"
-        >
-          Edit
-        </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-      <Flex alignItems="center">
-        <Button
-        type=""
-          icon={<PushpinOutlined />}
-          onClick={() => showUserProfile(elm)}
-          size="small"
-        >
-          Pin
-        </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-      <Flex alignItems="center">
-        <Button
-        type=""
-          icon={<DeleteOutlined />}
-          onClick={() => deleteUser(elm.id)}
-          size="small"
-        >
-          Delete
-        </Button>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const getDropdownItems = (record) => {
+    return [
+      {
+        key: 'view',
+        icon: <EyeOutlined />,
+        label: 'View Details',
+        onClick: () => showUserProfile(record)
+      },
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: openEditGoalTrackingModal
+      },
+      {
+        key: 'pin',
+        icon: <PushpinOutlined />,
+        label: 'Pin',
+        onClick: () => showUserProfile(record)
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(record.id),
+        danger: true
+      }
+    ];
+  };
 
   const tableColumns = [
     {
       title: "Goal Type",
       dataIndex: "goaltype",
-      sorter: (a, b) => a.goaltype.length - b.goaltype.length,
+      sorter: (a, b) => a.goaltype?.length - b.goaltype?.length,
     },
     {
       title: "Subject",
       dataIndex: "subject",
-      sorter: (a, b) => a.subject.length - b.subject.length,
+      sorter: (a, b) => a.subject?.length - b.subject?.length,
     },
     {
       title: "Branch",
       dataIndex: "branch",
-      sorter: (a, b) => a.branch.length - b.branch.length,
+      sorter: (a, b) => a.branch?.length - b.branch?.length,
     },
     {
       title: "Target Achievement",
       dataIndex: "targetachievement",
-      sorter: (a, b) => a.targetachievement.length - b.targetachievement.length,
+      sorter: (a, b) => a.targetachievement?.length - b.targetachievement?.length,
     },
     {
       title: "Overall Rating",
       dataIndex: "overallrating",
-      sorter: (a, b) => a.overallrating.length - b.overallrating.length,
+      sorter: (a, b) => a.overallrating?.length - b.overallrating?.length,
     },
     {
       title: "Start Date",
@@ -176,9 +146,24 @@ const GoalTrackingList = () => {
     {
       title: "Action",
       dataIndex: "actions",
-      render: (_, elm) => (
+      render: (_, record) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            menu={{ items: getDropdownItems(record) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -193,6 +178,7 @@ const GoalTrackingList = () => {
               placeholder="Search"
               prefix={<SearchOutlined />}
               onChange={(e) => onSearch(e)}
+              className="search-input"
             />
           </div>
         </Flex>
@@ -242,4 +228,73 @@ const GoalTrackingList = () => {
   );
 };
 
-export default GoalTrackingList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 250px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 4px;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-menu-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .ant-dropdown-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-dropdown-menu-item .anticon {
+    font-size: 16px;
+    margin-right: 8px;
+  }
+
+  .ant-btn-text:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .ant-btn-text:active {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  @media (max-width: 768px) {
+    .search-input {
+      width: 100%;
+      min-width: unset;
+    }
+    
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const GoalTrackingListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <GoalTrackingList />
+  </>
+);
+
+export default GoalTrackingListWithStyles;

@@ -1,5 +1,5 @@
-import { 
-    THEME_COLOR, 
+import {
+    THEME_COLOR,
     DARK_MODE,
     GRAY_SCALE,
     BORDER,
@@ -8,15 +8,15 @@ import {
 
 export function rgba(hex, opacity = 1) {
     if (!/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
-      throw new Error('Invalid Hex');
+        throw new Error('Invalid Hex');
     }
-  
+
     const decimal = parseInt(hex.substring(1), 16);
-  
+
     const r = (decimal >> 16) & 255;
     const g = (decimal >> 8) & 255;
     const b = decimal & 255;
-  
+
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
@@ -43,7 +43,7 @@ export const baseTheme = {
 const getBaseComponentThemeConfig = (
     {
         Button = {},
-        Menu = {}, 
+        Menu = {},
         Card = {},
         Table = {},
         Select = {},
@@ -110,7 +110,7 @@ const getBaseComponentThemeConfig = (
             paginationItemSize: 30,
             borderRadius: '50%',
             colorBgContainer: baseTheme.colorPrimary,
-            colorPrimary:  GRAY_SCALE.WHITE,
+            colorPrimary: GRAY_SCALE.WHITE,
             colorPrimaryHover: GRAY_SCALE.WHITE,
         },
         Steps: {

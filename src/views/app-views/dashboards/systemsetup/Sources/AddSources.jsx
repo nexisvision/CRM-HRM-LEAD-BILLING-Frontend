@@ -1,19 +1,12 @@
 import React from "react";
 import {
-  
   Row,
   Col,
- 
   Input,
   message,
   Button,
- 
 } from "antd";
-
 import "react-quill/dist/quill.snow.css";
-
-
-
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import {
@@ -22,26 +15,17 @@ import {
 } from "../../project/milestone/LableReducer/LableSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-
-
 const AddSources = ({ onClose }) => {
- 
-
   const dispatch = useDispatch();
-
   const allloggeddata = useSelector((state) => state.user);
   const userdata = allloggeddata.loggedInUser;
-
   const lid = userdata.id;
-
   const onSubmit = (values, { resetForm }) => {
     const payload = {
       ...values,
       lableType: "source",
     };
-
-    dispatch(AddLablee({ lid, payload }));
-
+    dispatch(AddLablee({ lid, payload }))
     dispatch(GetLablee(lid));
     dispatch(GetLablee(lid));
     onClose();
@@ -61,7 +45,6 @@ const AddSources = ({ onClose }) => {
     <>
       <div>
         <div className="">
-
           <div className="">
             <div className="">
               <Formik
@@ -70,14 +53,12 @@ const AddSources = ({ onClose }) => {
                 onSubmit={onSubmit}
               >
                 {({
-                
                   handleSubmit,
-                 
                 }) => (
                   <Form className="formik-form" onSubmit={handleSubmit}>
                     <Row gutter={16}>
                       <Col span={24} className="">
-                      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+                        <hr className="mb-4 border-b pb-2 font-medium"></hr>
                         <div className="form-item">
                           <label className="font-semibold">Source Name <span className="text-rose-500">*</span></label>
                           <Field

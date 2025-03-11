@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Table, Tag, Button, Modal, Input, Row, Col } from 'antd';
+import { Card, Table, Tag, Button, Modal, Row, Col } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import AddTask from './AddTask';
 import EditTask from './EditTask';
@@ -17,7 +17,6 @@ const TaskList = () => {
 
   const [isEditTaskModalVisible, setIsEditTaskModalVisible] = useState(false);
   const [isAddTaskModalVisible, setIsAddTaskModalVisible] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
 
   const openAddTaskModal = () => {
     setIsAddTaskModalVisible(true);

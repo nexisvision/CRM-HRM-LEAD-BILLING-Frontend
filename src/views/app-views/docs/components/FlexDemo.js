@@ -17,17 +17,17 @@ const Demo = () => {
 	const [flexDirection, setFlexDirection] = useState('row');
 	return (
 		<>
-			<Flex 
+			<Flex
 				alignItems={alignItems}
 				justifyContent={justifyContent}
 				flexDirection={flexDirection}
 			>
 				<>
 					{arr.map((elm, index) => (
-						<div 
-							key={elm} 
-							className={`bg-${elm} m-2`} 
-							style={{width: 40, height: index === 1 ? 25 : 40, borderRadius: 4}}
+						<div
+							key={elm}
+							className={`bg-${elm} m-2`}
+							style={{ width: 40, height: index === 1 ? 25 : 40, borderRadius: 4 }}
 						></div>
 					))}
 				</>
@@ -35,7 +35,7 @@ const Demo = () => {
 			<div className="mt-4">
 				<Flex alignItems="center" mobileFlex={false}>
 					<span className="font-weight-semibold mr-3">alignItems: </span>
-					<Select defaultValue="start" style={{ width: 120 }} onChange={val => {setAlignItems(val)}}>
+					<Select defaultValue="start" style={{ width: 120 }} onChange={val => { setAlignItems(val) }}>
 						{
 							alignItemsList.map(elm => (
 								<Option key={elm} value={elm}>{elm}</Option>
@@ -44,7 +44,7 @@ const Demo = () => {
 					</Select>
 					<Flex alignItems="center" mobileFlex={false} className="ml-md-4">
 						<span className="font-weight-semibold mr-3">justifyContent: </span>
-						<Select defaultValue="start" style={{ width: 120 }} onChange={val => {setJustifyContent(val)}}>
+						<Select defaultValue="start" style={{ width: 120 }} onChange={val => { setJustifyContent(val) }}>
 							{
 								justifyContentList.map(elm => (
 									<Option key={elm} value={elm}>{elm}</Option>
@@ -54,7 +54,7 @@ const Demo = () => {
 					</Flex>
 					<Flex alignItems="center" mobileFlex={false} className="ml-md-4">
 						<span className="font-weight-semibold mr-3">flexDirection: </span>
-						<Select defaultValue="row" style={{ width: 120 }} onChange={val => {setFlexDirection(val)}}>
+						<Select defaultValue="row" style={{ width: 120 }} onChange={val => { setFlexDirection(val) }}>
 							{
 								flexDirectionList.map(elm => (
 									<Option key={elm} value={elm}>{elm}</Option>
@@ -140,8 +140,8 @@ const FlexDemo = () => {
 		<div>
 			<h2>Flex</h2>
 			<div className="mt-4">
-				<ComponentIntro name="Location" desc="src/components/shared-components/Flex.js"/>
-				<ComponentIntro name="Description" desc="Flex component"/>
+				<ComponentIntro name="Location" desc="src/components/shared-components/Flex.js" />
+				<ComponentIntro name="Description" desc="Flex component" />
 				<div className="mt-4">
 					<Card title="Example">
 						<Demo />

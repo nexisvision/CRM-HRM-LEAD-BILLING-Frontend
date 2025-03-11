@@ -2,10 +2,9 @@ import React from 'react';
 import JobOfferLetterList from './JobOfferLetterList';
 
 const JobOfferLetter = () => (
-
-<div className="mail">
-<JobOfferLetterList/>
-</div>
+	<div className="mail">
+		<JobOfferLetterList />
+	</div>
 
 );
 

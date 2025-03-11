@@ -3,11 +3,11 @@ import OverViewList from './overView/OverViewList';
 import LeadMember from './leadMember/LeadMember';
 import FileList from './File/FileList';
 import NotesList from './notes/NotesList';
-import EstimatesList from './estimates/EstimatesList';
-import ReminderList from './Reminder/ReminderList.jsx';
 import ProductList from './product/ProductList';
+import ReminderList from './Reminder/AddReminder';
 
-const ViewLead  = () => {
+
+const ViewLead = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -16,7 +16,7 @@ const ViewLead  = () => {
     { id: 'leadmember', label: 'Lead Member' },
     { id: 'files', label: 'Files' },
     { id: 'estimate', label: 'Estimates' },
-    {id:'reminder',label:'Reminder'},
+    { id: 'reminder', label: 'Reminder' },
     { id: 'notes', label: 'Notes' },
     { id: 'products', label: 'Products & Services' },
   ];
@@ -26,7 +26,6 @@ const ViewLead  = () => {
       case "overview": return <OverViewList />;
       case "leadmember": return <LeadMember />;
       case "files": return <FileList />;
-      case "estimate": return <EstimatesList />;
       case 'products': return <ProductList />;
       case "notes": return <NotesList />;
       case "reminder": return <ReminderList />;
@@ -55,7 +54,6 @@ const ViewLead  = () => {
           </svg>
         </button>
       </div>
-
       <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'}`}>
         <div className="px-2 pt-2 pb-3 space-y-1 border-b border-gray-200 bg-white shadow-lg">
           {tabs.map((tab) => (
@@ -65,38 +63,32 @@ const ViewLead  = () => {
                 setActiveTab(tab.id);
                 setIsMenuOpen(false);
               }}
-              className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                activeTab === tab.id
-                  ? 'bg-blue-50 text-blue-600'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
+              className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${activeTab === tab.id
+                ? 'bg-blue-50 text-blue-600'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
             >
               {tab.label}
             </button>
           ))}
         </div>
       </div>
-
-      {/* Desktop Navigation */}
       <div className="hidden md:block lg:block border-b border-gray-200">
         <nav className="flex flex-wrap overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`py-4 px-4 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap ${
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              className={`py-4 px-4 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap ${activeTab === tab.id
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
             >
               {tab.label}
             </button>
           ))}
         </nav>
       </div>
-
-      {/* Content Area */}
       <div className="p-4 sm:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
           {renderContent()}

@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker, Modal } from 'antd';
-import { DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
+import { Form, Row, Col, Input, message, Button, Select, DatePicker } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { createestimate, getallestimate } from './estimatesReducer/EstimatesSlice';
 import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
-import * as Yup from 'yup';
 import moment from 'moment';
 import { getcurren } from 'views/app-views/setting/currencies/currenciesSlice/currenciesSlice';
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
@@ -16,30 +15,11 @@ const { Option } = Select;
 const AddEstimates = ({ onClose }) => {
 
     const { id } = useParams();
-
-
-    const [discountType, setDiscountType] = useState("%");
-    const [loading, setLoading] = useState(false);
-    const [discountValue, setDiscountValue] = useState(0);
-    const [leadsLoading, setLeadsLoading] = useState(true);
-
     const user = useSelector((state) => state.user.loggedInUser.username);
-    const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads || []);
-
-    const lead = Leads?.filter((item) => item.created_by === user);
     const { currencies } = useSelector((state) => state.currencies);
     const condata = currencies.data || [];
-
-    const currency = condata?.filter((item) => item.created_by === user);
     const { taxes } = useSelector((state) => state.tax);
     const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
-
-    const allleads = useSelector((state) => state.Leads);
-    const fndrewduxxdaa = allleads.Leads.data
-    const fnddata = fndrewduxxdaa?.find((lead) => lead?.id === id);
-
-    const leadName = fnddata?.leadTitle || 'N/A';
-
 
     const [discountRate, setDiscountRate] = useState(10);
     const dispatch = useDispatch();
@@ -63,7 +43,6 @@ const AddEstimates = ({ onClose }) => {
             description: "",
         }
     ]);
-
     useEffect(() => {
         dispatch(getAllTaxes());
     }, [dispatch]);
@@ -84,13 +63,10 @@ const AddEstimates = ({ onClose }) => {
     useEffect(() => {
         const fetchLeads = async () => {
             try {
-                setLeadsLoading(true);
                 await dispatch(GetLeads()).unwrap();
             } catch (error) {
                 console.error('Failed to fetch leads:', error);
                 message.error('Failed to load leads');
-            } finally {
-                setLeadsLoading(false);
             }
         };
 
@@ -110,25 +86,9 @@ const AddEstimates = ({ onClose }) => {
         });
     }, [form, leadTitle, id]);
 
-    const initialValues = {
-        valid_till: "",
-        currency: "",
-        // lead: "",
-        calculatedTax: 0,
-        // client: fnddata?.client || "",
-        lead: fnddata?.id || "",
-        discount: 0,
-        tax: 0,
-        total: 0,
-        quotationNumber: "",
-    };
-
-
 
     const handleFinish = async (values) => {
         try {
-            setLoading(true);
-
             const requiredFields = {
                 valid_till: values.valid_till,
                 currency: values.currency,
@@ -149,9 +109,10 @@ const AddEstimates = ({ onClose }) => {
             }
 
             const subtotal = calculateSubTotal();
-      const discountAmount = (subtotal * discountRate) / 100;
-      const finalTotal = parseFloat(totals.finalTotal);
-            
+            const discountAmount = (subtotal * discountRate) / 100;
+            const finalTotal = parseFloat(totals.finalTotal);
+
+            // Format items for the database
             const formattedItems = {};
             tableData.forEach((item, index) => {
                 const itemKey = `item_${index + 1}`;
@@ -195,8 +156,6 @@ const AddEstimates = ({ onClose }) => {
         } catch (error) {
             console.error("Estimate Creation Error:", error);
             message.error(error.message);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -227,107 +186,102 @@ const AddEstimates = ({ onClose }) => {
     };
 
     const navigate = useNavigate();
-
-    const calculateTotalTax = () => {
-        return tableData.reduce((sum, row) => {
-          const quantity = parseFloat(row.quantity) || 0;
-          const price = parseFloat(row.price) || 0;
-          const tax = parseFloat(row.tax) || 0;
-          const baseAmount = quantity * price;
-          return sum + ((baseAmount * tax) / 100);
-        }, 0);
-      };
-
+    // Calculate subtotal (sum of all row amounts before discount)
     const calculateSubTotal = () => {
         return tableData.reduce((sum, row) => {
-          const quantity = parseFloat(row.quantity) || 0;
-          const price = parseFloat(row.price) || 0;
-          return sum + (quantity * price);
+            const quantity = parseFloat(row.quantity) || 0;
+            const price = parseFloat(row.price) || 0;
+            return sum + (quantity * price);
         }, 0);
-      };
+    };
 
 
-      const calculateTotal = (data = tableData, discount = discountRate) => {
+    const calculateTotal = (data = tableData, discount = discountRate) => {
         if (!Array.isArray(data)) {
-          console.error('Invalid data passed to calculateTotal');
-          return;
+            console.error('Invalid data passed to calculateTotal');
+            return;
         }
-    
+
+        // Calculate subtotal (sum of all item amounts)
         const subtotal = data.reduce((sum, row) => {
-          return sum + (parseFloat(row.amount) || 0);
+            return sum + (parseFloat(row.amount) || 0);
         }, 0);
-    
+
+        // Calculate discount amount
         const discountAmount = (subtotal * (parseFloat(discount) || 0)) / 100;
-    
+
+        // Calculate total tax (for display purposes)
         const totalTax = data.reduce((sum, row) => {
-          const quantity = parseFloat(row.quantity) || 0;
-          const price = parseFloat(row.price) || 0;
-          const tax = (parseFloat(row.tax) || 0) ;
-          const baseAmount = quantity * price;
-          const taxAmount = (baseAmount * tax) / 100;
-          return sum + taxAmount;
+            const quantity = parseFloat(row.quantity) || 0;
+            const price = parseFloat(row.price) || 0;
+            const tax = (parseFloat(row.tax) || 0);
+            const baseAmount = quantity * price;
+            const taxAmount = (baseAmount * tax) / 100;
+            return sum + taxAmount;
         }, 0);
-    
+
+        // Calculate final total: subtotal - discount
         const finalTotal = subtotal - discountAmount;
-    
+
         setTotals({
-          subtotal: subtotal.toFixed(2),
-          discount: discountAmount.toFixed(2),
-          totalTax: totalTax.toFixed(2),
-          finalTotal: finalTotal.toFixed(2)
+            subtotal: subtotal.toFixed(2),
+            discount: discountAmount.toFixed(2),
+            totalTax: totalTax.toFixed(2),
+            finalTotal: finalTotal.toFixed(2)
         });
-    
+
         return {
-          subtotal,
-          discount: discountAmount,
-          totalTax,
-          finalTotal
+            subtotal,
+            discount: discountAmount,
+            totalTax,
+            finalTotal
         };
-      };
+    };
 
-   const handleTableDataChange = (id, field, value) => {
-    const updatedData = tableData.map((row) => {
-      if (row.id === id) {
-        const updatedRow = { ...row, [field]: value };
-        
-        if (field === 'tax' && taxes?.data) {
-          const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
-          if (selectedTax) {
-            setSelectedTaxDetails(prevDetails => ({
-              ...prevDetails,
-              [id]: {
-                gstName: selectedTax.gstName,
-                gstPercentage: selectedTax.gstPercentage
-              }
-            }));
-          }
-        }
-        if (field === 'quantity' || field === 'price' || field === 'tax') {
-          const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
-          const price = parseFloat(field === 'price' ? value : row.price) || 0;
-          const tax = parseFloat(field === 'tax' ? value : row.tax) || 0;
-          
-          const baseAmount = quantity * price;
-          const taxAmount = (baseAmount * tax) / 100;
-          const totalAmount = baseAmount + taxAmount;
-          
-          updatedRow.amount = totalAmount.toFixed(2);
-        }
-        
-        return updatedRow;
-      }
-      return row;
-    });
+    const handleTableDataChange = (id, field, value) => {
+        const updatedData = tableData.map((row) => {
+            if (row.id === id) {
+                const updatedRow = { ...row, [field]: value };
 
-    setTableData(updatedData);
-    calculateTotal(updatedData, discountRate);
-  };
+                if (field === 'tax' && taxes?.data) {
+                    const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
+                    if (selectedTax) {
+                        setSelectedTaxDetails(prevDetails => ({
+                            ...prevDetails,
+                            [id]: {
+                                gstName: selectedTax.gstName,
+                                gstPercentage: selectedTax.gstPercentage
+                            }
+                        }));
+                    }
+                }
+                // Calculate amount if quantity, price, or tax changes
+                if (field === 'quantity' || field === 'price' || field === 'tax') {
+                    const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
+                    const price = parseFloat(field === 'price' ? value : row.price) || 0;
+                    const tax = parseFloat(field === 'tax' ? value : row.tax) || 0;
+
+                    const baseAmount = quantity * price;
+                    const taxAmount = (baseAmount * tax) / 100;
+                    const totalAmount = baseAmount + taxAmount;
+
+                    updatedRow.amount = totalAmount.toFixed(2);
+                }
+
+                return updatedRow;
+            }
+            return row;
+        });
+
+        setTableData(updatedData);
+        calculateTotal(updatedData, discountRate);
+    };
 
     return (
         <>
             <div>
                 <div className=' ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4'>
-                    <h2 className="mb-4 border-b pb-[30px] font-medium"></h2>
+                    <hr className="mb-4 border-b  font-medium"></hr>
                     <Form
                         form={form}
                         layout="vertical"
@@ -339,23 +293,22 @@ const AddEstimates = ({ onClose }) => {
                             <div className=" p-2">
 
                                 <Row gutter={16}>
-                                   
+
 
                                     <Col span={12}>
-                                       
-                                         <Form.Item
+                                        <Form.Item
                                             name="leadTitle"
                                             label="Lead Title"
                                             rules={[{ required: true, message: "Lead title is required" }]}
                                         >
-                                            <Input 
+                                            <Input
                                                 placeholder="Lead Title"
-                                                disabled 
+                                                disabled
                                                 value={leadTitle}
                                             />
                                         </Form.Item>
-                                        <Form.Item 
-                                            name="lead" 
+                                        <Form.Item
+                                            name="lead"
                                             hidden
                                         >
                                             <Input type="hidden" />
@@ -462,52 +415,52 @@ const AddEstimates = ({ onClose }) => {
                                         {tableData.map((row) => (
                                             <React.Fragment key={row.id}>
                                                 <tr>
-                                                <td className="px-4 py-2 border-b">
-                            <input
-                              type="text"
-                              value={row.item}
-                              onChange={(e) => handleTableDataChange(row.id, 'item', e.target.value)}
-                              placeholder="Item Name"
-                              className="w-full p-2 border rounded"
-                            />
-                          </td>
-                          <td className="px-4 py-2 border-b">
-                            <input
-                              type="number"
-                              value={row.quantity}
-                              onChange={(e) => handleTableDataChange(row.id, 'quantity', e.target.value)}
-                              placeholder="Qty"
-                              className="w-full p-2 border rounded"
-                              min="1"
-                            />
-                          </td>
-                          <td className="px-4 py-2 border-b">
-                            <input
-                              type="number"
-                              value={row.price}
-                              onChange={(e) => handleTableDataChange(row.id, 'price', e.target.value)}
-                              placeholder="Price"
-                              className="w-full p-2 border rounded"
-                              min="0"
-                            />
-                          </td>
-                          <td className="px-4 py-2 border-b">
-                          <select
-                            value={row.tax}
-                            onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                            className="w-full p-2 border"
-                          >
-                            <option value="0">Nothing Selected</option>
-                            {taxes && taxes.data && taxes.data.map(tax => (
-                              <option key={tax.id} value={tax.gstPercentage}>
-                                {tax.gstName}: {tax.gstPercentage}%
-                              </option>
-                            ))}
-                          </select>
-                        </td>
-                        <td className="px-4 py-2 border-b">
-                            <span>{row.amount}</span>
-                          </td>
+                                                    <td className="px-4 py-2 border-b">
+                                                        <input
+                                                            type="text"
+                                                            value={row.item}
+                                                            onChange={(e) => handleTableDataChange(row.id, 'item', e.target.value)}
+                                                            placeholder="Item Name"
+                                                            className="w-full p-2 border rounded"
+                                                        />
+                                                    </td>
+                                                    <td className="px-4 py-2 border-b">
+                                                        <input
+                                                            type="number"
+                                                            value={row.quantity}
+                                                            onChange={(e) => handleTableDataChange(row.id, 'quantity', e.target.value)}
+                                                            placeholder="Qty"
+                                                            className="w-full p-2 border rounded"
+                                                            min="1"
+                                                        />
+                                                    </td>
+                                                    <td className="px-4 py-2 border-b">
+                                                        <input
+                                                            type="number"
+                                                            value={row.price}
+                                                            onChange={(e) => handleTableDataChange(row.id, 'price', e.target.value)}
+                                                            placeholder="Price"
+                                                            className="w-full p-2 border rounded"
+                                                            min="0"
+                                                        />
+                                                    </td>
+                                                    <td className="px-4 py-2 border-b">
+                                                        <select
+                                                            value={row.tax}
+                                                            onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
+                                                            className="w-full p-2 border"
+                                                        >
+                                                            <option value="0">Nothing Selected</option>
+                                                            {taxes && taxes.data && taxes.data.map(tax => (
+                                                                <option key={tax.id} value={tax.gstPercentage}>
+                                                                    {tax.gstName}: {tax.gstPercentage}%
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </td>
+                                                    <td className="px-4 py-2 border-b">
+                                                        <span>{row.amount}</span>
+                                                    </td>
                                                     <td className="px-2 py-1 border-b text-center">
                                                         <Button
                                                             danger
@@ -551,24 +504,24 @@ const AddEstimates = ({ onClose }) => {
                                     <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
                                         <td className="font-medium">Discount</td>
                                         <td className="flex items-center space-x-2">
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Discount Rate (%)
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={discountRate}
-                        onChange={(e) => {
-                          const newRate = parseFloat(e.target.value) || 0;
-                          setDiscountRate(newRate);
-                          calculateTotal(tableData, newRate);
-                        }}
-                        className="mt-1 block w-full p-2 border rounded"
-                      />
-                    </div>
-                  </td>
+                                            <div className="mb-4">
+                                                <label className="block text-sm font-medium text-gray-700">
+                                                    Discount Rate (%)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max="100"
+                                                    value={discountRate}
+                                                    onChange={(e) => {
+                                                        const newRate = parseFloat(e.target.value) || 0;
+                                                        setDiscountRate(newRate);
+                                                        calculateTotal(tableData, newRate);
+                                                    }}
+                                                    className="mt-1 block w-full p-2 border rounded"
+                                                />
+                                            </div>
+                                        </td>
                                     </tr>
 
                                     <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">

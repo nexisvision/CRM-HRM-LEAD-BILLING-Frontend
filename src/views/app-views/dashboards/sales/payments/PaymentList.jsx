@@ -1,13 +1,10 @@
-/* eslint-disable no-unused-vars */
 import React, { useState } from 'react'
-import { Card, Table, Select, Input, Button, Badge, Menu, Tag, Modal, Row, Col, message } from 'antd';
+import { Card, Table, Select, Input, Button, Menu, Tag, Modal, Row, Col, message } from 'antd';
 import OrderListData from "../../../../../assets/data/order-list.data.json"
 import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
 import { TiPinOutline } from "react-icons/ti";
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import Flex from 'components/shared-components/Flex'
-import NumberFormat from 'react-number-format';
+import Flex from 'components/shared-components/Flex';
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import { utils, writeFile } from "xlsx";
@@ -15,8 +12,6 @@ import AddPayment from "./AddPayment"
 import EditPayment from './EditPayment';
 import ViewPayment from './ViewPayment';
 import { PaymentStatisticData } from '../../../dashboards/default/DefaultDashboardData';
-
-// import { PaymentStatisticData } from '../../../dashboards/default/DefaultDashboardData';
 import StatisticWidget from 'components/shared-components/StatisticWidget';
 
 const { Option } = Select
@@ -36,7 +31,6 @@ const paymentStatusList = ['Normal', 'Expired']
 const PaymentList = () => {
 
 	const [list, setList] = useState(OrderListData)
-	const [selectedRows, setSelectedRows] = useState([])
 	const [selectedRowKeys, setSelectedRowKeys] = useState([])
 	const [isAddPaymentModalVisible, setIsAddPaymentModalVisible] = useState(false);
 	const [isEditPaymentModalVisible, setIsEditPaymentModalVisible] = useState(false);
@@ -69,17 +63,18 @@ const PaymentList = () => {
 
 	const exportToExcel = () => {
 		try {
-		  const ws = utils.json_to_sheet(list); // Convert JSON data to a sheet
-		  const wb = utils.book_new(); // Create a new workbook
-		  utils.book_append_sheet(wb, ws, "Payment"); // Append the sheet to the workbook
-	
-		  writeFile(wb, "PaymentData.xlsx"); // Save the file as ProposalData.xlsx
-		  message.success("Data exported successfully!"); // Show success message
+			console.log("data", list)
+			const ws = utils.json_to_sheet(list);
+			const wb = utils.book_new();
+			utils.book_append_sheet(wb, ws, "Payment");
+
+			writeFile(wb, "PaymentData.xlsx");
+			message.success("Data exported successfully!");
 		} catch (error) {
-		  console.error("Error exporting to Excel:", error);
-		  message.error("Failed to export data. Please try again."); // Show error message
+			console.error("Error exporting to Excel:", error);
+			message.error("Failed to export data. Please try again.");
 		}
-	  };
+	};
 	const handleShowStatus = value => {
 		if (value !== 'All') {
 			const key = 'method'
@@ -188,7 +183,6 @@ const PaymentList = () => {
 
 	const rowSelection = {
 		onChange: (key, rows) => {
-			setSelectedRows(rows)
 			setSelectedRowKeys(key)
 		}
 	};

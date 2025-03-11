@@ -1,23 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Form, Input, Button, Row, Col, message, Upload, Select } from "antd";
-import { useNavigate } from "react-router-dom";
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
-import { RxCross2 } from "react-icons/rx";
+import { UploadOutlined } from "@ant-design/icons";
 import * as Yup from "yup";
 import { Formik, Field, ErrorMessage } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
-import { AddDocu, editDocu, getDocu } from "./DocumentReducers/documentSlice";
+import { editDocu, getDocu } from "./DocumentReducers/documentSlice";
 import { getRoles } from '../RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice';
 const { Option } = Select;
 const EditDocument = ({ idd, onClose }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getDocu());
-  }, []);
+  }, [dispatch]);
 
   const alladatas = useSelector((state) => state.Documents);
   const fnddtaas = alladatas.Documents.data;
@@ -42,13 +39,6 @@ const EditDocument = ({ idd, onClose }) => {
     }
   }, [fnddtaas, idd]);
 
-  const [rows, setRows] = useState([
-    {
-      id: Date.now(),
-      link: "",
-      title: "",
-    },
-  ]);
   const [initialValues, setinitialValues] = useState({
     name: "",
     role: "",
@@ -60,17 +50,6 @@ const EditDocument = ({ idd, onClose }) => {
     role: Yup.string().required("Please enter Role"),
     description: Yup.string().required("Please enter Description"),
   });
-  const handleAddRow = () => {
-    setRows([
-      ...rows,
-      {
-        id: Date.now(),
-        link: "",
-        title: "",
-      },
-    ]);
-  };
- 
 
   const onSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
@@ -99,7 +78,7 @@ const EditDocument = ({ idd, onClose }) => {
 
   return (
     <div className="add-trainingSetup">
-        <h2 className="mb-3 border-b pb-1 font-medium"></h2>  
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -115,19 +94,19 @@ const EditDocument = ({ idd, onClose }) => {
           >
             <Row gutter={16}>
               <Col span={12}>
-              <label className="font-semibold">Name <span className="text-red-500">*</span></label>
-                  <Field name="name">
-                    {({ field }) => (
-                      <Input placeholder="Enter Name" {...field} className="" />
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="name"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-           
-              </Col>
+                <label className="font-semibold">Name <span className="text-red-500">*</span></label>
+                <Field name="name">
+                  {({ field }) => (
+                    <Input placeholder="Enter Name" {...field} className="mt-2" />
+                  )}
+                </Field>
+                <ErrorMessage
+                  name="name"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+
+              </Col >
               <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Role <span className="text-red-500">*</span></label>
@@ -207,7 +186,7 @@ const EditDocument = ({ idd, onClose }) => {
                   </Upload>
                 </div>
               </Col>
-            </Row>
+            </Row >
             <Form.Item>
               <div className="text-right mt-2">
                 <Button type="default" className="mr-2" onClick={onClose}>
@@ -218,10 +197,10 @@ const EditDocument = ({ idd, onClose }) => {
                 </Button>
               </div>
             </Form.Item>
-          </Form>
+          </Form >
         )}
-      </Formik>
-    </div>
+      </Formik >
+    </div >
   );
 };
 export default EditDocument;

@@ -40,7 +40,7 @@ const ViewTicket = () => {
   };
 
   return (
-    
+
     <Card>
       <Typography.Title level={5}>
         Reply Ticket - <span style={{ color: 'green' }}>030823</span>

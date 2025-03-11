@@ -3,9 +3,9 @@ import { PermissionList } from './PermissionList';
 
 const Permission = () => (
 
-<div className="mail">
-<PermissionList />
-</div>
+	<div className="mail">
+		<PermissionList />
+	</div>
 
 );
 

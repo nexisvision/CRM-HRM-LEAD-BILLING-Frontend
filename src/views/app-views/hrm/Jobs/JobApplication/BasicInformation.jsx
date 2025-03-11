@@ -20,11 +20,8 @@ const BasicInformation = () => {
   return (
     <Card
       title="Basic Information"
-      //   extra={<Button type="primary" style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}>+ Add to Job OnBoard</Button>}
       style={{ maxWidth: 1100 }}
     >
-      <
-
       <Descriptions column={1} bordered>
         <Descriptions.Item label="Phone">{user.phone}</Descriptions.Item>
         <Descriptions.Item label="DOB">{user.dob}</Descriptions.Item>

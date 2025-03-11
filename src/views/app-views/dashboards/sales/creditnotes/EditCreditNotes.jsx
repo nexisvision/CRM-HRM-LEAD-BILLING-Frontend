@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Input, message, Button, DatePicker } from "antd";
-import { useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -60,7 +59,7 @@ const EditCrediteNotes = ({ idd, onClose }) => {
   return (
     <div>
       <div>
-        <h2 className="mb-3 border-b pb-[5px] font-medium"></h2>
+        <hr className="mb-3 border-b font-medium"></hr>
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
@@ -86,7 +85,6 @@ const EditCrediteNotes = ({ idd, onClose }) => {
                     />
                   </div>
                 </Col>
-
                 <Col span={12}>
                   <div className="form-item">
                     <label className="font-semibold">Issue Date <span className="text-red-500">*</span></label>

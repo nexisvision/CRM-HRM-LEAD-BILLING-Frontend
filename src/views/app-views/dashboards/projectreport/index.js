@@ -3,9 +3,9 @@ import ProjectReportList from "./ProjectReportList"
 
 const projectreport = () => (
 
-<div className="mail">
-<ProjectReportList/>
-</div>
+	<div className="mail">
+		<ProjectReportList />
+	</div>
 
 );
 

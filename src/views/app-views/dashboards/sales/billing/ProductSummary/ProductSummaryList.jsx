@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
+import { Table } from 'antd';
 import dayjs from 'dayjs';
 import NumberFormat from 'react-number-format';
 import { useSelector, useDispatch } from 'react-redux';
@@ -17,7 +16,7 @@ function ProductSummaryList({ billingId }) {
         debitNote: 0,
         updated_total: 0
     });
-    
+
     const dispatch = useDispatch();
     const payments = useSelector((state) => state.payment?.payment || []);
     const debitNotes = useSelector((state) => state.debitNotes?.debitNotes || []);
@@ -36,7 +35,8 @@ function ProductSummaryList({ billingId }) {
             if (selectedBilling) {
                 try {
                     const itemsArray = JSON.parse(selectedBilling.items || '[]');
-                    
+
+                    // Transform items to table format
                     const transformedItems = itemsArray.map((item, index) => ({
                         id: index,
                         billNumber: selectedBilling.billNumber,
@@ -52,7 +52,8 @@ function ProductSummaryList({ billingId }) {
                     }));
 
                     setBillingData(transformedItems);
-                    
+
+                    // Get current payments and debit notes
                     const currentBillingPayments = payments.filter(
                         payment => payment.bill === billingId
                     );
@@ -64,7 +65,7 @@ function ProductSummaryList({ billingId }) {
                         (sum, payment) => {
                             const paymentAmount = typeof payment.amount === 'number' ? payment.amount : parseFloat(payment.amount || '0');
                             return sum + (isNaN(paymentAmount) ? 0 : paymentAmount);
-                        }, 
+                        },
                         0
                     );
 
@@ -72,7 +73,7 @@ function ProductSummaryList({ billingId }) {
                         (sum, note) => {
                             const noteAmount = parseFloat(note.amount || '0');
                             return sum + (isNaN(noteAmount) ? 0 : noteAmount);
-                        }, 
+                        },
                         0
                     );
 
@@ -80,7 +81,7 @@ function ProductSummaryList({ billingId }) {
 
                     const remainingAmount = Math.max(0, billingTotal - totalPaidAmount - totalDebitNoteAmount);
 
-                   
+
                     setTotals(prev => ({
                         ...prev,
                         discount: selectedBilling.discount || 0,
@@ -115,7 +116,6 @@ function ProductSummaryList({ billingId }) {
             key: "billDate",
             render: (date) => dayjs(date).format('DD/MM/YYYY')
         },
-        
         {
             title: "Product",
             dataIndex: "product",
@@ -167,104 +167,104 @@ function ProductSummaryList({ billingId }) {
     ];
 
     return (
-      
-            <div className="p-2">
-                <h1 className="text-sm font-medium mb-1">Product Summary</h1>
-                {/* <p className="text-xs text-gray-500 mb-2">
+
+        <div className="p-2">
+            <h1 className="text-sm font-medium mb-1">Product Summary</h1>
+            {/* <p className="text-xs text-gray-500 mb-2">
                     Billing details for selected item
                 </p> */}
 
-                <div className="">
-                    <Table 
-                        dataSource={billingData} 
-                        columns={columns}
-                        pagination={false} 
-                        className="mb-2"
-                        rowKey="id"
-                    />
+            <div className="">
+                <Table
+                    dataSource={billingData}
+                    columns={columns}
+                    pagination={false}
+                    className="mb-2"
+                    rowKey="id"
+                />
 
-                    {/* Summary Section */}
-                    <div className="d-flex justify-content-end mb-3">
-                        <div className="text-left">
-                            <div>
-                                <p className="mb-2">
-                                    <span className='font-weight-semibold'>Sub-Total : </span>
-                                    <NumberFormat
-                                        displayType="text"
-                                        value={billingData.reduce((sum, item) => sum + (Number(item.amount) || 0), 0)}
-                                        prefix="₹"
-                                        thousandSeparator={true}
-                                    />
-                                </p>
-                                <p className="mb-2">
-                                    <span className='font-weight-semibold'>Total Discount : </span>
-                                    <NumberFormat
-                                        displayType="text"
-                                        value={totals.discount}
-                                        prefix="₹"
-                                        thousandSeparator={true}
-                                    />
-                                </p>
-                                <p>
-                                    <span className='font-weight-semibold'>Total Tax : </span>
-                                    <NumberFormat
-                                        displayType="text"
-                                        value={totals.tax}
-                                        prefix="₹"
-                                        thousandSeparator={true}
-                                    />
-                                </p>
-                            </div>
-                            <h2 className="mt-2">
-                                <span className="font-weight-semibold"> Total: </span>
+                {/* Summary Section */}
+                <div className="d-flex justify-content-end mb-3">
+                    <div className="text-left">
+                        <div>
+                            <p className="mb-2">
+                                <span className='font-weight-semibold'>Sub-Total : </span>
                                 <NumberFormat
                                     displayType="text"
-                                    value={totals.total}
+                                    value={billingData.reduce((sum, item) => sum + (Number(item.amount) || 0), 0)}
                                     prefix="₹"
                                     thousandSeparator={true}
                                 />
-                            </h2>
-                            <div className=" mt-2">
-                                <p className="mb-2">
-                                    <span className='font-weight-semibold'>Paid : </span>
-                                    <NumberFormat
-                                        displayType="text"
-                                        value={totals.amount}
-                                        prefix="₹"
-                                        thousandSeparator={true}
-                                        decimalScale={2}
-                                        fixedDecimalScale={true}
-                                    />
-                                </p>
-                                <p className="mb-2 border-bottom">
-                                    <span className='font-weight-semibold'>Debit Note : </span>
-                                    <NumberFormat
-                                        displayType="text"
-                                        value={totals.debitNote}
-                                        prefix="₹"
-                                        thousandSeparator={true}
-                                        decimalScale={2}
-                                        fixedDecimalScale={true}
-                                       
-                                    />
-                                </p>
-                                <p>
-                                    <span className='font-weight-semibold'>Due : </span>
-                                    <NumberFormat
-                                        displayType="text"
-                                        value={totals.updated_total}
-                                        prefix="₹"
-                                        thousandSeparator={true}
-                                        decimalScale={2}
-                                        fixedDecimalScale={true}
-                                       
-                                    />
-                                </p>
-                            </div>
+                            </p>
+                            <p className="mb-2">
+                                <span className='font-weight-semibold'>Total Discount : </span>
+                                <NumberFormat
+                                    displayType="text"
+                                    value={totals.discount}
+                                    prefix="₹"
+                                    thousandSeparator={true}
+                                />
+                            </p>
+                            <p>
+                                <span className='font-weight-semibold'>Total Tax : </span>
+                                <NumberFormat
+                                    displayType="text"
+                                    value={totals.tax}
+                                    prefix="₹"
+                                    thousandSeparator={true}
+                                />
+                            </p>
+                        </div>
+                        <h2 className="mt-2">
+                            <span className="font-weight-semibold"> Total: </span>
+                            <NumberFormat
+                                displayType="text"
+                                value={totals.total}
+                                prefix="₹"
+                                thousandSeparator={true}
+                            />
+                        </h2>
+                        <div className=" mt-2">
+                            <p className="mb-2">
+                                <span className='font-weight-semibold'>Paid : </span>
+                                <NumberFormat
+                                    displayType="text"
+                                    value={totals.amount}
+                                    prefix="₹"
+                                    thousandSeparator={true}
+                                    decimalScale={2}
+                                    fixedDecimalScale={true}
+                                />
+                            </p>
+                            <p className="mb-2 border-bottom">
+                                <span className='font-weight-semibold'>Debit Note : </span>
+                                <NumberFormat
+                                    displayType="text"
+                                    value={totals.debitNote}
+                                    prefix="₹"
+                                    thousandSeparator={true}
+                                    decimalScale={2}
+                                    fixedDecimalScale={true}
+
+                                />
+                            </p>
+                            <p>
+                                <span className='font-weight-semibold'>Due : </span>
+                                <NumberFormat
+                                    displayType="text"
+                                    value={totals.updated_total}
+                                    prefix="₹"
+                                    thousandSeparator={true}
+                                    decimalScale={2}
+                                    fixedDecimalScale={true}
+
+                                />
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
     );
 }
 

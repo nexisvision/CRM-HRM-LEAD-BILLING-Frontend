@@ -3,15 +3,17 @@
 @theme: light;
 @rtl-enable: true;
 
-@body-background:    #fafafb;
+// Background color for `<body>`
+@body-background: #fafafb;
+// Base background color for most components
 @component-background: @white;
 @border-color-split: #ededed;
 @popover-background: @component-background;
 @popover-customize-border-color: @border-color-split;
 
 @font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-  'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-  'Noto Color Emoji';
+	'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+	'Noto Color Emoji';
 @code-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
 @text-color: @gray;
 @text-color-secondary: @gray-light;
@@ -37,7 +39,7 @@
 @line-height-base: 1.5;
 @border-radius-base: 0.625rem;
 @border-radius-sm: 0.25rem;
-@border-radius-lg:  0.3rem;
+@border-radius-lg: 0.3rem;
 @rounded-pill: 50rem;
 @border-width-base: 1px;
 
@@ -136,9 +138,11 @@
 	sm: @screen-sm;
 	md: @screen-md;
 	lg: @screen-lg;
-  xl: @screen-xl;
-  xxl: @screen-xxl;
-};
+	xl: @screen-xl;
+	xxl: @screen-xxl;
+}
+
+;
 
 // z-index list, order by `z-index`
 @zindex-badge: auto;
@@ -160,12 +164,14 @@
 @zindex-image: 1080;
 
 @sizes: {
-	25:   25%;
-	50:   50%;
-	75:   75%;
-	100:  100%;
+	25: 25%;
+	50: 50%;
+	75: 75%;
+	100: 100%;
 	auto: auto;
-};
+}
+
+;
 
 @emphasized-link-hover-darken-percentage: 15%;
 

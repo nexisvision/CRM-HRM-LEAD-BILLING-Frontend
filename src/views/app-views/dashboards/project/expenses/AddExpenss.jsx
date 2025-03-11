@@ -7,13 +7,12 @@ import {
     message,
     Row,
     Col,
-    Switch,
     Upload,
     Modal,
 } from "antd";
 import { UploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -25,19 +24,12 @@ import AddCurrencies from '../../../setting/currencies/AddCurrencies';
 const { Option } = Select;
 
 const AddExpenses = ({ onClose }) => {
-    const navigate = useNavigate();
 
     const { id } = useParams();
 
     const dispatch = useDispatch();
 
     const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
-
-    const user = useSelector((state) => state.user.loggedInUser.username);
-
-    const { currencies } = useSelector((state) => state.currencies);
-
-    const curren = currencies?.data || [];
 
     const allproject = useSelector((state) => state.Project);
     const fndrewduxxdaa = allproject.Project.data
@@ -119,7 +111,7 @@ const AddExpenses = ({ onClose }) => {
 
     return (
         <div className="add-expenses-form">
-  <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
+            <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
@@ -238,7 +230,7 @@ const AddExpenses = ({ onClose }) => {
                                     <ErrorMessage name="price" component="div" className="text-red-500 mt-1 text-sm" />
                                 </div>
                             </Col>
-                          
+
                             <Col span={12} className="mt-4">
                                 <div className="form-item">
                                     <label className="font-semibold">Purchase Date <span className="text-red-500">*</span></label>
@@ -257,7 +249,7 @@ const AddExpenses = ({ onClose }) => {
                                     />
                                 </div>
                             </Col>
-                          
+
                             <Col span={12} className="mt-4">
                                 <div className="form-item">
                                     <label className="font-semibold">Project <span className="text-red-500">*</span></label>

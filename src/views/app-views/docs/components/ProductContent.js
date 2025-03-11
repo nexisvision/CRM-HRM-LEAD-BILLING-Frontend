@@ -5,7 +5,7 @@ import { FolderOutlined } from '@ant-design/icons';
 const InfoList = props => (
 	<p className="d-flex align-items-center">
 		<span className="d-flex font-size-md align-items-center">
-			<FolderOutlined className="text-primary"/>
+			<FolderOutlined className="text-primary" />
 			<span className="ml-2 text-dark font-weight-bold">{props.title}</span>
 		</span>
 		<span className="mx-2"> - </span>

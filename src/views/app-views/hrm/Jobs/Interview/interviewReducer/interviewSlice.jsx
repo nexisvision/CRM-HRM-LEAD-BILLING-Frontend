@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./interviewService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
+
+
 
 export const AddInterviews = createAsyncThunk(
   "users/AddInterviews",
@@ -77,15 +78,7 @@ export const EditInterview = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const RoleAndPermissionSlice = createSlice({
   name: "Interviews",
@@ -195,7 +188,7 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(EditInterview.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; 
+        state.editItem = action.payload;
       })
       .addCase(EditInterview.rejected, (state, action) => {
         state.isLoading = false;

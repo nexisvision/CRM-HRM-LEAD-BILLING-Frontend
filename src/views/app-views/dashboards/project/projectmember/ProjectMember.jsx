@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Row, Card, Table, Button, Modal, message } from "antd";
+import { Card, Table, Button, Modal, message } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import AddProjectMember from "./AddProjectMember";
 import { GetProject } from "../project-list/projectReducer/ProjectSlice";
@@ -12,13 +12,8 @@ import { env } from "configs/EnvironmentConfig";
 
 const ProjectMember = () => {
   const dispatch = useDispatch();
-  const [isAddProjectMemberModalVisible, setIsAddProjectMemberModalVisible] =
-    useState(false);
-
-  const AllProject = useSelector((state) => state.Project);
+  const [isAddProjectMemberModalVisible, setIsAddProjectMemberModalVisible] = useState(false);
   const AllEmployee = useSelector((state) => state.Users);
-
-  const projectData = AllProject?.Project?.data || [];
   const employeeData = AllEmployee?.Users?.data || [];
 
   const { id } = useParams();
@@ -27,7 +22,7 @@ const ProjectMember = () => {
   const allproject = useSelector((state) => state.Project);
   const fndrewduxxdaa = allproject.Project.data
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
-  
+
 
 
   const DeletePro2 = async (payload) => {
@@ -55,14 +50,12 @@ const ProjectMember = () => {
     }
   };
 
-  
-
-  const userField = fnddata?.project_members; // The 'user' field in the project
+  const userField = fnddata?.project_members;
   let userArray = [];
 
   try {
-    const parsedUserField = JSON.parse(userField); // Parse the JSON string
-    userArray = parsedUserField?.project_members; // Extract the array of user IDs
+    const parsedUserField = JSON.parse(userField);
+    userArray = parsedUserField?.project_members;
   } catch (error) {
     console.error("Error parsing user field:", error);
   }
@@ -73,11 +66,9 @@ const ProjectMember = () => {
       if (!employee) {
         console.warn(`No employee found for userId: ${userId}`);
       }
-      return employee || null; // Return the employee if found, otherwise null
+      return employee || null;
     })
-    .filter((employee) => employee !== null); // Remove null values
-
-
+    .filter((employee) => employee !== null);
   const tableColumns = [
     {
       title: "Name",
@@ -120,7 +111,6 @@ const ProjectMember = () => {
       await DeletePro2(userId);
 
       await dispatch(GetProject()).unwrap();
-
       message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error);

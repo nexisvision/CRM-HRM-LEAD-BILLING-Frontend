@@ -9,6 +9,8 @@ import {
   Radio,
   Select,
   Tag,
+  Menu,
+  Dropdown,
 } from "antd";
 import {
   DeleteOutlined,
@@ -19,9 +21,9 @@ import {
   UnorderedListOutlined,
   AppstoreOutlined,
   RetweetOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AddLead from "./AddLead";
 import { utils, writeFile } from "xlsx";
 import EditLead from "./EditLead";
@@ -185,58 +187,37 @@ const LeadList = () => {
     setIsConvertDealModalVisible(false);
   };
 
-  const dropdownMenu = (elm) => ({
-    items: [
-      {
-        key: 'convert',
-        label: (
-          <Flex alignItems="center">
-            <Button
-              type=""
-              className=""
-              icon={<RetweetOutlined />}
-              onClick={() => openConvertDealModal(elm)}
-              size="small"
-            >
-              <span className="">Convert to Deal</span>
-            </Button>
-          </Flex>
-        ),
-      },
-      {
+  const getDropdownItems = (elm) => {
+    const items = [];
+
+    items.push({
+      key: 'convert',
+      icon: <RetweetOutlined />,
+      label: 'Convert to Deal',
+      onClick: () => openConvertDealModal(elm)
+    });
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
-        label: (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) && (
-          <Flex alignItems="center">
-            <Button
-              type=""
-              className=""
-              icon={<EditOutlined />}
-              onClick={() => EditFun(elm.id)}
-              size="small"
-            >
-              <span className="ml-2">Edit</span>
-            </Button>
-          </Flex>
-        ),
-      },
-      {
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => EditFun(elm.id)
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
-        label: (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) && (
-          <Flex alignItems="center">
-            <Button
-              type=""
-              className=""
-              icon={<DeleteOutlined />}
-              onClick={() => deleteUser(elm.id)}
-              size="small"
-            >
-              <span className="">Delete</span>
-            </Button>
-          </Flex>
-        ),
-      },
-    ].filter(Boolean),
-  });
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(elm.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -296,11 +277,42 @@ const LeadList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
   ];
+
+  const styles = `
+    .ant-dropdown-menu {
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .ant-dropdown-menu-item {
+      padding: 8px 16px;
+    }
+    .ant-dropdown-menu-item:hover {
+      background-color: #f5f5f5;
+    }
+    .ant-dropdown-menu-item-danger:hover {
+      background-color: #fff1f0;
+    }
+  `;
 
   return (
     <div>
@@ -395,6 +407,7 @@ const LeadList = () => {
           <ConvertDeal onClose={closeConvertDealModal} leadData={selectedLead} />
         </Modal>
       </Card>
+      <style jsx>{styles}</style>
     </div>
   );
 };

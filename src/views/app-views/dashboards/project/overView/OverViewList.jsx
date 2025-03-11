@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { FaCoins } from "react-icons/fa";
@@ -9,12 +9,10 @@ import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { useNavigate, useParams } from 'react-router-dom';
-import { Tag, Table, Progress, Avatar, Menu, Card } from 'antd';
+import { Tag, Table, Progress, Avatar, Menu, Card, Button, Dropdown, Modal } from 'antd';
 import { GetTasks } from "../task/TaskReducer/TaskSlice";
 import { Getmins } from "../milestone/minestoneReducer/minestoneSlice";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import utils from "utils";
-import { UserOutlined, MailOutlined, PhoneOutlined, GlobalOutlined, TeamOutlined, CalendarOutlined } from '@ant-design/icons';
+import { UserOutlined, MailOutlined, PhoneOutlined, GlobalOutlined, TeamOutlined, CalendarOutlined, EditOutlined, DeleteOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 // Register the chart components
@@ -23,20 +21,18 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const OverViewList = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
-  const [proo, setProo] = useState("0");
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
 
   // Add currencies selector
   const { currencies } = useSelector((state) => state.currencies);
-  const curr = currencies?.data || [];
+  const curr = useMemo(() => currencies?.data || [], [currencies?.data]);
 
   // Move all selectors to the top
   const allempdata = useSelector((state) => state?.Project) || {};
-  const filterdata = allempdata?.Project?.data || [];
-  const taskData = useSelector((state) => state?.Tasks?.Tasks?.data) || [];
-  const milestoneData = useSelector((state) => state.Milestone?.Milestone?.data) || [];
+  const filterdata = useMemo(() => allempdata?.Project?.data || [], [allempdata?.Project?.data]);
+  const { Tasks: { data: taskData = [] } = {} } = useSelector((state) => state.Tasks) || {};
+  const { Milestone: { data: milestoneData = [] } = {} } = useSelector((state) => state.Milestone) || {};
   const allclient = useSelector((state) => state?.SubClient?.SubClient?.data) || [];
 
   // Get the current project data based on ID
@@ -166,10 +162,6 @@ const OverViewList = () => {
     }
   }, [taskData, milestoneData, currentProject, id]);
 
-  // Update progress calculation
-  useEffect(() => {
-    setProo(projectMetrics.progress);
-  }, [projectMetrics.progress]);
 
   // Fetch data
   useEffect(() => {
@@ -197,7 +189,7 @@ const OverViewList = () => {
 
 
   // Define status colors mapping with more color options
-  const statusColors = {
+  const statusColors = useMemo(() => ({
     'To Do': '#FF6B6B',        // Red
     'In Progress': '#36A2EB',  // Blue
     'Done': '#4BC0C0',         // Teal
@@ -213,11 +205,12 @@ const OverViewList = () => {
     'Low Priority': '#27AE60',  // Dark Green
     'Critical': '#C0392B',     // Deep Red
     'Pending': '#F1C40F'       // Gold
-  };
+  }), []);
 
-  const getStatusColor = (status) => {
+  // Function to get color for unknown status using useCallback for memoization
+  const getStatusColor = useCallback((status) => {
     return statusColors[status] || generateRandomColor(status);
-  };
+  }, [statusColors]);
 
   // Generate consistent random color for unknown status
   const generateRandomColor = (seed) => {
@@ -228,29 +221,7 @@ const OverViewList = () => {
     const color = '#' + ('00000' + (hash & 0xFFFFFF).toString(16)).slice(-6);
     return color;
   };
-
-  // Prepare data for pie chart with dynamic colors
-  const taskStatusData = useMemo(() => {
-    const statusCounts = taskData.reduce((acc, task) => {
-      const status = task.status || 'No Status';
-      acc[status] = (acc[status] || 0) + 1;
-      return acc;
-    }, {});
-
-    const labels = Object.keys(statusCounts);
-    const data = Object.values(statusCounts);
-    const backgroundColor = labels.map(status => getStatusColor(status));
-
-    return {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor,
-        borderWidth: 1
-      }]
-    };
-  }, [taskData]);
-
+  // Group tasks by status
   const tasksByStatus = useMemo(() => {
     return taskData.reduce((acc, task) => {
       const status = task.status || 'No Status';
@@ -262,47 +233,32 @@ const OverViewList = () => {
     }, {});
   }, [taskData]);
 
-  const handleTaskClick = (taskId) => {
+
+
+  // Navigate to task details
+  const handleTaskClick = useCallback((taskId) => {
     navigate(`/app/dashboards/project/task/${taskId}`);
-    setIsTaskModalVisible(false);
-  };
+  }, [navigate]);
 
-  const clientInfo = useMemo(() => {
-    if (!fndpro || !allclient) {
-      return {
-        username: 'Loading...',
-        email: 'Loading...'
-      };
-    }
 
-    const client = allclient.find(item => item.id === fndpro.client);
-
-    if (!client) {
-      return {
-        username: 'Client Not Found',
-        email: 'No Email Available'
-      };
-    }
-
-    return {
-      username: client.username || 'No Client Name',
-      email: client.email || 'No Email Available'
-    };
-  }, [fndpro, allclient]);
-
+  // Add milestone status helper function
   const getMilestoneProgress = (milestone) => {
+    // If milestone end date has passed, consider it as completed
     const endDate = dayjs(milestone.milestone_end_date);
     const now = dayjs();
     const isOverdue = now.isAfter(endDate, 'day');
 
+    // If milestone is marked as completed or end date has passed, return 100%
     if (milestone.milestone_status?.toLowerCase() === 'completed' ||
       milestone.milestone_status?.toLowerCase() === 'done' ||
       isOverdue) {
       return 100;
     }
 
+    // Calculate progress based on tasks if available
     const tasks = taskData.filter(task => task.milestone_id === milestone.id);
     if (!tasks.length) {
+      // If no tasks, calculate progress based on timeline
       const startDate = dayjs(milestone.milestone_start_date);
       const totalDuration = endDate.diff(startDate, 'day');
       const elapsed = now.diff(startDate, 'day');
@@ -313,15 +269,18 @@ const OverViewList = () => {
     return Math.round((completed / tasks.length) * 100);
   };
 
+  // Update milestone status helper function
   const getMilestoneStatus = (status, milestone) => {
     const normalizedStatus = status?.toLowerCase();
     const endDate = dayjs(milestone?.milestone_end_date);
     const now = dayjs();
 
+    // If milestone is marked as completed or done
     if (normalizedStatus === "completed" || normalizedStatus === "done") {
       return "success";
     }
 
+    // If end date has passed, consider it completed
     if (now.isAfter(endDate, 'day')) {
       return "success";
     }
@@ -337,10 +296,12 @@ const OverViewList = () => {
     const endDate = dayjs(milestone?.milestone_end_date);
     const now = dayjs();
 
+    // If milestone is marked as completed or done
     if (normalizedStatus === "completed" || normalizedStatus === "done") {
       return "Done";
     }
 
+    // If end date has passed, show as Done
     if (now.isAfter(endDate, 'day')) {
       return "Done";
     }
@@ -350,42 +311,7 @@ const OverViewList = () => {
     if (normalizedStatus === "expired") return "Expired";
     return status || "Not Set";
   };
-
-  const milestoneTableColumns = [
-    {
-      title: "Milestone Title",
-      dataIndex: "milestone_title",
-      sorter: {
-        compare: (a, b) => a.milestone_title.localeCompare(b.milestone_title),
-      },
-    },
-    {
-      title: "Milestone Cost",
-      dataIndex: "milestone_cost",
-      sorter: {
-        compare: (a, b) => a.milestone_cost - b.milestone_cost,
-      },
-    },
-    {
-      title: "Budget",
-      dataIndex: "add_cost_to_project_budget",
-      sorter: {
-        compare: (a, b) => a.add_cost_to_project_budget - b.add_cost_to_project_budget,
-      },
-    },
-    {
-      title: "Status",
-      dataIndex: "milestone_status",
-      render: (status) => (
-        <Tag color={getMilestoneStatus(status, currentProject)}>
-          {getMilestoneStatusText(status, currentProject)}
-        </Tag>
-      ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "milestone_status"),
-    }
-  ];
-
-
+  // Update the Progress Circle component to show different colors based on status
   const getProgressColor = (progress, isComplete, isOverdue) => {
     if (isComplete) return '#059669'; // Green-600
     if (isOverdue) return '#DC2626';  // Red-600
@@ -726,6 +652,74 @@ const OverViewList = () => {
     </div>
   );
 
+  // Add handler functions for tasks
+  const handleTaskEdit = useCallback((taskId) => {
+    navigate(`/app/dashboards/project/task/edit/${taskId}`);
+  }, [navigate]);
+
+  const handleTaskDelete = useCallback((taskId) => {
+    Modal.confirm({
+      title: 'Are you sure you want to delete this task?',
+      content: 'This action cannot be undone.',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk: () => {
+        // Add your delete task logic here
+        console.log('Delete task:', taskId);
+      }
+    });
+  }, []);
+
+  // Add handler functions for milestones
+  const handleMilestoneEdit = useCallback((milestoneId) => {
+    navigate(`/app/dashboards/project/milestone/edit/${milestoneId}`);
+  }, [navigate]);
+
+  const handleMilestoneDelete = useCallback((milestoneId) => {
+    Modal.confirm({
+      title: 'Are you sure you want to delete this milestone?',
+      content: 'This action cannot be undone.',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk: () => {
+        // Add your delete milestone logic here
+        console.log('Delete milestone:', milestoneId);
+      }
+    });
+  }, []);
+
+  // Update getDropdownItems to use the correct handlers based on type
+  const getDropdownItems = useCallback((record, type = 'task') => {
+    const handlers = type === 'task'
+      ? { edit: handleTaskEdit, delete: handleTaskDelete }
+      : { edit: handleMilestoneEdit, delete: handleMilestoneDelete };
+
+    return [
+      {
+        key: 'view',
+        icon: <EyeOutlined />,
+        label: 'View Details',
+        onClick: () => type === 'task' ? handleTaskClick(record.id) : handlers.edit(record.id)
+      },
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => handlers.edit(record.id)
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => handlers.delete(record.id),
+        danger: true
+      }
+    ];
+  }, [handleTaskEdit, handleTaskDelete, handleMilestoneEdit, handleMilestoneDelete, handleTaskClick]);
+
+  // Add this new component after the CompactTimeline component
   const ProjectActivities = ({ milestoneData, taskData }) => {
     const [activeTab, setActiveTab] = useState('milestones');
     const [viewType, setViewType] = useState('card');
@@ -786,6 +780,7 @@ const OverViewList = () => {
       );
     };
 
+    // Milestone table columns
     const milestoneColumns = [
       {
         title: "Title",
@@ -842,18 +837,29 @@ const OverViewList = () => {
         title: "Actions",
         key: "actions",
         render: (_, record) => (
-          <EllipsisDropdown
-            menu={
-              <Menu>
-                <Menu.Item key="view">View Details</Menu.Item>
-                <Menu.Item key="edit">Edit Milestone</Menu.Item>
-              </Menu>
-            }
-          />
-        ),
+          <div className="text-center">
+            <Dropdown
+              overlay={<Menu items={getDropdownItems(record, 'milestone')} />}
+              trigger={['click']}
+              placement="bottomRight"
+            >
+              <Button
+                type="text"
+                className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+                style={{
+                  borderRadius: '10px',
+                  padding: 0
+                }}
+              >
+                <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              </Button>
+            </Dropdown>
+          </div>
+        )
       },
     ];
 
+    // Task table columns
     const taskColumns = [
       {
         title: "Title",
@@ -939,15 +945,25 @@ const OverViewList = () => {
         title: "Actions",
         key: "actions",
         render: (_, record) => (
-          <EllipsisDropdown
-            menu={
-              <Menu>
-                <Menu.Item key="view" onClick={() => handleTaskClick(record.id)}>View Details</Menu.Item>
-                <Menu.Item key="edit">Edit Task</Menu.Item>
-              </Menu>
-            }
-          />
-        ),
+          <div className="text-center">
+            <Dropdown
+              overlay={<Menu items={getDropdownItems(record, 'task')} />}
+              trigger={['click']}
+              placement="bottomRight"
+            >
+              <Button
+                type="text"
+                className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+                style={{
+                  borderRadius: '10px',
+                  padding: 0
+                }}
+              >
+                <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              </Button>
+            </Dropdown>
+          </div>
+        )
       },
     ];
 
@@ -1073,14 +1089,22 @@ const OverViewList = () => {
                                   </div>
                                 </div>
                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <EllipsisDropdown
-                                    menu={
-                                      <Menu>
-                                        <Menu.Item key="view">View Details</Menu.Item>
-                                        <Menu.Item key="edit">Edit Task</Menu.Item>
-                                      </Menu>
-                                    }
-                                  />
+                                  <Dropdown
+                                    overlay={<Menu items={getDropdownItems(task, 'task')} />}
+                                    trigger={['click']}
+                                    placement="bottomRight"
+                                  >
+                                    <Button
+                                      type="text"
+                                      className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+                                      style={{
+                                        borderRadius: '10px',
+                                        padding: 0
+                                      }}
+                                    >
+                                      <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+                                    </Button>
+                                  </Dropdown>
                                 </div>
                               </div>
 
@@ -1277,5 +1301,4 @@ const OverViewList = () => {
 };
 
 export default OverViewList;
-
 

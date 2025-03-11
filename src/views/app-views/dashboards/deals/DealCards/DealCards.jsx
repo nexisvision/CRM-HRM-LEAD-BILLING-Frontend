@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Card, Row, Col, Modal, Select, Avatar, Tag, Progress, Tooltip } from "antd";
+import React, { useState, useEffect, useMemo } from "react";
+import { Card, Row, Col, Modal, Select, Avatar, Tag, Tooltip } from "antd";
 import { DndContext, useDroppable, useDraggable, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,9 +9,9 @@ import AddDealCards from "./AdddealCards";
 import { GetPip } from "../../systemsetup/Pipeline/PiplineReducer/piplineSlice";
 import { Option } from "antd/es/mentions";
 import { EditDeals, GetDeals } from "../DealReducers/DealSlice";
-import { 
-  CalendarOutlined, 
-  DollarOutlined, 
+import {
+  CalendarOutlined,
+  DollarOutlined,
   ProjectOutlined,
   UserOutlined,
   ArrowRightOutlined
@@ -34,12 +34,6 @@ const DraggableItem = ({ lead, id }) => {
     return diffDays;
   };
 
-  const getProgressColor = (days) => {
-    if (days <= 7) return "#ff4d4f";
-    if (days <= 14) return "#faad14";
-    return "#52c41a";
-  };
-
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <Card
@@ -55,7 +49,7 @@ const DraggableItem = ({ lead, id }) => {
         <div className="deal-card-header" style={{ marginBottom: "12px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <Avatar 
+              <Avatar
                 style={{ backgroundColor: '#1890ff' }}
                 icon={<UserOutlined />}
               />
@@ -146,10 +140,10 @@ const DealCards = () => {
   }, [dispatch]);
 
   const allstagedata = useSelector((state) => state.StagesLeadsDeals);
-  const fndata = allstagedata?.StagesLeadsDeals?.data || [];
+  const fndata = useMemo(() => allstagedata?.StagesLeadsDeals?.data || [], [allstagedata?.StagesLeadsDeals?.data]);
 
   const allleaddata = useSelector((state) => state.Deals);
-  const fndleadadat = allleaddata?.Deals?.data || [];
+  const fndleadadat = useMemo(() => allleaddata?.Deals?.data || [], [allleaddata?.Deals?.data]);
 
   useEffect(() => {
     dispatch(GetPip());
@@ -244,7 +238,7 @@ const DealCards = () => {
       <div className="deal-board-header" style={{ marginBottom: "24px" }}>
         <Select
           placeholder="Select Pipeline"
-          style={{ 
+          style={{
             width: '100%',
             maxWidth: '300px',
             marginBottom: '16px'
@@ -263,7 +257,7 @@ const DealCards = () => {
       </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <Row 
+        <Row
           gutter={[16, 16]}
           style={{
             margin: 0,
@@ -274,14 +268,14 @@ const DealCards = () => {
         >
           {leadData?.length > 0 ? (
             leadData.map((leadGroup) => (
-              <Col 
+              <Col
                 key={leadGroup?.stageId}
                 style={{
                   minWidth: '300px',
                   maxWidth: '350px'
                 }}
               >
-                <Card 
+                <Card
                   title={
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span>{leadGroup?.status}</span>
@@ -289,12 +283,12 @@ const DealCards = () => {
                     </div>
                   }
                   className="stage-card"
-                  headStyle={{ 
+                  headStyle={{
                     backgroundColor: '#fafafa',
                     borderBottom: '1px solid #f0f0f0',
                     padding: '12px 16px'
                   }}
-                  bodyStyle={{ 
+                  bodyStyle={{
                     padding: '16px',
                     backgroundColor: 'rgba(0,0,0,0.02)'
                   }}

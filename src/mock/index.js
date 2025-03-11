@@ -10,10 +10,10 @@ export default function mockServer({ environment = 'test' }) {
     return createServer({
         environment,
         seeds(server) {
-			server.db.loadData({
-				signInUserData
-			})
-		},
+            server.db.loadData({
+                signInUserData
+            })
+        },
         routes() {
             this.urlPrefix = ''
             this.namespace = ''
@@ -22,8 +22,8 @@ export default function mockServer({ environment = 'test' }) {
                 return isExternal
             })
             this.passthrough()
-            
-            
+
+
             authFakeApi(this, API_BASE_URL)
         },
     })

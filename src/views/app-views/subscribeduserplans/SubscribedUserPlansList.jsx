@@ -1,44 +1,20 @@
-import React, { Component, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
-// import { PrinterOutlined } from '@ant-design/icons';
-import StatisticWidget from "components/shared-components/StatisticWidget";
-
 import {
-  Row,
   Card,
-  Col,
   Table,
-  Select,
   Input,
-  Button,
-  Badge,
-  Menu,
   Modal,
   Switch,
   message,
 } from "antd";
-// import { invoiceData } from '../../../pages/invoice/invoiceData';
-// import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
-import NumberFormat from "react-number-format";
 import {
-  EyeOutlined,
-  FileExcelOutlined,
   SearchOutlined,
-  PlusCircleOutlined,
-  EditOutlined,
-  PlusOutlined,
-  DeleteOutlined,
 } from "@ant-design/icons";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-// import NumberFormat from 'react-number-format';
 import dayjs from "dayjs";
 import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import utils from "utils";
-// import AddInvoice from './AddInvoice';
-// import EditInvoice from './EditInvoice';
-// import ViewInvoice from './ViewInvoice';
-import userData from "../../../assets/data/user-list.data.json";
 import ViewSubscribedUserPlans from "./ViewSubscribedUserPlans";
 import EditSubscribedUserPlans from "./EditSubscribedUserPlans";
 import { getsubplandata } from "./subplanReducer/subplanSlice";
@@ -48,20 +24,9 @@ import { ClientData } from "../company/CompanyReducers/CompanySlice";
 import axios from 'axios';
 import { env } from "configs/EnvironmentConfig";
 
-// import userData from '../../../../../assets/data/user-list.data.json';
-
-const { Column } = Table;
-
-const { Option } = Select;
-
 export const SubscribedUserPlansList = () => {
   const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [
-    isAddSubscribedUserPlansModalVisible,
-    setIsAddSubscribedUserPlansModalVisible,
-  ] = useState(false);
   const [
     isEditSubscribedUserPlansModalVisible,
     setIsEditSubscribedUserPlansModalVisible,
@@ -73,17 +38,17 @@ export const SubscribedUserPlansList = () => {
 
   useEffect(() => {
     dispatch(getsubplandata());
-  }, []);
+  }, [dispatch]);
 
 
   useEffect(() => {
     dispatch(GetPlan());
     dispatch(ClientData());
-  }, []);
+  }, [dispatch]);
 
 
   const alldatas = useSelector((state) => state.subplan);
-  const fnddtat = alldatas.subplan.data || [];
+  const fnddtat = React.useMemo(() => alldatas.subplan.data || [], [alldatas.subplan.data]);
 
   const allclient = useSelector((state) => state.ClientData);
   const fndclient = allclient.ClientData.data || [];
@@ -99,49 +64,19 @@ export const SubscribedUserPlansList = () => {
     }
   }, [fnddtat]);
 
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "paymentStatus";
-      const data = utils.filterArray(userData, key, value);
-      setUsers(data);
-    } else {
-      setUsers(userData);
-    }
-  };
-
-  // Open Add Job Modal
-  const openAddSubscribedUserPlansModal = () => {
-    setIsAddSubscribedUserPlansModalVisible(true);
-  };
-
-  // Close Add Job Modal
-  const closeAddSubscribedUserPlansModal = () => {
-    setIsAddSubscribedUserPlansModalVisible(false);
-  };
-
-  // Open Add Job Modal
-  const openEditSubscribedUserPlansModal = () => {
-    setIsEditSubscribedUserPlansModalVisible(true);
-  };
 
   // Close Add Job Modal
   const closeEditSubscribedUserPlansModal = () => {
     setIsEditSubscribedUserPlansModalVisible(false);
   };
 
-  // Open Add Job Modal
-  const openViewSubscribedUserPlansModal = () => {
-    setIsViewSubscribedUserPlansModalVisible(true);
-  };
 
   // Close Add Job Modal
   const closeViewSubscribedUserPlansModal = () => {
     setIsViewSubscribedUserPlansModalVisible(false);
   };
 
- 
+
 
   // Add this function to handle status changes
   const handleStatusChange = async (checked, id) => {
@@ -170,10 +105,6 @@ export const SubscribedUserPlansList = () => {
 
 
   const tableColumns = [
-    // {
-    //   title: "created_by",
-    //   dataIndex: "created_by",
-    // },
     {
       title: "Plan Name",
       dataIndex: "plan_id",
@@ -253,7 +184,7 @@ export const SubscribedUserPlansList = () => {
       sorter: (a, b) => utils.antdTableSorter(a, b, "end_date"),
 
     },
-   
+
   ];
 
   const onSearch = (e) => {
@@ -261,10 +192,7 @@ export const SubscribedUserPlansList = () => {
     const searchArray = e.currentTarget.value ? users : [];
     const data = utils.wildCardSearch(searchArray, value);
     setUsers(data);
-    setSelectedRowKeys([]);
   };
-
-
 
   return (
     <div className="container">
@@ -287,12 +215,6 @@ export const SubscribedUserPlansList = () => {
               />
             </div>
           </Flex>
-          {/* <Flex gap="7px" className="flex">
-                        <Button type="primary" className="flex items-center" onClick={openAddSubscribedUserPlansModal}>
-                            <PlusOutlined />
-                            <span className="ml-2">New</span>
-                        </Button>
-                    </Flex> */}
         </Flex>
         <div className="table-responsive">
           <Table
@@ -300,25 +222,8 @@ export const SubscribedUserPlansList = () => {
             dataSource={users}
             rowKey="id"
             scroll={{ x: 1200 }}
-          // rowSelection={{
-          // 	selectedRowKeys: selectedRowKeys,
-          // 	type: 'checkbox',
-          // 	preserveSelectedRowKeys: false,
-          // 	...rowSelection,
-          // }}
           />
         </div>
-
-        {/* <Modal
-					title="SubscribedUserPlans Create"
-					visible={isAddSubscribedUserPlansModalVisible}
-					onCancel={closeAddSubscribedUserPlansModal}
-					footer={null}
-					width={1000}
-					className='mt-[-70px]'
-				>
-					<AddInvoice onClose={closeAddSubscribedUserPlansModal} />
-				</Modal> */}
         <Modal
           title="Edit Subscribed Plans"
           visible={isEditSubscribedUserPlansModalVisible}

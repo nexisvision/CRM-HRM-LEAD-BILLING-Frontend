@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Select, Button, message, Col, Input, Row } from "antd";
-import axios from "axios";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { useDispatch, useSelector } from "react-redux";
-// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 import { addallowan, getallowan } from "./AllowancwReducer/AllowanceSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 
-// Validation Schema
 const AllowanceSchema = Yup.object().shape({
   employeeId: Yup.string().required("Employee is required"),
   allowanceOption: Yup.string().required("Allowance option is required"),
@@ -24,12 +21,11 @@ const AllowanceSchema = Yup.object().shape({
 });
 
 const AddAllowance = ({ id, onClose }) => {
-  const [employees, setEmployees] = useState([]);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(empdata());
-  }, []);
+  }, [dispatch]);
 
   const alldataemp = useSelector((state) => state.employee);
   const fnddata = alldataemp.employee?.data || [];
@@ -39,7 +35,7 @@ const AddAllowance = ({ id, onClose }) => {
 
   useEffect(() => {
     dispatch(getcurren());
-  }, []);
+  }, [dispatch]);
 
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies?.data;
@@ -60,7 +56,6 @@ const AddAllowance = ({ id, onClose }) => {
 
   return (
     <div className="allowance">
-      {/* <h3>Allowance</h3> */}
 
       <Formik
         initialValues={{

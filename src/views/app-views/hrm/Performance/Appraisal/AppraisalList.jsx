@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Tag, Input, message, Button, Modal, Rate, Select } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined,EditOutlined , PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
+import { Card, Table, Menu, Input, message, Button, Modal, Select } from 'antd';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
 import UserView from '../../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import { useNavigate } from 'react-router-dom';
 import AddAppraisal from './AddAppraisal';
 import { utils, writeFile } from "xlsx";
 import EditAppraisal from './EditAppraisal';
-import { Model } from 'miragejs';
 import ViewAppraisal from './ViewAppraisal';
 import { empdata } from '../../Employee/EmployeeReducers/EmployeeSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,9 +19,7 @@ const AppraisalList = () => {
   const [users, setUsers] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState([]);
-    const [id, setId] = useState(null);
-   const navigate = useNavigate();
+  const [id, setId] = useState(null);
   const [isAddAppraisalModalVisible, setIsAddAppraisalModalVisible] = useState(false);
   const [isEditAppraisalModalVisible, setIsEditAppraisalModalVisible] = useState(false);
   const [isViewAppraisalModalVisible, setIsViewAppraisalModalVisible] = useState(false);
@@ -33,38 +28,38 @@ const AppraisalList = () => {
   const [searchText, setSearchText] = useState('');
 
   const user = useSelector((state) => state.user.loggedInUser.username);
-    const tabledata = useSelector((state) => state.appraisal);
-    const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
- const employeeDaata = useSelector((state) => state.employee?.employee?.data || []);
+  const tabledata = useSelector((state) => state.appraisal);
+  const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
+  const employeeDaata = useSelector((state) => state.employee?.employee?.data || []);
 
- const employeeDataa = employeeDaata.filter(item => item.created_by === user);
-                    
-      const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-      const roles = useSelector((state) => state.role?.role?.data);
-      const roleData = roles?.find(role => role.id === roleId);
-   
-      const whorole = roleData.role_name;
-   
-      const parsedPermissions = Array.isArray(roleData?.permissions)
-      ? roleData.permissions
-      : typeof roleData?.permissions === 'string'
+  const employeeDataa = employeeDaata.filter(item => item.created_by === user);
+  //// permission
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
       ? JSON.parse(roleData.permissions)
       : [];
-    
-    
-      let allpermisson;  
-   
-      if (parsedPermissions["extra-hrm-performance-appraisal"] && parsedPermissions["extra-hrm-performance-appraisal"][0]?.permissions) {
-        allpermisson = parsedPermissions["extra-hrm-performance-appraisal"][0].permissions;
-      
-      } else {
-      }
-      
-      const canCreateClient = allpermisson?.includes('create');
-      const canEditClient = allpermisson?.includes('edit');
-      const canDeleteClient = allpermisson?.includes('delete');
-      const canViewClient = allpermisson?.includes('view');
-   
+
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-performance-appraisal"] && parsedPermissions["extra-hrm-performance-appraisal"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-performance-appraisal"][0].permissions;
+
+  }
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
 
   const openAddAppraisalModal = () => {
     setIsAddAppraisalModalVisible(true);
@@ -92,56 +87,37 @@ const AppraisalList = () => {
     setIsEditAppraisalModalVisible(false);
   };
 
-useEffect(() => {
+  useEffect(() => {
     dispatch(getBranch());
   }, [dispatch]);
 
-  useEffect(() => { 
+  useEffect(() => {
     dispatch(getAppraisals());
   }, [dispatch]);
 
-   useEffect(() => {
-      dispatch(empdata());
-    }, [dispatch]);
+  useEffect(() => {
+    dispatch(empdata());
+  }, [dispatch]);
 
 
 
 
-useEffect(() => {
-  if (tabledata?.Appraisals?.data) {
-    const mappedData = tabledata.Appraisals.data.filter((item) => item.created_by === user).map((appraisal) => {
-      const branch = branchData.find((b) => b.id === appraisal.branch)?.branchName || 'N/A';
-      const employee = employeeDataa.find((e) => e.id === appraisal.employee)?.username || 'N/A';
-      
-  
-      return {
-        ...appraisal,
-        branch,
-        employee,
-      };
-    });
-    setUsers(mappedData);
-  }
-}, [tabledata, branchData]);
+  useEffect(() => {
+    if (tabledata?.Appraisals?.data) {
+      const mappedData = tabledata.Appraisals.data.filter((item) => item.created_by === user).map((appraisal) => {
+        const branch = branchData.find((b) => b.id === appraisal.branch)?.branchName || 'N/A';
+        const employee = employeeDataa.find((e) => e.id === appraisal.employee)?.username || 'N/A';
 
 
-
-  const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = value ? list : [];
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-  };
-
-  
-  const deleteUser = (userId) => {
-    setUsers(users.filter(item => item.id !== userId));
-  };
-
-  const showUserProfile = (userInfo) => {
-    setUserProfileVisible(true);
-    setSelectedUser(userInfo);
-  };
+        return {
+          ...appraisal,
+          branch,
+          employee,
+        };
+      });
+      setUsers(mappedData);
+    }
+  }, [tabledata, branchData, employeeDataa, user]);
 
   const closeUserProfile = () => {
     setUserProfileVisible(false);
@@ -149,37 +125,41 @@ useEffect(() => {
   };
   const exportToExcel = () => {
     try {
-      const ws = utils.json_to_sheet(users); // Convert JSON data to a sheet
-      const wb = utils.book_new(); // Create a new workbook
-      utils.book_append_sheet(wb, ws, "Appraisal"); // Append the sheet to the workbook
+      const ws = utils.json_to_sheet(users);
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, ws, "Appraisal");
 
-      writeFile(wb, "AppraisalData.xlsx"); // Save the file as ProposalData.xlsx
-      message.success("Data exported successfully!"); // Show success message
+      writeFile(wb, "AppraisalData.xlsx");
+      message.success("Data exported successfully!");
     } catch (error) {
       console.error("Error exporting to Excel:", error);
-      message.error("Failed to export data. Please try again."); // Show error message
+      message.error("Failed to export data. Please try again.");
     }
   };
 
- const editfun = (id) =>{
+  const editfun = (id) => {
     openEditAppraisalModal();
     setId(id)
-  } 
+  }
 
-   const deleteAppraisals = (userId) => {
+  const deleteAppraisals = (userId) => {
+    // setUsers(users.filter(item => item.id !== userId));
+    // dispatch(DeleteDes(userId));
+    // dispatch(getDes())
+    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
 
-        dispatch(deleteAppraisal( userId )) 
-                  .then(() => {
-                    dispatch(getAppraisals());
-                    message.success('Appraisal Deleted successfully!');
-                    setUsers(users.filter(item => item.id !== userId));
-                    
-                  })
-                  .catch((error) => {
-                    // message.error('Failed to delete Indicator.');
-                    console.error('Edit API error:', error);
-                  });
-    };
+    dispatch(deleteAppraisal(userId))
+      .then(() => {
+        dispatch(getAppraisals());
+        message.success('Appraisal Deleted successfully!');
+        setUsers(users.filter(item => item.id !== userId));
+
+      })
+      .catch((error) => {
+        // message.error('Failed to delete Indicator.');
+        console.error('Edit API error:', error);
+      });
+  };
 
 
   const dropdownMenu = (elm) => (
@@ -196,39 +176,39 @@ useEffect(() => {
           </Button>
         </Flex>
       </Menu.Item>
-     
-      
+
+
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                  <Menu.Item>
-                                  <Flex alignItems="center">
-                                    <Button
-                                      type=""
-                                      icon={<EditOutlined />}
-                                      onClick={()=>{editfun(elm.id)}}
-                                      size="small"
-                                    >
-                                     Edit
-                                    </Button>
-                                  </Flex>
-                                </Menu.Item>
-                          ) : null}
-            
-            
-            {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                           <Menu.Item>
-                           <Flex alignItems="center">
-                             <Button
-                               type=""
-                               icon={<DeleteOutlined />}
-                               onClick={() => { deleteAppraisals(elm.id) }}
-                               size="small"
-                             >
-                               Delete
-                             </Button>
-                           </Flex>
-                         </Menu.Item>
-                          ) : null}
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              icon={<EditOutlined />}
+              onClick={() => { editfun(elm.id) }}
+              size="small"
+            >
+              Edit
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
+
+
+      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              icon={<DeleteOutlined />}
+              onClick={() => { deleteAppraisals(elm.id) }}
+              size="small"
+            >
+              Delete
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
 
 
     </Menu>
@@ -240,13 +220,13 @@ useEffect(() => {
       dataIndex: 'branch',
       sorter: (a, b) => a.branch.length - b.branch.length,
     },
- 
+
     {
       title: 'Employee',
       dataIndex: 'employee',
       sorter: (a, b) => a.employee.length - b.employee.length,
     },
-    
+
     {
       title: 'Overall Rating',
       dataIndex: 'overallRating',
@@ -258,55 +238,55 @@ useEffect(() => {
     },
 
     {
-          title: 'Business Process',
-          dataIndex: 'businessProcess',
-          key: 'businessProcess',
-          // render: (rating) => <Rate disabled defaultValue={rating} />,
-          sorter: {
-            compare: (a, b) => a.businessProcess - b.businessProcess,
-          },
-        },
-        {
-          title: 'Oral Communication',
-          dataIndex:'oralCommunication',
-          key: 'oralCommunication',
-          // render: (rating) => <Rate disabled defaultValue={rating} />,
-          sorter: {
-            compare: (a, b) => a.oralCommunication - b.oralCommunication,
-          },
-        },
-    
-        {
-          title: 'Leadership',
-          dataIndex: 'leadership',
-          key: 'leadership',
-          // render: (rating) => <Rate disabled defaultValue={rating} />,
-          sorter: {
-            compare: (a, b) => a.leadership - b.leadership,
-          },
-        },
-    
-        {
-          title: 'Project Management',
-          dataIndex: 'projectManagement',
-          key: 'projectManagement',
-          // render: (rating) => <Rate disabled defaultValue={rating} />,
-          sorter: {
-            compare: (a, b) => a.projectManagement - b.projectManagement,
-          },
-        },
-        {
-          title: 'Allocating Resources',
-          dataIndex: 'allocatingResources',
-          key: 'allocatingResources',
-          // render: (rating) => <Rate disabled defaultValue={rating} />,
-          sorter: {
-            compare: (a, b) => a.allocatingResources - b.allocatingResources,
-          },
-        },
-    
-  
-    
+      title: 'Business Process',
+      dataIndex: 'businessProcess',
+      key: 'businessProcess',
+      // render: (rating) => <Rate disabled defaultValue={rating} />,
+      sorter: {
+        compare: (a, b) => a.businessProcess - b.businessProcess,
+      },
+    },
+    {
+      title: 'Oral Communication',
+      dataIndex: 'oralCommunication',
+      key: 'oralCommunication',
+      // render: (rating) => <Rate disabled defaultValue={rating} />,
+      sorter: {
+        compare: (a, b) => a.oralCommunication - b.oralCommunication,
+      },
+    },
+
+    {
+      title: 'Leadership',
+      dataIndex: 'leadership',
+      key: 'leadership',
+      // render: (rating) => <Rate disabled defaultValue={rating} />,
+      sorter: {
+        compare: (a, b) => a.leadership - b.leadership,
+      },
+    },
+
+    {
+      title: 'Project Management',
+      dataIndex: 'projectManagement',
+      key: 'projectManagement',
+      // render: (rating) => <Rate disabled defaultValue={rating} />,
+      sorter: {
+        compare: (a, b) => a.projectManagement - b.projectManagement,
+      },
+    },
+    {
+      title: 'Allocating Resources',
+      dataIndex: 'allocatingResources',
+      key: 'allocatingResources',
+      // render: (rating) => <Rate disabled defaultValue={rating} />,
+      sorter: {
+        compare: (a, b) => a.allocatingResources - b.allocatingResources,
+      },
+    },
+
+
+
     {
       title: 'Action',
       dataIndex: 'actions',
@@ -320,12 +300,12 @@ useEffect(() => {
 
   const getFilteredAppraisals = () => {
     if (!users) return [];
-    
+
     let filteredData = [...users];
 
     // Filter by employee
     if (selectedEmployee !== 'all') {
-      filteredData = filteredData.filter(appraisal => 
+      filteredData = filteredData.filter(appraisal =>
         appraisal.employee === selectedEmployee
       );
     }
@@ -397,32 +377,32 @@ useEffect(() => {
           </div>
         </Flex>
         <Flex gap="7px">
-        
+
 
           {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                           <Button type="primary" onClick={openAddAppraisalModal}>
-                                           <PlusOutlined />
-                                           New
-                                         </Button>                                                                                                                                                
-                                                                                                                                                                          
-                                                        ) : null}
+            <Button type="primary" onClick={openAddAppraisalModal}>
+              <PlusOutlined />
+              New
+            </Button>
+
+          ) : null}
           <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel} // Call export function when the button is clicked
+            block
+          >
+            Export All
+          </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
 
-          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                                                          
-                           <Table columns={tableColumns} dataSource={getFilteredAppraisals()} rowKey="id" />
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
 
-                            ) : null}
+          <Table columns={tableColumns} dataSource={getFilteredAppraisals()} rowKey="id" />
+
+        ) : null}
 
 
       </div>

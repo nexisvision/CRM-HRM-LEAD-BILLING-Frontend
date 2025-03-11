@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
 import { EditLeave as EditLeaveAction, GetLeave } from "./LeaveReducer/LeaveSlice";
 
 const { Option } = Select;
@@ -85,7 +84,7 @@ const EditLeave = ({ editid, onClose }) => {
 
   return (
     <div className="">
-      <h1 className="border-b border-gray-200 mb-4"></h1>
+      <hr className="border-b border-gray-200 mb-4"></hr>
       <Formik
         innerRef={formikRef}
         initialValues={initialValues}
@@ -224,4 +223,3 @@ const EditLeave = ({ editid, onClose }) => {
 };
 
 export default EditLeave;
-  

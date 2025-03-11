@@ -4,10 +4,10 @@ import { theme } from 'antd';
 const { useToken } = theme
 
 const StyledApiContainer = styled('div')`
-    background-color:${({token}) => token.colorBgContainer};
-    padding: ${({token, gutterLess}) => gutterLess ? '0px' : `${token.paddingLG}px`};
-    border:  ${({token, gutterLess}) => gutterLess ? '0' : ('1px solid ' + token.colorBorderSecondary)};
-    border-radius: ${({token}) => token.borderRadiusLG}px;
+    background-color:${({ token }) => token.colorBgContainer};
+    padding: ${({ token, gutterLess }) => gutterLess ? '0px' : `${token.paddingLG}px`};
+    border:  ${({ token, gutterLess }) => gutterLess ? '0' : ('1px solid ' + token.colorBorderSecondary)};
+    border-radius: ${({ token }) => token.borderRadiusLG}px;
     padding-top: 0;
     overflow-x: auto;
 
@@ -22,12 +22,12 @@ const StyledApiContainer = styled('div')`
         border-radius: 3px;
         font-size: .9em;
         color: #ff6b72;
-        border: 1px solid ${({token}) => token.colorBorderSecondary};
+        border: 1px solid ${({ token }) => token.colorBorderSecondary};
     }
 
     .api-title {
         margin-top: 24px;
-        font-size: ${({token}) => `${token.fontSizeHeading2}px`};
+        font-size: ${({ token }) => `${token.fontSizeHeading2}px`};
         margin-bottom: 0.5rem;
         line-height: 1.5;
 
@@ -39,7 +39,7 @@ const StyledApiContainer = styled('div')`
             margin-top: 24px;
 
             &.h2 {
-                border-bottom: 1px solid ${({token}) => token.colorBorderSecondary};
+                border-bottom: 1px solid ${({ token }) => token.colorBorderSecondary};
                 padding-bottom: 8px;
                 margin-bottom: 24px;
             }
@@ -86,7 +86,7 @@ const StyledApiContainer = styled('div')`
         font-size: 13px;
         font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
         line-height: 1.5;
-        border: 1px solid ${({token}) => token.colorBorderSecondary};
+        border: 1px solid ${({ token }) => token.colorBorderSecondary};
         border-collapse: collapse;
         border-spacing: 0;
 
@@ -107,7 +107,7 @@ const StyledApiContainer = styled('div')`
         th,
         td {
             padding: 12px;
-            border-color: ${({token}) => token.colorBorderSecondary};
+            border-color: ${({ token }) => token.colorBorderSecondary};
             border-width: 1px 0;
             border-style: solid;
         }
@@ -123,7 +123,7 @@ const StyledApiContainer = styled('div')`
 `
 
 
-const Container = ({children, gutterLess = false}) => {
+const Container = ({ children, gutterLess = false }) => {
 
     const { token } = useToken();
 

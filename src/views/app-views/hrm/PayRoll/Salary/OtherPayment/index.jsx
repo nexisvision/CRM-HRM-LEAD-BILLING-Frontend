@@ -4,11 +4,11 @@ import OtherPaymentList from './OtherPaymentList';
 
 const OtherPayment = ({ id, onClose }) => (
 
-<div className="mail">
+    <div className="mail">
 
-<OtherPaymentList id={id} onClose={onClose} />
- 
-</div>
+        <OtherPaymentList id={id} onClose={onClose} />
+
+    </div>
 
 );
 

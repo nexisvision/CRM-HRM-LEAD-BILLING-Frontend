@@ -21,7 +21,7 @@ const AddDepartment = async (payload) => {
 
   try {
     const res = await axios.post(
-        `${env.API_ENDPOINT_URL}/departments/`,
+      `${env.API_ENDPOINT_URL}/departments/`,
       payload,
       {
         headers: {
@@ -74,7 +74,10 @@ const EditDept = async (comnyid, values) => {
   }
 };
 
+
+
 const UserService = {
+
   GetDept,
   AddDepartment,
   DeleteDept,

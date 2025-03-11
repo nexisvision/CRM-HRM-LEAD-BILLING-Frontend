@@ -3,9 +3,9 @@ import UsersList from './UsersList';
 
 const Users = () => (
 
-<div className="mail">
-<UsersList />
-</div>
+	<div className="mail">
+		<UsersList />
+	</div>
 
 );
 

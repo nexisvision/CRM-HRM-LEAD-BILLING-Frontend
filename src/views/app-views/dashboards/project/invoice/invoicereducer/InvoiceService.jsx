@@ -1,9 +1,7 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
-// import { API_BASE_URL } from 'configs/AppConfig';
 
 const InvoiceService = {
-  // Get all invoices
   getAllInvoices: async (id) => {
     const token = localStorage.getItem("auth_token");
     try {
@@ -89,7 +87,7 @@ const InvoiceService = {
     try {
       const response = await axios.put(
         `${env.API_ENDPOINT_URL}/invoices/${idd}`,
-        data, 
+        data,
         {
           headers: {
             Authorization: `Bearer ${token}`,

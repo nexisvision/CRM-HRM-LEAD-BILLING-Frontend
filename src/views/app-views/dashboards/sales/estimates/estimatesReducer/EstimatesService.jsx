@@ -60,8 +60,9 @@ const getQuotationsById = async (id) => {
         },
       }
     );
+    console.log("response.data", response.data);
     return response.data;
-    
+
   } catch (error) {
     throw error;
   }
@@ -70,14 +71,16 @@ const updateQuotations = async (id, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `${env.API_ENDPOINT_URL}/sales-quotations/${id}`,values,
+      `${env.API_ENDPOINT_URL}/sales-quotations/${id}`, values,
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }
     );
-    
+    console.log("res.data", res.data);
+    console.log("updateQuoid", id);
+
     return res.data;
   } catch (error) {
     console.error("Error updating Quotations :", error);
@@ -85,7 +88,7 @@ const updateQuotations = async (id, values) => {
   }
 };
 const QuotationsService = {
-  // addUser,
+
   getAllQuotations,
   createQuotations,
   deleteQuotations,
@@ -93,5 +96,4 @@ const QuotationsService = {
   getQuotationsById
 };
 export default QuotationsService;
-
 

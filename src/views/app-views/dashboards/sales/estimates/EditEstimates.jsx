@@ -1,39 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker, Modal } from 'antd';
-import { DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Form, Row, Col, Input, message, Button, Select, DatePicker, Modal } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import { useSelector, useDispatch } from 'react-redux';
-import { updatequotation, getquotationsById, getallquotations } from './estimatesReducer/EstimatesSlice';
+import { updatequotation, getallquotations } from './estimatesReducer/EstimatesSlice';
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
 import dayjs from 'dayjs';
-import * as Yup from 'yup';
 import { Getcus } from '../customer/CustomerReducer/CustomerSlice';
 import { AddLable, GetLable } from '../LableReducer/LableSlice';
 
 const { Option } = Select;
 
 const EditEstimates = ({ onClose, idd, setInitialValues }) => {
-
-    // const {id} = useParams();
-
     const [discountType, setDiscountType] = useState('percentage');
-    const [loading, setLoading] = useState(false);
     const [discountValue, setDiscountValue] = useState(0);
     const [discountRate, setDiscountRate] = useState(10);
     const dispatch = useDispatch();
-    
+
 
     // Safely access the Redux state with default values
     const allempdata = useSelector((state) => state.salesquotation) || {};
-    const quotationData = allempdata?.salesquotations || [];
-    
+    const quotationData = React.useMemo(() => allempdata?.salesquotations || [], [allempdata?.salesquotations]);
+
     const [form] = Form.useForm();
-    const [formData, setFormData] = useState({
-        customer: '',
-        category: '',
-        issueDate: null,
-    });
 
     const { taxes } = useSelector((state) => state.tax);
     const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
@@ -66,7 +56,7 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
     // Add useEffect for fetching customers
     useEffect(() => {
         dispatch(Getcus());
-    }, []);
+    }, [dispatch]);
 
     const customerdata = useSelector((state) => state.customers);
     const fnddata = customerdata.customers.data;
@@ -122,7 +112,7 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
     };
     useEffect(() => {
         dispatch(getAllTaxes());
-      }, []);
+    }, [dispatch]);
 
     // First useEffect to fetch all quotations
     useEffect(() => {
@@ -133,16 +123,170 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
                 message.error('Failed to fetch quotations');
             }
         };
-        
+
         fetchQuotations();
     }, [dispatch]);
 
+
+
+    const handleFinish = async (values) => {
+        try {
+
+            // Create items object without stringifying
+            const items = {};
+            tableData.forEach((item, index) => {
+                items[`item_${index + 1}`] = {
+                    item: item.item,
+                    description: item.description || '',
+                    quantity: parseFloat(item.quantity) || 0,
+                    price: parseFloat(item.price) || 0,
+                    tax_name: selectedTaxDetails[item.id]?.gstName || '',
+                    tax: parseFloat(item.tax) || 0,
+                    amount: parseFloat(item.amount) || 0
+                };
+            });
+
+            const updatedValues = {
+                ...values,
+                issueDate: values.issueDate.format('YYYY-MM-DD'),
+                items: items, // Remove JSON.stringify - keep as object
+                discountType: discountType,
+                discountValue: parseFloat(discountValue) || 0,
+                discount: parseFloat(totals.discount) || 0,
+                discountAmount: parseFloat(totals.discount) || 0,
+                tax: parseFloat(totals.totalTax) || 0,
+                total: parseFloat(totals.finalTotal) || 0
+            };
+
+            await dispatch(updatequotation({ id: idd, values: updatedValues })).unwrap();
+            message.success("Estimate updated successfully!");
+            dispatch(getallquotations());
+            onClose();
+        } catch (error) {
+            message.error("Failed to update estimate: " + (error.message || "Unknown error"));
+        }
+    };
+
+
+
+    // Function to handle adding a new row
+    const handleAddRow = () => {
+        const newRow = {
+            id: Date.now(), // Unique ID for the new row
+            item: "",
+            quantity: 1,
+            price: "",
+            tax: 0,
+            amount: "0",
+            description: "",
+        };
+
+        setTableData([...tableData, newRow]);
+    };
+
+    // Function to handle deleting a row
+    const handleDeleteRow = (id) => {
+        if (tableData.length > 1) {
+            const updatedData = tableData.filter(row => row.id !== id);
+            setTableData(updatedData);
+            calculateTotal(updatedData, discountRate);
+        } else {
+            message.warning('At least one item is required');
+        }
+    };
+
+    const navigate = useNavigate();
+
+
+    const calculateTotal = useCallback((data = tableData, discountVal = discountValue, type = discountType) => {
+        if (!Array.isArray(data)) {
+            console.error('Invalid data passed to calculateTotal');
+            return;
+        }
+
+        // Calculate subtotal
+        const subtotal = data.reduce((sum, row) => {
+            return sum + (parseFloat(row.amount) || 0);
+        }, 0);
+
+        // Calculate discount based on type
+        const discountAmount = type === 'percentage'
+            ? (subtotal * (parseFloat(discountVal) || 0)) / 100
+            : parseFloat(discountVal) || 0;
+
+        // Calculate total tax
+        const totalTax = data.reduce((sum, row) => {
+            const quantity = parseFloat(row.quantity) || 0;
+            const price = parseFloat(row.price) || 0;
+            const tax = parseFloat(row.tax) || 0;
+            const baseAmount = quantity * price;
+            const taxAmount = (baseAmount * tax) / 100;
+            return sum + taxAmount;
+        }, 0);
+
+        // Calculate final total
+        const finalTotal = subtotal - discountAmount + totalTax;
+
+        setTotals({
+            subtotal: subtotal.toFixed(2),
+            discount: discountVal ? discountAmount.toFixed(2) : '',
+            totalTax: totalTax.toFixed(2),
+            finalTotal: finalTotal.toFixed(2)
+        });
+
+        return {
+            subtotal,
+            discount: discountAmount,
+            totalTax,
+            finalTotal
+        };
+    }, [tableData, discountValue, discountType, setTotals]);
+
+    const handleTableDataChange = (id, field, value) => {
+        const updatedData = tableData.map((row) => {
+            if (row.id === id) {
+                const updatedRow = { ...row, [field]: value };
+
+                if (field === 'tax' && taxes?.data) {
+                    const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
+                    if (selectedTax) {
+                        setSelectedTaxDetails(prevDetails => ({
+                            ...prevDetails,
+                            [id]: {
+                                gstName: selectedTax.gstName,
+                                gstPercentage: selectedTax.gstPercentage
+                            }
+                        }));
+                    }
+                }
+                // Calculate amount if quantity, price, or tax changes
+                if (field === 'quantity' || field === 'price' || field === 'tax') {
+                    const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
+                    const price = parseFloat(field === 'price' ? value : row.price) || 0;
+                    const tax = parseFloat(field === 'tax' ? value : row.tax) || 0;
+
+                    const baseAmount = quantity * price;
+                    const taxAmount = (baseAmount * tax) / 100;
+                    const totalAmount = baseAmount + taxAmount;
+
+                    updatedRow.amount = totalAmount.toFixed(2);
+                }
+
+                return updatedRow;
+            }
+            return row;
+        });
+
+        setTableData(updatedData);
+        calculateTotal(updatedData, discountValue, discountType);
+    };
     // Second useEffect to handle individual quotation data
     useEffect(() => {
         const fetchAndSetData = async () => {
             if (idd && quotationData) {
                 try {
                     const quodata = quotationData.find((item) => item.id === idd);
+                    console.log("Quotation Data:", quodata);
 
                     if (quodata) {
                         // Set form fields
@@ -154,7 +298,6 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
 
                         // Update form with values
                         form.setFieldsValue(formValues);
-                        setFormData(formValues);
 
                         let formattedTableData = []; // Define the variable here
 
@@ -206,189 +349,12 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
         };
 
         fetchAndSetData();
-    }, [idd, quotationData, form]);
-
-    const handleFinish = async (values) => {
-    try {
-        setLoading(true);
-        
-        // Create items object without stringifying
-        const items = {};
-        tableData.forEach((item, index) => {
-            items[`item_${index + 1}`] = {
-                item: item.item,
-                description: item.description || '',
-                quantity: parseFloat(item.quantity) || 0,
-                price: parseFloat(item.price) || 0,
-                tax_name: selectedTaxDetails[item.id]?.gstName || '',
-                tax: parseFloat(item.tax) || 0,
-                amount: parseFloat(item.amount) || 0
-            };
-        });
-
-        const updatedValues = {
-            ...values,
-            issueDate: values.issueDate.format('YYYY-MM-DD'),
-            items: items, // Remove JSON.stringify - keep as object
-            discountType: discountType,
-            discountValue: parseFloat(discountValue) || 0,
-            discount: parseFloat(totals.discount) || 0,
-            discountAmount: parseFloat(totals.discount) || 0,
-            tax: parseFloat(totals.totalTax) || 0,
-            total: parseFloat(totals.finalTotal) || 0
-        };
-
-        await dispatch(updatequotation({ id: idd, values: updatedValues })).unwrap();
-        message.success("Estimate updated successfully!");
-        dispatch(getallquotations());
-        onClose();
-    } catch (error) {
-        message.error("Failed to update estimate: " + (error.message || "Unknown error"));
-    } finally {
-        setLoading(false);
-    }
-};
-
-
-    const [rows, setRows] = useState([
-        {
-            id: Date.now(),
-            item: "",
-            quantity: "",
-            price: "",
-            discount: "",
-            tax: "",
-            amount: "0",
-            description: "",
-            isNew: false,
-        },
-    ]);
-
-    // Function to handle adding a new row
-    const handleAddRow = () => {
-        const newRow = {
-            id: Date.now(), // Unique ID for the new row
-            item: "",
-            quantity: 1,
-            price: "",
-            tax: 0,
-            amount: "0",
-            description: "",
-        };
-        
-        setTableData([...tableData, newRow]);
-    };
-
-    // Function to handle deleting a row
-    const handleDeleteRow = (id) => {
-        if (tableData.length > 1) {
-            const updatedData = tableData.filter(row => row.id !== id);
-            setTableData(updatedData);
-            calculateTotal(updatedData, discountRate);
-        } else {
-            message.warning('At least one item is required');
-        }
-    };
-
-    const navigate = useNavigate();
-
-    // Calculate subtotal (sum of all row amounts before discount)
-  const calculateSubTotal = () => {
-    return tableData.reduce((sum, row) => {
-      const quantity = parseFloat(row.quantity) || 0;
-      const price = parseFloat(row.price) || 0;
-      return sum + (quantity * price);
-    }, 0);
-  };
-
-    const calculateTotal = (data = tableData, discountVal = discountValue, type = discountType) => {
-        if (!Array.isArray(data)) {
-          console.error('Invalid data passed to calculateTotal');
-          return;
-        }
-    
-        // Calculate subtotal
-        const subtotal = data.reduce((sum, row) => {
-          return sum + (parseFloat(row.amount) || 0);
-        }, 0);
-    
-        // Calculate discount based on type
-        const discountAmount = type === 'percentage' 
-          ? (subtotal * (parseFloat(discountVal) || 0)) / 100
-          : parseFloat(discountVal) || 0;
-    
-        // Calculate total tax
-        const totalTax = data.reduce((sum, row) => {
-          const quantity = parseFloat(row.quantity) || 0;
-          const price = parseFloat(row.price) || 0;
-          const tax = parseFloat(row.tax) || 0;
-          const baseAmount = quantity * price;
-          const taxAmount = (baseAmount * tax) / 100;
-          return sum + taxAmount;
-        }, 0);
-    
-        // Calculate final total
-        const finalTotal = subtotal - discountAmount + totalTax;
-    
-        setTotals({
-          subtotal: subtotal.toFixed(2),
-          discount: discountVal ? discountAmount.toFixed(2) : '',
-          totalTax: totalTax.toFixed(2),
-          finalTotal: finalTotal.toFixed(2)
-        });
-    
-        return {
-          subtotal,
-          discount: discountAmount,
-          totalTax,
-          finalTotal
-        };
-      };
-
-      const handleTableDataChange = (id, field, value) => {
-        const updatedData = tableData.map((row) => {
-          if (row.id === id) {
-            const updatedRow = { ...row, [field]: value };
-            
-            if (field === 'tax' && taxes?.data) {
-              const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
-              if (selectedTax) {
-                setSelectedTaxDetails(prevDetails => ({
-                  ...prevDetails,
-                  [id]: {
-                    gstName: selectedTax.gstName,
-                    gstPercentage: selectedTax.gstPercentage
-                  }
-                }));
-              }
-            }
-            // Calculate amount if quantity, price, or tax changes
-            if (field === 'quantity' || field === 'price' || field === 'tax') {
-              const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
-              const price = parseFloat(field === 'price' ? value : row.price) || 0;
-              const tax = parseFloat(field === 'tax' ? value : row.tax) || 0;
-              
-              const baseAmount = quantity * price;
-              const taxAmount = (baseAmount * tax) / 100;
-              const totalAmount = baseAmount + taxAmount;
-              
-              updatedRow.amount = totalAmount.toFixed(2);
-            }
-            
-            return updatedRow;
-          }
-          return row;
-        });
-    
-        setTableData(updatedData);
-        calculateTotal(updatedData, discountValue, discountType);
-      };
-
+    }, [idd, quotationData, form, calculateTotal]);
     return (
         <>
             <div>
                 <div className=' ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4'>
-                    <h2 className="mb-4 border-b pb-[30px] font-medium"></h2>
+                    <hr className="mb-4 border-b  font-medium"></hr>
                     <Form
                         form={form}
                         layout="vertical"
@@ -474,21 +440,21 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
                         <div>
                             <div className="overflow-x-auto">
 
-                            <div className="form-buttons text-left mt-2 mb-2 justify-end flex">
-                            <Button 
-                    type="primary"
-                    onClick={handleAddRow}
-                    icon={<PlusOutlined />}
-                  >
-                    Add Items
-                  </Button>
-                            </div>
+                                <div className="form-buttons text-left mt-2 mb-2 justify-end flex">
+                                    <Button
+                                        type="primary"
+                                        onClick={handleAddRow}
+                                        icon={<PlusOutlined />}
+                                    >
+                                        Add Items
+                                    </Button>
+                                </div>
 
                                 <table className="w-full border border-gray-200 bg-white">
                                     <thead className="bg-gray-100">
                                         <tr>
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                            Item<span className="text-red-500">*</span>
+                                                Item<span className="text-red-500">*</span>
                                             </th>
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Quantity<span className="text-red-500">*</span>
@@ -538,19 +504,19 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
                                                         />
                                                     </td>
                                                     <td className="px-4 py-2 border-b">
-                          <select
-                            value={row.tax}
-                            onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                            className="w-full p-2 border"
-                          >
-                            <option value="0">Nothing Selected</option>
-                            {taxes && taxes.data && taxes.data.map(tax => (
-                              <option key={tax.id} value={tax.gstPercentage}>
-                                {tax.gstName}: {tax.gstPercentage}%
-                              </option>
-                            ))}
-                          </select>
-                        </td>
+                                                        <select
+                                                            value={row.tax}
+                                                            onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
+                                                            className="w-full p-2 border"
+                                                        >
+                                                            <option value="0">Nothing Selected</option>
+                                                            {taxes && taxes.data && taxes.data.map(tax => (
+                                                                <option key={tax.id} value={tax.gstPercentage}>
+                                                                    {tax.gstName}: {tax.gstPercentage}%
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </td>
                                                     <td className="px-4 py-2 border-b">
                                                         <span>{row.amount}</span>
                                                     </td>
@@ -579,7 +545,7 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
                                     </tbody>
                                 </table>
                             </div>
-                           
+
 
                             {/* Summary Section */}
                             <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
@@ -680,6 +646,7 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
 };
 
 export default EditEstimates;
+
 
 
 

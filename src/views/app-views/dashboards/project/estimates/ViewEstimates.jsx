@@ -1,30 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Spin } from 'antd';
-import { useSelector, useDispatch } from 'react-redux';
+import { Card, Table } from 'antd';
+import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 import NumberFormat from 'react-number-format';
 
 function ViewEstimates({ estimateId, onClose }) {
-    const dispatch = useDispatch();
-    
-    // Get data from Redux store
-    const estimate = useSelector((state) => 
+    const estimate = useSelector((state) =>
         state.estimate.estimates.find(est => est.id === estimateId)
     );
-    
+    console.log('Current Estimate:', estimate);
+
     const [tableData, setTableData] = useState([]);
 
     useEffect(() => {
         if (estimate?.items) {
             try {
-                const itemsObj = typeof estimate.items === 'string' ? 
+                const itemsObj = typeof estimate.items === 'string' ?
                     JSON.parse(estimate.items) : estimate.items;
-
                 const itemsArray = Object.entries(itemsObj).map(([key, item]) => ({
                     key,
                     ...item
                 }));
 
+                console.log('Items Array:', itemsArray);
                 setTableData(itemsArray);
             } catch (error) {
                 console.error('Error processing items:', error);
@@ -105,9 +103,9 @@ function ViewEstimates({ estimateId, onClose }) {
     }
 
     return (
-        <div className='ml-[-24px] mr-[-24px] mt-[-52px] mb-[-24px] bg-gray-50 rounded-t-lg rounded-b-lg'>   
+        <div className='ml-[-24px] mr-[-24px] mt-[-52px] mb-[-24px] bg-gray-50 rounded-t-lg rounded-b-lg'>
             <div className="p-4">
-                <h2 className="border-b pb-[30px] font-medium"></h2>
+                <hr className="border-b  font-medium"></hr>
                 <Card bordered={false} className='mt-3'>
                     {/* Header Information */}
                     <div className="mb-6">
@@ -141,7 +139,7 @@ function ViewEstimates({ estimateId, onClose }) {
                                     <span className="font-semibold">Subtotal:</span>
                                     <NumberFormat
                                         displayType="text"
-                                        value={tableData.reduce((sum, item) => 
+                                        value={tableData.reduce((sum, item) =>
                                             sum + parseFloat(item.amount || 0), 0
                                         )}
                                         prefix='₹'
@@ -164,7 +162,7 @@ function ViewEstimates({ estimateId, onClose }) {
                                     <NumberFormat
                                         displayType="text"
                                         value={estimate.tax || 0}
-                                         prefix='₹'
+                                        prefix='₹'
                                         thousandSeparator={true}
                                         decimalScale={2}
                                     />
@@ -174,7 +172,7 @@ function ViewEstimates({ estimateId, onClose }) {
                                     <NumberFormat
                                         displayType="text"
                                         value={estimate.total || 0}
-                                         prefix='₹'
+                                        prefix='₹'
                                         thousandSeparator={true}
                                         decimalScale={2}
                                     />

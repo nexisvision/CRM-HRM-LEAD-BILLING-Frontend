@@ -1,11 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./UserService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
-
-
-
 
 export const forgotpass = createAsyncThunk(
   "users/forgotpass",
@@ -45,7 +41,7 @@ export const resetpass = createAsyncThunk(
 
 
 
-// Async thunk for adding user
+
 export const addNewUser = createAsyncThunk(
   "users/addUser",
   async (userData, thunkAPI) => {
@@ -58,10 +54,10 @@ export const addNewUser = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
+
 
 export const userLogin = createAsyncThunk(
-  "users/userLogin",  
+  "users/userLogin",
   async (loginData, thunkAPI) => {
     try {
       const response = await UserService.userLoginapi(loginData);
@@ -80,7 +76,7 @@ export const userLogin = createAsyncThunk(
 
 export const autol = createAsyncThunk(
   "users/autolog",
-  async ({localemail, localtoken}, thunkAPI) => {
+  async ({ localemail, localtoken }, thunkAPI) => {
     try {
       const response = await UserService.autologin(localemail, localtoken);
       if (response) {
@@ -99,7 +95,7 @@ export const autol = createAsyncThunk(
 
 
 
-// Async thunk for getting all users
+
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -112,7 +108,7 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
+
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -125,7 +121,7 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+
 export const deleteUser = createAsyncThunk(
   "users/deleteUser",
   async (userId, thunkAPI) => {
@@ -153,7 +149,7 @@ export const updateUser = createAsyncThunk(
 
 export const updateSuperAdmin = createAsyncThunk(
   "users/updatesuperadmin",
-  async ({id, data}, thunkAPI) => {
+  async ({ id, data }, thunkAPI) => {
     try {
       const response = await UserService.updatesuperadmin(id, data);
       return response;
@@ -178,7 +174,7 @@ const initialIsAuth = () => {
 const usersSlice = createSlice({
   name: "user",
   initialState: {
-    isAuth: initialIsAuth(),  
+    isAuth: initialIsAuth(),
     loggedInUser: initialUser(),
     employees: [],
     editItem: {},
@@ -218,48 +214,48 @@ const usersSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-    ////
+      ////
 
 
-    .addCase(forgotpass.pending, (state) => {
-      state.isLoading = true;
-    })
-    .addCase(forgotpass.fulfilled, (state, action) => {
-      state.isLoading = false;
-      toast.success(action.payload?.data?.message);
-    })
-    .addCase(forgotpass.rejected, (state, action) => {
-      state.isLoading = false;
-      toast.error(action.payload?.message);
-    })
-
-    
-    .addCase(forgototp.pending, (state) => {
-      state.isLoading = true;
-    })
-    .addCase(forgototp.fulfilled, (state, action) => {
-      state.isLoading = false;
-      toast.success(action.payload?.data?.message);
-    })
-    .addCase(forgototp.rejected, (state, action) => {
-      state.isLoading = false;
-      toast.error(action.payload?.message);
-    })
-
-    .addCase(resetpass.pending, (state) => {
-      state.isLoading = true;
-    })
-    .addCase(resetpass.fulfilled, (state, action) => {
-      state.isLoading = false;
-      toast.success(action.payload?.data?.message);
-    })
-    .addCase(resetpass.rejected, (state, action) => {
-      state.isLoading = false;
-      toast.error(action.payload?.message);
-    })
+      .addCase(forgotpass.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(forgotpass.fulfilled, (state, action) => {
+        state.isLoading = false;
+        toast.success(action.payload?.data?.message);
+      })
+      .addCase(forgotpass.rejected, (state, action) => {
+        state.isLoading = false;
+        toast.error(action.payload?.message);
+      })
 
 
-    
+      .addCase(forgototp.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(forgototp.fulfilled, (state, action) => {
+        state.isLoading = false;
+        toast.success(action.payload?.data?.message);
+      })
+      .addCase(forgototp.rejected, (state, action) => {
+        state.isLoading = false;
+        toast.error(action.payload?.message);
+      })
+
+      .addCase(resetpass.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(resetpass.fulfilled, (state, action) => {
+        state.isLoading = false;
+        toast.success(action.payload?.data?.message);
+      })
+      .addCase(resetpass.rejected, (state, action) => {
+        state.isLoading = false;
+        toast.error(action.payload?.message);
+      })
+
+
+
       //add
       .addCase(addNewUser.pending, (state) => {
         state.isLoading = true;

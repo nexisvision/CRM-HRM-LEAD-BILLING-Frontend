@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Input, Button, DatePicker, Select, message, Row, Col, Upload, Tag } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { AddTasks, GetTasks } from "../project/task/TaskReducer/TaskSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-import { GetAllNotifications } from "views/app-views/pages/setting/NotificationReducer/NotificationSlice";
 import { UploadOutlined } from "@ant-design/icons";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
@@ -16,14 +13,8 @@ const { Option } = Select;
 
 const AddTask = ({ onClose }) => {
   const dispatch = useDispatch();
-  const [isWithoutDueDate, setIsWithoutDueDate] = useState(false);
-  const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
   const [fileList, setFileList] = useState([]);
-
-  // const { id } = useParams();
-
   useEffect(() => {
-    // dispatch(empdata());
     dispatch(GetUsers());
   }, [dispatch]);
 
@@ -45,8 +36,6 @@ const AddTask = ({ onClose }) => {
   const allloggeduserdata = useSelector((state) => state.user);
   const loggedUserData = allloggeduserdata?.loggedInUser || {};
   const id = loggedUserData?.id;
-
-
 
   const initialValues = {
     taskName: "",
@@ -70,7 +59,6 @@ const AddTask = ({ onClose }) => {
     task_reporter: Yup.string().required("Please select a Task Reporter."),
   });
 
-  // File upload configuration
   const uploadProps = {
     onRemove: (file) => {
       const index = fileList.indexOf(file);
@@ -89,7 +77,6 @@ const AddTask = ({ onClose }) => {
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       ].includes(file.type);
 
-      // File size validation (2MB)
       const isLt2M = file.size / 1024 / 1024 < 2;
 
       if (!isValidType) {
@@ -103,7 +90,7 @@ const AddTask = ({ onClose }) => {
       }
 
       setFileList([...fileList, file]);
-      return false; // Prevent automatic upload
+      return false;
     },
     fileList,
     multiple: true,

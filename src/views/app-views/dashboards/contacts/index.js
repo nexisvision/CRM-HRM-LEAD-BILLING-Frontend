@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { Card, Table, Tag, Menu, Tooltip, message, Button } from 'antd';
-import { EyeOutlined, DeleteOutlined,PushpinOutlined,MailOutlined } from '@ant-design/icons';
+import { Card, Table, Tag, Menu, message, Button } from 'antd';
+import { EyeOutlined, DeleteOutlined, PushpinOutlined, MailOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from './UserView';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
@@ -31,12 +31,12 @@ export class Contacts extends Component {
 			selectedUser: userInfo
 		});
 	};
-	
+
 	closeUserProfile = () => {
 		this.setState({
 			userProfileVisible: false,
 			selectedUser: null
-    });
+		});
 	}
 
 	render() {
@@ -44,49 +44,49 @@ export class Contacts extends Component {
 
 		const dropdownMenu = elm => (
 			<Menu>
-				
+
 				<Menu.Item>
 					<Flex alignItems="center">
 						{/* <EyeOutlined />
 						<span className="ml-2">View Details</span> */}
-					 
-					<Button type="" className="" icon={<EyeOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
-					<span className="">View Details</span>
-					</Button>
+
+						<Button type="" className="" icon={<EyeOutlined />} onClick={() => { this.showUserProfile(elm) }} size="small">
+							<span className="">View Details</span>
+						</Button>
 					</Flex>
 				</Menu.Item>
 				<Menu.Item>
 					<Flex alignItems="center">
 						{/* <EyeOutlined />
 						<span className="ml-2">View Details</span> */}
-					 
-					 <Button type="" className="" icon={<MailOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
-					<span className="">Send Mail</span>
-					</Button>
+
+						<Button type="" className="" icon={<MailOutlined />} onClick={() => { this.showUserProfile(elm) }} size="small">
+							<span className="">Send Mail</span>
+						</Button>
 					</Flex>
 				</Menu.Item>
 				<Menu.Item>
 					<Flex alignItems="center">
 						{/* <EyeOutlined />
 						<span className="ml-2">View Details</span> */}
-					 
-					 <Button type="" className="" icon={<PushpinOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
-					<span className="ml-2">Pin</span>
-					</Button>
+
+						<Button type="" className="" icon={<PushpinOutlined />} onClick={() => { this.showUserProfile(elm) }} size="small">
+							<span className="ml-2">Pin</span>
+						</Button>
 					</Flex>
 				</Menu.Item>
 				<Menu.Item>
 					<Flex alignItems="center">
 						{/* <DeleteOutlined />
 						<span className="ml-2">Delete</span> */}
-					
-		<Button type="" className="" icon={<DeleteOutlined />} onClick={() => {this.deleteUser(elm.id)}} size="small"> 
-		<span className="">Delete</span>
-		</Button>
-		
-		
+
+						<Button type="" className="" icon={<DeleteOutlined />} onClick={() => { this.deleteUser(elm.id) }} size="small">
+							<span className="">Delete</span>
+						</Button>
+
+
 					</Flex>
-				</Menu.Item>	
+				</Menu.Item>
 			</Menu>
 		);
 
@@ -97,13 +97,13 @@ export class Contacts extends Component {
 				dataIndex: 'name',
 				render: (_, record) => (
 					<div className="d-flex">
-						<AvatarStatus src={record.img} name={record.name} subTitle={record.email}/>
+						<AvatarStatus src={record.img} name={record.name} subTitle={record.email} />
 					</div>
 				),
 				sorter: {
 					compare: (a, b) => {
 						a = a.name.toLowerCase();
-  						b = b.name.toLowerCase();
+						b = b.name.toLowerCase();
 						return a > b ? -1 : b > a ? 1 : 0;
 					},
 				},
@@ -127,7 +127,7 @@ export class Contacts extends Component {
 				title: 'Status',
 				dataIndex: 'status',
 				render: status => (
-					<Tag className ="text-capitalize" color={status === 'active'? 'cyan' : 'red'}>{status}</Tag>
+					<Tag className="text-capitalize" color={status === 'active' ? 'cyan' : 'red'}>{status}</Tag>
 				),
 				sorter: {
 					compare: (a, b) => a.status.length - b.status.length,
@@ -138,18 +138,18 @@ export class Contacts extends Component {
 				dataIndex: 'actions',
 				render: (_, elm) => (
 					<div className="text-center">
-						<EllipsisDropdown menu={dropdownMenu(elm)}/>
+						<EllipsisDropdown menu={dropdownMenu(elm)} />
 					</div>
 				)
 			},
 			
 		];
 		return (
-			<Card bodyStyle={{'padding': '0px'}}>
+			<Card bodyStyle={{ 'padding': '0px' }}>
 				<div className="table-responsive">
 					<Table columns={tableColumns} dataSource={users} rowKey='id' />
 				</div>
-				<UserView data={selectedUser} visible={userProfileVisible} close={()=> {this.closeUserProfile()}}/>
+				<UserView data={selectedUser} visible={userProfileVisible} close={() => { this.closeUserProfile() }} />
 			</Card>
 		)
 	}

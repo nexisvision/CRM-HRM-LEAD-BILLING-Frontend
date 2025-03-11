@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, message, Checkbox } from 'antd';
-import { useNavigate } from 'react-router-dom';
+
 import { useDispatch } from 'react-redux';
 import { addRole, getRoles } from '../RoleAndPermissionReducers/RoleAndPermissionSlice';
 
-const AddRole = ({ onClose,resetForm }) => {
+const AddRole = ({ onClose, resetForm }) => {
   const [form] = Form.useForm();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState('Staff');
   const [modulePermissions, setModulePermissions] = useState({});
@@ -18,39 +17,39 @@ const AddRole = ({ onClose,resetForm }) => {
     'Project',
     'HRM',
     'Account',
-    
+
   ];
 
   const subModules = {
-   
+
     CRM: [
-      {key: 'dashboards-leadcards', title: 'LeadCards'},
-      {key: 'dashboards-lead', title: 'Leads'},
-      {key: 'dashboards-deal', title: 'Deals'},
-      {key: 'dashboards-proposal', title: 'Proposal'},
-      {key: 'dashboards-task', title: 'Task'},
-      {key: 'dashboards-TaskCalendar', title: 'Task Calendar'},
-      {key: 'dashboards-systemsetup', title: 'CRM System Setup'},
-      {key: 'dashboards-mail', title: 'Mail'},
-      {key: 'dashboards-chat', title: 'Chat'},
-      {key: 'dashboards-calendar', title: 'Calendar'},
-      {key: 'extra-pages-customersupports-ticket', title: 'Ticket Supports'},
+      { key: 'dashboards-leadcards', title: 'LeadCards' },
+      { key: 'dashboards-lead', title: 'Leads' },
+      { key: 'dashboards-deal', title: 'Deals' },
+      { key: 'dashboards-proposal', title: 'Proposal' },
+      { key: 'dashboards-task', title: 'Task' },
+      { key: 'dashboards-TaskCalendar', title: 'Task Calendar' },
+      { key: 'dashboards-systemsetup', title: 'CRM System Setup' },
+      { key: 'dashboards-mail', title: 'Mail' },
+      { key: 'dashboards-chat', title: 'Chat' },
+      { key: 'dashboards-calendar', title: 'Calendar' },
+      { key: 'extra-pages-customersupports-ticket', title: 'Ticket Supports' },
     ],
     Staff: [
-      {key: 'extra-users-list', title: 'Users'},
-      {key: 'extra-users-client-list', title: 'Clients'},
-     
+      { key: 'extra-users-list', title: 'Users' },
+      { key: 'extra-users-client-list', title: 'Clients' },
+
     ],
     Project: [
       { key: 'dashboards-project-list', title: 'Project' },
       { key: 'dashboards-project-Contract', title: 'Contract' },
-      
+
     ],
     HRM: [
       { key: 'extra-hrm-employee', title: 'Employee' },
       { key: 'extra-hrm-payroll-salary', title: 'Salary' },
       { key: 'extra-hrm-performance-indicator', title: 'Indicator' },
-      { key: 'extra-hrm-performance-appraisal', title: 'Appraisal' }, 
+      { key: 'extra-hrm-performance-appraisal', title: 'Appraisal' },
       { key: 'extra-hrm-role', title: 'Role' },
       { key: 'extra-hrm-designation', title: 'Designation' },
       { key: 'extra-hrm-department', title: 'Department' },
@@ -75,9 +74,9 @@ const AddRole = ({ onClose,resetForm }) => {
       { key: 'dashboards-sales-revenue', title: 'Revenue' },
       { key: 'dashboards-sales-estimates', title: 'Estimates' },
       { key: 'dashboards-sales-creditnotes', title: 'Credit Notes' },
-      
+
     ],
-   
+
   };
 
   const permissions = ['view', 'create', 'update', 'delete'];
@@ -140,43 +139,44 @@ const AddRole = ({ onClose,resetForm }) => {
 
   const onFinish = (values) => {
     const payload = {
-        role_name: values.role_name,
-        permissions: {} 
+      role_name: values.role_name,
+      permissions: {} // Initialize permissions as an empty object
     };
 
     Object.entries(modulePermissions).forEach(([submoduleKey, perms]) => {
-        const selectedPermissions = Object.entries(perms)
-            .filter(([perm, isSelected]) => isSelected)
-            .map(([perm]) => perm.toLowerCase());
+      const selectedPermissions = Object.entries(perms)
+        .filter(([perm, isSelected]) => isSelected)
+        .map(([perm]) => perm.toLowerCase());
 
-        if (selectedPermissions.length > 0) {
-            const moduleName = submoduleKey.toLowerCase(); 
-            if (!payload.permissions[moduleName]) {
-                payload.permissions[moduleName] = []; 
-            }
-            payload.permissions[moduleName].push({
-                key: submoduleKey,
-                permissions: selectedPermissions
-            });
+      if (selectedPermissions.length > 0) {
+        // Use the submodule key as the module name in the permissions object
+        const moduleName = submoduleKey.toLowerCase(); // Convert to lowercase for consistency
+        if (!payload.permissions[moduleName]) {
+          payload.permissions[moduleName] = []; // Initialize if it doesn't exist
         }
+        payload.permissions[moduleName].push({
+          key: submoduleKey,
+          permissions: selectedPermissions
+        });
+      }
     });
 
     dispatch(addRole(payload))
-        .then(() => {
-            dispatch(getRoles());
-            message.success('Role added successfully!');
-            onClose();
-            resetForm();
-        })
-        .catch((error) => {
-        });
-};
+      .then(() => {
+        dispatch(getRoles());
+        message.success('Role added successfully!');
+        onClose();
+        resetForm();
+      })
+      .catch((error) => {
+      });
+  };
 
 
   return (
     <div className="">
-       <h2 className="mb-3 border-b pb-1 font-medium"></h2>
-      
+      <div className="mb-3 border-b pb-1 font-medium"></div>
+
       <Form form={form} onFinish={onFinish} layout="vertical">
         <Form.Item
           name="role_name"
