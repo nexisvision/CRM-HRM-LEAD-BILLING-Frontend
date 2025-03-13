@@ -172,7 +172,6 @@ const EditMilestone = ({ idd, onClose }) => {
   return (
     <div>
       <div className="ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4">
-        <hr className="border-b  font-medium"></hr>
         <div className="p-2">
           <Formik
             initialValues={initialValues}
@@ -182,6 +181,7 @@ const EditMilestone = ({ idd, onClose }) => {
           >
             {({ values, setFieldValue, setFieldTouched, isSubmitting }) => (
               <Form className="formik-form">
+                <div className="mb-2 border-b pb-[25px] font-medium"></div>
                 <Row gutter={16}>
                   <Col span={12} className="">
                     <div className="form-item">

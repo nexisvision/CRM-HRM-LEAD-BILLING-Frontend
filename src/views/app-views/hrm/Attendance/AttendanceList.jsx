@@ -47,6 +47,7 @@ const AttendanceList = () => {
   const employeeData = useSelector((state) => state.employee?.employee?.data || []);
   const leaveData = useSelector((state) => state.Leave?.Leave?.data || []);
   const fndleavedata = leaveData.filter((item) => item.created_by === user);
+  const allholidaudata = useSelector((state) => state.holiday?.holidays?.data || []);
 
 
   useEffect(() => {
@@ -184,8 +185,6 @@ const AttendanceList = () => {
                                     }
                                     
                                     const canCreateClient = allpermisson?.includes('create');
-                                    const canEditClient = allpermisson?.includes('edit');
-                                    const canDeleteClient = allpermisson?.includes('delete');
                                     const canViewClient = allpermisson?.includes('view');
                                  
 

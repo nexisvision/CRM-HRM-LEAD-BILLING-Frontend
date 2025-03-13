@@ -312,14 +312,15 @@ const EditInvoice = ({ idd, onClose, setFieldValue, values }) => {
         ...values,
         issueDate: values.issueDate.format("YYYY-MM-DD"),
         dueDate: values.dueDate.format("YYYY-MM-DD"),
-        items: JSON.stringify(itemsForDb),
+        project: fnddata?.project_name,
+        client: fnddata?.client,
+        items: itemsForDb,
         subtotal: totals.subtotal,
         discount: discountRate,
-        discountType: discountType,
-        discountValue: discountValue,
+        global_discount_amount: totals.globalDiscount,
+        total_item_discount: totals.itemDiscount,
         tax: totals.totalTax,
-        total: totals.finalTotal,
-        currency: values.currency
+        total: totals.finalTotal
       };
 
       await dispatch(updateInvoice({ idd, data: invoiceData })).unwrap();

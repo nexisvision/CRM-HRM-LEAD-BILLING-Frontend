@@ -18,21 +18,17 @@ const EditProposal = ({ id, onClose }) => {
   const [discountValue, setDiscountValue] = useState(0);
   const { taxes } = useSelector((state) => state.tax);
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
-  const loggeduser = useSelector((state) => state.user.loggedInUser.username);
+    // Add the missing state variables
+    const [singleEmp, setSingleEmp] = useState(null);
+    const [loading, setLoading] = useState(false);
   const currencies = useSelector((state) => state.currencies?.currencies?.data || []);
-  const [discountRate, setDiscountRate] = useState(10);
+  const [discountRate] = useState(10);
   const dispatch = useDispatch();
 
 
   const alldept = useSelector((state) => state.proposal);
 
   const { data: fndlead } = useSelector((state) => state.Leads.Leads);
-
-
-
-
-  const allogged = useSelector((state) => state.user.loggedInUser.username);
-
 
   const [form] = Form.useForm();
   const [totals, setTotals] = useState({
@@ -41,8 +37,6 @@ const EditProposal = ({ id, onClose }) => {
     totalTax: 0,
     finalTotal: 0,
   });
-
-
 
   useEffect(() => {
     const empData = alldept?.proposal?.data || [];

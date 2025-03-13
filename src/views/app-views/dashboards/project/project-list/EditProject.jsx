@@ -337,7 +337,7 @@ const EditProject = ({ id, onClose }) => {
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <>
             <Form className="formik-form" onSubmit={handleSubmit}>
-              <hr className="mb-4 border-b pb-2 font-medium"></hr>
+            <div className="mb-3 border-b pb-[-10px] font-medium"></div>
 
               <Row gutter={16}>
                 <Col span={24}>

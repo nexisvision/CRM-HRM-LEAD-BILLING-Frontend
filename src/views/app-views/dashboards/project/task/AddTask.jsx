@@ -10,7 +10,6 @@ import {
   Upload,
   Modal,
   Tag,
-  Checkbox,
 } from "antd";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
@@ -36,9 +35,9 @@ const AddTask = ({ onClose }) => {
   const [newPriority, setNewPriority] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newStatus, setNewStatus] = useState("");
-  const [priorities, setPriorities] = useState([]);
+  const [setPriorities] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [statuses, setStatuses] = useState([]);
+  const [ setStatuses] = useState([]);
   const [fileList, setFileList] = useState([]);
   const { id } = useParams();
   useSelector((state) => state.Leads.Leads || []);
@@ -166,24 +165,6 @@ const AddTask = ({ onClose }) => {
     }
   };
 
-  // File upload props configuration
-  const uploadProps = {
-    onRemove: (file) => {
-      const index = fileList.indexOf(file);
-      const newFileList = fileList.slice();
-      newFileList.splice(index, 1);
-      setFileList(newFileList);
-    },
-    beforeUpload: (file) => {
-      // Add additional file metadata
-      file.status = 'done';
-      setFileList([...fileList, file]);
-      return false;
-    },
-    fileList,
-    multiple: true,
-    maxCount: 5,
-  };
 
   const onSubmit = async (values, { resetForm }) => {
     try {
@@ -261,6 +242,7 @@ const AddTask = ({ onClose }) => {
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <>
             <Form className="formik-form" onSubmit={handleSubmit}>
+            <div className="mb-3 border-b pb-[-10px] font-medium"></div>
               <Row gutter={16}>
                 <Col span={24}>
                   <div className="form-item">

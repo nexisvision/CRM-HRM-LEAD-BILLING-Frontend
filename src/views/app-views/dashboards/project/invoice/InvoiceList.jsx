@@ -43,6 +43,7 @@ export const InvoiceList = () => {
   const clientsData = useSelector((state) => state.SubClient);
   const clients = React.useMemo(() => clientsData.SubClient.data || [], [clientsData.SubClient.data]);
   const [dateRange, setDateRange] = useState(null);
+  const projects = useSelector((state) => state.Project?.Projects?.data || []);
 
   useEffect(() => {
     dispatch(getAllInvoices(id));
@@ -244,6 +245,11 @@ export const InvoiceList = () => {
       ),
     },
   ];
+
+  const getProjectName = (projectId) => {
+    const project = projects?.find(p => p.id === projectId);
+    return project ? project.project_name : 'Unknown Project';
+  };
 
   return (
     <>
