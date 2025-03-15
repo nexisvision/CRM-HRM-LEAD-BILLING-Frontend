@@ -22,6 +22,7 @@ import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import AddCustomer from "../customer/AddCustomer";
 import AddCurrencies from '../../../setting/currencies/AddCurrencies';
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -187,6 +188,7 @@ const AddRevenue = ({ onClose }) => {
     const formattedValues = {
       ...values,
       amount: parseFloat(values.amount) || 0,
+      date: values.date // Use the date string directly
     };
 
     dispatch(AddRevenues(formattedValues)).then(() => {
@@ -219,11 +221,15 @@ const AddRevenue = ({ onClose }) => {
                     <Col span={12} className="">
                       <div className="form-item mt-3">
                         <label className="font-semibold"> Date <span className="text-red-500">*</span></label>
-                        <DatePicker
-                          className="w-full mt-1"
-                          format="DD-MM-YYYY"
-                          value={values.date}
-                          onChange={(date) => setFieldValue("date", date)}
+                        <input 
+                          type="date"
+                          className="w-full mt-1 p-2 border rounded"
+                          value={values.date ? dayjs(values.date).format('YYYY-MM-DD') : ''}
+                          min={dayjs().format('YYYY-MM-DD')}
+                          onChange={(e) => {
+                            const selectedDate = e.target.value;
+                            setFieldValue('date', selectedDate);
+                          }}
                           onBlur={() => setFieldTouched("date", true)}
                         />
                         <ErrorMessage

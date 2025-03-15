@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, Menu, Button, Input, message, Modal, Dropdown } from 'antd';
-import { DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, MoreOutlined } from '@ant-design/icons';
+import { DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, MoreOutlined, EditOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,7 +11,7 @@ import EditRole from './EditRole';
 const RoleList = () => {
   const [users, setUsers] = useState([]);
   const [isEditRoleModalVisible, setIsEditRoleModalVisible] = useState(false);
-  const id = null;
+  const [selectedRoleId, setSelectedRoleId] = useState(null);
   const [isAddRoleModalVisible, setIsAddRoleModalVisible] = useState(false);
   const dispatch = useDispatch();
 
@@ -25,9 +25,13 @@ const RoleList = () => {
 
   const [searchText, setSearchText] = useState('');
 
-
   const closeEditRoleModal = () => {
     setIsEditRoleModalVisible(false);
+  };
+
+  const openEditRoleModal = (roleId) => {
+    setSelectedRoleId(roleId);
+    setIsEditRoleModalVisible(true);
   };
 
   const openAddRoleModal = () => {
@@ -78,7 +82,6 @@ const RoleList = () => {
     }
   }, [filteredData]);
 
-
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find(role => role.id === roleId);
@@ -104,6 +107,15 @@ const RoleList = () => {
 
   const getDropdownItems = (elm) => {
     const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => openEditRoleModal(elm.id),
+      });
+    }
 
     if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
       items.push({
@@ -148,7 +160,6 @@ const RoleList = () => {
       return "Invalid Permissions";
     }
   };
-
 
   const tableColumns = [
     {
@@ -255,7 +266,7 @@ const RoleList = () => {
         width={1000}
         className='mt-[-70px]'
       >
-        <EditRole onClose={closeEditRoleModal} id={id} />
+        <EditRole onClose={closeEditRoleModal} id={selectedRoleId} />
       </Modal>
     </Card>
   );

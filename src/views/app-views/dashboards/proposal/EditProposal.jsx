@@ -18,13 +18,11 @@ const EditProposal = ({ id, onClose }) => {
   const [discountValue, setDiscountValue] = useState(0);
   const { taxes } = useSelector((state) => state.tax);
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
-    // Add the missing state variables
-    const [singleEmp, setSingleEmp] = useState(null);
-    const [ setLoading] = useState(false);
+  const [singleEmp, setSingleEmp] = useState(null);
+  const [loading, setLoading] = useState(false);
   const currencies = useSelector((state) => state.currencies?.currencies?.data || []);
   const [discountRate] = useState(10);
   const dispatch = useDispatch();
-
 
   const alldept = useSelector((state) => state.proposal);
 
@@ -104,7 +102,7 @@ const EditProposal = ({ id, onClose }) => {
         try {
           form.setFieldsValue({
             lead_title: data.lead_title,
-            valid_till: dayjs(data.valid_till),
+            valid_till: data.valid_till,
             currency: data.currency,
             description: data.description,
           });
@@ -172,23 +170,20 @@ const EditProposal = ({ id, onClose }) => {
     try {
       setLoading(true);
       const subtotal = calculateSubTotal();
-        // Calculate discount amount based on type
-    let discountAmount = 0;
-    if (discountType === 'percentage') {
-      discountAmount = (subtotal * discountValue) / 100;
-    } else {
-      discountAmount = parseFloat(discountValue) || 0;
-    }
-
-     
+      let discountAmount = 0;
+      if (discountType === 'percentage') {
+        discountAmount = (subtotal * discountValue) / 100;
+      } else {
+        discountAmount = parseFloat(discountValue) || 0;
+      }
 
       const proposalData = {
         lead_title: values.lead_title,
         deal_title: values.deal_title,
-        valid_till: values.valid_till.format("YYYY-MM-DD"),
+        valid_till: values.valid_till,
         currency: values.currency,
         calculatedTax: totals.totalTax,
-        description: "",
+        description: values.description || "",
         items: tableData.map((item) => ({
           item: item.item,
           quantity: parseFloat(item.quantity),
@@ -198,23 +193,24 @@ const EditProposal = ({ id, onClose }) => {
           amount: parseFloat(item.amount),
           description: item.description,
         })),
-        subtotal:subtotal,
+        subtotal: subtotal,
         discount: discountAmount,
         discountRate: discountRate,
         tax: totals.totalTax,
         total: totals.finalTotal,
       };
 
-      dispatch(edpropos({ id, proposalData }))
-        .then(() => {
-          dispatch(getpropos());
-          onClose();
-        })
-        .catch((error) => {
-          console.error("Error during proposal submission:", error);
-        });
+      const result = await dispatch(edpropos({ id, proposalData })).unwrap();
+      if (result) {
+        message.success('Proposal updated successfully');
+        await dispatch(getpropos());
+        onClose();
+      }
     } catch (error) {
-      message.error("Failed to create proposal: " + error.message);
+      console.error("Error during proposal update:", error);
+      message.error(error.message || "Failed to update proposal");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -424,7 +420,18 @@ const EditProposal = ({ id, onClose }) => {
                         { required: true, message: "Please select the Date" },
                       ]}
                     >
-                      <DatePicker className="w-full" format="DD-MM-YYYY" />
+                      <input 
+                        type="date"
+                        className="w-full mt-1 p-2 border rounded"
+                        value={form.getFieldValue('valid_till') ? dayjs(form.getFieldValue('valid_till')).format('YYYY-MM-DD') : ''}
+                        onChange={(e) => {
+                          const selectedDate = e.target.value;
+                          form.setFieldsValue({ 
+                            valid_till: selectedDate
+                          });
+                        }}
+                        min={dayjs().format('YYYY-MM-DD')}
+                      />
                     </Form.Item>
                   </Col>
 

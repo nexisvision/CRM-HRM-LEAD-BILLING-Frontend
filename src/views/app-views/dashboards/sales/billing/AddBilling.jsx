@@ -3,7 +3,6 @@ import {
   Card,
   Button,
   Select,
-  DatePicker,
   Input,
   message,
   Row,
@@ -23,6 +22,7 @@ import { vendordataedata } from "../../Purchase/vendor/vendorReducers/vendorSlic
 import Flex from 'components/shared-components/Flex';
 import { GetAllProdu } from "../../project/product/ProductReducer/ProductsSlice";
 import AddVendor from '../../Purchase/vendor/AddVendor';
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -275,7 +275,7 @@ const AddBilling = ({ onClose }) => {
         const invoiceData = {
           billNumber: values.billNumber,
           vendor: values.vendor,
-          billDate: values.billDate?.format("YYYY-MM-DD"),
+          billDate: values.billDate,
           discription: values.discription || "",
           status: values.status,
           category: values.category,
@@ -423,7 +423,7 @@ const AddBilling = ({ onClose }) => {
     <div>
       
       <Form form={form} layout="vertical">
-      <div className="border-b mb-2 pb-[-10px] font-medium"></div>
+      <div className="border-b mb-2 pb-[10px] font-medium"></div>
         <Card className="border-0">
           
           <Row gutter={16}>
@@ -471,7 +471,15 @@ const AddBilling = ({ onClose }) => {
                 name="billDate"
                 rules={[{ required: true, message: "Please select bill date" }]}
               >
-                <DatePicker className="w-full" format="DD-MM-YYYY" />
+                <input 
+                  type="date"
+                  className="w-full mt-1 p-2 border rounded"
+                  min={dayjs().format('YYYY-MM-DD')}
+                  onChange={(e) => {
+                    const selectedDate = e.target.value;
+                    form.setFieldsValue({ billDate: selectedDate });
+                  }}
+                />
               </Form.Item>
             </Col>
 

@@ -7,7 +7,6 @@ import {
   message,
   Button,
   Select,
-  DatePicker,
 } from "antd";
 import {
   DeleteOutlined,
@@ -20,6 +19,7 @@ import { GetLeads } from "../leads/LeadReducers/LeadSlice";
 import { addpropos, getpropos } from "./proposalReducers/proposalSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { getAllTaxes } from "views/app-views/setting/tax/taxreducer/taxSlice";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -118,7 +118,7 @@ const AddProposal = ({ onClose }) => {
         // Restructured proposal data to match backend requirements
         const proposalData = {
             lead_title: values.lead_title,
-            valid_till: values.valid_till.format("YYYY-MM-DD"),
+            valid_till: dayjs(values.valid_till).format('YYYY-MM-DD'),
             currency: values.currency,
             description: values.description || "",
             items: tableData.map((item) => ({
@@ -367,7 +367,18 @@ const AddProposal = ({ onClose }) => {
                         { required: true, message: "Please select the Date" },
                       ]}
                     >
-                      <DatePicker className="w-full" format="DD-MM-YYYY" />
+                      <input 
+                        type="date"
+                        className="w-full mt-1 p-2 border rounded"
+                        value={form.getFieldValue('valid_till') ? dayjs(form.getFieldValue('valid_till')).format('YYYY-MM-DD') : ''}
+                        onChange={(e) => {
+                          const selectedDate = e.target.value;
+                          form.setFieldsValue({ 
+                            valid_till: selectedDate
+                          });
+                        }}
+                        min={dayjs().format('YYYY-MM-DD')}
+                      />
                     </Form.Item>
                   </Col>
 

@@ -3,7 +3,6 @@ import {
   Form,
   Input,
   Button,
-  DatePicker,
   Select,
   Row,
   Col,
@@ -16,6 +15,7 @@ import { UploadOutlined } from "@ant-design/icons";
 import { AddTickets, getAllTicket } from "./TicketReducer/TicketSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -26,7 +26,6 @@ const AddTicket = ({ onClose }) => {
   useEffect(() => {
     dispatch(GetUsers());
   }, [dispatch]);
-
 
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
@@ -41,12 +40,13 @@ const AddTicket = ({ onClose }) => {
       return emp.client_id === loggedInUser.client_id;
     }
   });
+
   const initialValues = {
     ticketSubject: "",
     requestor: "",
     priority: "",
     status: "",
-    endDate: null,
+    endDate: "",
     description: "",
     file: null,
   };
@@ -56,7 +56,7 @@ const AddTicket = ({ onClose }) => {
     requestor: Yup.string().required("Employee selection is required"),
     priority: Yup.string().required("Priority is required"),
     status: Yup.string().required("Status is required"),
-    endDate: Yup.date().required("End date is required"),
+    endDate: Yup.string().required("End date is required"),
     description: Yup.string().required("Description is required"),
   });
 
@@ -66,7 +66,7 @@ const AddTicket = ({ onClose }) => {
       Object.keys(values).forEach(key => {
         if (values[key] !== null) {
           if (key === 'endDate') {
-            formData.append(key, values[key].format('YYYY-MM-DD'));
+            formData.append(key, values[key]); // Use the date string directly
           } else if (key === 'file' && values[key]) {
             formData.append(key, values[key]);
           } else {
@@ -93,7 +93,7 @@ const AddTicket = ({ onClose }) => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ values, handleSubmit, setFieldValue, isSubmitting }) => (
+        {({ values, handleSubmit, setFieldValue, setFieldTouched }) => (
           <Form layout="vertical" onFinish={handleSubmit} className="space-y-4">
             <Row gutter={16}>
               {/* Subject */}
@@ -211,11 +211,16 @@ const AddTicket = ({ onClose }) => {
                   </label>
                   <Field name="endDate">
                     {({ field }) => (
-                      <DatePicker
-                        {...field}
-                        className="w-full"
-                        format="DD-MM-YYYY"
-                        onChange={(date) => setFieldValue("endDate", date)}
+                      <input 
+                        type="date"
+                        className="w-full mt-1 p-2 border rounded"
+                        value={field.value || ''}
+                        onChange={(e) => {
+                          const selectedDate = e.target.value;
+                          setFieldValue('endDate', selectedDate);
+                        }}
+                        onBlur={() => setFieldTouched("endDate", true)}
+                        min={dayjs().format('YYYY-MM-DD')}
                       />
                     )}
                   </Field>
@@ -279,7 +284,6 @@ const AddTicket = ({ onClose }) => {
                     <Button icon={<UploadOutlined />} className="bg-white">
                       Select File
                     </Button>
-
                   </Upload>
                 </div>
               </Col>
@@ -296,7 +300,6 @@ const AddTicket = ({ onClose }) => {
               <Button
                 type="primary"
                 htmlType="submit"
-                loading={isSubmitting}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 Create Ticket

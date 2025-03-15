@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, Select, DatePicker, message, Row, Col, Modal } from "antd";
+import { Input, Button, Select, message, Row, Col, Modal } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,6 +16,7 @@ import AddDealStages from "../systemsetup/DealStages/AddDealStages";
 import AddPipeLine from "../systemsetup/Pipeline/AddPipeLine";
 import AddCurrencies from "views/app-views/setting/currencies/AddCurrencies";
 import AddCountries from "views/app-views/setting/countries/AddCountries";
+import dayjs from "dayjs";
 const { Option } = Select;
 const AddDeal = ({ onClose }) => {
   const dispatch = useDispatch();
@@ -158,7 +159,7 @@ const AddDeal = ({ onClose }) => {
     category: "",
     pipeline: "",
     stage: "",
-    closedDate: null,
+    closedDate: "",
     project: "",
   };
   const onSubmit = (values, { resetForm }) => {
@@ -613,16 +614,16 @@ const AddDeal = ({ onClose }) => {
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Closed Date <span className="text-rose-500">*</span></label>
-                  <Field name="closedDate">
-                    {({ field }) => (
-                      <DatePicker
-                        {...field}
-                        className="mt-1"
-                        style={{ width: "100%" }}
-                        onChange={(date) => setFieldValue("closedDate", date)}
-                      />
-                    )}
-                  </Field>
+                  <input 
+                    type="date"
+                    className="w-full mt-1 p-2 border rounded"
+                    value={values.closedDate || ''}
+                    min={dayjs().format('YYYY-MM-DD')}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      setFieldValue('closedDate', selectedDate);
+                    }}
+                  />
                   <ErrorMessage
                     name="closedDate"
                     component="div"

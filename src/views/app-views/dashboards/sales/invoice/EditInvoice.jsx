@@ -487,8 +487,8 @@ const handleProductChange = (productId) => {
 
     const prepareInvoiceData = () => ({
       customer: values.customer,
-      issueDate: values.issueDate.format("YYYY-MM-DD"),
-      dueDate: values.dueDate.format("YYYY-MM-DD"),
+      issueDate: values.issueDate,
+      dueDate: values.dueDate,
       category: values.category,
       items: itemsForDatabase,
       discountType: globalDiscountType,
@@ -612,7 +612,7 @@ const handleProductChange = (productId) => {
   return (
     <div>
       <Card className="border-0">
-      <div className="mb-3 border-b pb-[30px] font-medium"></div>
+      <div className="mb-3 border-b mb-[-20px] font-medium"></div>
         <Formik
           initialValues={initialValues}
           enableReinitialize={true}
@@ -685,14 +685,19 @@ const handleProductChange = (productId) => {
 
                   <Col span={12}>
                     <label className="font-semibold">Issue Date <span className="text-red-500">*</span></label>
-                    <DatePicker
-                      className="w-full mt-2"
-                      format="DD-MM-YYYY"
-
-                      value={values.issueDate ? dayjs(values.issueDate) : null}
-                      onChange={(issueDate) =>
-                        setFieldValue("issueDate", issueDate)
-                      }
+                    <input 
+                      type="date"
+                      className="w-full mt-2 p-2 border rounded"
+                      value={values.issueDate ? dayjs(values.issueDate).format('YYYY-MM-DD') : ''}
+                      min={dayjs().format('YYYY-MM-DD')}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        setFieldValue('issueDate', selectedDate);
+                        // Clear dueDate if it's before the new issueDate
+                        if (values.dueDate && dayjs(values.dueDate).isBefore(dayjs(selectedDate))) {
+                          setFieldValue('dueDate', null);
+                        }
+                      }}
                       onBlur={() => setFieldTouched("issueDate", true)}
                     />
                     <ErrorMessage
@@ -704,11 +709,15 @@ const handleProductChange = (productId) => {
 
                   <Col span={12} className="mt-4">
                     <label className="font-semibold">Due Date <span className="text-red-500">*</span></label>
-                    <DatePicker
-                      className="w-full mt-2"
-                      format="DD-MM-YYYY"
-                      value={values.dueDate ? dayjs(values.dueDate) : null}
-                      onChange={(dueDate) => setFieldValue("dueDate", dueDate)}
+                    <input 
+                      type="date"
+                      className="w-full mt-2 p-2 border rounded"
+                      value={values.dueDate ? dayjs(values.dueDate).format('YYYY-MM-DD') : ''}
+                      min={values.issueDate || dayjs().format('YYYY-MM-DD')}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        setFieldValue('dueDate', selectedDate);
+                      }}
                       onBlur={() => setFieldTouched("dueDate", true)}
                     />
                     <ErrorMessage

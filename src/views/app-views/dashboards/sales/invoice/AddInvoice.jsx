@@ -21,6 +21,7 @@ import { getcurren } from "../../../setting/currencies/currenciesSlice/currencie
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
 import { GetAllProdu } from "../../project/product/ProductReducer/ProductsSlice";
 import AddCustomer from "../customer/AddCustomer";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -244,8 +245,8 @@ const AddInvoice = ({ onClose }) => {
 
       const updatedValues = {
         ...formValues,
-        issueDate: formValues.issueDate.format('YYYY-MM-DD'),
-        dueDate: formValues.dueDate.format('YYYY-MM-DD'),
+        issueDate: formValues.issueDate,
+        dueDate: formValues.dueDate,
         items: items,
         discountType: globalDiscountType,
         discountValue: parseFloat(globalDiscountValue) || 0,
@@ -492,13 +493,19 @@ const AddInvoice = ({ onClose }) => {
                   { required: true, message: "Please select issue date" },
                 ]}
               >
-                <DatePicker
-                  className="w-full"
-                  format="DD-MM-YYYY"
-                  onChange={(date) => {
-                    form.setFieldsValue({ issueDate: date });
+                <input 
+                  type="date"
+                  className="w-full mt-1 p-2 border rounded"
+                  value={form.getFieldValue('issueDate') || ''}
+                  min={dayjs().format('YYYY-MM-DD')}
+                  onChange={(e) => {
+                    const selectedDate = e.target.value;
+                    form.setFieldsValue({ 
+                      issueDate: selectedDate 
+                    });
+                    // Clear dueDate if it's before the new issueDate
                     const dueDate = form.getFieldValue('dueDate');
-                    if (dueDate && date && dueDate.isBefore(date)) {
+                    if (dueDate && dayjs(dueDate).isBefore(dayjs(selectedDate))) {
                       form.setFieldsValue({ dueDate: null });
                     }
                   }}
@@ -512,16 +519,18 @@ const AddInvoice = ({ onClose }) => {
                 name="dueDate"
                 rules={[{ required: true, message: "Please select due date" }]}
               >
-                <DatePicker
-                  className="w-full"
-                  format="DD-MM-YYYY"
-                  disabledDate={(current) => {
-                    const issueDate = form.getFieldValue('issueDate');
-                    return issueDate ? current && current < issueDate.startOf('day') : false;
+                <input 
+                  type="date"
+                  className="w-full mt-1 p-2 border rounded"
+                  value={form.getFieldValue('dueDate') || ''}
+                  min={form.getFieldValue('issueDate') || dayjs().format('YYYY-MM-DD')}
+                  onChange={(e) => {
+                    const selectedDate = e.target.value;
+                    form.setFieldsValue({ 
+                      dueDate: selectedDate 
+                    });
                   }}
                 />
-
-
               </Form.Item>
             </Col>
 

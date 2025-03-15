@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Row, Col, Input, message, Button, Select, DatePicker } from "antd";
+import { Row, Col, Input, message, Button, Select } from "antd";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -10,6 +10,7 @@ import {
   getcreditnote,
 } from "./CustomerReducer/CreditnoteSlice";
 import { getInvoice } from "../invoice/InvoiceReducer/InvoiceSlice";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -146,11 +147,15 @@ const AddCrediteNotes = ({ onClose }) => {
                       <Col span={12} className="mt-3">
                         <div className="form-item">
                           <label className="font-semibold">Issue Date <span className="text-red-500">*</span></label>
-                          <DatePicker
-                            className="w-full mt-1"
-                            format="DD-MM-YYYY"
-                            value={values.date}
-                            onChange={(date) => setFieldValue("date", date)}
+                          <input 
+                            type="date"
+                            className="w-full mt-1 p-2 border rounded"
+                            value={values.date ? dayjs(values.date).format('YYYY-MM-DD') : ''}
+                            min={dayjs().format('YYYY-MM-DD')}
+                            onChange={(e) => {
+                              const selectedDate = e.target.value;
+                              setFieldValue('date', selectedDate);
+                            }}
                             onBlur={() => setFieldTouched("date", true)}
                           />
                           <ErrorMessage

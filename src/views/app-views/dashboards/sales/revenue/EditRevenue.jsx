@@ -22,6 +22,7 @@ import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import AddCustomer from "../customer/AddCustomer";
 import AddCurrencies from '../../../setting/currencies/AddCurrencies';
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -153,7 +154,7 @@ const EditRevenue = ({ idd, onClose }) => {
   useEffect(() => {
     if (fnd) {
       setInitialValues({
-        date: fnd.date ? moment(fnd.date, "YYYY-MM-DD") : null,
+        date: fnd.date || null,
         amount: parseFloat(fnd.amount) || "",
         account: fnd.account || "",
         customer: fnd.customer || "",
@@ -209,18 +210,17 @@ const EditRevenue = ({ idd, onClose }) => {
                   <Col span={12} className="">
                     <div className="form-item">
                       <label className="font-semibold"> Date <span className="text-red-500">*</span></label>
-                      <Field name="date">
-                        {({ field }) => (
-                          <Input
-                            {...field}
-                            type="date"
-                            className="w-full "
-                            value={values.date ? moment(values.date).format('YYYY-MM-DD') : ''}
-                            onChange={(e) => setFieldValue("date", moment(e.target.value))}
-                            onBlur={() => setFieldTouched("date", true)}
-                          />
-                        )}
-                      </Field>
+                      <input 
+                        type="date"
+                        className="w-full mt-1 p-2 border rounded"
+                        value={values.date ? dayjs(values.date).format('YYYY-MM-DD') : ''}
+                        min={dayjs().format('YYYY-MM-DD')}
+                        onChange={(e) => {
+                          const selectedDate = e.target.value;
+                          setFieldValue('date', selectedDate);
+                        }}
+                        onBlur={() => setFieldTouched("date", true)}
+                      />
                       <ErrorMessage
                         name="date"
                         component="div"

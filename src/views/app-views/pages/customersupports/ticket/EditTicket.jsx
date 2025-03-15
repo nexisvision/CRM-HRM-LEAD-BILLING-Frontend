@@ -8,6 +8,7 @@ import {
   Row,
   Col,
   Upload,
+  message,
 } from "antd";
 import { Formik, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -64,7 +65,7 @@ const EditTicket = ({ idd, onClose }) => {
     requestor: perfectdata?.requestor || "",
     priority: perfectdata?.priority || "Low",
     status: perfectdata?.status || "Open",
-    endDate: perfectdata?.endDate ? moment(perfectdata.endDate) : null,
+    endDate: perfectdata?.endDate ? dayjs(perfectdata.endDate).format('YYYY-MM-DD') : "",
     description: perfectdata?.description || "",
     file: null
   };
@@ -78,20 +79,26 @@ const EditTicket = ({ idd, onClose }) => {
         formData.append('file', values.file);
       }
 
-      Object.keys(values).forEach(key => {
-        if (key !== 'file' && values[key] !== null) {
-          if (key === 'endDate') {
-            formData.append(key, values[key].format('YYYY-MM-DD'));
-          } else {
-            formData.append(key, values[key]);
-          }
+      // Format the date before sending to the database
+      const formattedValues = {
+        ...values,
+        endDate: values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : null
+      };
+
+      // Append formatted values to formData
+      Object.keys(formattedValues).forEach(key => {
+        if (key !== 'file' && formattedValues[key] !== null) {
+          formData.append(key, formattedValues[key]);
         }
       });
 
       await dispatch(Editicket({ idd, formData })).unwrap();
+      message.success('Ticket updated successfully');
       dispatch(getAllTicket());
       onClose();
     } catch (error) {
+      console.error("Error updating ticket:", error);
+      message.error('Failed to update ticket');
     } finally {
       setSubmitting(false);
     }
@@ -223,11 +230,15 @@ const EditTicket = ({ idd, onClose }) => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     End Date <span className="text-red-500">*</span>
                   </label>
-                  <DatePicker
-                    className="w-full"
-                    format="DD-MM-YYYY"
-                    value={values.endDate ? dayjs(values.endDate) : null}
-                    onChange={(date) => setFieldValue("endDate", date)}
+                  <input 
+                    type="date"
+                    className="w-full mt-1 p-2 border rounded"
+                    value={values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : ''}
+                    min={dayjs().format('YYYY-MM-DD')}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      setFieldValue('endDate', selectedDate);
+                    }}
                   />
                   <ErrorMessage
                     name="endDate"

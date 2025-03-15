@@ -553,18 +553,16 @@ const EditDeal = ({ onClose, id }) => {
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Closed Date <span className="text-rose-500">*</span></label>
-                  <Field name="closedDate">
-                    {({ field, form }) => (
-                      <DatePicker
-                        className="mt-1"
-                        style={{ width: "100%" }}
-                        value={field.value ? dayjs(field.value) : null}
-                        onChange={(date) => {
-                          form.setFieldValue("closedDate", date ? date.toISOString() : null);
-                        }}
-                      />
-                    )}
-                  </Field>
+                  <input 
+                    type="date"
+                    className="w-full mt-1 p-2 border rounded"
+                    value={values.closedDate ? dayjs(values.closedDate).format('YYYY-MM-DD') : ''}
+                    min={dayjs().format('YYYY-MM-DD')}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      setFieldValue('closedDate', selectedDate);
+                    }}
+                  />
                   <ErrorMessage
                     name="closedDate"
                     component="div"

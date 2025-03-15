@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {  Form, Row, Col, Input, message, Button, Upload, Select, DatePicker } from 'antd';
+import {  Form, Row, Col, Input, message, Button, Upload, Select } from 'antd';
 import { DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { createestimate, getallestimate } from './estimatesReducer/EstimatesSlice';
 import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
 import * as Yup from 'yup';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { getcurren } from 'views/app-views/setting/currencies/currenciesSlice/currenciesSlice';
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
 
@@ -189,7 +189,7 @@ const AddEstimates = ({ onClose }) => {
             });
 
             const estimateData = {
-                valid_till: values.valid_till.format('YYYY-MM-DD'),
+                valid_till: values.valid_till,
                 currency: values.currency,
                 client: values.client,
                 related_id: id,
@@ -414,11 +414,16 @@ const AddEstimates = ({ onClose }) => {
                                             label="Valid Till"
                                             rules={[{ required: true, message: "Please select the expiry date" }]}
                                         >
-                                            <DatePicker
-                                                className="w-full"
-                                                format="YYYY-MM-DD"
-                                                disabledDate={(current) => {
-                                                    return current && current < moment().startOf('day');
+                                            <input 
+                                                type="date"
+                                                className="w-full mt-1 p-2 border rounded"
+                                                value={form.getFieldValue('valid_till') || ''}
+                                                min={dayjs().format('YYYY-MM-DD')}
+                                                onChange={(e) => {
+                                                    const selectedDate = e.target.value;
+                                                    form.setFieldsValue({ 
+                                                        valid_till: selectedDate 
+                                                    });
                                                 }}
                                             />
                                         </Form.Item>

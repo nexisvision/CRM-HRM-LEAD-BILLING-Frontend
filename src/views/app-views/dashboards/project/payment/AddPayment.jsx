@@ -22,6 +22,7 @@ import { getallestimate } from '../estimates/estimatesReducer/EstimatesSlice';
 import { Getexp } from '../expenses/Expencereducer/ExpenseSlice';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import AddCurrencies from "views/app-views/setting/currencies/AddCurrencies";
+import dayjs from "dayjs";
 const { Option } = Select;
 const AddPayment = ({ onClose, setFieldValue }) => {
   const dispatch = useDispatch();
@@ -109,7 +110,7 @@ const AddPayment = ({ onClose, setFieldValue }) => {
   const onSubmit = (values, { resetForm }) => {
     const data = {
       project_name: values.project_name,
-      paidOn: values.paidOn ? values.paidOn.format('YYYY-MM-DD') : '',
+      paidOn: values.paidOn,
       amount: values.amount || '',
       currency: values.currency || '',
       transactionId: values.transactionId || '',
@@ -319,11 +320,15 @@ const AddPayment = ({ onClose, setFieldValue }) => {
                 <Col span={12} className="mt-4">
                   <div className="form-item">
                     <label className="font-semibold">Paid On <span className="text-red-500">*</span></label>
-                    <DatePicker
-                      className="w-full mt-1"
-                      format="DD-MM-YYYY"
-                      value={values.paidOn}
-                      onChange={(date) => setFieldValue("paidOn", date)}
+                    <input 
+                      type="date"
+                      className="w-full mt-1 p-2 border rounded"
+                      value={values.paidOn || ''}
+                      min={dayjs().format('YYYY-MM-DD')}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        setFieldValue('paidOn', selectedDate);
+                      }}
                       onBlur={() => setFieldTouched("paidOn", true)}
                     />
                     <ErrorMessage

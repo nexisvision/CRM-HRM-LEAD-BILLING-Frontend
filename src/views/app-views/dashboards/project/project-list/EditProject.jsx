@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import {
   Input,
   Button,
-  DatePicker,
   Select,
   message,
   Row,
@@ -15,7 +14,6 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Editpro, GetProject } from "./projectReducer/ProjectSlice";
 import { useDispatch, useSelector } from "react-redux";
-import moment from "moment";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetTagspro } from "./tagReducer/TagSlice";
 import { PlusOutlined } from "@ant-design/icons";
@@ -24,6 +22,30 @@ import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/Co
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { AddUserss, GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 import AddCurrencies from '../../../setting/currencies/AddCurrencies';
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+
+dayjs.extend(duration);
+
+const calculateDuration = (startDate, endDate) => {
+  const start = dayjs(startDate);
+  const end = dayjs(endDate);
+  const diff = dayjs.duration(end.diff(start));
+
+  const years = diff.years();
+  const months = diff.months();
+
+  let displayValue = '';
+  if (years > 0) {
+    displayValue += `${years} year${years > 1 ? 's' : ''} `;
+  }
+  if (months > 0) {
+    displayValue += `${months} month${months > 1 ? 's' : ''}`;
+  }
+
+  return displayValue.trim();
+};
+
 const { Option } = Select;
 
 const EditProject = ({ id, onClose }) => {
@@ -84,19 +106,12 @@ const EditProject = ({ id, onClose }) => {
           }
         }
 
-        const startDate = project.startDate ? moment(project.startDate) : null;
-        const endDate = project.endDate ? moment(project.endDate) : null;
+        const startDate = project.startDate ? dayjs(project.startDate) : null;
+        const endDate = project.endDate ? dayjs(project.endDate) : null;
 
         let estimatedmonths = project.estimatedmonths;
         if (startDate && endDate) {
-          const daysDiff = endDate.diff(startDate, 'days');
-          if (daysDiff < 30) {
-            estimatedmonths = `${daysDiff} day${daysDiff !== 1 ? 's' : ''}`;
-          } else {
-            const monthsDiff = endDate.diff(startDate, 'months', true);
-            const roundedMonths = Math.max(1, Math.ceil(monthsDiff));
-            estimatedmonths = `${roundedMonths} month${roundedMonths !== 1 ? 's' : ''}`;
-          }
+          estimatedmonths = calculateDuration(startDate, endDate);
         }
 
         const clientId = project.client || project.client_id;
@@ -293,39 +308,6 @@ const EditProject = ({ id, onClose }) => {
   const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false);
   const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
 
-  // Add date change handlers
-  const handleStartDateChange = (date, setFieldValue, values) => {
-    setFieldValue("startDate", date);
-    if (date && values.endDate) {
-      const daysDiff = moment(values.endDate).diff(date, 'days');
-      let displayValue;
-      if (daysDiff < 30) {
-        displayValue = `${daysDiff} day${daysDiff !== 1 ? 's' : ''}`;
-      } else {
-        const monthsDiff = moment(values.endDate).diff(date, 'months', true);
-        const roundedMonths = Math.max(1, Math.ceil(monthsDiff));
-        displayValue = `${roundedMonths} month${roundedMonths !== 1 ? 's' : ''}`;
-      }
-      setFieldValue("estimatedmonths", displayValue);
-    }
-  };
-
-  const handleEndDateChange = (date, setFieldValue, values) => {
-    setFieldValue("endDate", date);
-    if (values.startDate && date) {
-      const daysDiff = moment(date).diff(values.startDate, 'days');
-      let displayValue;
-      if (daysDiff < 30) {
-        displayValue = `${daysDiff} day${daysDiff !== 1 ? 's' : ''}`;
-      } else {
-        const monthsDiff = moment(date).diff(values.startDate, 'months', true);
-        const roundedMonths = Math.max(1, Math.ceil(monthsDiff));
-        displayValue = `${roundedMonths} month${roundedMonths !== 1 ? 's' : ''}`;
-      }
-      setFieldValue("estimatedmonths", displayValue);
-    }
-  };
-
   return (
     <div className="add-job-form">
       <Formik
@@ -398,12 +380,24 @@ const EditProject = ({ id, onClose }) => {
 
                 <Col span={12} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
-                    <DatePicker
-                      className="w-full mt-1"
-                      format="DD-MM-YYYY"
-                      value={values.startDate ? moment(values.startDate) : null}
-                      onChange={(date) => handleStartDateChange(date, setFieldValue, values)}
+                    <label className="font-semibold">Start Date <span className="text-rose-500">*</span></label>
+                    <input
+                      type="date"
+                      className="w-full mt-1 p-2 border rounded"
+                      value={values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : ''}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        setFieldValue("startDate", selectedDate);
+
+                        if (values.endDate && dayjs(values.endDate).isBefore(selectedDate)) {
+                          setFieldValue("endDate", null);
+                        }
+
+                        if (selectedDate && values.endDate) {
+                          const displayValue = calculateDuration(selectedDate, values.endDate);
+                          setFieldValue("estimatedmonths", displayValue);
+                        }
+                      }}
                       onBlur={() => setFieldTouched("startDate", true)}
                     />
                     <ErrorMessage
@@ -416,16 +410,22 @@ const EditProject = ({ id, onClose }) => {
 
                 <Col span={12} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
-                    <DatePicker
-                      className="w-full mt-1"
-                      format="DD-MM-YYYY"
-                      value={values.endDate ? moment(values.endDate) : null}
-                      onChange={(date) => handleEndDateChange(date, setFieldValue, values)}
-                      onBlur={() => setFieldTouched("endDate", true)}
-                      disabledDate={(current) => {
-                        return values.startDate ? current && current < moment(values.startDate).startOf('day') : false;
+                    <label className="font-semibold">End Date <span className="text-rose-500">*</span></label>
+                    <input
+                      type="date"
+                      className="w-full mt-1 p-2 border rounded"
+                      value={values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : ''}
+                      min={values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : ''}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        setFieldValue("endDate", selectedDate);
+
+                        if (values.startDate && selectedDate) {
+                          const displayValue = calculateDuration(values.startDate, selectedDate);
+                          setFieldValue("estimatedmonths", displayValue);
+                        }
                       }}
+                      onBlur={() => setFieldTouched("endDate", true)}
                     />
                     <ErrorMessage
                       name="endDate"
@@ -441,9 +441,9 @@ const EditProject = ({ id, onClose }) => {
                     <Field
                       name="estimatedmonths"
                       as={Input}
-                      className="mt-1"
+                      className="mt-1 bg-gray-100"
                       placeholder="Duration will be calculated automatically"
-                      disabled={values.startDate && values.endDate}
+                      disabled={true}
                     />
                     <ErrorMessage
                       name="estimatedmonths"

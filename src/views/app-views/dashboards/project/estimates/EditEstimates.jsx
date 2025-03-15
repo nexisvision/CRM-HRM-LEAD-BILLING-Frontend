@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker, Modal } from 'antd';
+import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, Modal } from 'antd';
 import { DeleteOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
@@ -110,7 +110,7 @@ const EditEstimates = ({ idd, onClose }) => {
 
                     // Set basic form fields
                     form.setFieldsValue({
-                        valid_till: dayjs(currentEstimate.valid_till),
+                        valid_till: currentEstimate.valid_till,
                         currency: currentEstimate.currency,
                         client: currentEstimate.client,
                         calculatedTax: currentEstimate.calculatedTax,
@@ -429,7 +429,18 @@ const EditEstimates = ({ idd, onClose }) => {
                                             label="Date"
                                             rules={[{ required: true, message: "Please select the date" }]}
                                         >
-                                            <DatePicker className="w-full" format="DD-MM-YYYY" />
+                                            <input 
+                                                type="date"
+                                                className="w-full mt-1 p-2 border rounded"
+                                                value={form.getFieldValue('valid_till') || ''}
+                                                min={dayjs().format('YYYY-MM-DD')}
+                                                onChange={(e) => {
+                                                    const selectedDate = e.target.value;
+                                                    form.setFieldsValue({ 
+                                                        valid_till: selectedDate 
+                                                    });
+                                                }}
+                                            />
                                         </Form.Item>
                                     </Col>
 

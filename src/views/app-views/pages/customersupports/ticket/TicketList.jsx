@@ -53,7 +53,7 @@ export const TicketList = () => {
     dispatch(empdata())
   }, [dispatch])
 
-  const alldatass = useSelector((state) => state.employee.employee.data);
+  const alldatass = useSelector((state) => state?.employee?.employee?.data || []);
 
   useEffect(() => {
     dispatch(empdata());
@@ -222,12 +222,14 @@ export const TicketList = () => {
       title: "requestor",
       dataIndex: "requestor",
       sorter: (a, b) => {
-        const requestorNameA = alldatass.find(emp => emp.id === a.requestor)?.username || '';
-        const requestorNameB = alldatass.find(emp => emp.id === b.requestor)?.username || '';
+        if (!Array.isArray(alldatass)) return 0;
+        const requestorNameA = alldatass.find(emp => emp?.id === a?.requestor)?.username || '';
+        const requestorNameB = alldatass.find(emp => emp?.id === b?.requestor)?.username || '';
         return requestorNameA.localeCompare(requestorNameB);
       },
       render: (requestorId) => {
-        const requestorName = alldatass.find(emp => emp.id === requestorId)?.username;
+        if (!Array.isArray(alldatass)) return <span>N/A</span>;
+        const requestorName = alldatass.find(emp => emp?.id === requestorId)?.username;
         return <span>{requestorName || 'N/A'}</span>;
       },
     },

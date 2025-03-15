@@ -6,7 +6,6 @@ import {
   message,
   Button,
   Select,
-  DatePicker,
   Modal,
 } from "antd";
 import { useParams } from "react-router-dom";
@@ -19,6 +18,7 @@ import { AddMins, Getmins } from "./minestoneReducer/minestoneSlice";
 import { AddLable, GetLable } from "./LableReducer/LableSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import AddCurrencies from '../../../setting/currencies/AddCurrencies';
+import dayjs from "dayjs";
 const { Option } = Select;
 const AddMilestone = ({ onClose }) => {
   const dispatch = useDispatch();
@@ -289,20 +289,19 @@ const AddMilestone = ({ onClose }) => {
                     <Col span={12} className="mt-4">
                       <div className="form-item">
                         <label className="font-semibold mb-2">Start Date <span className="text-red-500">*</span></label>
-                        <DatePicker
-                          className="w-full mt-1"
-                          format="DD-MM-YYYY"
-                          value={values.milestone_start_date}
-                          onChange={(date) => {
-                            setFieldValue("milestone_start_date", date);
-                            // If end date is before new start date, clear it
-                            if (values.milestone_end_date && date && values.milestone_end_date.isBefore(date)) {
+                        <input
+                          type="date"
+                          className="w-full mt-1 p-2 border rounded"
+                          value={values.milestone_start_date ? dayjs(values.milestone_start_date).format('YYYY-MM-DD') : ''}
+                          onChange={(e) => {
+                            const selectedDate = e.target.value;
+                            setFieldValue("milestone_start_date", selectedDate);
+                            
+                            if (values.milestone_end_date && dayjs(values.milestone_end_date).isBefore(selectedDate)) {
                               setFieldValue("milestone_end_date", null);
                             }
                           }}
-                          onBlur={() =>
-                            setFieldTouched("milestone_start_date", true)
-                          }
+                          onBlur={() => setFieldTouched("milestone_start_date", true)}
                         />
                         <ErrorMessage
                           name="milestone_start_date"
@@ -314,20 +313,16 @@ const AddMilestone = ({ onClose }) => {
                     <Col span={12} className="mt-4">
                       <div className="form-item">
                         <label className="font-semibold mb-2">End Date <span className="text-red-500">*</span></label>
-                        <DatePicker
-                          className="w-full mt-1"
-                          format="DD-MM-YYYY"
-                          value={values.milestone_end_date}
-                          disabledDate={(current) => {
-                            // Disable dates before start date
-                            return values.milestone_start_date ? current && current < values.milestone_start_date.startOf('day') : false;
+                        <input
+                          type="date"
+                          className="w-full mt-1 p-2 border rounded"
+                          value={values.milestone_end_date ? dayjs(values.milestone_end_date).format('YYYY-MM-DD') : ''}
+                          min={values.milestone_start_date ? dayjs(values.milestone_start_date).format('YYYY-MM-DD') : ''}
+                          onChange={(e) => {
+                            const selectedDate = e.target.value;
+                            setFieldValue("milestone_end_date", selectedDate);
                           }}
-                          onChange={(date) =>
-                            setFieldValue("milestone_end_date", date)
-                          }
-                          onBlur={() =>
-                            setFieldTouched("milestone_end_date", true)
-                          }
+                          onBlur={() => setFieldTouched("milestone_end_date", true)}
                         />
                         <ErrorMessage
                           name="milestone_end_date"

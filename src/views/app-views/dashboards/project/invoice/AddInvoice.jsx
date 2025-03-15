@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import { getcurren } from 'views/app-views/setting/currencies/currenciesSlice/currenciesSlice';
 import { GetProdu } from '../product/ProductReducer/ProductsSlice';
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -237,8 +238,8 @@ const sub = subClientsss?.SubClient?.data;
 
             const invoiceData = {
                 product_id: id,
-                issueDate: values.issueDate.format('YYYY-MM-DD'),
-                dueDate: values.dueDate.format('YYYY-MM-DD'),
+                issueDate: values.issueDate,
+                dueDate: values.dueDate,
                 client: values.client,
                 project: values.project,
                 currency: values.currency,
@@ -720,15 +721,20 @@ const sub = subClientsss?.SubClient?.data;
                                             label="Issue Date"
                                             rules={[{ required: true, message: "Please select the issue date" }]}
                                         >
-                                            <DatePicker 
-                                                className="w-full" 
-                                                format="DD-MM-YYYY"
-                                                onChange={(date) => {
-                                                    form.setFieldsValue({ issueDate: date });
+                                            <input 
+                                                type="date"
+                                                className="w-full mt-1 p-2 border rounded"
+                                                value={form.getFieldValue('issueDate') || ''}
+                                                onChange={(e) => {
+                                                    const selectedDate = e.target.value;
+                                                    form.setFieldsValue({ 
+                                                        issueDate: selectedDate 
+                                                    });
+                                                    
                                                     // Clear due date if it's before the new issue date
                                                     const dueDate = form.getFieldValue('dueDate');
-                                                    if (dueDate && date && dueDate.isBefore(date)) {
-                                                        form.setFieldsValue({ dueDate: null });
+                                                    if (dueDate && dayjs(dueDate).isBefore(selectedDate)) {
+                                                        form.setFieldsValue({ dueDate: '' });
                                                     }
                                                 }}
                                             />
@@ -741,14 +747,16 @@ const sub = subClientsss?.SubClient?.data;
                                             label="Due Date"
                                             rules={[{ required: true, message: "Please select the due date" }]}
                                         >
-                                            <DatePicker 
-                                                className="w-full" 
-                                                format="DD-MM-YYYY"
-                                                disabledDate={(current) => {
-                                                    // Get the issue date from form
-                                                    const issueDate = form.getFieldValue('issueDate');
-                                                    // Disable dates before issue date
-                                                    return issueDate ? current && current < issueDate.startOf('day') : false;
+                                            <input 
+                                                type="date"
+                                                className="w-full mt-1 p-2 border rounded"
+                                                value={form.getFieldValue('dueDate') || ''}
+                                                min={form.getFieldValue('issueDate') || ''}
+                                                onChange={(e) => {
+                                                    const selectedDate = e.target.value;
+                                                    form.setFieldsValue({ 
+                                                        dueDate: selectedDate 
+                                                    });
                                                 }}
                                             />
                                         </Form.Item>

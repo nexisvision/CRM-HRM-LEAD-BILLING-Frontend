@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, DatePicker, Select, message, Row, Col, Upload, Tag } from "antd";
+import { Input, Button, Select, message, Row, Col, Upload, Tag } from "antd";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -8,6 +8,7 @@ import { AddTasks, GetTasks } from "../project/task/TaskReducer/TaskSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { UploadOutlined } from "@ant-design/icons";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -39,8 +40,8 @@ const AddTask = ({ onClose }) => {
 
   const initialValues = {
     taskName: "",
-    startDate: null,
-    dueDate: null,
+    startDate: "",
+    dueDate: "",
     status: "",
     priority: "",
     assignTo: [],
@@ -126,7 +127,7 @@ const AddTask = ({ onClose }) => {
 
   return (
     <div className="add-expenses-form">
-          <div className="mb-3 border-b pb-[-10px] font-medium"></div>
+      <div className="mb-3 border-b pb-[-10px] font-medium"></div>
 
       <Formik
         initialValues={initialValues}
@@ -155,19 +156,19 @@ const AddTask = ({ onClose }) => {
 
               <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold ">StartDate <span className="text-rose-500">*</span></label>
-                  <DatePicker
-                    name="startDate"
-                    className="w-full mt-1"
-                    placeholder="Select startDate"
-                    format="DD-MM-YYYY"
-                    onChange={(date) => {
-                      setFieldValue("startDate", date);
-                      if (values.dueDate && date && values.dueDate.isBefore(date)) {
-                        setFieldValue("dueDate", null);
+                  <label className="font-semibold">StartDate <span className="text-rose-500">*</span></label>
+                  <input
+                    type="date"
+                    className="w-full mt-1 p-2 border rounded"
+                    value={values.startDate}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      setFieldValue("startDate", selectedDate);
+                      
+                      if (values.dueDate && dayjs(values.dueDate).isBefore(selectedDate)) {
+                        setFieldValue("dueDate", "");
                       }
                     }}
-                    value={values.startDate}
                     onBlur={() => setFieldTouched("startDate", true)}
                   />
                   <ErrorMessage
@@ -180,18 +181,17 @@ const AddTask = ({ onClose }) => {
 
               <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold ">DueDate <span className="text-rose-500">*</span></label>
-                  <DatePicker
-                    name="dueDate"
-                    className="w-full mt-1"
-                    placeholder="Select DueDate"
-                     format="DD-MM-YYYY"
-                    onChange={(value) => setFieldValue("dueDate", value)}
+                  <label className="font-semibold">DueDate <span className="text-rose-500">*</span></label>
+                  <input
+                    type="date"
+                    className="w-full mt-1 p-2 border rounded"
                     value={values.dueDate}
-                    onBlur={() => setFieldTouched("dueDate", true)}
-                    disabledDate={(current) => {
-                      return values.startDate ? current && current < values.startDate.startOf('day') : false;
+                    min={values.startDate}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      setFieldValue("dueDate", selectedDate);
                     }}
+                    onBlur={() => setFieldTouched("dueDate", true)}
                   />
                   <ErrorMessage
                     name="dueDate"
@@ -325,7 +325,6 @@ const AddTask = ({ onClose }) => {
                           </div>
                         </Option>
                       </Select>
-                      // </Select>
                     )}
                   </Field>
                   <ErrorMessage

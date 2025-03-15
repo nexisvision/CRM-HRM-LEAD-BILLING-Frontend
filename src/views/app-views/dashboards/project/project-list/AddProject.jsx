@@ -25,8 +25,31 @@ import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/cu
 import AddUser from "views/app-views/Users/user-list/AddUser";
 import AddClient from "views/app-views/Users/client-list/AddClient";
 import AddCurrencies from '../../../setting/currencies/AddCurrencies';
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+
+dayjs.extend(duration);
 
 const { Option } = Select;
+
+const calculateDuration = (startDate, endDate) => {
+  const start = dayjs(startDate);
+  const end = dayjs(endDate);
+  const diff = dayjs.duration(end.diff(start));
+
+  const years = diff.years();
+  const months = diff.months();
+
+  let displayValue = '';
+  if (years > 0) {
+    displayValue += `${years} year${years > 1 ? 's' : ''} `;
+  }
+  if (months > 0) {
+    displayValue += `${months} month${months > 1 ? 's' : ''}`;
+  }
+
+  return displayValue.trim();
+};
 
 const AddProject = ({ onClose }) => {
   const dispatch = useDispatch();
@@ -332,29 +355,20 @@ const AddProject = ({ onClose }) => {
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Start Date <span className="text-rose-500">*</span></label>
-                  <DatePicker
-                    className="w-full mt-1"
-                    format="DD-MM-YYYY"
-                    value={values.startDate}
-                    onChange={(date) => {
-                      setFieldValue("startDate", date);
-                      if (values.endDate && date && values.endDate.isBefore(date)) {
+                  <input
+                    type="date"
+                    className="w-full mt-1 p-2 border rounded"
+                    value={values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : ''}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      setFieldValue("startDate", selectedDate);
+
+                      if (values.endDate && dayjs(values.endDate).isBefore(selectedDate)) {
                         setFieldValue("endDate", null);
                       }
-                      if (date && values.endDate) {
-                        const startDate = date;
-                        const endDate = values.endDate;
-                        const daysDiff = endDate.diff(startDate, 'days');
-                        const monthsDiff = endDate.diff(startDate, 'months', true);
 
-                        let displayValue;
-                        if (daysDiff < 30) {
-                          displayValue = `${daysDiff} day${daysDiff !== 1 ? 's' : ''}`; // Show days if less than 30 days
-                        } else {
-                          const roundedMonths = Math.max(1, Math.ceil(monthsDiff));
-                          displayValue = `${roundedMonths} month${roundedMonths !== 1 ? 's' : ''}`;
-                        }
-
+                      if (selectedDate && values.endDate) {
+                        const displayValue = calculateDuration(selectedDate, values.endDate);
                         setFieldValue("estimatedmonths", displayValue);
                       }
                     }}
@@ -371,29 +385,17 @@ const AddProject = ({ onClose }) => {
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">End Date <span className="text-rose-500">*</span></label>
-                  <DatePicker
-                    className="w-full mt-1"
-                    format="DD-MM-YYYY"
-                    value={values.endDate}
-                    disabledDate={(current) => {
-                      return values.startDate ? current && current < values.startDate.startOf('day') : false;
-                    }}
-                    onChange={(date) => {
-                      setFieldValue("endDate", date);
-                      if (values.startDate && date) {
-                        const startDate = values.startDate;
-                        const endDate = date;
-                        const daysDiff = endDate.diff(startDate, 'days');
-                        const monthsDiff = endDate.diff(startDate, 'months', true);
+                  <input
+                    type="date"
+                    className="w-full mt-1 p-2 border rounded"
+                    value={values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : ''}
+                    min={values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : ''}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      setFieldValue("endDate", selectedDate);
 
-                        let displayValue;
-                        if (daysDiff < 30) {
-                          displayValue = `${daysDiff} day${daysDiff !== 1 ? 's' : ''}`; // Show days if less than 30 days
-                        } else {
-                          const roundedMonths = Math.max(1, Math.ceil(monthsDiff));
-                          displayValue = `${roundedMonths} month${roundedMonths !== 1 ? 's' : ''}`;
-                        }
-
+                      if (values.startDate && selectedDate) {
+                        const displayValue = calculateDuration(values.startDate, selectedDate);
                         setFieldValue("estimatedmonths", displayValue);
                       }
                     }}
@@ -409,14 +411,13 @@ const AddProject = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Estimated Months <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Estimated Duration <span className="text-red-500">*</span></label>
                   <Field
                     name="estimatedmonths"
                     as={Input}
-                    className="mt-1"
-                    // type="string"
+                    className="mt-1 bg-gray-100"
                     placeholder="Duration will be calculated automatically"
-                    disabled={values.startDate && values.endDate}
+                    disabled={true}
                   />
                   <ErrorMessage
                     name="estimatedmonths"

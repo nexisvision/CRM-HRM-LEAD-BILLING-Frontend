@@ -9,14 +9,12 @@ import {
   Select,
   DatePicker
 } from "antd";
-import { ErrorMessage } from "formik";
 import {
   DeleteOutlined,
   PlusOutlined
 } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-import OrderListData from "assets/data/order-list.data.json";
 import Flex from "components/shared-components/Flex";
 import { Getmins } from "../../../dashboards/project/milestone/minestoneReducer/minestoneSlice";
 import {
@@ -25,11 +23,9 @@ import {
   getInvoiceById,
 } from "../../../dashboards/project/invoice/invoicereducer/InvoiceSlice";
 import { useSelector, useDispatch } from "react-redux";
-import { createInvoice } from "../../../dashboards/project/invoice/invoicereducer/InvoiceSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { GetProdu } from '../product/ProductReducer/ProductsSlice';
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
-import moment from "moment";
 import dayjs from "dayjs";
 
 const { Option } = Select;
@@ -236,8 +232,8 @@ const EditInvoice = ({ idd, onClose}) => {
                     client: currentInvoice.client,
                     project: currentInvoice.project,
                     currency: currentInvoice.currency,
-                    issueDate: dayjs(currentInvoice.issueDate),
-                    dueDate: dayjs(currentInvoice.dueDate),
+                    issueDate: currentInvoice.issueDate,
+                    dueDate: currentInvoice.dueDate,
                 });
 
                 // Parse items from JSON string
@@ -376,8 +372,8 @@ useEffect(() => {
 
       const invoiceData = {
         ...values,
-        issueDate: values.issueDate.format("YYYY-MM-DD"),
-        dueDate: values.dueDate.format("YYYY-MM-DD"),
+        issueDate: values.issueDate,
+        dueDate: values.dueDate,
         project: fnddata?.project_name,
         client: fnddata?.client,
         items: itemsForDb,
@@ -385,7 +381,7 @@ useEffect(() => {
         discount: discountRate,
         global_discount_amount: totals.globalDiscount,
         total_item_discount: totals.itemDiscount,
-        tax: totalTax, // Store total tax amount
+        tax: totalTax,
         total: totals.finalTotal
       };
 
@@ -840,7 +836,23 @@ useEffect(() => {
                         },
                       ]}
                     >
-                      <DatePicker className="w-full" format="DD-MM-YYYY" />
+                      <input 
+                        type="date"
+                        className="w-full mt-1 p-2 border rounded"
+                        value={form.getFieldValue('issueDate') || ''}
+                        onChange={(e) => {
+                          const selectedDate = e.target.value;
+                          form.setFieldsValue({ 
+                            issueDate: selectedDate 
+                          });
+                          
+                          // Clear due date if it's before the new issue date
+                          const dueDate = form.getFieldValue('dueDate');
+                          if (dueDate && dayjs(dueDate).isBefore(selectedDate)) {
+                            form.setFieldsValue({ dueDate: '' });
+                          }
+                        }}
+                      />
                     </Form.Item>
                   </Col>
 
@@ -855,7 +867,18 @@ useEffect(() => {
                         },
                       ]}
                     >
-                      <DatePicker className="w-full" format="DD-MM-YYYY" />
+                      <input 
+                        type="date"
+                        className="w-full mt-1 p-2 border rounded"
+                        value={form.getFieldValue('dueDate') || ''}
+                        min={form.getFieldValue('issueDate') || ''}
+                        onChange={(e) => {
+                          const selectedDate = e.target.value;
+                          form.setFieldsValue({ 
+                            dueDate: selectedDate 
+                          });
+                        }}
+                      />
                     </Form.Item>
                   </Col>
 

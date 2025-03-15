@@ -13,9 +13,7 @@ const EditRole = ({ id, onClose }) => {
   const [modulePermissions, setModulePermissions] = useState({});
   const [singleEmp, setSingleEmp] = useState(null);
 
-
   const role = alldept?.role?.data?.find((item) => item.id === id);
-
 
   const modules = React.useMemo(() => [
     'Staff',
@@ -26,7 +24,6 @@ const EditRole = ({ id, onClose }) => {
   ], []);
 
   const subModules = {
-
     CRM: [
       { key: 'dashboards-leadcards', title: 'LeadCards' },
       { key: 'dashboards-lead', title: 'Leads' },
@@ -43,12 +40,10 @@ const EditRole = ({ id, onClose }) => {
     Staff: [
       { key: 'extra-users-list', title: 'Users' },
       { key: 'extra-users-client-list', title: 'Clients' },
-
     ],
     Project: [
       { key: 'dashboards-project-list', title: 'Project' },
       { key: 'dashboards-project-Contract', title: 'Contract' },
-
     ],
     HRM: [
       { key: 'extra-hrm-employee', title: 'Employee' },
@@ -79,9 +74,7 @@ const EditRole = ({ id, onClose }) => {
       { key: 'dashboards-sales-revenue', title: 'Revenue' },
       { key: 'dashboards-sales-estimates', title: 'Estimates' },
       { key: 'dashboards-sales-creditnotes', title: 'Credit Notes' },
-
     ],
-
   };
 
   const permissions = ['view', 'create', 'update', 'delete'];
@@ -126,7 +119,6 @@ const EditRole = ({ id, onClose }) => {
     }
   }, [id, alldept, form, role]);
 
-
   useEffect(() => {
     if (singleEmp?.permissions) {
       const initialPermissions = {};
@@ -161,7 +153,6 @@ const EditRole = ({ id, onClose }) => {
     );
   };
 
-
   const handleSelectAllSubmodule = (submodule) => {
     setModulePermissions(prev => {
       const currentPermissions = prev[submodule] || {};
@@ -194,47 +185,45 @@ const EditRole = ({ id, onClose }) => {
     return permissions.every(perm => modulePermissions[submodule]?.[perm]);
   };
 
-
   const onFinish = (values) => {
     const payload = {
-      role_name: values.role_name,
-      permissions: {}
+        role_name: values.role_name,
+        permissions: {}
     };
 
-    // Format permissions for API
     Object.entries(modulePermissions).forEach(([submoduleKey, perms]) => {
-      const selectedPermissions = Object.entries(perms)
-        .filter(([perm, isSelected]) => isSelected)
-        .map(([perm]) => perm.toLowerCase());
+        const selectedPermissions = Object.entries(perms)
+            .filter(([_, isSelected]) => isSelected)
+            .map(([perm]) => perm.toLowerCase());
 
-      if (selectedPermissions.length > 0) {
-        // Use the submodule key as the module name in the permissions object
-        const moduleName = activeTab.toLowerCase(); // Convert to lowercase for consistency
-        if (!payload.permissions[moduleName]) {
-          payload.permissions[moduleName] = []; // Initialize if it doesn't exist
+        if (selectedPermissions.length > 0) {
+            const moduleName = activeTab; // Get active module
+            if (!payload.permissions[moduleName]) {
+                payload.permissions[moduleName] = []; 
+            }
+            payload.permissions[moduleName].push({
+                key: submoduleKey,
+                permissions: selectedPermissions
+            });
         }
-        payload.permissions[moduleName].push({
-          key: submoduleKey,
-          permissions: selectedPermissions
-        });
-      }
     });
 
     dispatch(editRole({ id, payload }))
-      .then(() => {
-        dispatch(getRoles());
-        message.success('Role edited successfully!');
-        onClose();
-        navigate("/app/hrm/role");
-      })
-      .catch((error) => {
-        message.error('Failed to edit role.');
-        console.error("Edit API error:", error);
-      });
-  };
+        .then(() => {
+            dispatch(getRoles());
+            message.success('Role edited successfully!');
+            onClose();
+            navigate("/app/hrm/role");
+        })
+        .catch((error) => {
+            message.error('Failed to edit role.');
+            console.error("Edit API error:", error);
+        });
+};
 
   return (
     <div className="p-4">
+       <div className="mb-3 border-b pb-1 "></div>
       <Form form={form} onFinish={onFinish} layout="vertical">
         <Form.Item
           name="role_name"

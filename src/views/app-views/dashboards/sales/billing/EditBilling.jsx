@@ -3,7 +3,6 @@ import {
   Card,
   Button,
   Select,
-  DatePicker,
   Input,
   message,
   Row,
@@ -24,6 +23,7 @@ import moment from "moment";
 import { vendordataedata } from "../../Purchase/vendor/vendorReducers/vendorSlice";
 import { GetAllProdu } from "../../project/product/ProductReducer/ProductsSlice";
 import AddVendor from '../../Purchase/vendor/AddVendor';
+import dayjs from "dayjs";
 
 
 const { Option } = Select;
@@ -118,7 +118,7 @@ const EditBilling = ({ idd, onClose }) => {
       // Set basic form fields
       form.setFieldsValue({
         vendor: currentBill.vendor || '',
-        billDate: currentBill.billDate ? moment(currentBill.billDate) : null,
+        billDate: currentBill.billDate || '',
         status: currentBill.status || '',
         billNumber: currentBill.billNumber || '',
         note: currentBill.note || '',
@@ -133,20 +133,19 @@ const EditBilling = ({ idd, onClose }) => {
       if (parsedItems.length > 0) {
         const formattedItems = parsedItems.map(item => ({
           id: Date.now() + Math.random(),
-          item: item.item || '', // Changed from item.name to item.item
+          item: item.item || '',
           quantity: Number(item.quantity) || 0,
-          price: Number(item.price) || 0, // Changed from item.unitPrice to item.price
-          tax: item.tax_percentage > 0 ? { // Changed tax structure
+          price: Number(item.price) || 0,
+          tax: item.tax_percentage > 0 ? {
             gstName: item.tax_name || '',
             gstPercentage: Number(item.tax_percentage)
           } : null,
           amount: Number(item.amount) || 0,
-          description: item.discription || '' // Changed from description to discription
+          description: item.discription || ''
         }));
 
         setTableData(formattedItems);
       } else {
-        // Set default empty row if no items
         setTableData([{
           id: Date.now(),
           item: '',
@@ -241,7 +240,7 @@ const EditBilling = ({ idd, onClose }) => {
     setTotals({
       subtotal: subtotal.toFixed(2),
       totalTax: totalTax.toFixed(2),
-      discount: discountAmount.toFixed(2),
+      discount: discountAmount,
       finalTotal: finalTotal.toFixed(2)
     });
 
@@ -366,10 +365,10 @@ const EditBilling = ({ idd, onClose }) => {
           related_id: currentBill.related_id,
           billNumber: values.billNumber,
           vendor: values.vendor,
-          billDate: values.billDate?.format("YYYY-MM-DD"),
+          billDate: values.billDate,
           discription: JSON.stringify(values.description || ""),
           subtotal: parseFloat(totals.subtotal),
-          items: formattedItems, // Send as array, not JSON string
+          items: formattedItems,
           status: values.status,
           bill_status: "draft",
           discount: parseFloat(totals.discount),
@@ -550,7 +549,15 @@ const EditBilling = ({ idd, onClose }) => {
                 name="billDate"
                 rules={[{ required: true, message: "Please select bill date" }]}
               >
-                <DatePicker className="w-full" format="DD-MM-YYYY" />
+                <input 
+                  type="date"
+                  className="w-full mt-1 p-2 border rounded"
+                  min={dayjs().format('YYYY-MM-DD')}
+                  onChange={(e) => {
+                    const selectedDate = e.target.value;
+                    form.setFieldsValue({ billDate: selectedDate });
+                  }}
+                />
               </Form.Item>
             </Col>
 

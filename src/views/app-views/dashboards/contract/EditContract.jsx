@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { ContaractData, Editcon } from "./ContractReducers/ContractSlice";
 import { useDispatch } from "react-redux";
 import moment from "moment";
+import dayjs from "dayjs";
 import { getcurren } from "../../setting/currencies/currenciesSlice/currenciesSlice";
 import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
 import { GetLable, AddLable } from "../sales/LableReducer/LableSlice";
@@ -115,8 +116,14 @@ const EditContract = ({ id, onClose }) => {
   });
 
   const onSubmit = (values) => {
+    const formattedValues = {
+      ...values,
+      startDate: values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : null,
+      endDate: values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : null,
+      value: values.value ? parseFloat(values.value) : 0
+    };
 
-    dispatch(Editcon({ id, values }))
+    dispatch(Editcon({ id, values: formattedValues }))
       .then(() => {
         dispatch(ContaractData());
         onClose();
@@ -649,21 +656,21 @@ const EditContract = ({ id, onClose }) => {
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold ">StartDate <span className="text-rose-500">*</span></label>
-                  <Field name="startDate">
-                    {({ field }) => (
-                      <Input
-                        {...field}
-                        type="date"
-                        className="w-full mt-1"
-                        onChange={(e) => {
-                          const date = e.target.value;
-                          setFieldValue("startDate", moment(date));
-                        }}
-                        value={values.startDate ? moment(values.startDate).format('YYYY-MM-DD') : ''}
-                        onBlur={() => setFieldTouched("startDate", true)}
-                      />
-                    )}
-                  </Field>
+                  <input 
+                    type="date"
+                    className="w-full mt-1 p-2 border rounded"
+                    value={values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : ''}
+                    min={dayjs().format('YYYY-MM-DD')}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      setFieldValue('startDate', selectedDate);
+                      // Clear endDate if it's before the new startDate
+                      if (values.endDate && dayjs(values.endDate).isBefore(selectedDate)) {
+                        setFieldValue('endDate', '');
+                      }
+                    }}
+                    onBlur={() => setFieldTouched("startDate", true)}
+                  />
                   <ErrorMessage
                     name="startDate"
                     component="div"
@@ -675,12 +682,15 @@ const EditContract = ({ id, onClose }) => {
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold ">EndDate <span className="text-rose-500">*</span></label>
-                  <DatePicker
-                    name="endDate"
-                    className="w-full mt-1"
-                    placeholder="Select endDate"
-                    onChange={(value) => setFieldValue("endDate", value)}
-                    value={values.endDate}
+                  <input 
+                    type="date"
+                    className="w-full mt-1 p-2 border rounded"
+                    value={values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : ''}
+                    min={values.startDate ? dayjs(values.startDate).add(1, 'day').format('YYYY-MM-DD') : dayjs().add(1, 'day').format('YYYY-MM-DD')}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      setFieldValue('endDate', selectedDate);
+                    }}
                     onBlur={() => setFieldTouched("endDate", true)}
                   />
                   <ErrorMessage

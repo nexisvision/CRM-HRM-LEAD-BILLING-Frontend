@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Button, DatePicker, Select, Row, Col, message } from 'antd';
+import { Input, Button, Select, Row, Col, message } from 'antd';
 import { Formik, Field, Form as FormikForm } from 'formik';
 import * as Yup from 'yup';
-import moment from 'moment';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { createDebitNote, clearState } from './debitReducer/DebitSlice';
 import { getbil } from '../../sales/billing/billing2Reducer/billing2Slice';
+import dayjs from 'dayjs';
 
 const AddDebitnote = ({ onClose }) => {
   const dispatch = useDispatch();
@@ -30,7 +30,7 @@ const AddDebitnote = ({ onClose }) => {
 
   const initialValues = {
     bill: '',
-    date: null,
+    date: '',
     amount: '',
     description: '',
   };
@@ -62,7 +62,7 @@ const AddDebitnote = ({ onClose }) => {
 
     const formattedData = {
       ...values,
-      date: moment(values.date).format('YYYY-MM-DD'),
+      date: values.date,
       amount: parseFloat(values.amount),
     };
 
@@ -117,12 +117,15 @@ const AddDebitnote = ({ onClose }) => {
                   <label className="font-semibold">
                     Date <span className="text-red-500">*</span>
                   </label>
-                  <DatePicker
-                    className={`w-full mt-1 ${errors.date && touched.date ? 'border-red-500' : ''}`}
+                  <input 
+                    type="date"
+                    className={`w-full mt-1 p-2 border rounded ${errors.date && touched.date ? 'border-red-500' : ''}`}
                     value={values.date}
-                    onChange={(date) => setFieldValue('date', date)}
-                    format="YYYY-MM-DD"
-                    placeholder="Select date"
+                    min={dayjs().format('YYYY-MM-DD')}
+                    onChange={(e) => {
+                      const selectedDate = e.target.value;
+                      setFieldValue('date', selectedDate);
+                    }}
                   />
                   {errors.date && touched.date && (
                     <div className="text-red-500 mt-1">{errors.date}</div>
@@ -144,7 +147,6 @@ const AddDebitnote = ({ onClose }) => {
                         className={`w-full mt-1 ${errors.amount && touched.amount ? 'border-red-500' : ''}`}
                         max={selectedBillAmount}
                         value={values.amount}
-                      // disabled
                       />
                     )}
                   </Field>

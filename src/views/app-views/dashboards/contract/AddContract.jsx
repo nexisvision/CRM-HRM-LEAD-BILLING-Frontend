@@ -24,6 +24,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { GetLable, AddLable } from "../sales/LableReducer/LableSlice";
 import AddCurrencies from '../../setting/currencies/AddCurrencies';
 import AddCountries from "views/app-views/setting/countries/AddCountries";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -163,8 +164,8 @@ const AddContract = ({ onClose }) => {
   const onSubmit = (values, { resetForm }) => {
     const formattedValues = {
       ...values,
-      startDate: values.startDate ? values.startDate.toISOString() : null,
-      endDate: values.endDate ? values.endDate.toISOString() : null,
+      startDate: values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : null,
+      endDate: values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : null,
       phone: values.phoneCode + values.phone,
       value: values.value ? parseFloat(values.value) : 0
     };
@@ -658,13 +659,19 @@ const AddContract = ({ onClose }) => {
                 <Col span={12} className="mt-4">
                   <div className="form-item">
                     <label className="font-semibold">StartDate <span className="text-rose-500">*</span></label>
-                    <DatePicker
-                      name="startDate"
-                      className="w-full mt-1"
-                      placeholder="DD-MM-YYYY"
-                      format="DD-MM-YYYY"
-                      onChange={(value) => setFieldValue("startDate", value)}
-                      value={values.startDate}
+                    <input 
+                      type="date"
+                      className="w-full mt-1 p-2 border rounded"
+                      value={values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : ''}
+                      min={dayjs().format('YYYY-MM-DD')}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        setFieldValue('startDate', selectedDate);
+                        // Clear endDate if it's before the new startDate
+                        if (values.endDate && dayjs(values.endDate).isBefore(selectedDate)) {
+                          setFieldValue('endDate', '');
+                        }
+                      }}
                       onBlur={() => setFieldTouched("startDate", true)}
                     />
                     <ErrorMessage
@@ -678,13 +685,15 @@ const AddContract = ({ onClose }) => {
                 <Col span={12} className="mt-4">
                   <div className="form-item">
                     <label className="font-semibold">EndDate <span className="text-rose-500">*</span></label>
-                    <DatePicker
-                      name="endDate"
-                      className="w-full mt-1"
-                      placeholder="DD-MM-YYYY"
-                      format="DD-MM-YYYY"
-                      onChange={(value) => setFieldValue("endDate", value)}
-                      value={values.endDate}
+                    <input 
+                      type="date"
+                      className="w-full mt-1 p-2 border rounded"
+                      value={values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : ''}
+                      min={values.startDate ? dayjs(values.startDate).add(1, 'day').format('YYYY-MM-DD') : dayjs().add(1, 'day').format('YYYY-MM-DD')}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        setFieldValue('endDate', selectedDate);
+                      }}
                       onBlur={() => setFieldTouched("endDate", true)}
                     />
                     <ErrorMessage

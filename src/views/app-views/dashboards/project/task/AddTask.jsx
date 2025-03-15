@@ -22,8 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AddLable, GetLable } from "./LableReducer/LableSlice";
 import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
-
-
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -62,8 +61,8 @@ const AddTask = ({ onClose }) => {
     category: "",
     project: fnddata?.id || "", 
     lead: "",
-    startDate: null,
-    dueDate: null,
+    startDate: "",
+    dueDate: "",
     assignTo: [],
     description: "",
     task_reporter: "",
@@ -191,8 +190,8 @@ const AddTask = ({ onClose }) => {
         category: values.category,
         project: values.project,
         lead: values.lead || "",
-        startDate: values.startDate ? values.startDate.format('YYYY-MM-DD') : null,
-        dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD') : null,
+        startDate: values.startDate,
+        dueDate: values.dueDate,
         assignTo: assignToObject,
         description: values.description,
         task_reporter: values.task_reporter,
@@ -342,23 +341,23 @@ const AddTask = ({ onClose }) => {
 
                 <Col span={12} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold ">StartDate <span className="text-red-500">*</span></label>
-                    <DatePicker
-                      name="startDate"
-                      className="w-full mt-1"
-                      placeholder="Select startDate"
-                      onChange={(date) => {
-                        setFieldValue("startDate", date);
-                        // Clear end date if it's before the new start date
-                        if (values.dueDate && date && values.dueDate.isBefore(date)) {
-                          setFieldValue("dueDate", null);
+                    <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
+                    <input
+                      type="date"
+                      className="w-full mt-1 p-2 border rounded"
+                      value={values.startDate || ''}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        setFieldValue("startDate", selectedDate);
+                        
+                        if (values.dueDate && dayjs(values.dueDate).isBefore(selectedDate)) {
+                          setFieldValue("dueDate", "");
                         }
                       }}
-                      value={values.startDate}
                       onBlur={() => setFieldTouched("startDate", true)}
                     />
                     <ErrorMessage
-                      name="taskDate"
+                      name="startDate"
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
@@ -367,18 +366,17 @@ const AddTask = ({ onClose }) => {
 
                 <Col span={12} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold ">DueDate <span className="text-red-500">*</span></label>
-                    <DatePicker
-                      name="dueDate"
-                      className="w-full mt-1"
-                      placeholder="Select DueDate"
-                      onChange={(value) => setFieldValue("dueDate", value)}
-                      value={values.dueDate}
-                      onBlur={() => setFieldTouched("dueDate", true)}
-                      disabledDate={(current) => {
-                        // Disable dates before start date
-                        return values.startDate ? current && current < values.startDate.startOf('day') : false;
+                    <label className="font-semibold">Due Date <span className="text-red-500">*</span></label>
+                    <input
+                      type="date"
+                      className="w-full mt-1 p-2 border rounded"
+                      value={values.dueDate || ''}
+                      min={values.startDate || ''}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        setFieldValue("dueDate", selectedDate);
                       }}
+                      onBlur={() => setFieldTouched("dueDate", true)}
                     />
                     <ErrorMessage
                       name="dueDate"
