@@ -340,7 +340,7 @@ const CreditNotesList = () => {
         <EditCrediteNotes onClose={closeEditCreditNotesModal} idd={idd} />
       </Modal>
 
-      <Modal
+      {/* <Modal
         title={<h2 className="text-xl font-medium">View Credit Note</h2>}
         visible={isViewCreditNotesModalVisible}
         onCancel={closeViewCreditNotesModal}
@@ -349,7 +349,7 @@ const CreditNotesList = () => {
         className="mt-[-70px]"
       >
         <ViewCreditNotes creditNoteId={selectedCreditNoteId} onClose={closeViewCreditNotesModal} />
-      </Modal>
+      </Modal> */}
 
     </>
   );

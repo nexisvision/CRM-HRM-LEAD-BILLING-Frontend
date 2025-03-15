@@ -270,7 +270,7 @@ const CalendarApp = () => {
           destroyOnClose={true}
           onCancel={() => setModalVisible(false)}
         >
-          <h2 className="mb-4 border-b pb-2 font-medium"></h2>
+          <div className="mb-3 border-b pb-[-10px] font-medium"></div>
           <Form form={form} layout="vertical" name="new-event" preserve={false} onFinish={onAddEvent}>
             <Form.Item name="title" label="Title" rules={[{ required: true, message: 'Please enter event title' }]} >
               <Input autoComplete="off" />

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Input,
   Button,
@@ -135,7 +135,7 @@ const AddJobOfferLetter = ({ onClose }) => {
 
   return (
     <div>
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+     <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

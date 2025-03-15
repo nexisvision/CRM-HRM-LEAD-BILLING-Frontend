@@ -199,7 +199,7 @@ const AddRevenue = ({ onClose }) => {
 
   return (
     <div className="add-job-form">
-      <hr className="mb-2 border-b font-medium"></hr>
+     <div className="border-b pb-[10px] font-medium"></div>
       <div className="">
         <div className="p-2">
           <Formik

@@ -15,6 +15,7 @@ import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
 import { Form } from "antd";
 import { useDispatch, useSelector } from "react-redux";
+import { ErrorMessage, Field } from "formik";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { addbil, getbil } from "./billing2Reducer/billing2Slice";
@@ -28,19 +29,22 @@ const { Option } = Select;
 const AddBilling = ({ onClose }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const [newTag, setNewTag] = useState("");
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
   const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
   const [newStatus, setNewStatus] = useState("");
   const [statuses, setStatuses] = useState([]);
+
+  const [tags, setTags] = useState([]);
   const AllLoggeddtaa = useSelector((state) => state.user);
   const { taxes } = useSelector((state) => state.tax);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // Get products directly from Redux store
-  const productsData = useSelector((state) => state.Product.Product);
+   // Get products directly from Redux store
+   const productsData = useSelector((state) => state.Product.Product);
   const [tableData, setTableData] = useState([
     {
       id: Date.now(),
@@ -73,7 +77,9 @@ const AddBilling = ({ onClose }) => {
     dispatch(Getcus());
     dispatch(getAllTaxes());
     dispatch(vendordataedata());
-  }, [dispatch]);
+  }, []);
+
+  const customerdata = useSelector((state) => state.customers);
 
   const handleAddRow = () => {
     setTableData([
@@ -107,8 +113,7 @@ const AddBilling = ({ onClose }) => {
     const fetchProducts = async () => {
       try {
         const response = await dispatch(GetAllProdu());
-        console.log("Products response:", response); // Debug log
-
+        
         if (response?.payload?.data) {
           setProducts(response.payload.data);
         }
@@ -129,12 +134,9 @@ const AddBilling = ({ onClose }) => {
 
   // Product selection handler
   const handleProductChange = (productId) => {
-    console.log("Selected product ID:", productId); // Debug log
-
     if (productId) {
-      const selectedProd = products.find(p => p.id === productId);
-      console.log("Found product:", selectedProd); // Debug log
-
+      const selectedProd = productsData?.data?.find(p => p.id === productId);
+      
       if (selectedProd) {
         // Always update the current row instead of checking for empty
         const updatedData = tableData.map((row, index) => {
@@ -169,27 +171,25 @@ const AddBilling = ({ onClose }) => {
     const updatedData = tableData.map((row) => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
-
+        
         // Calculate amount if quantity, price, or tax changes
         if (field === 'quantity' || field === 'price' || field === 'tax') {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
-          const tax = field === 'tax' ?
-            (value ? parseFloat(value.gstPercentage) : 0) :
+          const taxPercentage = field === 'tax' ? 
+            (value ? parseFloat(value.gstPercentage) : 0) : 
             (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
-
+          
           const baseAmount = quantity * price;
-          const taxAmount = (baseAmount * tax) / 100;
-          const totalAmount = baseAmount + taxAmount;
-
-          updatedRow.amount = totalAmount.toFixed(2);
+          const taxAmount = showTax ? (baseAmount * taxPercentage) / 100 : 0;
+          updatedRow.amount = baseAmount + taxAmount;
         }
-
+        
         return updatedRow;
       }
       return row;
     });
-
+  
     setTableData(updatedData);
     calculateTotal(updatedData);
   };
@@ -205,11 +205,11 @@ const AddBilling = ({ onClose }) => {
       const quantity = parseFloat(row.quantity) || 0;
       const price = parseFloat(row.price) || 0;
       const tax = row.tax ? parseFloat(row.tax.gstPercentage) : 0;
-
+      
       const baseAmount = quantity * price;
       const taxAmount = (baseAmount * tax) / 100;
       const totalAmount = baseAmount + taxAmount;
-
+      
       return sum + totalAmount;
     }, 0);
 
@@ -247,11 +247,11 @@ const AddBilling = ({ onClose }) => {
     form.validateFields()
       .then((values) => {
         // Validate items first
-        const hasInvalidItems = tableData.some(row =>
-          !row.item ||
-          !row.quantity ||
-          row.quantity <= 0 ||
-          !row.price ||
+        const hasInvalidItems = tableData.some(row => 
+          !row.item || 
+          !row.quantity || 
+          row.quantity <= 0 || 
+          !row.price || 
           row.price <= 0
         );
 
@@ -322,42 +322,57 @@ const AddBilling = ({ onClose }) => {
       });
   };
 
-
   useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        const lid = AllLoggeddtaa.loggedInUser.id;
-        await dispatch(GetLable(lid));
-      } catch (error) {
-        console.error("Failed to fetch tags:", error);
-        message.error("Failed to load tags");
-      }
-    };
+    // Fetch existing tags/status when component mounts
     fetchTags();
-  }, [dispatch, AllLoggeddtaa.loggedInUser.id]);
+  }, []);
+
+  const fetchTags = async () => {
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+
+      if (response.payload && response.payload.data) {
+        const uniqueTags = response.payload.data
+          .filter((label) => label && label.name)
+          .map((label) => ({
+            id: label.id,
+            name: label.name.trim(),
+          }))
+          .filter(
+            (label, index, self) =>
+              index === self.findIndex((t) => t.name === label.name)
+          );
+
+        setTags(uniqueTags);
+      }
+    } catch (error) {
+      console.error("Failed to fetch tags:", error);
+      message.error("Failed to load tags");
+    }
+  };
+
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+
+      if (response.payload && response.payload.data) {
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType)
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+        setter(filteredLables);
+      }
+    } catch (error) {
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
+    }
+  };
 
   useEffect(() => {
-    const fetchLables = async (lableType, setter) => {
-      try {
-        const lid = AllLoggeddtaa.loggedInUser.id;
-        const response = await dispatch(GetLable(lid));
-
-        if (response.payload && response.payload.data) {
-          const filteredLables = response.payload.data
-            .filter((lable) => lable.lableType === lableType)
-            .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
-          setter(filteredLables);
-        }
-      } catch (error) {
-        console.error(`Failed to fetch ${lableType}:`, error);
-        message.error(`Failed to load ${lableType}`);
-      }
-    };
-
     fetchLables("category", setCategories);
     fetchLables("status", setStatuses);
-  }, [dispatch, AllLoggeddtaa.loggedInUser.id]);
-
+  }, []);
 
   const handleAddNewLabel = async (labelType, newValue, setter, modalSetter) => {
     if (!newValue.trim()) {
@@ -406,13 +421,13 @@ const AddBilling = ({ onClose }) => {
 
   return (
     <div>
-
+      
       <Form form={form} layout="vertical">
-        <hr className="mb-2 border-b font-medium"></hr>
+      <div className="border-b mb-2 pb-[-10px] font-medium"></div>
         <Card className="border-0">
-
+          
           <Row gutter={16}>
-            <Col span={12} className="">
+            <Col span={12} className="mt-1">
               <Form.Item
                 label={<span>Vendor </span>}
                 name="vendor"
@@ -529,7 +544,7 @@ const AddBilling = ({ onClose }) => {
             <Col span={12}>
               <Form.Item label="Note" name="note">
                 <Input placeholder="Enter Note (Optional)" />
-
+                
               </Form.Item>
             </Col>
 
@@ -539,14 +554,14 @@ const AddBilling = ({ onClose }) => {
               </Form.Item>
             </Col>
 
-
+            
           </Row>
         </Card>
 
         <Card>
           <div className="flex justify-between items-center mb-4">
             <h4 className="font-semibold text-lg">Product & Services</h4>
-
+           
             <div className="flex items-center gap-2">
               <span>Enable Tax</span>
               <Switch
@@ -562,11 +577,11 @@ const AddBilling = ({ onClose }) => {
                     const quantity = parseFloat(newRow.quantity) || 0;
                     const price = parseFloat(newRow.price) || 0;
                     const tax = checked ? (parseFloat(newRow.tax) || 0) : 0;
-
+                    
                     const baseAmount = quantity * price;
                     const taxAmount = (baseAmount * tax) / 100;
                     newRow.amount = (baseAmount + taxAmount).toFixed(2);
-
+                    
                     return newRow;
                   });
                   setTableData(updatedData);
@@ -577,7 +592,7 @@ const AddBilling = ({ onClose }) => {
           </div>
 
           <div>
-            <Flex alignItems="center" mobileFlex={false} className='flex mb-4 gap-4'>
+          <Flex alignItems="center" mobileFlex={false} className='flex mb-4 gap-4'>
               <Flex className="flex" mobileFlex={false}>
                 <div className="w-full flex gap-4">
                   <div>
@@ -605,7 +620,7 @@ const AddBilling = ({ onClose }) => {
 
               </Flex>
             </Flex>
-
+           
             <div className="overflow-x-auto">
               <table className="w-full border border-gray-200 bg-white">
                 <thead className="bg-gray-100">
@@ -721,21 +736,21 @@ const AddBilling = ({ onClose }) => {
                         </td>
                       </tr>
                       <tr>
-                        <td colSpan={8} className="px-2 py-2 border-b">
-                          <textarea
+                      <td colSpan={8} className="px-2 py-2 border-b">
+                        <textarea
                             rows={2}
                             value={row.discription ? row.discription.replace(/<[^>]*>/g, '') : ''} // Remove HTML tags
                             onChange={(e) => handleTableDataChange(row.id, "discription", e.target.value)}
                             placeholder="discription"
                             className="w-[70%] p-2 border"
-                          />
-                        </td>
+                        />
+                    </td>
                       </tr>
                     </React.Fragment>
                   ))}
                 </tbody>
               </table>
-              <div className="form-buttons text-left  mt-3">
+              <div className="form-buttons text-left mb-2 mt-2">
               <Button type="primary" onClick={handleAddRow}>
                 <PlusOutlined /> Add Items
               </Button>
@@ -798,9 +813,9 @@ const AddBilling = ({ onClose }) => {
         </Card>
 
         <div className="mt-3 flex justify-end">
-          <Button type="default" onClick={onClose} style={{ marginRight: 8 }}>
-            Cancel
-          </Button>
+        <Button type="default" onClick={onClose} style={{ marginRight: 8 }}>
+              Cancel
+            </Button>
           <Button type="primary" onClick={handleSubmit}>
             Submit Bill
           </Button>

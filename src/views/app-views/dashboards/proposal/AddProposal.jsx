@@ -24,10 +24,11 @@ import { getAllTaxes } from "views/app-views/setting/tax/taxreducer/taxSlice";
 const { Option } = Select;
 
 const AddProposal = ({ onClose }) => {
-  const [discountType] = useState('percentage');
-  const [discountValue] = useState(0);
+  const [discountType, setDiscountType] = useState('percentage');
+  const [discountValue, setDiscountValue] = useState(0);
   const currencies = useSelector((state) => state.currencies?.currencies?.data || []);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
   const Leads = useSelector((state) => state.Leads?.Leads?.data || []);
 
@@ -41,7 +42,6 @@ const AddProposal = ({ onClose }) => {
 
   const { taxes } = useSelector((state) => state.tax);
 
-  const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [form] = Form.useForm();
   const [totals, setTotals] = useState({
     subtotal: 0,
@@ -96,7 +96,6 @@ const AddProposal = ({ onClose }) => {
 
         // Calculate all the totals
         const subtotal = calculateSubTotal();
-        const discountAmount = totals.discount;
         const totalTax = tableData.reduce((sum, item) => {
           const quantity = parseFloat(item.quantity) || 0;
           const price = parseFloat(item.price) || 0;
@@ -105,7 +104,16 @@ const AddProposal = ({ onClose }) => {
           const taxAmount = (baseAmount * tax) / 100;
           return sum + taxAmount;
       }, 0);
-      const finalTotal = subtotal - discountAmount;
+
+      // Calculate discount amount based on type
+      let calculatedDiscountAmount = 0;
+      if (discountType === 'percentage') {
+          calculatedDiscountAmount = (subtotal * parseFloat(discountValue)) / 100;
+      } else {
+          calculatedDiscountAmount = parseFloat(discountValue);
+      }
+
+      const finalTotal = subtotal - calculatedDiscountAmount;
 
         // Restructured proposal data to match backend requirements
         const proposalData = {
@@ -119,18 +127,15 @@ const AddProposal = ({ onClose }) => {
                 price: parseFloat(item.price) || 0,
                 tax_name: item.tax?.gstName || '',
                 tax: parseFloat(item.tax?.gstPercentage) || 0,
-                tax_amount: parseFloat(item.tax_amount) || 0,
                 amount: parseFloat(item.amount) || 0,
                 description: item.description || "",
               })),
-              discount: parseFloat(discountRate) || 0,
-            subtotal: parseFloat(subtotal).toFixed(2), // Add subtotal to the payload
-            discountamount: parseFloat(discountAmount),
-            discountType: discountType,
-            discountValue: parseFloat(discountValue) || 0,
-            discountRate: discountRate,
-            tax: parseFloat(totalTax),
-            total: parseFloat(finalTotal),
+              subtotal: parseFloat(subtotal).toFixed(2),
+              discount_type: discountType,
+              discount_value: parseFloat(discountValue) || 0,
+              discount: parseFloat(calculatedDiscountAmount).toFixed(2),
+              tax: parseFloat(totalTax).toFixed(2),
+              total: parseFloat(finalTotal).toFixed(2)
         };
 
       dispatch(addpropos(proposalData))
@@ -151,13 +156,21 @@ const AddProposal = ({ onClose }) => {
   const handleAddRow = () => {
     const newRow = {
       id: Date.now(),
-      item: selectedLeadDetails?.leadTitle || '',
+      item: "",
       quantity: 1,
-      price: selectedLeadDetails?.leadValue || '',
+      price: "0",
       tax: 0,
-      amount: '0',
-      description: selectedLeadDetails?.description || '',
+      amount: "0",
+      description: "",
     };
+
+    // If it's the first item, set the lead data
+    if (tableData.length === 0) {
+      newRow.item = selectedLeadDetails?.leadTitle || '';
+      newRow.price = selectedLeadDetails?.leadValue || '';
+      newRow.description = selectedLeadDetails?.description || '';
+    }
+
     setTableData([...tableData, newRow]);
   };
 
@@ -288,7 +301,7 @@ const AddProposal = ({ onClose }) => {
     <>
       <div>
         <div className=" ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4">
-          <div className="mb-4 border-b pb-[30px] font-medium"></div>
+          <div className="mb-3 border-b pb-[30px] font-medium"></div>
           <Form
             form={form}
             layout="vertical"

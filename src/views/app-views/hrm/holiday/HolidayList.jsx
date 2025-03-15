@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Menu, Input, message, Button, Modal } from 'antd';
+import { Card, Table, Menu, Input, message, Button, Modal, Select, Tag } from 'antd';
 import { DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import Flex from 'components/shared-components/Flex';
@@ -8,6 +8,8 @@ import AddHoliday from './AddHoliday';
 import EditHoliday from './EditHoliday';
 import { deltsholidayss, getsholidayss } from './AttendanceReducer/holidaySlice';
 import { useDispatch, useSelector } from 'react-redux';
+
+const { Option } = Select;
 
 const HolidayList = () => {
   const dispatch = useDispatch();

@@ -94,7 +94,7 @@ const EditNotes = ({ idd, onClose }) => {
 
   return (
     <div className="add-expenses-form">
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-[-10px] font-medium"></div>
       <Formik
         enableReinitialize={true}
         initialValues={initialValues}

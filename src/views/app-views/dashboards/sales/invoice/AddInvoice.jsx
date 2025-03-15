@@ -432,7 +432,7 @@ const AddInvoice = ({ onClose }) => {
   return (
     <div>
       <Form form={form} layout="vertical">
-        <hr className="mb-2 border-b pb-[20px] font-medium"></hr>
+      <div className="border-b pb-[10px] font-medium"></div>
         <Card className="border-0">
           <Row gutter={16}>
             <Col span={12} className="mt-1">

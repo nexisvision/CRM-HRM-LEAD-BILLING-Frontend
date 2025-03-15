@@ -98,7 +98,7 @@ const AddSalary = ({ onClose }) => {
             className="formik-form"
             onSubmit={handleSubmit}
           >
-            <div className="mb-3 border-b pb-1 font-medium"></div>
+            <div className="mb-3 border-b pb-[-10px] font-medium"></div>
             <Row gutter={16}>
               <Col span={24}>
                 <div className="form-item">

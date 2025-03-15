@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Input, Button, Modal } from 'antd';
+import { Card, Table, Menu, Input, Button, Modal, DatePicker } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, EditOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
 import UserView from '../../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
@@ -9,6 +9,13 @@ import AddTransfer from './AddTransfer';
 import EditTransfer from './EditTransfer';
 import { transferdatas, transferdeltess } from './transferReducers/transferSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import dayjs from 'dayjs';
+
+// Add this helper function to strip HTML tags
+const stripHtmlTags = (html) => {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '');
+};
 
 const TransferList = () => {
   const [list, setList] = useState([]);
@@ -21,6 +28,9 @@ const TransferList = () => {
   const [isEditTransferModalVisible, setIsEditTransferModalVisible] = useState(false);
   const [selectedTransfer, setSelectedTransfer] = useState(null);
   const [idd, setIdd] = useState("");
+  // Add the missing state variables
+  const [accountsList, setAccountsList] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
     dispatch(transferdatas())

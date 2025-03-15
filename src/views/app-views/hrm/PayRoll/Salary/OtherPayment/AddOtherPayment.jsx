@@ -66,7 +66,7 @@ const AddOtherPayment = ({ id, onClose }) => {
 
   return (
     <div className="employee-salary">
-      <h2 className="mb-3 border-b  pb-1 font-medium"></h2>
+      <div className="mb-2 border-b pb-[-10px] font-medium"></div>
       <Formik
         initialValues={{ title: "", type: "", currency: "", amount: "", employeeId: "" }}
         validationSchema={validationSchema}

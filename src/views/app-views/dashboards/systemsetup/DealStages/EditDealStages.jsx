@@ -79,7 +79,7 @@ const EditDealStages = ({ idd, onClose }) => {
   return (
     <div>
       <div className="">
-        <hr className="mb-1 border-b font-medium"></hr>
+      <div className="border-b pb-[-10px] font-medium"></div>
         <div className="p-2">
           <Formik
             initialValues={initialValues}
@@ -193,6 +193,7 @@ const EditDealStages = ({ idd, onClose }) => {
       </div>
 
       <Modal
+        title="Add Pipeline"
         visible={isAddPipelineModalVisible}
         onCancel={closeAddPipelineModal}
         footer={null}

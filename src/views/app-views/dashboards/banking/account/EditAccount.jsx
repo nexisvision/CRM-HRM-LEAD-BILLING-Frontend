@@ -90,7 +90,7 @@ const EditAccount = ({ onClose, idd }) => {
 
   return (
     <div className="edit-account-form">
-  <h2 className="mb-2 border-b font-medium"></h2>
+    <div className="mb-2 border-b pb-[-10px] font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -119,23 +119,17 @@ const EditAccount = ({ onClose, idd }) => {
 
               <Col span={12}>
                 <div className="form-group mt-2">
-                  <label className='font-semibold'>Bank Name <span className='text-red-500'>*</span></label>
-                  <Select
-                    placeholder="Select bank"
-                    value={values.bankName}
-                    className="mt-1"
-                    onChange={(value) => setFieldValue('bankName', value)}
-                    style={{ width: '100%' }}
-                  >
-                    <Option value="sbi">State Bank of India</Option>
-                    <Option value="hdfc">HDFC Bank</Option>
-                    <Option value="icici">ICICI Bank</Option>
-                    <Option value="axis">Axis Bank</Option>
-                  </Select>
+                  <label className="font-semibold">Bank Name <span className="text-red-500">*</span></label>
+                  <Field
+                    name="bankName"
+                    as={Input}
+                    className="w-full mt-1"
+                    placeholder="Enter bank name"
+                  />
                   <ErrorMessage
                     name="bankName"
                     component="div"
-                    className="text-danger"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>

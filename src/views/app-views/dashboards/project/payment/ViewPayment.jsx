@@ -35,7 +35,7 @@ function ViewPayment({ data }) {
 
     return (
         <div className='bg-gray-50 ml-[-51px] mr-[-24px] mt-[-52px] mb-[-30px] rounded-t-lg rounded-b-lg p-10'>
-            <hr className="mb-6 border-b pb-[25px] font-medium"></hr>
+            <div className="mb-4 border-b pb-[20px] font-medium"></div>
             <div className="bg-white shadow rounded-lg p-6 space-y-4 w-full">
                 <table className="table">
                     <tbody>

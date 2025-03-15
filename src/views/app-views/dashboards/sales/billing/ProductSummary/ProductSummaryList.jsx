@@ -44,8 +44,8 @@ function ProductSummaryList({ billingId }) {
                         vendor: selectedBilling.vendor,
                         product: item.item,
                         quantity: item.quantity,
-                        unitPrice: item.unitPrice,
-                        tax: item.tax,
+                        price: item.price,
+                        tax_percentage: item.tax_percentage,
                         tax_name: item.tax_name,
                         amount: item.amount,
                         description: item.description || ''
@@ -128,8 +128,8 @@ function ProductSummaryList({ billingId }) {
         },
         {
             title: "Unit Price",
-            dataIndex: "unitPrice",
-            key: "unitPrice",
+            dataIndex: "price",
+            key: "price",
             render: (price) => (
                 <NumberFormat
                     displayType="text"
@@ -141,9 +141,9 @@ function ProductSummaryList({ billingId }) {
         },
         {
             title: "Tax (%)",
-            dataIndex: "tax",
-            key: "tax",
-            render: (tax) => `${tax || 0}%`
+            dataIndex: "tax_percentage",
+            key: "tax_percentage",
+            render: (tax_percentage) => `${tax_percentage || 0}%`
         },
         {
             title: "GST Name",

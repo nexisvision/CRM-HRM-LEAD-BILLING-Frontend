@@ -65,7 +65,7 @@ const AddLeave = ({ onClose }) => {
 
   return (
     <div className="">
-      <hr className="border-b border-gray-200 mb-4"></hr>
+     <div className="mb-2 border-b pb-[-10px] font-medium"></div>
 
       <Formik
         initialValues={initialValues}

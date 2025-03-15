@@ -2,19 +2,32 @@ import React, { useState } from "react";
 import { Modal, Input, Button, Row, Col, message } from "antd";
 import { useDispatch } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import { addClient, ClientData } from "./CompanyReducers/CompanySlice";
 import axios from "axios";
 import { ReloadOutlined } from "@ant-design/icons";
 import { env } from "configs/EnvironmentConfig";
+
+const validationSchema = Yup.object().shape({
+  username: Yup.string()
+    .required('Name is required')
+    .min(2, 'Name must be at least 2 characters')
+    .max(50, 'Name must not exceed 50 characters'),
+  email: Yup.string()
+    .email('Invalid email format')
+    .required('Email is required'),
+  password: Yup.string()
+    .required('Password is required')
+    .min(8, 'Password must be at least 8 characters')
+});
+
 const AddClient = ({ visible, onClose, onCreate }) => {
   const dispatch = useDispatch();
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpToken, setOtpToken] = useState(null);
   const [otp, setOtp] = useState("");
 
-  const
-
-    generatePassword = () => {
+  const generatePassword = () => {
       const length = 8;
       const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
       let password = "";

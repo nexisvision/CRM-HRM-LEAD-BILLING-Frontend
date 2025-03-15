@@ -337,7 +337,7 @@ const EditLead = ({ id, onClose }) => {
               <h2 className="text-xl font-semibold text-gray-700">Edit Lead</h2>
             </div>
 
-            <hr className="mb-4" />
+            <div className="mb-3 border-b pb-[-20px] font-medium"></div>
 
             <div className="bg-white border rounded mb-3">
               <div className="border-b px-4 py-2">

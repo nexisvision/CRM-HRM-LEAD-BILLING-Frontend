@@ -20,7 +20,7 @@ const EditProposal = ({ id, onClose }) => {
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
     // Add the missing state variables
     const [singleEmp, setSingleEmp] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [ setLoading] = useState(false);
   const currencies = useSelector((state) => state.currencies?.currencies?.data || []);
   const [discountRate] = useState(10);
   const dispatch = useDispatch();
@@ -65,7 +65,7 @@ const EditProposal = ({ id, onClose }) => {
       id: Date.now(),
       item: "",
       quantity: 1,
-      price: "",
+      price: "0",
       tax: null,
       tax_name: "",
       tax_amount: 0,
@@ -225,7 +225,7 @@ const EditProposal = ({ id, onClose }) => {
       id: Date.now(),
       item: "",
       quantity: 1,
-      price: "",
+      price: "0",
       tax: null,
       tax_name: "",
       tax_amount: 0,
@@ -313,42 +313,25 @@ const EditProposal = ({ id, onClose }) => {
 
   const handleTableDataChange = (id, field, value) => {
     const updatedData = tableData.map(row => {
-        if (row.id === id) {
-            const updatedRow = { ...row };
-
-            if (field === 'tax') {
-                if (!value) {
-                    updatedRow.tax = null;
-                    updatedRow.tax_name = '';
-                    updatedRow.tax_amount = 0;
-                } else {
-                    const quantity = parseFloat(updatedRow.quantity) || 0;
-                    const price = parseFloat(updatedRow.price) || 0;
-                    const baseAmount = quantity * price;
-                    const taxAmount = (baseAmount * value.gstPercentage) / 100;
-                    
-                    updatedRow.tax = value;
-                    updatedRow.tax_name = value.gstName;
-                    updatedRow.tax_amount = taxAmount;
-                }
-            } else {
-                updatedRow[field] = value;
-            }
-
-            // Recalculate amounts
-            const quantity = parseFloat(updatedRow.quantity) || 0;
-            const price = parseFloat(updatedRow.price) || 0;
-            const baseAmount = quantity * price;
-            const taxPercentage = updatedRow.tax?.gstPercentage || 0;
-            const taxAmount = (baseAmount * taxPercentage) / 100;
-            const finalAmount = baseAmount + taxAmount;
-
-            updatedRow.base_amount = baseAmount;
-            updatedRow.tax_amount = taxAmount;
-            updatedRow.amount = finalAmount.toFixed(2);
-
-            return updatedRow;
+      if (row.id === id) {
+        const updatedRow = { ...row, [field]: value };
+        
+        if (field === 'quantity' || field === 'price' || field === 'tax') {
+          const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
+          const price = parseFloat(field === 'price' ? value : row.price) || 0;
+          const tax = field === 'tax' ? 
+            (value ? parseFloat(value.gstPercentage) : 0) : 
+            (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
+          
+          const baseAmount = quantity * price;
+          const taxAmount = (baseAmount * tax) / 100;
+          const totalAmount = baseAmount + taxAmount; // Item total = base amount + tax amount
+          
+          updatedRow.amount = totalAmount.toFixed(2);
         }
+        
+        return updatedRow;
+      }
         return row;
     });
 
@@ -370,7 +353,7 @@ const EditProposal = ({ id, onClose }) => {
     <>
       <div>
         <div className=' ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4'>
-          <hr className="mb-4 border-b  font-medium"></hr>
+        <div className="mb-3 border-b pb-[30px] font-medium"></div>
           <Form
             form={form}
             layout="vertical"
@@ -541,7 +524,18 @@ const EditProposal = ({ id, onClose }) => {
                             <input
                               type="number"
                               value={row.price}
-                              onChange={(e) => handleTableDataChange(row.id, 'price', e.target.value)}
+                              onChange={(e) =>
+                                handleTableDataChange(
+                                  row.id,
+                                  "price",
+                                  e.target.value
+                                )
+                              }
+                              onFocus={(e) => {
+                                if (e.target.value === '0') {
+                                  handleTableDataChange(row.id, 'price', '');
+                                }
+                              }}
                               placeholder="Price"
                               className="w-full p-2 border rounded-s"
                             />

@@ -46,7 +46,7 @@ const EditTax = ({ idd, tax, onClose }) => {
 
     return (
         <div className="edit-tax-form">
-
+<div className="mb-3 border-b pb-1 font-medium"></div>
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}

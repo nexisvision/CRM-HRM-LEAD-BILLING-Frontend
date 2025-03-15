@@ -197,7 +197,7 @@ const AddTask = ({ onClose }) => {
         task_reporter: values.task_reporter,
         status: values.status,
         priority: values.priority,
-        file: formattedFiles // Use formatted file data
+        file: formattedFiles 
       };
 
       // Log the payload for debugging

@@ -16,7 +16,7 @@ function ViewBilling({ billingId }) {
     return (
         <>
             <div className='bg-gray-50 ml-[-51px] mr-[-24px] mt-[-52px] mb-[-30px] rounded-t-lg rounded-b-lg p-10'>
-                <hr className="mb-6 border-b  font-medium"></hr>
+            <div className="border-b mb-2 pb-[10px] font-medium"></div>
 
                 {billStatus !== 'paid' && (
                     <div className='p-10 pt-3 pb-3'>

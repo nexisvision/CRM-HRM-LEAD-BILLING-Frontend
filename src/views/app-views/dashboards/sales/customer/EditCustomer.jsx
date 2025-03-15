@@ -172,7 +172,7 @@ const EditCustomer = ({ idd, onClose }) => {
   return (
     <div className="add-job-form">
       <div className=" ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4">
-        <hr className="mb-4 border-b pb-4 font-medium"></hr>
+      <div className="mb-3 border-b pb-[30px] font-medium"></div>
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}

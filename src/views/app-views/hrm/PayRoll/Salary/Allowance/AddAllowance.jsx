@@ -71,7 +71,7 @@ const AddAllowance = ({ id, onClose }) => {
       >
         {({ errors, touched, setFieldValue, values }) => (
           <Form className="formik-form">
-            <div className="mb-3 border-b pb-1 font-medium"></div>
+         <div className="mb-2 border-b pb-[-10px] font-medium"></div>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">

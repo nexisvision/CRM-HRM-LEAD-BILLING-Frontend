@@ -67,7 +67,7 @@ const AddTransfer = ({ onClose }) => {
 
     return (
         <div className="create-account-form">
-<h2 className="mb-3 border-b pb-1 font-medium"></h2>
+            <div className="border-b mb-2 pb-[-10px] font-medium"></div>
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
@@ -144,7 +144,7 @@ const AddTransfer = ({ onClose }) => {
                                 </div>
                             </Col>
 
-                            <Col span={12}>
+                            <Col span={12} className="mt-3">
                                 <div className="form-group">
                                     <label className="font-semibold">To Account <span className="text-red-500">*</span></label>
                                     <Field name="toAccount">

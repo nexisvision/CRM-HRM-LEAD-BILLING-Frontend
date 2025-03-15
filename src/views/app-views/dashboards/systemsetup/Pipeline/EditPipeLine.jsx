@@ -47,7 +47,7 @@ const EditPipeLine = ({ idd, onClose }) => {
 
   return (
     <div>
-      <hr className="mb-1 border-b font-medium"></hr>
+       <div className="mb-2 border-b pb-[-10px] font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -74,7 +74,7 @@ const EditPipeLine = ({ idd, onClose }) => {
               </Col>
             </Row>
 
-            <div className="form-buttons text-right">
+            <div className="form-buttons text-right mt-3">
               <Button type="default" onClick={onClose} className="mr-2">
                 Cancel
               </Button>

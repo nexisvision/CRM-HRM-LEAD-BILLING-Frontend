@@ -88,7 +88,7 @@ const AddVendor = ({ onClose }) => {
     >
       {({ values, errors, touched, handleChange, setFieldValue }) => (
         <Form className="create-vendor-form">
-          <hr className='border-b-2 border-gray-300 '></hr>
+           <div className="border-b mb-2 pb-[-10px] font-medium"></div>
           <h2 className='text-2xl font-bold mt-2'> Basic Info</h2>
           <Row gutter={16}>
             <Col span={8}>

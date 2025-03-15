@@ -70,7 +70,7 @@ const AddNotes = ({ onClose }) => {
 
   return (
     <div className="add-notes-form">
-      <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
+      <div className="mb-3 border-b pb-[-10px] font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

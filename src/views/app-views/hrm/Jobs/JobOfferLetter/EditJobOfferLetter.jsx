@@ -133,7 +133,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
 
   return (
     <div>
-      <hr style={{ border: "1px solid #E8E8E8" }} />
+     <div className="mb-2 border-b pb-1 font-medium"></div>
 
       <Formik
         initialValues={initialValues}

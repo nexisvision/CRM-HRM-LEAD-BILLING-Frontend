@@ -97,7 +97,7 @@ const AddJobApplication = ({ onClose }) => {
   });
   return (
     <div>
-      <hr style={{ marginBottom: "-10px", border: "1px solid #e8e8e8", marginTop: "20px" }} />
+           <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

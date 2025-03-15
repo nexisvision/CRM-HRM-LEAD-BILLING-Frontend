@@ -43,7 +43,7 @@ const AddPipeLine = ({ onClose }) => {
           <Form className="formik-form" onSubmit={handleSubmit}>
             <Row gutter={16}>
               <Col span={24} className="">
-                <hr className="mb-4 border-b pb-2 font-medium"></hr>
+              <div className="mb-3 border-b pb-[-10px] font-medium"></div>
                 <div className="form-item">
                   <label className="font-semibold">Pipeline Name <span className="text-rose-500">*</span></label>
                   <Field

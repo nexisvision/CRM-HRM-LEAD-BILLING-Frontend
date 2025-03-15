@@ -88,7 +88,7 @@ const EditLeadStages = ({ idd, onClose }) => {
   return (
     <div>
       <div className="">
-        <hr className="mb-1 border-b font-medium"></hr>
+      <div className="border-b pb-[-10px] font-medium"></div>
         <div className="p-2">
           <Formik
             initialValues={initialValues}

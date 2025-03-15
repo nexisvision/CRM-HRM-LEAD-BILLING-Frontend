@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Menu, Input, Button, Modal, Select } from 'antd';
+import { Card, Table, Menu, Input, Button, Modal } from 'antd';
 import { DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
 import UserView from '../../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
@@ -8,19 +8,16 @@ import AddVendor from './AddVendor';
 import EditVendor from './Editvendor';
 import { vendordatadeletee, vendordataedata } from './vendorReducers/vendorSlice';
 import { useDispatch, useSelector } from 'react-redux';
-const { Option } = Select
 
 const VendorList = () => {
   const [list, setList] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const dispatch = useDispatch();
-  const [accountType, setAccountType] = useState('All');
   const [isAddVendorModalVisible, setIsAddVendorModalVisible] = useState(false);
   const [isEditVendorModalVisible, setIsEditVendorModalVisible] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [idd, setIdd] = useState("");
-  const accountTypeList = ['All', 'Salary', 'Savings', 'Current'];
 
   useEffect(() => {
     dispatch(vendordataedata())
@@ -37,18 +34,7 @@ const VendorList = () => {
     }
   }, [allvendordata, fnsddta])
 
-  // Handle account type filter
-  const handleAccountTypeFilter = value => {
-    setAccountType(value);
-    if (value !== 'All') {
-      const filteredData = list.filter(item =>
-        item.accounttype && item.accounttype.toLowerCase() === value.toLowerCase()
-      );
-      setList(filteredData);
-    } else {
-      setList([]); // or refetch the data
-    }
-  };
+
   // Search functionality
   const onSearch = (e) => {
     const value = e.currentTarget.value.toLowerCase();

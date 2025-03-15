@@ -363,7 +363,7 @@ const AddLead = ({ onClose }) => {
           <Form className="formik-form" onSubmit={handleSubmit}>
             <div className="pb-3 pr-3">
                 <h2 className="text-xl font-semibold text-gray-700">Create Lead</h2>
-                <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+                <div className="mb-2 border-b pb-[10px] font-medium"></div>
             </div>
             
             <div className="bg-white border rounded mb-3">

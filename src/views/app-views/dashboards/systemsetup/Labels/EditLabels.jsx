@@ -69,7 +69,7 @@ const EditLabels = ({ idd, onClose }) => {
   return (
     <div>
       <div className="">
-        <hr className="mb-1 border-b font-medium"></hr>
+        <div className="mb-2 border-b pb-[-10px] font-medium"></div>           
         <div className="p-2">
           <Formik
             initialValues={initialValues}

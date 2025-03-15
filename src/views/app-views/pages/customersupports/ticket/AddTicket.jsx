@@ -87,8 +87,7 @@ const AddTicket = ({ onClose }) => {
 
   return (
     <div className="">
-      <div className="border-b border-gray-200 mb-2"></div>
-
+      <div className="border-b pb-[-10px] font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

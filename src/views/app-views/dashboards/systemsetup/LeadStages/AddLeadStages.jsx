@@ -63,7 +63,7 @@ const AddLeadStages = ({ onClose }) => {
     <>
       <div>
         <div className="">
-          <hr className="mb-1 border-b font-medium"></hr>
+        <div className="mb-3 border-b pb-[-10px] font-medium"></div>
           <div className="">
             <div className="">
               <Formik

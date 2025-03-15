@@ -119,6 +119,7 @@ const AddCompany = ({ onClose }) => {
 
   return (
     <div className="add-employee ">
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

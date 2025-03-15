@@ -58,7 +58,7 @@ const AddDocument = ({ onClose }) => {
 
   return (
     <div className="add-trainingSetup">
-      <div className="mb-3 border-b pb-1 font-medium"></div>
+      <div className=" border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

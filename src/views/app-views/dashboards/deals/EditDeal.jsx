@@ -53,7 +53,7 @@ const EditDeal = ({ onClose, id }) => {
   const handlePhoneNumberChange = (e, setFieldValue) => {
     const value = e.target.value.replace(/\D/g, '');
     if (value.length <= 15) {
-      setFieldValue('phone', value);
+      setFieldValue('phoneNumber', value);
     }
   };
 
@@ -152,7 +152,7 @@ const EditDeal = ({ onClose, id }) => {
 
   return (
     <div className="add-job-form">
-      <h2 className="mb-4 border-b pb-2 font-medium"></h2>
+          <div className="mb-2 border-b pb-[-10px] font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -163,11 +163,9 @@ const EditDeal = ({ onClose, id }) => {
           values,
           setFieldValue,
           handleSubmit,
-          handleChange,
           setFieldTouched,
         }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
-            <hr className="mb-4 border-b pb-2 font-medium"></hr>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
@@ -252,6 +250,7 @@ const EditDeal = ({ onClose, id }) => {
                           type="number"
                           placeholder="Enter phone number"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                          value={field.value || ''}
                         // prefix={
                         //   values.phoneCode && (
                         //     <span className="text-gray-600 font-medium mr-1">

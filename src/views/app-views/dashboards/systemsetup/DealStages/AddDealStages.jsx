@@ -65,7 +65,7 @@ const AddDealStages = ({ onClose }) => {
     <>
       <div>
         <div className="">
-          <hr className="mb-1 border-b font-medium"></hr>
+        <div className="border-b pb-[-10px] font-medium"></div>
 
           <div className="">
             <div className="">
@@ -175,6 +175,7 @@ const AddDealStages = ({ onClose }) => {
       </div>
 
       <Modal
+        title="Add Pipeline"
         visible={isAddPipelineModalVisible}
         onCancel={closeAddPipelineModal}
         footer={null}

@@ -130,7 +130,7 @@ const AddUser = ({ visible, onClose }) => {
       >
         {({ errors, touched, setFieldValue, handleSubmit }) => (
           <Form className="space-y-4">
-            <div className="border-b border-gray-200 mb-6"></div>
+            <div className="mb-3 border-b pb-[-10px] font-medium"></div>
 
             <Row gutter={[16, 16]}>
               <Col span={12}>

@@ -76,7 +76,7 @@ const AddCrediteNotes = ({ onClose }) => {
     <>
       <div>
         <div className="">
-          <hr className="mb-3 border-b font-medium"></hr>
+          <div className="border-b mb-3 pb-[-10px] font-medium"></div>
           <div className="">
             <div className="">
               <Formik

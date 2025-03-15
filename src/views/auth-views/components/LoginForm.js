@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Button, Form, Input, Divider, Modal, Checkbox } from 'antd';
+import { Button, Form, Input, Modal, Checkbox } from 'antd';
 import { MailOutlined, LockOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 import {
@@ -171,7 +171,7 @@ export const LoginForm = props => {
 	const [form] = Form.useForm();
 
 	const {
-
+		loading,
 		hideAuthMessage,
 		showLoading,
 		token,
@@ -179,11 +179,6 @@ export const LoginForm = props => {
 		showMessage,
 		allowRedirect = true
 	} = props
-
-	const initialCredential = {
-		login: 'user1@themenate.net',
-		password: '2005ipo'
-	}
 
 	const [forgotPasswordVisible, setForgotPasswordVisible] = useState(false);
 

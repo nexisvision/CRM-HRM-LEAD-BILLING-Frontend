@@ -222,7 +222,7 @@ const AddDeal = ({ onClose }) => {
 
   return (
     <div className="add-job-form">
-      <h2 className="mb-4 border-b pb-2 font-medium"></h2>
+          <div className="mb-2 border-b pb-[10px] font-medium"></div>
       <Formik
         initialValues={initialValues}
         // validationSchema={validationSchema}

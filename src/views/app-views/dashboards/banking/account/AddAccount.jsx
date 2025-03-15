@@ -75,7 +75,7 @@ const AddAccount = ({ onClose }) => {
 
   return (
     <div className="create-account-form">
-      <h2 className="mb-2 border-b font-medium"></h2>
+      <div className="mb-2 border-b pb-[-10px] font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

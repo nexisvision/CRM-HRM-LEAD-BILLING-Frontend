@@ -382,7 +382,7 @@ const UserList = () => {
         visible={isAddUserModalVisible}
         onCancel={closeAddUserModal}
         footer={null}
-        width={1100}
+        width={700}
       >
         <AddUser onClose={closeAddUserModal} />
       </Modal>
@@ -391,7 +391,7 @@ const UserList = () => {
         visible={isEditUserModalVisible}
         onCancel={closeEditUserModal}
         footer={null}
-        width={1000}
+        width={700}
       >
         <EditUser onClose={closeEditUserModal} idd={idd} />
       </Modal>
@@ -401,7 +401,7 @@ const UserList = () => {
         visible={isResetPasswordModalVisible}
         onCancel={closeResetPasswordModal}
         footer={null}
-        width={1000}
+        width={800}
       >
         <ResetPassword onClose={closeResetPasswordModal} />
       </Modal>
