@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Input, message, Button, Modal, DatePicker } from 'antd';
-import { DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { Card, Table, Menu, Input, message, Button, Modal, DatePicker, Dropdown } from 'antd';
+import { DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
@@ -144,60 +144,25 @@ const AnnouncementList = () => {
     return tmp.textContent || tmp.innerText || '';
   };
 
-  // Convert dropdownMenu to a regular function
-  const dropdownMenu = (elm) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<EyeOutlined />} onClick={() => showUserProfile(elm)} size="small">
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<MailOutlined />} onClick={() => showUserProfile(elm)} size="small">
-            <span className="">Send Mail</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<PushpinOutlined />} onClick={() => showUserProfile(elm)} size="small">
-            <span className="ml-2">Pin</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-
-
-      {/* {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                   <Menu.Item>
-                                   <Flex alignItems="center">
-                                     <Button
-                                       type=""
-                                       className=""
-                                       icon={<EditOutlined />}
-                                       onClick={() => EditMeet(elm.id)}
-                                       size="small"
-                                     >
-                                       <span className="">Edit</span>
-                                     </Button>
-                                   </Flex>
-                                 </Menu.Item>
-                                ) : null} */}
-
-
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button type="" className="" icon={<DeleteOutlined />} onClick={() => deleteUser(elm.id)} size="small">
-              <span className="">Delete</span>
-            </Button>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-    </Menu>
-  );
+  // Update the dropdownMenu function
+  const getDropdownItems = (elm) => [
+    {
+      key: 'view',
+      icon: <EyeOutlined />,
+      label: 'View Details',
+      onClick: () => {
+        // Add your view logic here
+        message.info('View Details clicked');
+      }
+    },
+    ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      label: 'Delete',
+      onClick: () => deleteUser(elm.id),
+      danger: true
+    }] : [])
+  ];
 
   const tableColumns = [
     {
@@ -224,8 +189,23 @@ const AnnouncementList = () => {
       title: 'Action',
       dataIndex: 'actions',
       render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+        <div className="text-center" onClick={(e) => e.stopPropagation()}>
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       )
     },
@@ -356,6 +336,29 @@ const styles = `
 
   .table-responsive {
     overflow-x: auto;
+  }
+
+  .ant-dropdown-trigger {
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-trigger:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .ant-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+  }
+
+  .ant-menu-item:hover {
+    background-color: #f0f7ff;
+  }
+
+  .ant-menu-item-danger:hover {
+    background-color: #fff1f0;
   }
 `;
 

@@ -135,7 +135,7 @@ const AddHoliday = ({ onClose }) => {
                     className="w-full mt-1"
                     placeholder="Select start date"
                     value={values.start_date ? moment(values.start_date) : null}
-                    format="YYYY-MM-DD"
+                    format="DD-MM-YYYY"
                     onChange={(date) => {
                       setFieldValue("start_date", date ? date.format("YYYY-MM-DD") : null);
                       if (values.end_date && date && moment(date).isAfter(values.end_date)) {
@@ -158,7 +158,7 @@ const AddHoliday = ({ onClose }) => {
                     style={{ width: "100%" }}
                     className="w-full mt-1"
                     placeholder="Select end date"
-                    format="YYYY-MM-DD"
+                    format="DD-MM-YYYY"
                     value={values.end_date ? moment(values.end_date) : null}
                     onChange={(date) => setFieldValue("end_date", date ? date.format("YYYY-MM-DD") : null)}
                     disabledDate={(current) => {

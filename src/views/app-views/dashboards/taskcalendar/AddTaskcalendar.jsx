@@ -18,14 +18,16 @@ const AddTaskcalendar = ({ open, onCancel, selectedDate }) => {
 
   const onSubmit = async (values) => {
     try {
+      const timeValue = values.start ? moment(values.start).format('HH:mm') : null;
+      
       const taskData = {
         taskName: values.title,
         taskDate: selectedDate,
-        taskTime: moment(values.start).format('HH:mm'),
+        taskTime: timeValue,
         taskDescription: values.taskDescription,
       };
 
-console.log("dfdfdfgdfdfgdf",taskData);
+      console.log("Task Data:", taskData);
 
       await dispatch(AddTask(taskData));
       await dispatch(GetTaskdata());
@@ -60,7 +62,15 @@ console.log("dfdfdfgdfdfgdf",taskData);
           label="Time"
           rules={[{ required: true, message: 'Please select time!' }]}
         >
-          <TimePicker className="w-100" format="HH:mm" />
+          <TimePicker 
+            className="w-100" 
+            format="HH:mm"
+            use12Hours={false}
+            defaultOpenValue={moment('00:00', 'HH:mm')}
+            onChange={(time) => {
+              console.log('Selected time:', time ? time.format('HH:mm') : null);
+            }}
+          />
         </Form.Item>
 
         <Form.Item

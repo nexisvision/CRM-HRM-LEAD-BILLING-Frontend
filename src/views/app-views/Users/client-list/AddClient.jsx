@@ -19,6 +19,10 @@ const validationSchema = Yup.object().shape({
   password: Yup.string()
     .required('Password is required')
     .min(8, 'Password must be at least 8 characters')
+    .matches(
+      /^(?=.*[A-Za-z])(?=.*\d)/,
+      'Password must contain at least one letter and one number'
+    ),
 });
 
 const AddClient = ({ visible, onClose, onCreate }) => {
@@ -28,21 +32,21 @@ const AddClient = ({ visible, onClose, onCreate }) => {
   const [otp, setOtp] = useState("");
 
   const generatePassword = () => {
-      const length = 8;
-      const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-      let password = "";
+    const length = 8;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let password = "";
 
-      // Generate 6 characters
-      for (let i = 0; i < length; i++) {
-        password += charset[Math.floor(Math.random() * charset.length)];
-      }
+    // Generate 6 characters
+    for (let i = 0; i < length; i++) {
+      password += charset[Math.floor(Math.random() * charset.length)];
+    }
 
-      // Ensure at least one number
-      const randomNum = Math.floor(Math.random() * 10).toString();
-      password = password.slice(0, 7) + randomNum;
+    // Ensure at least one number
+    const randomNum = Math.floor(Math.random() * 10).toString();
+    password = password.slice(0, 7) + randomNum;
 
-      return password;
-    };
+    return password;
+  };
 
   const otpapi = async (otp) => {
     try {

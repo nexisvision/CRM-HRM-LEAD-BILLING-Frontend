@@ -40,8 +40,10 @@ const ConvertDeal = ({ onClose, leadData }) => {
     const alldatas = useSelector((state) => state.SubClient.SubClient.data);
 
     useEffect(() => {
-        setClientdata(alldatas);
-    }, [alldatas])
+        if (Array.isArray(alldatas)) {
+            setClientdata(alldatas);
+        }
+    }, [alldatas]);
 
 
 
@@ -505,11 +507,11 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
                                                 >
 
-                                                    {clientdata.map((client) => (
+                                                    {Array.isArray(clientdata) && clientdata.map((client) => (
 
                                                         <Option key={client.id} value={client.id}>
 
-                                                            {client.name || client.email}
+                                                            {client.name || client.email || 'Unnamed Client'}
 
                                                         </Option>
 
@@ -647,72 +649,65 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
             <Modal
 
-                title="OTP Verification"
+                title="Verify OTP"
 
                 visible={isOtpModalVisible}
 
                 onCancel={() => setIsOtpModalVisible(false)}
 
-                footer={[
+                footer={null}
 
-                    <Button key="cancel" onClick={() => setIsOtpModalVisible(false)}>
-
-                        Cancel
-
-                    </Button>,
-
-                    <Button
-
-                        key="submit"
-
-                        type="primary"
-
-                        onClick={handleOtpSubmit}
-
-                        disabled={otp.length !== 6}
-
-                    >
-
-                        Verify
-
-                    </Button>
-
-                ]}
+                width={400}
 
             >
 
                 <div className="p-4">
+                  
 
-                    <p className="mb-4">
+                    <h3 className="text-lg font-medium mb-4">OTP Page</h3>
 
-                        Please enter the 6-digit OTP sent to your email address:
+                    
 
-                        <span className="font-semibold ml-1">{formValues?.clientEmail}</span>
+                    <p className="text-gray-600 mb-6">
+
+                        An OTP has been sent to your registered email. Please enter the OTP below to verify your account.
 
                     </p>
 
+
+
                     <Input
 
-                        placeholder="Enter 6-digit OTP"
+                        placeholder="Enter OTP"
 
                         value={otp}
 
                         onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
 
-                        className="text-center text-2xl tracking-wider"
+                        className="w-full p-2 text-lg mb-4 border rounded"
 
                         maxLength={6}
 
                     />
 
+
+
                     <Button
+
                         type="primary"
+
                         onClick={handleOtpSubmit}
-                        disabled={otp.length !== 6}
-                        className="bg-blue-500 hover:bg-blue-600"
+
+                        // disabled={otp.length !== 6}
+
+                        className="w-full h-10 bg-blue-500 hover:bg-blue-600 text-white rounded"
+
                     >
+
                         Verify OTP
+
                     </Button>
+
                 </div>
 
             </Modal>

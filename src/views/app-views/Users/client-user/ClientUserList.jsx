@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Menu, Table, Tag, Button, Modal, Select, Input } from 'antd';
-import { EyeOutlined, DeleteOutlined, MailOutlined, FileExcelOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { Card, Menu, Table, Tag, Button, Modal, Select, Input, Dropdown } from 'antd';
+import { EyeOutlined, DeleteOutlined, MailOutlined, FileExcelOutlined, PlusOutlined, SearchOutlined, MoreOutlined } from '@ant-design/icons';
 import { RiLockPasswordLine } from "react-icons/ri";
 import OrderListData from 'assets/data/order-list.data.json';
 import { utils, writeFile } from "xlsx";
@@ -40,9 +40,6 @@ const ClientUserList = () => {
     }
   };
 
-
-
-
   const paymentStatusList = ['active', 'blocked'];
 
   const handleShowStatus = (value) => {
@@ -61,8 +58,6 @@ const ClientUserList = () => {
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
   };
-
-
 
   const openAddClientUserModal = () => {
     setIsAddClientUserModalVisible(true);
@@ -90,62 +85,33 @@ const ClientUserList = () => {
     setSelectedUser(null);
   };
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            onClick={() => { showUserProfile(elm) }}
-            size="small"
-          >
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<MailOutlined />}
-            onClick={openEditClientUserModal}
-            size="small"
-          >
-            <span className="">Edit</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<RiLockPasswordLine />}
-            onClick={() => { showUserProfile(elm) }}
-            size="small"
-          >
-            <span className="ml-2">Update Password</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<DeleteOutlined />}
-            onClick={() => { deleteUser(elm.id) }}
-            size="small"
-          >
-            <span className="">Delete</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const getDropdownItems = (elm) => [
+    {
+      key: 'view',
+      icon: <EyeOutlined />,
+      label: 'View Details',
+      onClick: () => showUserProfile(elm)
+    },
+    {
+      key: 'edit',
+      icon: <MailOutlined />,
+      label: 'Edit',
+      onClick: () => openEditClientUserModal()
+    },
+    {
+      key: 'password',
+      icon: <RiLockPasswordLine />,
+      label: 'Update Password',
+      onClick: () => showUserProfile(elm)
+    },
+    {
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      label: 'Delete',
+      onClick: () => deleteUser(elm.id),
+      danger: true
+    }
+  ];
 
   const tableColumns = [
     {
@@ -215,81 +181,208 @@ const ClientUserList = () => {
       title: 'Action',
       dataIndex: 'actions',
       render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+        <div className="text-center" onClick={(e) => e.stopPropagation()}>
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
-      ),
+      )
     },
   ];
 
-  return (
-    <Card bodyStyle={{ 'padding': '0px' }}>
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
-        <Flex className="mb-1" mobileFlex={false}>
-          <div className="mr-md-3 mb-3">
-            <Input
-              placeholder="Search"
-              prefix={<SearchOutlined />}
-              onChange={(e) => onSearch(e)}
-            />
-          </div>
-          <div className="mb-3">
-            <Select
-              defaultValue="All"
-              className="w-100"
-              style={{ minWidth: 180 }}
-              onChange={handleShowStatus}
-              placeholder="Status"
-            >
-              <Select.Option value="All">Status</Select.Option>
-              {paymentStatusList.map((elm) => (
-                <Select.Option key={elm} value={elm}>
-                  {elm}
-                </Select.Option>
-              ))}
-            </Select>
-          </div>
-        </Flex>
-        <Flex gap="7px">
-          <Button type="primary" className="ml-2" onClick={openAddClientUserModal}>
-            <PlusOutlined />
-            New
-          </Button>
-          <Button
-            type="primary"
-            icon={<FileExcelOutlined />}
-            onClick={exportToExcel} // Call export function when the button is clicked
-            block
-          >
-            Export All
-          </Button>
-        </Flex>
-      </Flex>
-      <div className="table-responsive">
-        <Table columns={tableColumns} dataSource={users} rowKey='id' />
-      </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
-      <Modal
-        title="Create Client"
-        visible={isAddClientUserModalVisible}
-        onCancel={closeAddClientUserModal}
-        footer={null}
-        width={1100}
-      // className="mt-[-70px]"
-      >
-        <AddClientUser onClose={closeAddClientUserModal} />
-      </Modal>
-      <Modal
-        title="Edit Client"
-        visible={isEditClientUserModalVisible}
-        onCancel={closeEditClientUserModal}
-        footer={null}
-        width={1000}
-      >
-        <EditClientUser onClose={closeEditClientUserModal} />
-      </Modal>
+  const styles = `
+    .ant-dropdown-trigger {
+      transition: all 0.3s;
+    }
 
-    </Card>
+    .ant-dropdown-trigger:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .ant-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+    }
+
+    .ant-menu-item:hover {
+      background-color: #f0f7ff;
+    }
+
+    .ant-menu-item-danger:hover {
+      background-color: #fff1f0;
+    }
+
+    .ant-table-row {
+      transition: all 0.3s;
+    }
+
+    .ant-table-row:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    }
+
+    .ant-tag {
+      border-radius: 20px;
+      font-weight: 500;
+      text-transform: capitalize;
+      padding: 2px 12px;
+    }
+
+    .ant-tag-cyan {
+      background-color: #e6fffb;
+      border-color: #87e8de;
+      color: #08979c;
+    }
+
+    .ant-tag-red {
+      background-color: #fff1f0;
+      border-color: #ffa39e;
+      color: #cf1322;
+    }
+
+    .d-flex {
+      transition: all 0.3s;
+    }
+
+    .d-flex:hover .ant-avatar {
+      transform: scale(1.05);
+    }
+
+    .ant-input-affix-wrapper,
+    .ant-select-selector {
+      border-radius: 6px !important;
+      transition: all 0.3s !important;
+    }
+
+    .ant-input-affix-wrapper:hover,
+    .ant-select-selector:hover {
+      border-color: #40a9ff !important;
+    }
+
+    .ant-input-affix-wrapper:focus,
+    .ant-input-affix-wrapper-focused,
+    .ant-select-focused .ant-select-selector {
+      border-color: #40a9ff !important;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+    }
+
+    .ant-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 6px;
+    }
+
+    .ant-modal-content {
+      border-radius: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .ant-input-affix-wrapper,
+      .ant-select {
+        width: 100%;
+      }
+      
+      .mb-1 {
+        margin-bottom: 1rem;
+      }
+
+      .mr-md-3 {
+        margin-right: 0;
+      }
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+  `;
+
+  return (
+    <>
+      <style>{styles}</style>
+      <Card bodyStyle={{ 'padding': '0px' }}>
+        <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+          <Flex className="mb-1" mobileFlex={false}>
+            <div className="mr-md-3 mb-3">
+              <Input
+                placeholder="Search"
+                prefix={<SearchOutlined />}
+                onChange={(e) => onSearch(e)}
+              />
+            </div>
+            <div className="mb-3">
+              <Select
+                defaultValue="All"
+                className="w-100"
+                style={{ minWidth: 180 }}
+                onChange={handleShowStatus}
+                placeholder="Status"
+              >
+                <Select.Option value="All">Status</Select.Option>
+                {paymentStatusList.map((elm) => (
+                  <Select.Option key={elm} value={elm}>
+                    {elm}
+                  </Select.Option>
+                ))}
+              </Select>
+            </div>
+          </Flex>
+          <Flex gap="7px">
+            <Button type="primary" className="ml-2" onClick={openAddClientUserModal}>
+              <PlusOutlined />
+              New
+            </Button>
+            <Button
+              type="primary"
+              icon={<FileExcelOutlined />}
+              onClick={exportToExcel} // Call export function when the button is clicked
+              block
+            >
+              Export All
+            </Button>
+          </Flex>
+        </Flex>
+        <div className="table-responsive">
+          <Table columns={tableColumns} dataSource={users} rowKey='id' />
+        </div>
+        <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+        <Modal
+          title="Create Client"
+          visible={isAddClientUserModalVisible}
+          onCancel={closeAddClientUserModal}
+          footer={null}
+          width={1100}
+          // className="mt-[-70px]"
+        >
+          <AddClientUser onClose={closeAddClientUserModal} />
+        </Modal>
+        <Modal
+          title="Edit Client"
+          visible={isEditClientUserModalVisible}
+          onCancel={closeEditClientUserModal}
+          footer={null}
+          width={1000}
+        >
+          <EditClientUser onClose={closeEditClientUserModal} />
+        </Modal>
+      </Card>
+    </>
   );
 };
 

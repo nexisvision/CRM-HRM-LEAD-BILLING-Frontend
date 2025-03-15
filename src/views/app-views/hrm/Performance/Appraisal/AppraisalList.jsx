@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Input, message, Button, Modal, Select } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { Card, Table, Menu, Input, message, Button, Modal, Select, Dropdown } from 'antd';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, FileExcelOutlined, MoreOutlined } from '@ant-design/icons';
 import UserView from '../../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import AddAppraisal from './AddAppraisal';
 import { utils, writeFile } from "xlsx";
 import EditAppraisal from './EditAppraisal';
@@ -162,57 +161,37 @@ const AppraisalList = () => {
   };
 
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            icon={<EyeOutlined />}
-            onClick={openViewAppraisalModal}
-            size="small"
-          >
-            View Details
-          </Button>
-        </Flex>
-      </Menu.Item>
+  const getDropdownItems = (elm) => {
+    const items = [
+      {
+        key: 'view',
+        icon: <EyeOutlined />,
+        label: 'View Details',
+        onClick: openViewAppraisalModal
+      }
+    ];
 
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => editfun(elm.id)
+      });
+    }
 
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteAppraisals(elm.id),
+        danger: true
+      });
+    }
 
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button
-              type=""
-              icon={<EditOutlined />}
-              onClick={() => { editfun(elm.id) }}
-              size="small"
-            >
-              Edit
-            </Button>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-
-
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button
-              type=""
-              icon={<DeleteOutlined />}
-              onClick={() => { deleteAppraisals(elm.id) }}
-              size="small"
-            >
-              Delete
-            </Button>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-
-
-    </Menu>
-  );
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -291,10 +270,25 @@ const AppraisalList = () => {
       title: 'Action',
       dataIndex: 'actions',
       render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+        <div className="text-center" onClick={(e) => e.stopPropagation()}>
+          <Dropdown
+            menu={{ items: getDropdownItems(elm) }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
-      ),
+      )
     },
   ];
 
@@ -465,9 +459,86 @@ const styles = `
     margin-right: 1rem;
   }
 
+  .ant-dropdown-trigger {
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-trigger:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .ant-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .ant-menu-item:hover {
+    background-color: #f0f7ff;
+  }
+
+  .ant-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .ant-table-row {
+    transition: all 0.3s;
+  }
+
+  .ant-table-row:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  }
+
+  .search-input {
+    border-radius: 6px;
+    transition: all 0.3s;
+  }
+
+  .search-input:hover {
+    border-color: #40a9ff;
+  }
+
+  .search-input:focus,
+  .search-input-focused {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 6px;
+    transition: all 0.3s;
+  }
+
+  .ant-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .ant-modal-content {
+    border-radius: 8px;
+  }
+
   @media (max-width: 768px) {
     .ant-select {
       width: 100%;
+    }
+    
+    .mb-1 {
+      margin-bottom: 1rem;
+    }
+
+    .mr-md-3 {
+      margin-right: 0;
     }
   }
 `;

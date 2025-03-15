@@ -22,6 +22,7 @@ import {
 import { UploadOutlined } from "@ant-design/icons";
 import moment from 'moment';
 import { getgeneralsettings } from '../../../setting/general/generalReducer/generalSlice';
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 
@@ -30,6 +31,9 @@ const AddJobOfferLetter = ({ onClose }) => {
   const user = useSelector((state) => state.user.loggedInUser.username);
 
   const [companyDetails, setCompanyDetails] = useState({});
+  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [fileList, setFileList] = useState([]);
+  const [selectedJob, setSelectedJob] = useState(null);
 
   useEffect(() => {
     dispatch(GetJobdata());
@@ -75,10 +79,6 @@ const AddJobOfferLetter = ({ onClose }) => {
     salary: Yup.string().required("Please enter a salary"),
     description: Yup.string().required("Please enter a description"),
   });
-
-  const [selectedApplication, setSelectedApplication] = useState(null);
-  const [fileList, setFileList] = useState([]);
-  const [selectedJob, setSelectedJob] = useState(null);
 
   const handleFileChange = ({ fileList: newFileList }) => {
     
@@ -270,19 +270,24 @@ Best regards,
                 <Col span={12} className='mt-3'>
                   <div className="form-item">
                     <label className='font-semibold'>Offer Expire On <span className="text-red-500">*</span></label>
-                    <DatePicker
-                      className="w-full mt-1"
-                      format="DD-MM-YYYY"
-                      value={values.offer_expiry}
-                      onChange={(date) => {
-                        setFieldValue('offer_expiry', date);
-                        // Clear expected joining date if it's before the new offer expiry date
-                        if (values.expected_joining_date && date && values.expected_joining_date.isBefore(date)) {
-                          setFieldValue('expected_joining_date', null);
-                        }
-                      }}
-                      onBlur={() => setFieldTouched("offer_expiry", true)}
-                    />
+                    <Field name="offer_expiry">
+                      {({ field }) => (
+                        <input
+                          type="date"
+                          {...field}
+                          className="w-full mt-1 p-2 border rounded"
+                          value={values.offer_expiry ? values.offer_expiry.format('YYYY-MM-DD') : ''}
+                          onChange={(e) => {
+                            const date = dayjs(e.target.value);
+                            setFieldValue('offer_expiry', date);
+                            if (values.expected_joining_date && date && values.expected_joining_date.isBefore(date)) {
+                              setFieldValue('expected_joining_date', null);
+                            }
+                          }}
+                          onBlur={() => setFieldTouched("offer_expiry", true)}
+                        />
+                      )}
+                    </Field>
                     <ErrorMessage name="offer_expiry" component="div" className="error-message text-red-500 my-1" />
                   </div>
                 </Col>
@@ -290,17 +295,22 @@ Best regards,
                 <Col span={12} className='mt-3'>
                   <div className="form-item">
                     <label className='font-semibold'>Expected Joining Date <span className="text-red-500">*</span></label>
-                    <DatePicker
-                      className="w-full mt-1"
-                      format="DD-MM-YYYY"
-                      value={values.expected_joining_date}
-                      onChange={(date) => setFieldValue('expected_joining_date', date)}
-                      onBlur={() => setFieldTouched("expected_joining_date", true)}
-                      disabledDate={(current) => {
-                        // Disable dates before offer expiry date
-                        return values.offer_expiry ? current && current < values.offer_expiry.startOf('day') : false;
-                      }}
-                    />
+                    <Field name="expected_joining_date">
+                      {({ field }) => (
+                        <input
+                          type="date"
+                          {...field}
+                          className="w-full mt-1 p-2 border rounded"
+                          value={values.expected_joining_date ? values.expected_joining_date.format('YYYY-MM-DD') : ''}
+                          onChange={(e) => {
+                            const date = dayjs(e.target.value);
+                            setFieldValue('expected_joining_date', date);
+                          }}
+                          min={values.offer_expiry ? values.offer_expiry.format('YYYY-MM-DD') : ''}
+                          onBlur={() => setFieldTouched("expected_joining_date", true)}
+                        />
+                      )}
+                    </Field>
                     <ErrorMessage name="expected_joining_date" component="div" className="error-message text-red-500 my-1" />
                   </div>
                 </Col>

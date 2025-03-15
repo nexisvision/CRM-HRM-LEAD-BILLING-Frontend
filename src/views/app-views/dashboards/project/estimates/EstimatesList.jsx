@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
-import { Card, Table, Select, Input, Button, Menu, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
+import { Card, Table, Select, Input, Button, Menu, Modal, Dropdown } from 'antd';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import Flex from 'components/shared-components/Flex'
 import NumberFormat from 'react-number-format';
@@ -86,52 +86,30 @@ const EstimatesList = () => {
 			})
 	}
 
-	const dropdownMenu = row => (
-		<Menu>
-			<Menu.Item>
-				<Flex alignItems="center">
-					<Button
-						type=""
-						className=""
-						icon={<EyeOutlined />}
-						onClick={() => {
-							setSelectedEstimateId(row.id);
-							openviewEstimatesModal();
-						}}
-						size="small"
-					>
-						<span className="">View Details</span>
-					</Button>
-				</Flex>
-			</Menu.Item>
-			<Menu.Item>
-				<Flex alignItems="center">
-					<Button
-						type=""
-						className=""
-						icon={<EditOutlined />}
-						onClick={() => EditFun(row.id)}
-						size="small"
-					>
-						<span className="">Edit</span>
-					</Button>
-				</Flex>
-			</Menu.Item>
-			<Menu.Item>
-				<Flex alignItems="center">
-					<Button
-						type=""
-						className=""
-						icon={<DeleteOutlined />}
-						onClick={() => delfun(row.id)}
-						size="small"
-					>
-						<span className="">Delete</span>
-					</Button>
-				</Flex>
-			</Menu.Item>
-		</Menu>
-	);
+	const getDropdownItems = (row) => [
+		{
+			key: 'view',
+			icon: <EyeOutlined />,
+			label: 'View Details',
+			onClick: () => {
+				setSelectedEstimateId(row.id);
+				openviewEstimatesModal();
+			}
+		},
+		{
+			key: 'edit',
+			icon: <EditOutlined />,
+			label: 'Edit',
+			onClick: () => EditFun(row.id)
+		},
+		{
+			key: 'delete',
+			icon: <DeleteOutlined />,
+			label: 'Delete',
+			onClick: () => delfun(row.id),
+			danger: true
+		}
+	];
 
 	const tableColumns = [
 		{
@@ -201,8 +179,23 @@ const EstimatesList = () => {
 			title: 'Action',
 			dataIndex: 'actions',
 			render: (_, elm) => (
-				<div className="text-center">
-					<EllipsisDropdown menu={dropdownMenu(elm)} />
+				<div className="text-center" onClick={(e) => e.stopPropagation()}>
+					<Dropdown
+						overlay={<Menu items={getDropdownItems(elm)} />}
+						trigger={['click']}
+						placement="bottomRight"
+					>
+						<Button
+							type="text"
+							className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+							style={{
+								borderRadius: '10px',
+								padding: 0
+							}}
+						>
+							<MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+						</Button>
+					</Dropdown>
 				</div>
 			)
 		}
@@ -246,8 +239,49 @@ const EstimatesList = () => {
 		return filtered;
 	};
 
+	const styles = `
+		.ant-dropdown-trigger {
+			transition: all 0.3s;
+		}
+
+		.ant-dropdown-trigger:hover {
+			transform: scale(1.05);
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+		}
+
+		.ant-menu-item {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 8px 12px;
+		}
+
+		.ant-menu-item:hover {
+			background-color: #f0f7ff;
+		}
+
+		.ant-menu-item-danger:hover {
+			background-color: #fff1f0;
+		}
+
+		.table-responsive {
+			overflow-x: auto;
+		}
+
+		.search-input {
+			transition: all 0.3s;
+		}
+
+		.search-input:hover,
+		.search-input:focus {
+			border-color: #40a9ff;
+			box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+		}
+	`;
+
 	return (
 		<>
+			<style>{styles}</style>
 			<Card>
 
 				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>

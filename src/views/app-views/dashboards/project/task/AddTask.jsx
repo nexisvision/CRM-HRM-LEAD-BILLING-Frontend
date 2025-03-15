@@ -175,12 +175,13 @@ const AddTask = ({ onClose }) => {
           : []
       };
 
-      // Format task_file data
+      // Format file data from fileList state
       const formattedFiles = fileList.map(file => ({
-        uid: file.uid,
         name: file.name,
         type: file.type,
         size: file.size,
+        // If you have a base64 or URL of the file, include it here
+        // url: file.url || file.thumbUrl,
         status: 'done'
       }));
 
@@ -226,6 +227,19 @@ const AddTask = ({ onClose }) => {
       console.error("Form submission error:", error);
       message.error("An error occurred while processing the form.");
     }
+  };
+
+  // Add uploadProps configuration
+  const uploadProps = {
+    name: 'file',
+    multiple: true,
+    maxCount: 5,
+    showUploadList: true,
+    accept: '.jpg,.jpeg,.png,.pdf',
+    customRequest: ({ onSuccess }) => {
+      // Since we're handling the file list manually, just call onSuccess
+      onSuccess();
+    },
   };
 
   return (
@@ -591,6 +605,12 @@ const AddTask = ({ onClose }) => {
                     Attachment (Optional)
                   </label>
                   <Upload
+                    {...uploadProps}
+                    fileList={fileList}
+                    onChange={({ fileList: newFileList }) => {
+                      // Update fileList state when files are added or removed
+                      setFileList(newFileList);
+                    }}
                     beforeUpload={(file) => {
                       const isValidFileType = ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type);
                       const isValidFileSize = file.size / 1024 / 1024 < 5;
@@ -604,17 +624,18 @@ const AddTask = ({ onClose }) => {
                         return Upload.LIST_IGNORE;
                       }
 
-                      setFieldValue("file", file);
+                      // Don't actually upload, just add to fileList
                       return false;
                     }}
-                    maxCount={1}
+                    multiple={true}
+                    maxCount={5}
                   >
                     <Button icon={<UploadOutlined />} className="bg-white">
                       Select File
                     </Button>
-                    {/* <span className="ml-2 text-gray-500 text-sm">
+                    <span className="ml-2 text-gray-500 text-sm">
                       Supports: JPG, PNG, PDF (Max: 5MB)
-                    </span> */}
+                    </span>
                   </Upload>
                 </div>
               </Col>

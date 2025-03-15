@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Tag, Input, message, Button, Modal, DatePicker, Select } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
+import { Card, Table, Menu, Tag, Input, message, Button, Modal, DatePicker, Select, Dropdown } from 'antd';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
@@ -161,38 +161,47 @@ const MeetingList = () => {
     setIsViewMeetingModalVisible(true);
   };
 
-  const dropdownMenu = (elm) => ({
-    items: [
+  const getDropdownItems = (elm) => {
+    const items = [
       {
         key: 'view',
         icon: <EyeOutlined />,
         label: 'View',
         onClick: () => openViewMeetingModal(elm.id)
-      },
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+      }
+    ];
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
         onClick: () => EditMeet(elm.id)
-      }] : []),
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(elm.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
-      title: 'Meeting title ',
+      title: 'Meeting title',
       dataIndex: 'title',
       sorter: {
-        compare: (a, b) => a.branch.length - b.branch.length,
+        compare: (a, b) => a.title.length - b.title.length,
       },
+      render: (text) => <span className="meeting-title">{text}</span>
     },
-
     {
       title: "Meeting Date",
       dataIndex: "date",
@@ -247,10 +256,25 @@ const MeetingList = () => {
       title: 'Action',
       dataIndex: 'actions',
       render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+        <div className="text-center" onClick={(e) => e.stopPropagation()}>
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
-      ),
+      )
     },
   ];
 
@@ -382,33 +406,88 @@ const styles = `
     min-width: 300px;
   }
 
-  .search-input:hover,
-  .search-input:focus {
-    border-color: #40a9ff;
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  .ant-dropdown-trigger {
+    transition: all 0.3s;
   }
 
-  .ant-input-group {
+  .ant-dropdown-trigger:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .ant-menu-item {
     display: flex;
     align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
   }
 
-  .ant-input-group .ant-input {
-    width: calc(100% - 90px);
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+  .ant-menu-item:hover {
+    background-color: #f0f7ff;
   }
 
-  .ant-input-group .ant-btn {
-    width: 90px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+  .ant-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .meeting-title {
+    font-weight: 500;
+  }
+
+  .ant-table-row {
+    transition: all 0.3s;
+  }
+
+  .ant-table-row:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  }
+
+  .ant-tag {
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-weight: 500;
+  }
+
+  .ant-input-affix-wrapper,
+  .ant-picker,
+  .ant-select-selector {
+    border-radius: 6px !important;
+    transition: all 0.3s !important;
+  }
+
+  .ant-input-affix-wrapper:hover,
+  .ant-picker:hover,
+  .ant-select-selector:hover {
+    border-color: #40a9ff !important;
+  }
+
+  .ant-input-affix-wrapper:focus,
+  .ant-input-affix-wrapper-focused,
+  .ant-picker-focused,
+  .ant-select-focused .ant-select-selector {
+    border-color: #40a9ff !important;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+  }
+
+  .ant-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 6px;
+  }
+
+  .ant-modal-content {
+    border-radius: 8px;
   }
 
   @media (max-width: 768px) {
     .search-input,
-    .ant-input-group {
-      width: 100%;
+    .ant-input-group,
+    .ant-picker,
+    .ant-select {
+      width: 100% !important;
+      min-width: unset !important;
     }
     
     .mb-1 {
@@ -417,6 +496,11 @@ const styles = `
 
     .mr-md-3 {
       margin-right: 0;
+    }
+
+    .flex.items-center {
+      flex-direction: column;
+      align-items: stretch;
     }
   }
 

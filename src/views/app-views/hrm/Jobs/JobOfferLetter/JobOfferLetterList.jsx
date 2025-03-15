@@ -273,15 +273,16 @@ const JobOfferLetterList = () => {
       dataIndex: "salary",
       sorter: (a, b) => a.salary.length - b.salary.length,
     },
-    {
-      title: "Offer Expiry",
-      dataIndex: "offer_expiry",
-      render: (text) => dayjs(text).format("DD-MM-YYYY"), // Format the date
-    },
+   
     {
       title: "Expected Joining Date",
       dataIndex: "expected_joining_date",
       render: (text) => dayjs(text).format("DD-MM-YYYY"),
+    },
+    {
+      title: "Offer Expiry",
+      dataIndex: "offer_expiry",
+      render: (text) => dayjs(text).format("DD-MM-YYYY"), // Format the date
     },
     {
       title: "Description",

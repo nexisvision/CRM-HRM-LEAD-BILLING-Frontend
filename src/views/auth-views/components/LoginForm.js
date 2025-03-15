@@ -169,15 +169,15 @@ export const LoginForm = props => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const [form] = Form.useForm();
+	const [loading, setLoading] = useState(false);
 
 	const {
-		loading,
 		hideAuthMessage,
 		showLoading,
 		token,
 		redirect,
 		showMessage,
-		allowRedirect = true
+		allowRedirect = true,
 	} = props
 
 	const [forgotPasswordVisible, setForgotPasswordVisible] = useState(false);
@@ -217,20 +217,22 @@ export const LoginForm = props => {
 		return () => clearInterval(intervalId);
 	}, [dispatch, navigate]); // Add necessary dependencies
 
-	const onLogin = values => {
-		showLoading()
-		dispatch(userLogin(values))
-			.then((response) => {
-				if (response.meta.requestStatus === 'fulfilled') {
-					navigate('/dashboard/default');
-					window.location.reload();
-				}
-			})
-			.catch((error) => {
-				// message.error("Login failed. Please try again.");
-
-				console.error('Login failed:', error);
-			})
+	const onLogin = async (values) => {
+		setLoading(true);
+		try {
+			dispatch(userLogin(values))
+				.then((response) => {
+					if (response.meta.requestStatus === 'fulfilled') {
+						navigate('/dashboard/default');
+						window.location.reload();
+					}
+				})
+				.catch((error) => {
+					console.error('Login failed:', error);
+				});
+		} finally {
+			setLoading(false);
+		}
 	};
 
 

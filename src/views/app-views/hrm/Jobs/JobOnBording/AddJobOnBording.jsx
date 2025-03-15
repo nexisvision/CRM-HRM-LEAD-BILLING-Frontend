@@ -9,6 +9,7 @@ import {
 } from "./JobOnBoardingReducer/jobonboardingSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AddLable, GetLable } from "../../../dashboards/sales/LableReducer/LableSlice";
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 
@@ -91,7 +92,7 @@ const AddJobOnBoarding = ({ onClose }) => {
         related_id: values.related_id,
         Interviewer: values.interviewer,
         JoiningDate: values.joiningDate
-          ? values.joiningDate.format("YYYY-MM-DD")
+          ? values.joiningDate.format("DD-MM-YYYY")
           : null,
         DaysOfWeek: values.daysOfWeek,
         Salary: values.salary,
@@ -185,17 +186,23 @@ const AddJobOnBoarding = ({ onClose }) => {
                 <Col span={12}>
                   <div className="form-item">
                     <label className="font-semibold">Joining Date <span className="text-red-500">*</span></label>
-                    <DatePicker
-                      className="w-full mt-1"
-                      format="DD-MM-YYYY"
-                      value={values.joiningDate}
-                      onChange={(joiningDate) =>
-                        setFieldValue("joiningDate", joiningDate)
-                      }
-                      onBlur={() => setFieldTouched("joiningDate", true)}
-                    />
+                    <Field name="joiningDate">
+                      {({ field }) => (
+                        <input
+                          type="date"
+                          {...field}
+                          className="w-full mt-1 p-2 border rounded"
+                          value={values.joiningDate ? values.joiningDate.format('YYYY-MM-DD') : ''}
+                          onChange={(e) => {
+                            const date = dayjs(e.target.value);
+                            setFieldValue('joiningDate', date);
+                          }}
+                          onBlur={() => setFieldTouched("joiningDate", true)}
+                        />
+                      )}
+                    </Field>
                     <ErrorMessage
-                      name="joiningDate"
+                      name="joiningDate" 
                       component="div"
                       className="error-message text-red-500 my-1"
                     />

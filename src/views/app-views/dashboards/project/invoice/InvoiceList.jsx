@@ -8,6 +8,7 @@ import {
   message,
   Menu,
   Modal,
+  Dropdown,
 } from "antd";
 import {
   EyeOutlined,
@@ -16,6 +17,7 @@ import {
   EditOutlined,
   PlusOutlined,
   DeleteOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import Flex from 'components/shared-components/Flex'
@@ -28,7 +30,7 @@ import EditInvoice from "./EditInvoice";
 import InvoiceView from "./InvoiceView";
 import { ClientData } from 'views/app-views/Users/client-list/CompanyReducers/CompanySlice';
 import { DatePicker } from 'antd';
-
+import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 export const InvoiceList = () => {
   const [list, setList] = useState([]);
   const [isAddInvoiceModalVisible, setIsAddInvoiceModalVisible] = useState(false);
@@ -43,12 +45,17 @@ export const InvoiceList = () => {
   const clientsData = useSelector((state) => state.SubClient);
   const clients = React.useMemo(() => clientsData.SubClient.data || [], [clientsData.SubClient.data]);
   const [dateRange, setDateRange] = useState(null);
-  const projects = useSelector((state) => state.Project?.Projects?.data || []);
+
+  useEffect(()=>{
+    dispatch(GetProject());
+  },[dispatch])
+
+  const projects = useSelector((state) => state.Project?.Project?.data || []);
 
   useEffect(() => {
     dispatch(getAllInvoices(id));
     dispatch(ClientData());
-  }, [dispatch, id]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (invoices) {
@@ -70,8 +77,10 @@ export const InvoiceList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await dispatch(deleteInvoice(id));
-      message.success({ content: "Deleted user successfully", duration: 2 });
+      await dispatch(deleteInvoice(id))
+        .then(()=>{
+          dispatch(getAllInvoices(id));
+        })
     } catch (error) {
       console.error("Error deleting user:", error);
     }
@@ -153,28 +162,27 @@ export const InvoiceList = () => {
     filterInvoices(searchText, dateRange);
   }, [dateRange, invoices, searchText, filterInvoices]);
 
-  const dropdownMenu = (row) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => Viewfunc(row.id)}>
-          <EyeOutlined />
-          <span className="ml-2">View Invoice</span>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => Editfunc(row.id)}>
-          <EditOutlined />
-          <span className="ml-2">Edit</span>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => handleDelete(row.id)}>
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const getDropdownItems = (row) => [
+    {
+      key: 'view',
+      icon: <EyeOutlined />,
+      label: 'View Invoice',
+      onClick: () => Viewfunc(row.id)
+    },
+    {
+      key: 'edit',
+      icon: <EditOutlined />,
+      label: 'Edit',
+      onClick: () => Editfunc(row.id)
+    },
+    {
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      label: 'Delete',
+      onClick: () => handleDelete(row.id),
+      danger: true
+    }
+  ];
 
   const tableColumns = [
     {
@@ -193,14 +201,15 @@ export const InvoiceList = () => {
     {
       title: "Project",
       dataIndex: "project",
+      render: (project) => {
+        const projectName = projects.find(p => p.id === project)?.project_name || 'N/A';
+        return <span>{projectName}</span>;
+      },
       sorter: (a, b) => {
-        const projectNameA = getProjectName(a.project) || '';
-        const projectNameB = getProjectName(b.project) || '';
+        const projectNameA = projects.find(p => p.id === a.project)?.project_name || '';
+        const projectNameB = projects.find(p => p.id === b.project)?.project_name || '';
         return projectNameA.localeCompare(projectNameB);
       },
-      render: (projectId) => (
-        <span>{getProjectName(projectId)}</span>
-      ),
     },
     {
       title: "Client",
@@ -239,10 +248,25 @@ export const InvoiceList = () => {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+        <div className="text-center" onClick={(e) => e.stopPropagation()}>
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
-      ),
+      )
     },
   ];
 
@@ -251,8 +275,62 @@ export const InvoiceList = () => {
     return project ? project.project_name : 'Unknown Project';
   };
 
+  const styles = `
+    .ant-dropdown-trigger {
+      transition: all 0.3s;
+    }
+
+    .ant-dropdown-trigger:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .ant-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+    }
+
+    .ant-menu-item:hover {
+      background-color: #f0f7ff;
+    }
+
+    .ant-menu-item-danger:hover {
+      background-color: #fff1f0;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .search-input {
+      transition: all 0.3s;
+    }
+
+    .search-input:hover,
+    .search-input:focus {
+      border-color: #40a9ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    }
+
+    .ant-table-row {
+      cursor: pointer;
+    }
+
+    .ant-table-row:hover {
+      background-color: #f0f7ff !important;
+    }
+
+    .hover\:underline:hover {
+      text-decoration: underline;
+      color: #1890ff;
+    }
+  `;
+
   return (
     <>
+      <style>{styles}</style>
       <div>
         <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
           <Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>

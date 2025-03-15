@@ -135,6 +135,10 @@ const TransferList = () => {
       </Menu.Item>
     </Menu>
   );
+  const stripHtmlTags = (html) => {
+    if (!html) return '';
+    return html.replace(/<[^>]*>/g, '');
+  };
   const tableColumns = [
     {
       title: 'Date',
@@ -295,7 +299,7 @@ const TransferList = () => {
         footer={null}
         width={1000}
         className='mt-[-70px]'
-      // height={1000}
+        // height={1000}
       >
         <EditTransfer
           onClose={closeEditTransferModal}

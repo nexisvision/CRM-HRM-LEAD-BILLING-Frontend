@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Input, message, Button, Modal, Select } from 'antd';
-import { DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { Card, Table, Menu, Input, message, Button, Modal, Select, Dropdown } from 'antd';
+import { DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, FileExcelOutlined, MoreOutlined } from '@ant-design/icons';
 import UserView from '../../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
@@ -154,33 +154,30 @@ const IndicatorList = () => {
       });
   };
 
-  const dropdownMenu = (elm) => (
-    <Menu>
+  const getDropdownItems = (elm) => {
+    const items = [];
 
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button type="" className="" icon={<EditOutlined />} onClick={() => { editfun(elm.id) }} size="small">
-              <span className="">Edit</span>
-            </Button>
-          </Flex>
-        </Menu.Item>
-      ) : null}
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => editfun(elm.id)
+      });
+    }
 
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteIndicators(elm.id),
+        danger: true
+      });
+    }
 
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button type="" className="" icon={<DeleteOutlined />} onClick={() => { deleteIndicators(elm.id) }} size="small">
-              <span className="">Delete</span>
-            </Button>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-
-
-    </Menu>
-  );
+    return items;
+  };
 
   const tableColumns = [
     {
@@ -260,10 +257,25 @@ const IndicatorList = () => {
       title: 'Action',
       dataIndex: 'actions',
       render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+        <div className="text-center" onClick={(e) => e.stopPropagation()}>
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
-      ),
+      )
     },
   ];
 
@@ -436,6 +448,58 @@ const styles = `
 
   .table-responsive {
     overflow-x: auto;
+  }
+
+  .ant-dropdown-trigger {
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-trigger:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .ant-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .ant-menu-item:hover {
+    background-color: #f0f7ff;
+  }
+
+  .ant-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-table-row {
+    transition: all 0.3s;
+  }
+
+  .ant-table-row:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  }
+
+  .ant-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ant-modal-content {
+    border-radius: 8px;
+  }
+
+  .ant-select:hover .ant-select-selector {
+    border-color: #40a9ff;
+  }
+
+  .ant-select-focused .ant-select-selector {
+    border-color: #40a9ff !important;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
   }
 `;
 

@@ -81,6 +81,21 @@ const EditBilling = ({ idd, onClose }) => {
 
   const [isAddVendorModalVisible, setIsAddVendorModalVisible] = useState(false);
 
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const response = await dispatch(GetLable(lid));
+      if (response.payload && response.payload.data) {
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType)
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+        setter(filteredLables);
+      }
+    } catch (error) {
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
+    }
+  };
+
   useEffect(() => {
     dispatch(getbil(lid));
     dispatch(getAllTaxes());
@@ -405,20 +420,7 @@ const EditBilling = ({ idd, onClose }) => {
     }
   };
 
-  const fetchLables = async (lableType, setter) => {
-    try {
-      const response = await dispatch(GetLable(lid));
-      if (response.payload && response.payload.data) {
-        const filteredLables = response.payload.data
-          .filter((lable) => lable.lableType === lableType)
-          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
-        setter(filteredLables);
-      }
-    } catch (error) {
-      console.error(`Failed to fetch ${lableType}:`, error);
-      message.error(`Failed to load ${lableType}`);
-    }
-  };
+ 
 
   const handleAddNewStatus = async () => {
     if (!newStatus.trim()) {

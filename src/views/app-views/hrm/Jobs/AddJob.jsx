@@ -24,7 +24,7 @@ import { AddJobs, GetJobdata } from "./JobReducer/JobSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { getInterview } from "./Interview/interviewReducer/interviewSlice";
 import AddCurrencies from "../../setting/currencies/AddCurrencies";
-
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 
@@ -367,18 +367,24 @@ const AddJob = ({ onClose }) => {
                 <Col span={12} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
-                    <DatePicker
-                      className="w-full mt-1"
-                      format="DD-MM-YYYY"
-                      value={values.startDate}
-                      onChange={(date) => {
-                        setFieldValue("startDate", date);
-                        if (values.endDate && date && values.endDate.isBefore(date)) {
-                          setFieldValue("endDate", null);
-                        }
-                      }}
-                      onBlur={() => setFieldTouched("startDate", true)}
-                    />
+                    <Field name="startDate">
+                      {({ field }) => (
+                        <input
+                          type="date"
+                          {...field}
+                          className="w-full mt-1 p-2 border rounded"
+                          value={values.startDate ? values.startDate.format('YYYY-MM-DD') : ''}
+                          onChange={(e) => {
+                            const date = dayjs(e.target.value);
+                            setFieldValue('startDate', date);
+                            if (values.endDate && date && values.endDate.isBefore(date)) {
+                              setFieldValue('endDate', null);
+                            }
+                          }}
+                          onBlur={() => setFieldTouched("startDate", true)}
+                        />
+                      )}
+                    </Field>
                     <ErrorMessage
                       name="startDate"
                       component="div"
@@ -390,17 +396,22 @@ const AddJob = ({ onClose }) => {
                 <Col span={12} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
-
-                    <DatePicker
-                      className="w-full mt-1"
-                      format="DD-MM-YYYY"
-                      value={values.endDate}
-                      onChange={(date) => setFieldValue("endDate", date)}
-                      onBlur={() => setFieldTouched("endDate", true)}
-                      disabledDate={(current) => {
-                        return values.startDate ? current && current < values.startDate.startOf('day') : false;
-                      }}
-                    />
+                    <Field name="endDate">
+                      {({ field }) => (
+                        <input
+                          type="date"
+                          {...field}
+                          className="w-full mt-1 p-2 border rounded"
+                          value={values.endDate ? values.endDate.format('YYYY-MM-DD') : ''}
+                          onChange={(e) => {
+                            const date = dayjs(e.target.value);
+                            setFieldValue('endDate', date);
+                          }}
+                          min={values.startDate ? values.startDate.format('YYYY-MM-DD') : ''}
+                          onBlur={() => setFieldTouched("endDate", true)}
+                        />
+                      )}
+                    </Field>
                     <ErrorMessage
                       name="endDate"
                       component="div"

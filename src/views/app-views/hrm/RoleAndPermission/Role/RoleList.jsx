@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Menu, Button, Input, message, Modal } from 'antd';
-import { DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { Card, Table, Menu, Button, Input, message, Modal, Dropdown } from 'antd';
+import { DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, MoreOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import { useDispatch, useSelector } from 'react-redux';
@@ -102,38 +102,47 @@ const RoleList = () => {
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button type="" icon={<DeleteOutlined />} onClick={() => { deleteRoles(elm.id) }} size="small">
-              <span className="">Delete</span>
-            </Button>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-    </Menu>
-  );
+  const getDropdownItems = (elm) => {
+    const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteRoles(elm.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const renderPermissions = (permissions) => {
     try {
       const parsedPermissions =
         permissions && typeof permissions === "string" ? JSON.parse(permissions) : {};
 
-      return Object.keys(parsedPermissions).map(moduleKey => (
-        <div key={moduleKey}>
-          {parsedPermissions[moduleKey].map(permission => (
-            <div key={permission.key} style={{ marginBottom: '5px' }}>
-              {permission.permissions.map(action => (
-                <Button key={`${permission.key}-${action}`} size="small" style={{ margin: '2px', backgroundColor: '#3e79f7', color: 'white' }}>
-                  {`${permission.key.replace('extra-hrm-', '')}  ${action}`} {/* Remove prefix for cleaner display */}
-                </Button>
+      return (
+        <div className="permissions-container">
+          {Object.keys(parsedPermissions).map(moduleKey => (
+            <div key={moduleKey} className="module-permissions">
+              {parsedPermissions[moduleKey].map(permission => (
+                <div key={permission.key}>
+                  {permission.permissions.map(action => (
+                    <span
+                      key={`${permission.key}-${action}`}
+                      className="permission-tag"
+                    >
+                      {`${permission.key.replace('extra-hrm-', '')} ${action}`}
+                    </span>
+                  ))}
+                </div>
               ))}
             </div>
           ))}
         </div>
-      ));
+      );
     } catch (error) {
       console.error("Error parsing permissions:", error);
       return "Invalid Permissions";
@@ -162,8 +171,23 @@ const RoleList = () => {
       title: 'Action',
       dataIndex: 'actions',
       render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+        <div className="text-center" onClick={(e) => e.stopPropagation()}>
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       )
     },
@@ -271,6 +295,81 @@ const styles = `
 
   .table-responsive {
     overflow-x: auto;
+  }
+
+  .ant-dropdown-trigger {
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-trigger:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .ant-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .ant-menu-item:hover {
+    background-color: #f0f7ff;
+  }
+
+  .ant-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-table-row {
+    transition: all 0.3s;
+  }
+
+  .ant-table-row:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  }
+
+  .permission-button {
+    margin: 2px;
+    background-color: #3e79f7;
+    color: white;
+    transition: all 0.3s;
+  }
+
+  .permission-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(62, 121, 247, 0.2);
+  }
+
+  .permissions-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .module-permissions {
+    margin-bottom: 8px;
+    padding: 8px;
+    border-radius: 6px;
+    background-color: rgba(62, 121, 247, 0.05);
+  }
+
+  .permission-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    margin: 2px;
+    border-radius: 4px;
+    background-color: #3e79f7;
+    color: white;
+    font-size: 12px;
+    transition: all 0.3s;
+  }
+
+  .permission-tag:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(62, 121, 247, 0.2);
   }
 `;
 

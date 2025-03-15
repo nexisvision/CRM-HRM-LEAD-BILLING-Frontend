@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Input, Button, Modal, message, Select } from 'antd';
-import { DeleteOutlined, SearchOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
+import { Card, Table, Menu, Input, Button, Modal, message, Select, Dropdown } from 'antd';
+import { DeleteOutlined, SearchOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
 import UserView from '../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
@@ -166,33 +166,44 @@ const DepartmentList = () => {
     setDept(Deptid)
   }
 
-  const dropdownMenu = (elm) => ({
-    items: [
-      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+  const getDropdownItems = (elm) => {
+    const items = [];
+
+    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
         onClick: () => editDept(elm.id)
-      }] : []),
-      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+      items.push({
         key: 'delete',
         icon: <DeleteOutlined />,
         label: 'Delete',
-        onClick: () => deleteUser(elm.id)
-      }] : [])
-    ]
-  });
+        onClick: () => deleteUser(elm.id),
+        danger: true
+      });
+    }
+
+    return items;
+  };
 
   const tableColumns = [
     {
       title: 'Department',
       dataIndex: 'department_name',
       sorter: (a, b) => a.department_name.length - b.department_name.length,
+      render: (text) => <span className="department-cell">{text}</span>
     },
     {
       title: 'Branch',
       dataIndex: 'branch',
-      render: (branchId) => getBranchNameById(branchId),
+      render: (branchId) => (
+        <span className="branch-cell">{getBranchNameById(branchId)}</span>
+      ),
       sorter: (a, b) => {
         const branchNameA = getBranchNameById(a.branch).toLowerCase();
         const branchNameB = getBranchNameById(b.branch).toLowerCase();
@@ -203,10 +214,25 @@ const DepartmentList = () => {
       title: 'Action',
       dataIndex: 'actions',
       render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+        <div className="text-center" onClick={(e) => e.stopPropagation()}>
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
-      ),
+      )
     },
   ];
 
@@ -353,6 +379,71 @@ const styles = `
 
   .table-responsive {
     overflow-x: auto;
+  }
+
+  .ant-dropdown-trigger {
+    transition: all 0.3s;
+  }
+
+  .ant-dropdown-trigger:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .ant-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .ant-menu-item:hover {
+    background-color: #f0f7ff;
+  }
+
+  .ant-menu-item-danger:hover {
+    background-color: #fff1f0;
+  }
+
+  .ant-table-row {
+    transition: all 0.3s;
+  }
+
+  .ant-table-row:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  }
+
+  .ant-select-selector {
+    transition: all 0.3s !important;
+  }
+
+  .ant-select-selector:hover {
+    border-color: #40a9ff !important;
+  }
+
+  .ant-select-focused .ant-select-selector {
+    border-color: #40a9ff !important;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+  }
+
+  .ant-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ant-modal-content {
+    border-radius: 8px;
+  }
+
+  .department-cell {
+    font-weight: 500;
+  }
+
+  .branch-cell {
+    color: #666;
+    font-size: 0.9em;
   }
 `;
 

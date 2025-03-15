@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Table, Menu, Col, Tag, Input, message, Button, Modal, Select } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
+import { Card, Table, Menu, Col, Tag, Input, message, Button, Modal, Select, Dropdown } from 'antd';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined, MoreOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import utils from 'utils';
@@ -68,73 +68,45 @@ function ProposalList() {
 
    const proposalStatusList = ['Normal', 'Expired']
 
-   const dropdownMenu = (elm) => (
-      <Menu>
-         <Menu.Item>
-            <Flex alignItems="center">
-               <Button
-                  type=""
-                  className=""
-                  icon={<LinkOutlined />}
-                  size="small"
-               >
-                  <span className="">Copy Invoice</span>
-               </Button>
-            </Flex>
-         </Menu.Item>
-         <Menu.Item>
-            <Flex alignItems="center">
-               <Button
-                  type=""
-                  className=""
-                  icon={<CopyOutlined />}
-                  size="small"
-               >
-                  <span className="">Duplicate Proposal</span>
-               </Button>
-            </Flex>
-         </Menu.Item>
-         <Menu.Item>
-            <Flex alignItems="center">
-               <Button
-                  type=""
-                  className=""
-                  icon={<EyeOutlined />}
-                  onClick={() => openviewCustomerModal(elm)}
-                  size="small"
-               >
-                  <span className="">Show</span>
-               </Button>
-            </Flex>
-         </Menu.Item>
-         <Menu.Item>
-            <Flex alignItems="center">
-               <Button
-                  type=""
-                  className=""
-                  icon={<EditOutlined />}
-                  size="small"
-               >
-                  <span className="">Edit</span>
-               </Button>
-            </Flex>
-         </Menu.Item>
-         <Menu.Item>
-            <Flex alignItems="center">
-               <Button
-                  type=""
-                  className=""
-                  icon={<DeleteOutlined />}
-                  onClick={() => deleteUser(elm.id)}
-                  size="small"
-               >
-                  <span className="">Delete</span>
-               </Button>
-            </Flex>
-         </Menu.Item>
-      </Menu>
-   );
-
+   const getDropdownItems = (elm) => [
+      {
+         key: 'copy-invoice',
+         icon: <LinkOutlined />,
+         label: 'Copy Invoice',
+         onClick: () => {
+            message.info('Copy Invoice clicked');
+         }
+      },
+      {
+         key: 'duplicate',
+         icon: <CopyOutlined />,
+         label: 'Duplicate Proposal',
+         onClick: () => {
+            message.info('Duplicate Proposal clicked');
+         }
+      },
+      {
+         key: 'view',
+         icon: <EyeOutlined />,
+         label: 'Show',
+         onClick: () => openviewCustomerModal(elm)
+      },
+      {
+         key: 'edit',
+         icon: <EditOutlined />,
+         label: 'Edit',
+         onClick: () => {
+            message.info('Edit clicked');
+         }
+      },
+      {
+         key: 'delete',
+         icon: <DeleteOutlined />,
+         label: 'Delete',
+         onClick: () => deleteUser(elm.id),
+         danger: true
+      }
+   ];
 
    const tableColumns = [
       {
@@ -170,17 +142,56 @@ function ProposalList() {
          title: 'Action',
          dataIndex: 'actions',
          render: (_, elm) => (
-            <div className="text-center">
-               <EllipsisDropdown menu={dropdownMenu(elm)} />
+            <div className="text-center" onClick={(e) => e.stopPropagation()}>
+               <Dropdown
+                  overlay={<Menu items={getDropdownItems(elm)} />}
+                  trigger={['click']}
+                  placement="bottomRight"
+               >
+                  <Button
+                     type="text"
+                     className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+                     style={{
+                        borderRadius: '10px',
+                        padding: 0
+                     }}
+                  >
+                     <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+                  </Button>
+               </Dropdown>
             </div>
-         ),
+         )
       },
    ];
 
+   const styles = `
+      .ant-dropdown-trigger {
+         transition: all 0.3s;
+      }
+
+      .ant-dropdown-trigger:hover {
+         transform: scale(1.05);
+         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .ant-menu-item {
+         display: flex;
+         align-items: center;
+         padding: 8px 12px;
+      }
+
+      .ant-menu-item:hover {
+         background-color: #f0f7ff;
+      }
+
+      .ant-menu-item-danger:hover {
+         background-color: #fff1f0;
+      }
+   `;
 
    return (
       <>
-
+         <style>{styles}</style>
          <Card bodyStyle={{ padding: '-3px' }}>
             <Col span={24}>
                <h4 className='font-medium'>Proposal</h4>
@@ -243,7 +254,6 @@ function ProposalList() {
                <ViewInvoice onClose={closeViewCustomerModal} />
             </Modal>
          </Card>
-
       </>
    )
 }

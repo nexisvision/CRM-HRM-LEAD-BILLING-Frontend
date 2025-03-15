@@ -160,6 +160,7 @@ const AddTask = ({ onClose }) => {
                     name="startDate"
                     className="w-full mt-1"
                     placeholder="Select startDate"
+                    format="DD-MM-YYYY"
                     onChange={(date) => {
                       setFieldValue("startDate", date);
                       if (values.dueDate && date && values.dueDate.isBefore(date)) {
@@ -184,6 +185,7 @@ const AddTask = ({ onClose }) => {
                     name="dueDate"
                     className="w-full mt-1"
                     placeholder="Select DueDate"
+                     format="DD-MM-YYYY"
                     onChange={(value) => setFieldValue("dueDate", value)}
                     value={values.dueDate}
                     onBlur={() => setFieldTouched("dueDate", true)}
