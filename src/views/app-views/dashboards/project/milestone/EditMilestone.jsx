@@ -1,13 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  Row,
-  Col,
-  Input,
-  message,
-  Button,
-  Select,
-  Modal,
-} from "antd";
+import { Row, Col, Input, message, Button, Select, Modal } from "antd";
 import { useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -17,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Editmins, Getmins } from "./minestoneReducer/minestoneSlice";
 import { AddLable, GetLable } from "./LableReducer/LableSlice";
 import dayjs from "dayjs";
-import AddCurrencies from '../../../setting/currencies/AddCurrencies';
+import AddCurrencies from "../../../setting/currencies/AddCurrencies";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
@@ -29,10 +21,11 @@ const EditMilestone = ({ idd, onClose }) => {
   const [tags, setTags] = useState([]);
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [newTag, setNewTag] = useState("");
-  const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
+  const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] =
+    useState(false);
   const projectData = useSelector((state) => state?.Project) || {};
   const filterdata = projectData?.Project?.data || [];
-  const currentProject = filterdata.find(project => project.id === id);
+  const currentProject = filterdata.find((project) => project.id === id);
 
   const { currencies } = useSelector((state) => state.currencies);
   const curr = currencies?.data || [];
@@ -41,7 +34,7 @@ const EditMilestone = ({ idd, onClose }) => {
     if (currentProject?.currency) {
       return currentProject.currency;
     }
-    return '';
+    return "";
   }, [currentProject]);
 
   useEffect(() => {
@@ -68,12 +61,17 @@ const EditMilestone = ({ idd, onClose }) => {
         milestone_cost: milestone.milestone_cost || "",
         milestone_status: milestone.milestone_status || "",
         currency: milestone.currency || getInitialCurrency(), // Use milestone currency or project currency
-        add_cost_to_project_budget: milestone.add_cost_to_project_budget === true ||
-          milestone.add_cost_to_project_budget === 'true' ||
-          milestone.add_cost_to_project_budget === 'yes',
+        add_cost_to_project_budget:
+          milestone.add_cost_to_project_budget === true ||
+          milestone.add_cost_to_project_budget === "true" ||
+          milestone.add_cost_to_project_budget === "yes",
         milestone_summary: milestone.milestone_summary || "",
-        milestone_start_date: milestone.milestone_start_date ? dayjs(milestone.milestone_start_date).format('YYYY-MM-DD') : "",
-        milestone_end_date: milestone.milestone_end_date ? dayjs(milestone.milestone_end_date).format('YYYY-MM-DD') : "",
+        milestone_start_date: milestone.milestone_start_date
+          ? dayjs(milestone.milestone_start_date).format("YYYY-MM-DD")
+          : "",
+        milestone_end_date: milestone.milestone_end_date
+          ? dayjs(milestone.milestone_end_date).format("YYYY-MM-DD")
+          : "",
       });
     } else {
       message.error("Milestone not found!");
@@ -123,7 +121,9 @@ const EditMilestone = ({ idd, onClose }) => {
       const formattedValues = {
         ...values,
         milestone_cost: Number(values.milestone_cost),
-        add_cost_to_project_budget: values.add_cost_to_project_budget ? "yes" : "no",
+        add_cost_to_project_budget: values.add_cost_to_project_budget
+          ? "yes"
+          : "no",
         milestone_start_date: values.milestone_start_date,
         milestone_end_date: values.milestone_end_date,
       };
@@ -155,8 +155,9 @@ const EditMilestone = ({ idd, onClose }) => {
       .typeError("Cost must be a number")
       .required("Please enter milestone cost."),
     milestone_status: Yup.string().required("Please select status."),
-    add_cost_to_project_budget: Yup.string()
-      .required("Please select add cost to project budget option."),
+    add_cost_to_project_budget: Yup.string().required(
+      "Please select add cost to project budget option."
+    ),
     milestone_summary: Yup.string().required("Please enter milestone summary."),
     milestone_start_date: Yup.date()
       .nullable()
@@ -164,7 +165,10 @@ const EditMilestone = ({ idd, onClose }) => {
     milestone_end_date: Yup.date()
       .nullable()
       .required("End Date is required")
-      .min(Yup.ref("milestone_start_date"), "End date must be after start date"),
+      .min(
+        Yup.ref("milestone_start_date"),
+        "End date must be after start date"
+      ),
   });
 
   return (
@@ -201,21 +205,28 @@ const EditMilestone = ({ idd, onClose }) => {
                   </Col>
                   <Col span={12}>
                     <div className="form-group">
-                      <label className="text-gray-600 mt-1 font-semibold block">Milestone Cost & Currency <span className="text-red-500">*</span></label>
+                      <label className="text-gray-600 mt-1 font-semibold block">
+                        Milestone Cost & Currency{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
                       <div className="flex gap-0">
-                        <div className="currency-display mt-1" style={{
-                          width: '60px',
-                          padding: '4px 11px',
-                          background: '#f8fafc',
-                          border: '1px solid #d9d9d9',
-                          borderRight: 0,
-                          borderRadius: '2px 0 0 2px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}>
+                        <div
+                          className="currency-display mt-1"
+                          style={{
+                            width: "60px",
+                            padding: "4px 11px",
+                            background: "#f8fafc",
+                            border: "1px solid #d9d9d9",
+                            borderRight: 0,
+                            borderRadius: "2px 0 0 2px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
                           <span className="text-gray-600 font-medium">
-                            {curr?.find(c => c.id === values.currency)?.currencyIcon || '₹'}
+                            {curr?.find((c) => c.id === values.currency)
+                              ?.currencyIcon || "₹"}
                           </span>
                         </div>
                         <Field name="milestone_cost">
@@ -226,8 +237,8 @@ const EditMilestone = ({ idd, onClose }) => {
                               style={{
                                 borderTopLeftRadius: 0,
                                 borderBottomLeftRadius: 0,
-                                borderLeft: '1px solid #d9d9d9',
-                                width: 'calc(100% - 60px)'
+                                borderLeft: "1px solid #d9d9d9",
+                                width: "calc(100% - 60px)",
                               }}
                               type="number"
                               min="0"
@@ -235,16 +246,26 @@ const EditMilestone = ({ idd, onClose }) => {
                               placeholder="0.00"
                               onChange={(e) => {
                                 const value = e.target.value;
-                                if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                                  form.setFieldValue('milestone_cost', value);
+                                if (
+                                  value === "" ||
+                                  /^\d*\.?\d{0,2}$/.test(value)
+                                ) {
+                                  form.setFieldValue("milestone_cost", value);
                                 }
                               }}
                               onKeyPress={(e) => {
                                 const charCode = e.which ? e.which : e.keyCode;
-                                if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                if (
+                                  charCode !== 46 &&
+                                  charCode > 31 &&
+                                  (charCode < 48 || charCode > 57)
+                                ) {
                                   e.preventDefault();
                                 }
-                                if (charCode === 46 && field.value.includes('.')) {
+                                if (
+                                  charCode === 46 &&
+                                  field.value.includes(".")
+                                ) {
                                   e.preventDefault();
                                 }
                               }}
@@ -252,12 +273,18 @@ const EditMilestone = ({ idd, onClose }) => {
                           )}
                         </Field>
                       </div>
-                      <ErrorMessage name="milestone_cost" component="div" className="text-red-500 mt-1 text-sm" />
+                      <ErrorMessage
+                        name="milestone_cost"
+                        component="div"
+                        className="text-red-500 mt-1 text-sm"
+                      />
                     </div>
                   </Col>
                   <Col span={24} className="mt-4">
                     <div className="form-item">
-                      <label className="font-semibold">Status <span className="text-red-500">*</span></label>
+                      <label className="font-semibold">
+                        Status <span className="text-red-500">*</span>
+                      </label>
                       <div className="flex gap-2">
                         <Field name="milestone_status">
                           {({ field, form }) => (
@@ -311,12 +338,16 @@ const EditMilestone = ({ idd, onClose }) => {
                   <Col span={12} className="mt-4">
                     <div className="form-item">
                       <label className="font-semibold mb-2">
-                        Add Cost To Project Budget <span className="text-red-500">*</span>
+                        Add Cost To Project Budget{" "}
+                        <span className="text-red-500">*</span>
                       </label>
                       <Select
-                        value={values.add_cost_to_project_budget ? 'yes' : 'no'}
+                        value={values.add_cost_to_project_budget ? "yes" : "no"}
                         onChange={(value) =>
-                          setFieldValue("add_cost_to_project_budget", value === 'yes')
+                          setFieldValue(
+                            "add_cost_to_project_budget",
+                            value === "yes"
+                          )
                         }
                         onBlur={() =>
                           setFieldTouched("add_cost_to_project_budget", true)
@@ -336,7 +367,9 @@ const EditMilestone = ({ idd, onClose }) => {
                   </Col>
                   <Col span={12} className="mt-4">
                     <div className="form-item">
-                      <label className="font-semibold mb-2">Start Date <span className="text-red-500">*</span></label>
+                      <label className="font-semibold mb-2">
+                        Start Date <span className="text-red-500">*</span>
+                      </label>
                       <input
                         type="date"
                         className="w-full mt-1 p-2 border rounded"
@@ -344,12 +377,19 @@ const EditMilestone = ({ idd, onClose }) => {
                         onChange={(e) => {
                           const selectedDate = e.target.value;
                           setFieldValue("milestone_start_date", selectedDate);
-                          
-                          if (values.milestone_end_date && dayjs(values.milestone_end_date).isBefore(selectedDate)) {
+
+                          if (
+                            values.milestone_end_date &&
+                            dayjs(values.milestone_end_date).isBefore(
+                              selectedDate
+                            )
+                          ) {
                             setFieldValue("milestone_end_date", "");
                           }
                         }}
-                        onBlur={() => setFieldTouched("milestone_start_date", true)}
+                        onBlur={() =>
+                          setFieldTouched("milestone_start_date", true)
+                        }
                       />
                       <ErrorMessage
                         name="milestone_start_date"
@@ -361,7 +401,9 @@ const EditMilestone = ({ idd, onClose }) => {
 
                   <Col span={12} className="mt-4">
                     <div className="form-item">
-                      <label className="font-semibold mb-2">End Date <span className="text-red-500">*</span></label>
+                      <label className="font-semibold mb-2">
+                        End Date <span className="text-red-500">*</span>
+                      </label>
                       <input
                         type="date"
                         className="w-full mt-1 p-2 border rounded"
@@ -371,7 +413,9 @@ const EditMilestone = ({ idd, onClose }) => {
                           const selectedDate = e.target.value;
                           setFieldValue("milestone_end_date", selectedDate);
                         }}
-                        onBlur={() => setFieldTouched("milestone_end_date", true)}
+                        onBlur={() =>
+                          setFieldTouched("milestone_end_date", true)
+                        }
                       />
                       <ErrorMessage
                         name="milestone_end_date"
@@ -382,7 +426,10 @@ const EditMilestone = ({ idd, onClose }) => {
                   </Col>
                   <Col span={24} className="mt-4">
                     <div className="form-item">
-                      <label className="font-semibold">Milestone Summary <span className="text-red-500">*</span></label>
+                      <label className="font-semibold">
+                        Milestone Summary{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
                       <ReactQuill
                         className="mt-1"
                         value={values.milestone_summary}
@@ -398,7 +445,6 @@ const EditMilestone = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-
                 </Row>
                 <div className="form-buttons text-right mt-4">
                   <Button type="default" className="mr-2" onClick={onClose}>
@@ -636,7 +682,7 @@ export default EditMilestone;
 //                         onChange={(e) => {
 //                           const selectedDate = e.target.value;
 //                           setFieldValue("milestone_start_date", selectedDate);
-//                           
+//
 //                           if (values.milestone_end_date && dayjs(values.milestone_end_date).isBefore(selectedDate)) {
 //                             setFieldValue("milestone_end_date", "");
 //                           }
@@ -750,4 +796,3 @@ export default EditMilestone;
 //   );
 // };
 // export default EditMilestone;
-

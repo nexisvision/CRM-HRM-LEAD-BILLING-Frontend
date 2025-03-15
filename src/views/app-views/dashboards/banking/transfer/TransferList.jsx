@@ -1,20 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Input, Button, Modal, DatePicker } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, EditOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
-import UserView from '../../../Users/user-list/UserView';
-import Flex from 'components/shared-components/Flex';
-import { useNavigate } from 'react-router-dom';
-import utils from 'utils';
-import AddTransfer from './AddTransfer';
-import EditTransfer from './EditTransfer';
-import { transferdatas, transferdeltess } from './transferReducers/transferSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import dayjs from 'dayjs';
+import React, { useEffect, useState } from "react";
+import { Card, Table, Menu, Input, Button, Modal, DatePicker } from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  MailOutlined,
+  EditOutlined,
+  PlusOutlined,
+  FileExcelOutlined,
+} from "@ant-design/icons";
+import UserView from "../../../Users/user-list/UserView";
+import Flex from "components/shared-components/Flex";
+import { useNavigate } from "react-router-dom";
+import utils from "utils";
+import AddTransfer from "./AddTransfer";
+import EditTransfer from "./EditTransfer";
+import {
+  transferdatas,
+  transferdeltess,
+} from "./transferReducers/transferSlice";
+import { useDispatch, useSelector } from "react-redux";
+import dayjs from "dayjs";
 
 // Add this helper function to strip HTML tags
 const stripHtmlTags = (html) => {
-  if (!html) return '';
-  return html.replace(/<[^>]*>/g, '');
+  if (!html) return "";
+  return html.replace(/<[^>]*>/g, "");
 };
 
 const TransferList = () => {
@@ -22,10 +33,12 @@ const TransferList = () => {
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-  const [accountType, setAccountType] = useState('All');
-  const [isAddTransferModalVisible, setIsAddTransferModalVisible] = useState(false);
-  const [isEditTransferModalVisible, setIsEditTransferModalVisible] = useState(false);
+  const dispatch = useDispatch();
+  const [accountType, setAccountType] = useState("All");
+  const [isAddTransferModalVisible, setIsAddTransferModalVisible] =
+    useState(false);
+  const [isEditTransferModalVisible, setIsEditTransferModalVisible] =
+    useState(false);
   const [selectedTransfer, setSelectedTransfer] = useState(null);
   const [idd, setIdd] = useState("");
   // Add the missing state variables
@@ -33,42 +46,43 @@ const TransferList = () => {
   const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
-    dispatch(transferdatas())
-  }, [dispatch])
+    dispatch(transferdatas());
+  }, [dispatch]);
 
   const handleJob = () => {
-    navigate('/app/hrm/jobs/viewjob', { state: { user: selectedUser } });
+    navigate("/app/hrm/jobs/viewjob", { state: { user: selectedUser } });
   };
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const searchArray = list;
     let data = utils.wildCardSearch(searchArray, value);
 
-    if (accountType !== 'All') {
-      data = data.filter(item =>
-        item.accounttype && item.accounttype.toLowerCase() === accountType.toLowerCase()
+    if (accountType !== "All") {
+      data = data.filter(
+        (item) =>
+          item.accounttype &&
+          item.accounttype.toLowerCase() === accountType.toLowerCase()
       );
     }
 
     setList(data);
   };
   const deleteUser = (userId) => {
-    dispatch(transferdeltess(userId))
-      .then(() => {
-        dispatch(transferdatas())
-        setList(list.filter((item) => item.id !== userId));
-      })
+    dispatch(transferdeltess(userId)).then(() => {
+      dispatch(transferdatas());
+      setList(list.filter((item) => item.id !== userId));
+    });
   };
 
-  const alltransferdata = useSelector((state) => state?.transfer?.transfer?.data);
-
-
+  const alltransferdata = useSelector(
+    (state) => state?.transfer?.transfer?.data
+  );
 
   useEffect(() => {
     if (alltransferdata) {
-      setList(alltransferdata)
+      setList(alltransferdata);
     }
-  }, [alltransferdata])
+  }, [alltransferdata]);
 
   const showUserProfile = (userInfo) => {
     setSelectedUser(userInfo);
@@ -136,67 +150,67 @@ const TransferList = () => {
     </Menu>
   );
   const stripHtmlTags = (html) => {
-    if (!html) return '';
-    return html.replace(/<[^>]*>/g, '');
+    if (!html) return "";
+    return html.replace(/<[^>]*>/g, "");
   };
   const tableColumns = [
     {
-      title: 'Date',
-      dataIndex: 'date',
-      render: (date) => dayjs(date).format('DD/MM/YYYY'),
+      title: "Date",
+      dataIndex: "date",
+      render: (date) => dayjs(date).format("DD/MM/YYYY"),
       sorter: {
         compare: (a, b) => dayjs(a.date).unix() - dayjs(b.date).unix(),
       },
     },
     {
-      title: 'From Account',
-      dataIndex: 'fromAccount',
+      title: "From Account",
+      dataIndex: "fromAccount",
       render: (fromAccount) => {
-        const account = accountsList.find(acc => acc.id === fromAccount);
-        return account ? account.bankName : 'Unknown Account';
+        const account = accountsList.find((acc) => acc.id === fromAccount);
+        return account ? account.bankName : "Unknown Account";
       },
       sorter: {
         compare: (a, b) => {
-          const accountA = accountsList.find(acc => acc.id === a.fromAccount);
-          const accountB = accountsList.find(acc => acc.id === b.fromAccount);
+          const accountA = accountsList.find((acc) => acc.id === a.fromAccount);
+          const accountB = accountsList.find((acc) => acc.id === b.fromAccount);
           return accountA?.bankName.localeCompare(accountB?.bankName) || 0;
         },
       },
     },
     {
-      title: 'To Account',
-      dataIndex: 'toAccount',
+      title: "To Account",
+      dataIndex: "toAccount",
       render: (toAccount) => {
-        const account = accountsList.find(acc => acc.id === toAccount);
-        return account ? account.bankName : 'Unknown Account';
+        const account = accountsList.find((acc) => acc.id === toAccount);
+        return account ? account.bankName : "Unknown Account";
       },
       sorter: {
         compare: (a, b) => {
-          const accountA = accountsList.find(acc => acc.id === a.toAccount);
-          const accountB = accountsList.find(acc => acc.id === b.toAccount);
+          const accountA = accountsList.find((acc) => acc.id === a.toAccount);
+          const accountB = accountsList.find((acc) => acc.id === b.toAccount);
           return accountA?.bankName.localeCompare(accountB?.bankName) || 0;
         },
       },
     },
     {
-      title: 'Amount',
-      dataIndex: 'amount',
+      title: "Amount",
+      dataIndex: "amount",
       sorter: {
         compare: (a, b) => a.amount.length - b.amount.length,
       },
     },
     {
-      title: 'Description',
-      dataIndex: 'description',
+      title: "Description",
+      dataIndex: "description",
       render: (description) => stripHtmlTags(description),
       sorter: {
-        compare: (a, b) => stripHtmlTags(a.description).localeCompare(stripHtmlTags(b.description)),
+        compare: (a, b) =>
+          stripHtmlTags(a.description).localeCompare(
+            stripHtmlTags(b.description)
+          ),
       },
     },
-
   ];
-
-
 
   const openAddTransferModal = () => {
     setIsAddTransferModalVisible(true);
@@ -209,7 +223,7 @@ const TransferList = () => {
   const openEditTransferModal = (transfer) => {
     setSelectedTransfer(transfer);
     setIsEditTransferModalVisible(true);
-    setIdd(transfer.id)
+    setIdd(transfer.id);
   };
 
   const closeEditTransferModal = () => {
@@ -229,9 +243,9 @@ const TransferList = () => {
   const handleDateChange = (date) => {
     setSelectedDate(date);
     if (date) {
-      const formattedDate = dayjs(date).format('YYYY-MM-DD');
-      const filteredData = alltransferdata.filter(item =>
-        dayjs(item.date).format('YYYY-MM-DD') === formattedDate
+      const formattedDate = dayjs(date).format("YYYY-MM-DD");
+      const filteredData = alltransferdata.filter(
+        (item) => dayjs(item.date).format("YYYY-MM-DD") === formattedDate
       );
       setList(filteredData);
     } else {
@@ -241,9 +255,12 @@ const TransferList = () => {
   };
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
@@ -258,12 +275,16 @@ const TransferList = () => {
               onChange={handleDateChange}
               value={selectedDate}
               format="DD/MM/YYYY"
-              style={{ width: '200px' }}
+              style={{ width: "200px" }}
             />
           </div>
         </Flex>
         <Flex gap="7px">
-          <Button type="primary" className="ml-2" onClick={openAddTransferModal}>
+          <Button
+            type="primary"
+            className="ml-2"
+            onClick={openAddTransferModal}
+          >
             <PlusOutlined />
             <span>New</span>
           </Button>
@@ -280,7 +301,11 @@ const TransferList = () => {
           scroll={{ x: 1200 }}
         />
       </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+      <UserView
+        data={selectedUser}
+        visible={userProfileVisible}
+        close={closeUserProfile}
+      />
       {/* Add Account Modal */}
       <Modal
         title="Create Transfer"
@@ -288,7 +313,7 @@ const TransferList = () => {
         onCancel={closeAddTransferModal}
         footer={null}
         width={1100}
-        className='mt-[-70px]'
+        className="mt-[-70px]"
       >
         <AddTransfer onClose={closeAddTransferModal} />
       </Modal>
@@ -298,7 +323,7 @@ const TransferList = () => {
         onCancel={closeEditTransferModal}
         footer={null}
         width={1000}
-        className='mt-[-70px]'
+        className="mt-[-70px]"
         // height={1000}
       >
         <EditTransfer
@@ -311,5 +336,3 @@ const TransferList = () => {
   );
 };
 export default TransferList;
-
-

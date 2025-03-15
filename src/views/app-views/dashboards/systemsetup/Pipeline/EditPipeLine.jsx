@@ -1,30 +1,25 @@
 import React, { useEffect, useState } from "react";
-import {
-  Row,
-  Col,
-  Input,
-  message,
-  Button,
-} from "antd";
+import { Row, Col, Input, message, Button } from "antd";
 import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Editpipl, GetPip } from "./PiplineReducer/piplineSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-
 const EditPipeLine = ({ idd, onClose }) => {
   const dispatch = useDispatch();
 
   const allempdata = useSelector((state) => state.Piplines);
-  const Expensedata = React.useMemo(() => allempdata?.Piplines?.data || [], [allempdata?.Piplines?.data]);
+  const Expensedata = React.useMemo(
+    () => allempdata?.Piplines?.data || [],
+    [allempdata?.Piplines?.data]
+  );
 
   useEffect(() => {
     const milestone = Expensedata.find((item) => item.id === idd);
     if (milestone) {
       setInitialValues(milestone);
     } else {
-      message.error("Milestone not found!");
     }
   }, [idd, Expensedata]);
 
@@ -47,7 +42,7 @@ const EditPipeLine = ({ idd, onClose }) => {
 
   return (
     <div>
-       <div className="mb-2 border-b pb-[-10px] font-medium"></div>
+      <div className="mb-2 border-b pb-[-10px] font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

@@ -1,20 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  Input,
-  Button,
-  Select,
-  message,
-  Row,
-  Col,
-  Modal,
-} from "antd";
+import { Input, Button, Select, message, Row, Col, Modal } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { GetLeads, LeadsEdit } from "./LeadReducers/LeadSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-import { GetLable, AddLable } from "../project/milestone/LableReducer/LableSlice";
+import {
+  GetLable,
+  AddLable,
+} from "../project/milestone/LableReducer/LableSlice";
 import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
@@ -35,9 +30,12 @@ const EditLead = ({ id, onClose }) => {
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
-  const [isAddLeadStageModalVisible, setIsAddLeadStageModalVisible] = useState(false);
-  const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
-  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
+  const [isAddLeadStageModalVisible, setIsAddLeadStageModalVisible] =
+    useState(false);
+  const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] =
+    useState(false);
+  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] =
+    useState(false);
   const [isAddSourceModalVisible, setIsAddSourceModalVisible] = useState(false);
   const [newTag, setNewTag] = useState("");
   const [newCategory, setNewCategory] = useState("");
@@ -51,32 +49,38 @@ const EditLead = ({ id, onClose }) => {
   const empData = allempdata?.Users?.data || [];
   const loggedInUser = useSelector((state) => state.user.loggedInUser);
   const roles = useSelector((state) => state.role?.role?.data);
-  const userRole = roles?.find(role => role.id === loggedInUser.role_id);
+  const userRole = roles?.find((role) => role.id === loggedInUser.role_id);
   const allstagedata = useSelector((state) => state.StagesLeadsDeals);
-  const filterdatas = allstagedata?.StagesLeadsDeals?.data?.filter(item => item.stageType === "lead") || [];
+  const filterdatas =
+    allstagedata?.StagesLeadsDeals?.data?.filter(
+      (item) => item.stageType === "lead"
+    ) || [];
 
-  const employee = empData.filter(emp => {
-    if (userRole?.role_name === 'client') {
+  const employee = empData.filter((emp) => {
+    if (userRole?.role_name === "client") {
       return emp.client_id === loggedInUser.id;
     }
     return emp.client_id === loggedInUser.client_id;
   });
 
-  const fetchLables = useCallback(async (lableType, setter) => {
-    try {
-      const lid = loggedInUser.id;
-      const response = await dispatch(GetLable(lid));
-      if (response.payload && response.payload.data) {
-        const filteredLables = response.payload.data
-          .filter((lable) => lable.lableType === lableType)
-          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
-        setter(filteredLables);
+  const fetchLables = useCallback(
+    async (lableType, setter) => {
+      try {
+        const lid = loggedInUser.id;
+        const response = await dispatch(GetLable(lid));
+        if (response.payload && response.payload.data) {
+          const filteredLables = response.payload.data
+            .filter((lable) => lable.lableType === lableType)
+            .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+          setter(filteredLables);
+        }
+      } catch (error) {
+        console.error(`Failed to fetch ${lableType}:`, error);
+        message.error(`Failed to load ${lableType}`);
       }
-    } catch (error) {
-      console.error(`Failed to fetch ${lableType}:`, error);
-      message.error(`Failed to load ${lableType}`);
-    }
-  }, [dispatch, loggedInUser.id]);
+    },
+    [dispatch, loggedInUser.id]
+  );
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -100,7 +104,13 @@ const EditLead = ({ id, onClose }) => {
     }
   }, [loggedInUser?.id, fetchLables]);
 
-  const handleAddNewLable = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
+  const handleAddNewLable = async (
+    lableType,
+    newValue,
+    setter,
+    modalSetter,
+    setFieldValue
+  ) => {
     if (!newValue.trim()) {
       message.error(`Please enter a ${lableType} name.`);
       return;
@@ -142,7 +152,7 @@ const EditLead = ({ id, onClose }) => {
         setter("");
         modalSetter(false);
       } else {
-        throw new Error('Failed to add label');
+        throw new Error("Failed to add label");
       }
     } catch (error) {
       console.error(`Failed to add ${lableType}:`, error);
@@ -158,8 +168,8 @@ const EditLead = ({ id, onClose }) => {
     email: "",
     leadStage: "",
     leadValue: "",
-    currency: currencies[0]?.id || '',
-    currencyIcon: currencies[0]?.currencyIcon || '',
+    currency: currencies[0]?.id || "",
+    currencyIcon: currencies[0]?.currencyIcon || "",
     assigned: "",
     status: "",
     notes: "",
@@ -177,55 +187,49 @@ const EditLead = ({ id, onClose }) => {
   const validationSchema = Yup.object().shape({
     leadTitle: Yup.string()
       .trim()
-      .required('Lead title is required')
-      .min(3, 'Lead title must be at least 3 characters')
-      .max(100, 'Lead title must not exceed 100 characters'),
+      .required("Lead title is required")
+      .min(3, "Lead title must be at least 3 characters")
+      .max(100, "Lead title must not exceed 100 characters"),
     firstName: Yup.string()
       .trim()
-      .required('First name is required')
-      .min(2, 'First name must be at least 2 characters')
-      .max(50, 'First name must not exceed 50 characters'),
+      .required("First name is required")
+      .min(2, "First name must be at least 2 characters")
+      .max(50, "First name must not exceed 50 characters"),
     lastName: Yup.string()
       .trim()
-      .required('Last name is required')
-      .min(2, 'Last name must be at least 2 characters')
-      .max(50, 'Last name must not exceed 50 characters'),
+      .required("Last name is required")
+      .min(2, "Last name must be at least 2 characters")
+      .max(50, "Last name must not exceed 50 characters"),
     email: Yup.string()
       .trim()
-      .email('Invalid email format')
-      .max(100, 'Email must not exceed 100 characters'),
-    phoneCode: Yup.string()
-      .required('Country code is required'),
+      .email("Invalid email format")
+      .max(100, "Email must not exceed 100 characters"),
+    phoneCode: Yup.string().required("Country code is required"),
     telephone: Yup.string()
       .trim()
-      .required('Phone number is required')
-      .matches(/^[0-9]{10}$/, 'Phone number must be 10 digits'),
+      .required("Phone number is required")
+      .matches(/^[0-9]{10}$/, "Phone number must be 10 digits"),
     company_name: Yup.string()
       .trim()
-      .max(100, 'Company name must not exceed 100 characters'),
-    leadStage: Yup.string()
-      .required('Lead stage is required'),
+      .max(100, "Company name must not exceed 100 characters"),
+    leadStage: Yup.string().required("Lead stage is required"),
     leadValue: Yup.number()
       .transform((value) => (isNaN(value) ? undefined : value))
-      .min(0, 'Lead value must be greater than or equal to 0')
+      .min(0, "Lead value must be greater than or equal to 0")
       .nullable(),
-    currency: Yup.string()
-      .when(['leadValue'], {
-        is: (leadValue) => leadValue && leadValue > 0,
-        then: () => Yup.string().required('Currency is required when lead value is provided'),
-        otherwise: () => Yup.string().nullable()
-      }),
-    employee: Yup.string()
-      .nullable(),
-    status: Yup.string()
-      .trim()
-      .required('Status is required'),
-    source: Yup.string()
-      .nullable(),
-    category: Yup.string()
-      .nullable(),
-    tag: Yup.string()
-      .nullable(),
+    currency: Yup.string().when(["leadValue"], {
+      is: (leadValue) => leadValue && leadValue > 0,
+      then: () =>
+        Yup.string().required(
+          "Currency is required when lead value is provided"
+        ),
+      otherwise: () => Yup.string().nullable(),
+    }),
+    employee: Yup.string().nullable(),
+    status: Yup.string().trim().required("Status is required"),
+    source: Yup.string().nullable(),
+    category: Yup.string().nullable(),
+    tag: Yup.string().nullable(),
   });
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
@@ -248,15 +252,14 @@ const EditLead = ({ id, onClose }) => {
         telephone: values.telephone,
         client_id: loggedInUser.client_id,
         created_by: loggedInUser.username,
-        assigned: values.employee
+        assigned: values.employee,
       };
 
-
-      const response = await dispatch(LeadsEdit({ id, formData: transformedValues }));
+      const response = await dispatch(
+        LeadsEdit({ id, formData: transformedValues })
+      );
 
       if (response) {
-        message.success("Lead updated successfully!");
-
         await dispatch(GetLeads());
 
         resetForm();
@@ -308,9 +311,9 @@ const EditLead = ({ id, onClose }) => {
   };
 
   const handlePhoneNumberChange = (e, setFieldValue) => {
-    const value = e.target.value.replace(/\D/g, '');
+    const value = e.target.value.replace(/\D/g, "");
     if (value.length <= 15) {
-      setFieldValue('telephone', value);
+      setFieldValue("telephone", value);
     }
   };
 
@@ -341,7 +344,9 @@ const EditLead = ({ id, onClose }) => {
 
             <div className="bg-white border rounded mb-3">
               <div className="border-b px-4 py-2">
-                <h4 className="text-base font-medium text-gray-700">Lead Information</h4>
+                <h4 className="text-base font-medium text-gray-700">
+                  Lead Information
+                </h4>
               </div>
               <div className="p-4">
                 <Row gutter={16}>
@@ -353,11 +358,15 @@ const EditLead = ({ id, onClose }) => {
                       <Field
                         name="leadTitle"
                         as={Input}
-                        className={`mt-1 ${touched.leadTitle && errors.leadTitle ? 'border-red-500' : ''}`}
+                        className={`mt-1 ${
+                          touched.leadTitle && errors.leadTitle
+                            ? "border-red-500"
+                            : ""
+                        }`}
                         placeholder="Enter Lead Title"
                         onChange={(e) => {
-                          setFieldValue('leadTitle', e.target.value);
-                          setFieldTouched('leadTitle', true);
+                          setFieldValue("leadTitle", e.target.value);
+                          setFieldTouched("leadTitle", true);
                         }}
                       />
                       <ErrorMessage
@@ -378,7 +387,11 @@ const EditLead = ({ id, onClose }) => {
                           <Select
                             {...field}
                             id="leadStage"
-                            className={`w-full mt-1 ${touched.leadStage && errors.leadStage ? 'border-red-500' : ''}`}
+                            className={`w-full mt-1 ${
+                              touched.leadStage && errors.leadStage
+                                ? "border-red-500"
+                                : ""
+                            }`}
                             placeholder="Select Lead Stage"
                             onChange={(value) => {
                               form.setFieldValue("leadStage", value);
@@ -387,7 +400,12 @@ const EditLead = ({ id, onClose }) => {
                             dropdownRender={(menu) => (
                               <div>
                                 {menu}
-                                <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                <div
+                                  style={{
+                                    padding: 8,
+                                    borderTop: "1px solid #e8e8e8",
+                                  }}
+                                >
                                   <Button
                                     type="link"
                                     icon={<PlusOutlined />}
@@ -429,15 +447,17 @@ const EditLead = ({ id, onClose }) => {
                                     {...field}
                                     className="currency-select"
                                     style={{
-                                      width: '70px',
+                                      width: "70px",
                                       borderTopRightRadius: 0,
                                       borderBottomRightRadius: 0,
                                       borderRight: 0,
-                                      backgroundColor: '#f8fafc',
+                                      backgroundColor: "#f8fafc",
                                     }}
-                                    placeholder={<span className="text-gray-400">₹</span>}
+                                    placeholder={
+                                      <span className="text-gray-400">₹</span>
+                                    }
                                     onChange={(value) => {
-                                      if (value === 'add_new') {
+                                      if (value === "add_new") {
                                         setIsAddCurrencyModalVisible(true);
                                       } else {
                                         field.onChange(value || null);
@@ -445,15 +465,28 @@ const EditLead = ({ id, onClose }) => {
                                     }}
                                     value={field.value || null}
                                     allowClear
-                                    dropdownStyle={{ minWidth: '180px' }}
-                                    suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                                    dropdownStyle={{ minWidth: "180px" }}
+                                    suffixIcon={
+                                      <span className="text-gray-400 text-xs">
+                                        ▼
+                                      </span>
+                                    }
                                   >
                                     {currencies?.map((currency) => (
-                                      <Option key={currency.id} value={currency.id}>
+                                      <Option
+                                        key={currency.id}
+                                        value={currency.id}
+                                      >
                                         <div className="flex items-center w-full px-1">
-                                          <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
-                                          <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
-                                          <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                          <span className="text-base min-w-[24px]">
+                                            {currency.currencyIcon}
+                                          </span>
+                                          <span className="text-gray-600 text-sm ml-3">
+                                            {currency.currencyName}
+                                          </span>
+                                          <span className="text-gray-400 text-xs ml-auto">
+                                            {currency.currencyCode}
+                                          </span>
                                         </div>
                                       </Option>
                                     ))}
@@ -468,8 +501,8 @@ const EditLead = ({ id, onClose }) => {
                                     style={{
                                       borderTopLeftRadius: 0,
                                       borderBottomLeftRadius: 0,
-                                      borderLeft: '1px solid #d9d9d9',
-                                      width: 'calc(100% - 70px)'
+                                      borderLeft: "1px solid #d9d9d9",
+                                      width: "calc(100% - 70px)",
                                     }}
                                     type="number"
                                     min="0"
@@ -477,7 +510,10 @@ const EditLead = ({ id, onClose }) => {
                                     placeholder="0.00"
                                     onChange={(e) => {
                                       const value = e.target.value;
-                                      if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                      if (
+                                        value === "" ||
+                                        /^\d*\.?\d{0,2}$/.test(value)
+                                      ) {
                                         field.onChange(value || null);
                                       }
                                     }}
@@ -485,8 +521,16 @@ const EditLead = ({ id, onClose }) => {
                                 )}
                               </Field>
                             </div>
-                            <ErrorMessage name="leadValue" component="div" className="text-red-500 mt-1 text-sm" />
-                            <ErrorMessage name="currency" component="div" className="text-red-500 mt-1 text-sm" />
+                            <ErrorMessage
+                              name="leadValue"
+                              component="div"
+                              className="text-red-500 mt-1 text-sm"
+                            />
+                            <ErrorMessage
+                              name="currency"
+                              component="div"
+                              className="text-red-500 mt-1 text-sm"
+                            />
                           </div>
                         )}
                       </Field>
@@ -500,7 +544,11 @@ const EditLead = ({ id, onClose }) => {
                         {({ field, form }) => (
                           <Select
                             {...field}
-                            className={`w-full mt-1 ${touched.employee && errors.employee ? 'border-red-500' : ''}`}
+                            className={`w-full mt-1 ${
+                              touched.employee && errors.employee
+                                ? "border-red-500"
+                                : ""
+                            }`}
                             placeholder="Select Employee"
                             onChange={(value) => {
                               form.setFieldValue("employee", value);
@@ -510,7 +558,9 @@ const EditLead = ({ id, onClose }) => {
                             showSearch
                             optionFilterProp="children"
                             filterOption={(input, option) =>
-                              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                              option.children
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0
                             }
                           >
                             {Array.isArray(employee) &&
@@ -535,7 +585,9 @@ const EditLead = ({ id, onClose }) => {
 
             <div className="bg-white border rounded mb-3">
               <div className="border-b px-4 py-2">
-                <h4 className="text-base font-medium text-gray-700">Contact & Company Information</h4>
+                <h4 className="text-base font-medium text-gray-700">
+                  Contact & Company Information
+                </h4>
               </div>
               <div className="p-4">
                 <Row gutter={16}>
@@ -547,11 +599,15 @@ const EditLead = ({ id, onClose }) => {
                       <Field
                         name="firstName"
                         as={Input}
-                        className={`mt-1 ${touched.firstName && errors.firstName ? 'border-red-500' : ''}`}
+                        className={`mt-1 ${
+                          touched.firstName && errors.firstName
+                            ? "border-red-500"
+                            : ""
+                        }`}
                         placeholder="Enter First Name"
                         onChange={(e) => {
-                          setFieldValue('firstName', e.target.value);
-                          setFieldTouched('firstName', true);
+                          setFieldValue("firstName", e.target.value);
+                          setFieldTouched("firstName", true);
                         }}
                       />
                       <ErrorMessage
@@ -569,11 +625,15 @@ const EditLead = ({ id, onClose }) => {
                       <Field
                         name="lastName"
                         as={Input}
-                        className={`mt-1 ${touched.lastName && errors.lastName ? 'border-red-500' : ''}`}
+                        className={`mt-1 ${
+                          touched.lastName && errors.lastName
+                            ? "border-red-500"
+                            : ""
+                        }`}
                         placeholder="Enter Last Name"
                         onChange={(e) => {
-                          setFieldValue('lastName', e.target.value);
-                          setFieldTouched('lastName', true);
+                          setFieldValue("lastName", e.target.value);
+                          setFieldTouched("lastName", true);
                         }}
                       />
                       <ErrorMessage
@@ -589,11 +649,13 @@ const EditLead = ({ id, onClose }) => {
                       <Field
                         name="email"
                         as={Input}
-                        className={`mt-1 ${touched.email && errors.email ? 'border-red-500' : ''}`}
+                        className={`mt-1 ${
+                          touched.email && errors.email ? "border-red-500" : ""
+                        }`}
                         placeholder="Enter Email Address"
                         onChange={(e) => {
-                          setFieldValue('email', e.target.value);
-                          setFieldTouched('email', true);
+                          setFieldValue("email", e.target.value);
+                          setFieldTouched("email", true);
                         }}
                       />
                       <ErrorMessage
@@ -605,38 +667,57 @@ const EditLead = ({ id, onClose }) => {
                   </Col>
                   <Col span={12} className="mt-3">
                     <div className="form-group">
-                      <label className="font-semibold">Telephone <span className="text-red-500">*</span></label>
+                      <label className="font-semibold">
+                        Telephone <span className="text-red-500">*</span>
+                      </label>
                       <div className="flex gap-0 mt-1">
                         <Field name="phoneCode">
                           {({ field }) => (
                             <Select
                               {...field}
-                              className={`currency-select ${touched.phoneCode && errors.phoneCode ? 'border-red-500' : ''}`}
+                              className={`currency-select ${
+                                touched.phoneCode && errors.phoneCode
+                                  ? "border-red-500"
+                                  : ""
+                              }`}
                               style={{
-                                width: '80px',
+                                width: "80px",
                                 borderTopRightRadius: 0,
                                 borderBottomRightRadius: 0,
                                 borderRight: 0,
-                                backgroundColor: '#f8fafc',
+                                backgroundColor: "#f8fafc",
                               }}
-                              placeholder={<span className="text-gray-400">+91</span>}
+                              placeholder={
+                                <span className="text-gray-400">+91</span>
+                              }
                               onChange={(value) => {
-                                if (value === 'add_new') {
+                                if (value === "add_new") {
                                   setIsAddPhoneCodeModalVisible(true);
                                 } else {
                                   field.onChange(value);
                                 }
                               }}
                               value={values.phoneCode}
-                              dropdownStyle={{ minWidth: '180px' }}
-                              suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                              dropdownStyle={{ minWidth: "180px" }}
+                              suffixIcon={
+                                <span className="text-gray-400 text-xs">▼</span>
+                              }
                             >
                               {countries?.map((country) => (
-                                <Option key={country.id} value={country.phoneCode}>
+                                <Option
+                                  key={country.id}
+                                  value={country.phoneCode}
+                                >
                                   <div className="flex items-center w-full px-1">
-                                    <span className="text-base min-w-[40px]">{country.phoneCode}</span>
-                                    <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
-                                    <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                                    <span className="text-base min-w-[40px]">
+                                      {country.phoneCode}
+                                    </span>
+                                    <span className="text-gray-600 text-sm ml-3">
+                                      {country.countryName}
+                                    </span>
+                                    <span className="text-gray-400 text-xs ml-auto">
+                                      {country.countryCode}
+                                    </span>
                                   </div>
                                 </Option>
                               ))}
@@ -647,24 +728,32 @@ const EditLead = ({ id, onClose }) => {
                           {({ field }) => (
                             <Input
                               {...field}
-                              className={`price-input ${touched.telephone && errors.telephone ? 'border-red-500' : ''}`}
+                              className={`price-input ${
+                                touched.telephone && errors.telephone
+                                  ? "border-red-500"
+                                  : ""
+                              }`}
                               style={{
                                 borderTopLeftRadius: 0,
                                 borderBottomLeftRadius: 0,
-                                borderLeft: '1px solid #d9d9d9',
-                                width: 'calc(100% - 80px)'
+                                borderLeft: "1px solid #d9d9d9",
+                                width: "calc(100% - 80px)",
                               }}
                               type="number"
                               placeholder="Enter telephone number"
                               onChange={(e) => {
                                 handlePhoneNumberChange(e, setFieldValue);
-                                setFieldTouched('telephone', true);
+                                setFieldTouched("telephone", true);
                               }}
                             />
                           )}
                         </Field>
                       </div>
-                      <ErrorMessage name="telephone" component="div" className="text-red-500 mt-1 text-sm" />
+                      <ErrorMessage
+                        name="telephone"
+                        component="div"
+                        className="text-red-500 mt-1 text-sm"
+                      />
                     </div>
                   </Col>
                   <Col span={24} className="mt-3">
@@ -673,11 +762,15 @@ const EditLead = ({ id, onClose }) => {
                       <Field
                         name="company_name"
                         as={Input}
-                        className={`mt-1 ${touched.company_name && errors.company_name ? 'border-red-500' : ''}`}
+                        className={`mt-1 ${
+                          touched.company_name && errors.company_name
+                            ? "border-red-500"
+                            : ""
+                        }`}
                         placeholder="Enter Company Name"
                         onChange={(e) => {
-                          setFieldValue('company_name', e.target.value);
-                          setFieldTouched('company_name', true);
+                          setFieldValue("company_name", e.target.value);
+                          setFieldTouched("company_name", true);
                         }}
                       />
                       <ErrorMessage
@@ -693,7 +786,9 @@ const EditLead = ({ id, onClose }) => {
 
             <div className="bg-white border rounded mb-3">
               <div className="border-b px-4 py-2">
-                <h4 className="text-base font-medium text-gray-700">Classification & Tags</h4>
+                <h4 className="text-base font-medium text-gray-700">
+                  Classification & Tags
+                </h4>
               </div>
               <div className="p-4">
                 <Row gutter={16}>
@@ -706,7 +801,11 @@ const EditLead = ({ id, onClose }) => {
                         {({ field }) => (
                           <Select
                             {...field}
-                            className={`w-full mt-1 ${touched.status && errors.status ? 'border-red-500' : ''}`}
+                            className={`w-full mt-1 ${
+                              touched.status && errors.status
+                                ? "border-red-500"
+                                : ""
+                            }`}
                             placeholder="Select or add new status"
                             onChange={(value) => {
                               field.onChange(value);
@@ -717,12 +816,19 @@ const EditLead = ({ id, onClose }) => {
                             dropdownRender={(menu) => (
                               <div>
                                 {menu}
-                                <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                <div
+                                  style={{
+                                    padding: 8,
+                                    borderTop: "1px solid #e8e8e8",
+                                  }}
+                                >
                                   <Button
                                     type="link"
                                     icon={<PlusOutlined />}
                                     className="w-full mt-2"
-                                    onClick={() => setIsStatusModalVisible(true)}
+                                    onClick={() =>
+                                      setIsStatusModalVisible(true)
+                                    }
                                   >
                                     Add New Status
                                   </Button>
@@ -752,7 +858,11 @@ const EditLead = ({ id, onClose }) => {
                         {({ field }) => (
                           <Select
                             {...field}
-                            className={`w-full mt-1 ${touched.source && errors.source ? 'border-red-500' : ''}`}
+                            className={`w-full mt-1 ${
+                              touched.source && errors.source
+                                ? "border-red-500"
+                                : ""
+                            }`}
                             placeholder="Select source"
                             onChange={(value) => {
                               field.onChange(value || null);
@@ -764,12 +874,19 @@ const EditLead = ({ id, onClose }) => {
                             dropdownRender={(menu) => (
                               <div>
                                 {menu}
-                                <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                <div
+                                  style={{
+                                    padding: 8,
+                                    borderTop: "1px solid #e8e8e8",
+                                  }}
+                                >
                                   <Button
                                     type="link"
                                     icon={<PlusOutlined />}
                                     className="w-full mt-2"
-                                    onClick={() => setIsAddSourceModalVisible(true)}
+                                    onClick={() =>
+                                      setIsAddSourceModalVisible(true)
+                                    }
                                   >
                                     Add New Source
                                   </Button>
@@ -799,7 +916,11 @@ const EditLead = ({ id, onClose }) => {
                         {({ field }) => (
                           <Select
                             {...field}
-                            className={`w-full mt-1 ${touched.category && errors.category ? 'border-red-500' : ''}`}
+                            className={`w-full mt-1 ${
+                              touched.category && errors.category
+                                ? "border-red-500"
+                                : ""
+                            }`}
                             placeholder="Select or add new category"
                             onChange={(value) => {
                               field.onChange(value);
@@ -810,12 +931,19 @@ const EditLead = ({ id, onClose }) => {
                             dropdownRender={(menu) => (
                               <div>
                                 {menu}
-                                <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                <div
+                                  style={{
+                                    padding: 8,
+                                    borderTop: "1px solid #e8e8e8",
+                                  }}
+                                >
                                   <Button
                                     type="link"
                                     icon={<PlusOutlined />}
                                     className="w-full mt-2"
-                                    onClick={() => setIsCategoryModalVisible(true)}
+                                    onClick={() =>
+                                      setIsCategoryModalVisible(true)
+                                    }
                                   >
                                     Add New Category
                                   </Button>
@@ -845,7 +973,9 @@ const EditLead = ({ id, onClose }) => {
                         {({ field }) => (
                           <Select
                             {...field}
-                            className={`w-full mt-1 ${touched.tag && errors.tag ? 'border-red-500' : ''}`}
+                            className={`w-full mt-1 ${
+                              touched.tag && errors.tag ? "border-red-500" : ""
+                            }`}
                             placeholder="Select or add new tag"
                             onChange={(value) => {
                               field.onChange(value);
@@ -856,7 +986,12 @@ const EditLead = ({ id, onClose }) => {
                             dropdownRender={(menu) => (
                               <div>
                                 {menu}
-                                <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                <div
+                                  style={{
+                                    padding: 8,
+                                    borderTop: "1px solid #e8e8e8",
+                                  }}
+                                >
                                   <Button
                                     type="link"
                                     icon={<PlusOutlined />}
@@ -906,7 +1041,15 @@ const EditLead = ({ id, onClose }) => {
               title="Add New Tag"
               visible={isTagModalVisible}
               onCancel={() => setIsTagModalVisible(false)}
-              onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible, setFieldValue)}
+              onOk={() =>
+                handleAddNewLable(
+                  "tag",
+                  newTag,
+                  setNewTag,
+                  setIsTagModalVisible,
+                  setFieldValue
+                )
+              }
               okText="Add Tag"
             >
               <Input
@@ -914,8 +1057,14 @@ const EditLead = ({ id, onClose }) => {
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible, setFieldValue);
+                  if (e.key === "Enter") {
+                    handleAddNewLable(
+                      "tag",
+                      newTag,
+                      setNewTag,
+                      setIsTagModalVisible,
+                      setFieldValue
+                    );
                   }
                 }}
               />
@@ -925,7 +1074,15 @@ const EditLead = ({ id, onClose }) => {
               title="Add New Category"
               visible={isCategoryModalVisible}
               onCancel={() => setIsCategoryModalVisible(false)}
-              onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible, setFieldValue)}
+              onOk={() =>
+                handleAddNewLable(
+                  "category",
+                  newCategory,
+                  setNewCategory,
+                  setIsCategoryModalVisible,
+                  setFieldValue
+                )
+              }
               okText="Add Category"
             >
               <Input
@@ -933,8 +1090,14 @@ const EditLead = ({ id, onClose }) => {
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible, setFieldValue);
+                  if (e.key === "Enter") {
+                    handleAddNewLable(
+                      "category",
+                      newCategory,
+                      setNewCategory,
+                      setIsCategoryModalVisible,
+                      setFieldValue
+                    );
                   }
                 }}
               />
@@ -944,7 +1107,15 @@ const EditLead = ({ id, onClose }) => {
               title="Add New Status"
               visible={isStatusModalVisible}
               onCancel={() => setIsStatusModalVisible(false)}
-              onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible, setFieldValue)}
+              onOk={() =>
+                handleAddNewLable(
+                  "status",
+                  newStatus,
+                  setNewStatus,
+                  setIsStatusModalVisible,
+                  setFieldValue
+                )
+              }
               okText="Add Status"
             >
               <Input
@@ -952,8 +1123,14 @@ const EditLead = ({ id, onClose }) => {
                 value={newStatus}
                 onChange={(e) => setNewStatus(e.target.value)}
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible, setFieldValue);
+                  if (e.key === "Enter") {
+                    handleAddNewLable(
+                      "status",
+                      newStatus,
+                      setNewStatus,
+                      setIsStatusModalVisible,
+                      setFieldValue
+                    );
                   }
                 }}
               />
@@ -965,7 +1142,7 @@ const EditLead = ({ id, onClose }) => {
               onCancel={closeAddLeadStageModal}
               footer={null}
               width={600}
-              bodyStyle={{ padding: '16px' }}
+              bodyStyle={{ padding: "16px" }}
             >
               <AddLeadStages onClose={closeAddLeadStageModal} />
             </Modal>
@@ -976,7 +1153,7 @@ const EditLead = ({ id, onClose }) => {
               onCancel={() => setIsAddCurrencyModalVisible(false)}
               footer={null}
               width={600}
-              bodyStyle={{ padding: '16px' }}
+              bodyStyle={{ padding: "16px" }}
             >
               <AddCurrencies
                 onClose={() => {
@@ -992,7 +1169,7 @@ const EditLead = ({ id, onClose }) => {
               onCancel={() => setIsAddPhoneCodeModalVisible(false)}
               footer={null}
               width={600}
-              bodyStyle={{ padding: '16px' }}
+              bodyStyle={{ padding: "16px" }}
             >
               <AddCountries
                 onClose={() => {
@@ -1006,7 +1183,15 @@ const EditLead = ({ id, onClose }) => {
               title="Add New Source"
               visible={isAddSourceModalVisible}
               onCancel={() => setIsAddSourceModalVisible(false)}
-              onOk={() => handleAddNewLable("source", newSource, setNewSource, setIsAddSourceModalVisible, setFieldValue)}
+              onOk={() =>
+                handleAddNewLable(
+                  "source",
+                  newSource,
+                  setNewSource,
+                  setIsAddSourceModalVisible,
+                  setFieldValue
+                )
+              }
               okText="Add Source"
             >
               <Input
@@ -1014,8 +1199,14 @@ const EditLead = ({ id, onClose }) => {
                 value={newSource}
                 onChange={(e) => setNewSource(e.target.value)}
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAddNewLable("source", newSource, setNewSource, setIsAddSourceModalVisible, setFieldValue);
+                  if (e.key === "Enter") {
+                    handleAddNewLable(
+                      "source",
+                      newSource,
+                      setNewSource,
+                      setIsAddSourceModalVisible,
+                      setFieldValue
+                    );
                   }
                 }}
               />
@@ -1034,7 +1225,7 @@ export default EditLead;
   .ant-select-dropdown {
     z-index: 1050 !important; /* Ensure dropdown appears above other elements */
   }
-  
+
   /* Make sure the modal doesn't clip dropdowns */
   .ant-modal-wrap,
   .ant-modal,
@@ -1042,7 +1233,7 @@ export default EditLead;
   .ant-modal-body {
     overflow: visible !important;
   }
-  
+
   /* Currency select specific styles */
   .currency-select .ant-select-selector {
     height: 40px !important;
@@ -1073,5 +1264,4 @@ export default EditLead;
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
   }
-`}</style>
-
+`}</style>;

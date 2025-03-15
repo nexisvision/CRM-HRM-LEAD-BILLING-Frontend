@@ -20,7 +20,7 @@ import * as Yup from "yup";
 import { AddTaskk, GetTasks } from "./TaskReducer/TaskSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AddLable, GetLable } from "./LableReducer/LableSlice";
-import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
+import { GetLeads } from "../../leads/LeadReducers/LeadSlice";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 import dayjs from "dayjs";
 
@@ -36,21 +36,21 @@ const AddTask = ({ onClose }) => {
   const [newStatus, setNewStatus] = useState("");
   const [setPriorities] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [ setStatuses] = useState([]);
+  const [setStatuses] = useState([]);
   const [fileList, setFileList] = useState([]);
   const { id } = useParams();
   useSelector((state) => state.Leads.Leads || []);
   const allproject = useSelector((state) => state.Project);
-  const fndrewduxxdaa = allproject.Project.data
+  const fndrewduxxdaa = allproject.Project.data;
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
   const loggedInUser = useSelector((state) => state.user.loggedInUser);
   const roles = useSelector((state) => state.role?.role?.data);
-  const userRole = roles?.find(role => role.id === loggedInUser.role_id);
+  const userRole = roles?.find((role) => role.id === loggedInUser.role_id);
 
-  const fnduserdatas = empData.filter(emp => {
-    if (userRole?.role_name === 'client') {
+  const fnduserdatas = empData.filter((emp) => {
+    if (userRole?.role_name === "client") {
       return emp.client_id === loggedInUser.id;
     } else {
       return emp.client_id === loggedInUser.client_id;
@@ -59,7 +59,7 @@ const AddTask = ({ onClose }) => {
   const initialValues = {
     taskName: "",
     category: "",
-    project: fnddata?.id || "", 
+    project: fnddata?.id || "",
     lead: "",
     startDate: "",
     dueDate: "",
@@ -68,32 +68,24 @@ const AddTask = ({ onClose }) => {
     task_reporter: "",
     file: [],
     status: "To Do",
-    priority: "Medium"
+    priority: "Medium",
   };
 
   const validationSchema = Yup.object({
     taskName: Yup.string().required("Task Name is required"),
     category: Yup.string().required("Category is required"),
     project: Yup.string().required("Project is required"),
-    startDate: Yup.date()
-      .nullable()
-      .required("Start Date is required"),
+    startDate: Yup.date().nullable().required("Start Date is required"),
     dueDate: Yup.date()
       .nullable()
       .required("Due Date is required")
-      .min(
-        Yup.ref('startDate'),
-        'Due Date must be after Start Date'
-      ),
+      .min(Yup.ref("startDate"), "Due Date must be after Start Date"),
     assignTo: Yup.array()
       .min(1, "Please select at least one assignee")
       .required("Please assign the task to someone"),
-    description: Yup.string()
-      .required("Description is required"),
-    priority: Yup.string()
-      .required("Priority is required"),
-    status: Yup.string()
-      .required("Status is required"),
+    description: Yup.string().required("Description is required"),
+    priority: Yup.string().required("Priority is required"),
+    status: Yup.string().required("Status is required"),
     task_reporter: Yup.string().required("Please select a Task Reporter."),
   });
 
@@ -101,31 +93,38 @@ const AddTask = ({ onClose }) => {
     dispatch(GetUsers());
 
     dispatch(GetLeads());
-
   }, [dispatch]);
 
-
-  const fetchLables = useCallback(async (lableType, setter) => {
-    try {
-      const response = await dispatch(GetLable(id));
-      if (response.payload && response.payload.data) {
-        const filteredLables = response.payload.data
-          .filter((lable) => lable.lableType === lableType)
-          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
-        setter(filteredLables);
+  const fetchLables = useCallback(
+    async (lableType, setter) => {
+      try {
+        const response = await dispatch(GetLable(id));
+        if (response.payload && response.payload.data) {
+          const filteredLables = response.payload.data
+            .filter((lable) => lable.lableType === lableType)
+            .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+          setter(filteredLables);
+        }
+      } catch (error) {
+        console.error(`Failed to fetch ${lableType}:`, error);
+        message.error(`Failed to load ${lableType}`);
       }
-    } catch (error) {
-      console.error(`Failed to fetch ${lableType}:`, error);
-      message.error(`Failed to load ${lableType}`);
-    }
-  }, [dispatch, id]);
+    },
+    [dispatch, id]
+  );
   useEffect(() => {
     fetchLables("category", setCategories);
     fetchLables("priority", setPriorities);
     fetchLables("status", setStatuses);
   }, [fetchLables]);
 
-  const handleAddNewLable = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
+  const handleAddNewLable = async (
+    lableType,
+    newValue,
+    setter,
+    modalSetter,
+    setFieldValue
+  ) => {
     if (!newValue.trim()) {
       message.error(`Please enter a ${lableType} name.`);
       return;
@@ -134,7 +133,7 @@ const AddTask = ({ onClose }) => {
     try {
       const payload = {
         name: newValue.trim(),
-        lableType
+        lableType,
       };
       await dispatch(AddLable({ id, payload }));
       message.success(`${lableType} added successfully.`);
@@ -164,24 +163,23 @@ const AddTask = ({ onClose }) => {
     }
   };
 
-
   const onSubmit = async (values, { resetForm }) => {
     try {
       // Create assignTo object
       const assignToObject = {
         assignedUsers: Array.isArray(values.assignTo)
-          ? values.assignTo.filter(id => id && id.trim() !== '')
-          : []
+          ? values.assignTo.filter((id) => id && id.trim() !== "")
+          : [],
       };
 
       // Format file data from fileList state
-      const formattedFiles = fileList.map(file => ({
+      const formattedFiles = fileList.map((file) => ({
         name: file.name,
         type: file.type,
         size: file.size,
         // If you have a base64 or URL of the file, include it here
         // url: file.url || file.thumbUrl,
-        status: 'done'
+        status: "done",
       }));
 
       // Create the main payload object
@@ -197,11 +195,11 @@ const AddTask = ({ onClose }) => {
         task_reporter: values.task_reporter,
         status: values.status,
         priority: values.priority,
-        file: formattedFiles 
+        file: formattedFiles,
       };
 
       // Log the payload for debugging
-      console.log('Submitting Task with payload:', payload);
+      console.log("Submitting Task with payload:", payload);
 
       // Dispatch AddTaskk with payload
       dispatch(AddTaskk({ id, payload }))
@@ -230,11 +228,11 @@ const AddTask = ({ onClose }) => {
 
   // Add uploadProps configuration
   const uploadProps = {
-    name: 'file',
+    name: "file",
     multiple: true,
     maxCount: 5,
     showUploadList: true,
-    accept: '.jpg,.jpeg,.png,.pdf',
+    accept: ".jpg,.jpeg,.png,.pdf",
     customRequest: ({ onSuccess }) => {
       // Since we're handling the file list manually, just call onSuccess
       onSuccess();
@@ -243,11 +241,10 @@ const AddTask = ({ onClose }) => {
 
   return (
     <div className="add-expenses-form">
-
       <Formik
         initialValues={{
           ...initialValues,
-          files: [] // Add files to initial values
+          files: [], // Add files to initial values
         }}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
@@ -255,11 +252,13 @@ const AddTask = ({ onClose }) => {
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <>
             <Form className="formik-form" onSubmit={handleSubmit}>
-            <div className="mb-3 border-b pb-[-10px] font-medium"></div>
+              <div className="mb-3 border-b pb-[-10px] font-medium"></div>
               <Row gutter={16}>
                 <Col span={24}>
                   <div className="form-item">
-                    <label className="font-semibold">Task Name <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">
+                      Task Name <span className="text-red-500">*</span>
+                    </label>
                     <Field
                       name="taskName"
                       className="mt-1"
@@ -274,11 +273,11 @@ const AddTask = ({ onClose }) => {
                   </div>
                 </Col>
 
-
-
                 <Col span={24} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Category <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">
+                      Category <span className="text-red-500">*</span>
+                    </label>
                     <Select
                       style={{ width: "100%" }}
                       className="mt-1"
@@ -288,7 +287,12 @@ const AddTask = ({ onClose }) => {
                       dropdownRender={(menu) => (
                         <div>
                           {menu}
-                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <div
+                            style={{
+                              padding: 8,
+                              borderTop: "1px solid #e8e8e8",
+                            }}
+                          >
                             <Button
                               type="link"
                               icon={<PlusOutlined />}
@@ -315,13 +319,12 @@ const AddTask = ({ onClose }) => {
                   </div>
                 </Col>
 
-
-
-
                 {fnddata?.project_name && (
                   <Col span={24} className="mt-4">
                     <div className="form-item">
-                      <label className="font-semibold">Project <span className="text-red-500">*</span></label>
+                      <label className="font-semibold">
+                        Project <span className="text-red-500">*</span>
+                      </label>
                       <Field
                         value={fnddata.project_name}
                         name="project"
@@ -341,16 +344,21 @@ const AddTask = ({ onClose }) => {
 
                 <Col span={12} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">
+                      Start Date <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="date"
                       className="w-full mt-1 p-2 border rounded"
-                      value={values.startDate || ''}
+                      value={values.startDate || ""}
                       onChange={(e) => {
                         const selectedDate = e.target.value;
                         setFieldValue("startDate", selectedDate);
-                        
-                        if (values.dueDate && dayjs(values.dueDate).isBefore(selectedDate)) {
+
+                        if (
+                          values.dueDate &&
+                          dayjs(values.dueDate).isBefore(selectedDate)
+                        ) {
                           setFieldValue("dueDate", "");
                         }
                       }}
@@ -366,12 +374,14 @@ const AddTask = ({ onClose }) => {
 
                 <Col span={12} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Due Date <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">
+                      Due Date <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="date"
                       className="w-full mt-1 p-2 border rounded"
-                      value={values.dueDate || ''}
-                      min={values.startDate || ''}
+                      value={values.dueDate || ""}
+                      min={values.startDate || ""}
                       onChange={(e) => {
                         const selectedDate = e.target.value;
                         setFieldValue("dueDate", selectedDate);
@@ -386,87 +396,109 @@ const AddTask = ({ onClose }) => {
                   </div>
                 </Col>
 
-               
-
-<Col span={24} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">AssignTo <span className="text-rose-500">*</span></label>
-                  <Field name="assignTo">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        mode="multiple"
-                        placeholder="Select AddProjectMember"
-                        onChange={(value) => {
-                          const arrayValue = Array.isArray(value) ? value : [value];
-                          setFieldValue("assignTo", arrayValue);
-                        }}
-                        value={values.assignTo}
-                        onBlur={() => setFieldTouched("assignTo", true)}
-                        showSearch
-                        optionFilterProp="children"
-                        filterOption={(input, option) => {
-                          if (!option?.children) return false;
-                          return option.children.toLowerCase().includes(input.toLowerCase());
-                        }}
-                      >
-                        {Array.isArray(fnduserdatas) && fnduserdatas.length > 0 ? (
-                          fnduserdatas.map((client) => {
-                            const displayName = client.firstName || client.username || "Unnamed Client";
-                            return (
-                              <Option key={client.id} value={client.id}>
-                                {displayName}
-                              </Option>
-                            );
-                          })
-                        ) : (
-                          <Option value="" disabled>
-                            No Members Available
-                          </Option>
+                <Col span={24} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">
+                      AssignTo <span className="text-rose-500">*</span>
+                    </label>
+                    <Field name="assignTo">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-1"
+                          mode="multiple"
+                          placeholder="Select AddProjectMember"
+                          onChange={(value) => {
+                            const arrayValue = Array.isArray(value)
+                              ? value
+                              : [value];
+                            setFieldValue("assignTo", arrayValue);
+                          }}
+                          value={values.assignTo}
+                          onBlur={() => setFieldTouched("assignTo", true)}
+                          showSearch
+                          optionFilterProp="children"
+                          filterOption={(input, option) => {
+                            if (!option?.children) return false;
+                            return option.children
+                              .toLowerCase()
+                              .includes(input.toLowerCase());
+                          }}
+                        >
+                          {Array.isArray(fnduserdatas) &&
+                          fnduserdatas.length > 0 ? (
+                            fnduserdatas.map((client) => {
+                              const displayName =
+                                client.firstName ||
+                                client.username ||
+                                "Unnamed Client";
+                              return (
+                                <Option key={client.id} value={client.id}>
+                                  {displayName}
+                                </Option>
+                              );
+                            })
+                          ) : (
+                            <Option value="" disabled>
+                              No Members Available
+                            </Option>
+                          )}
+                        </Select>
+                      )}
+                    </Field>
+                    {/* Display selected users as tags */}
+                    <div className="mt-2">
+                      {Array.isArray(values.assignTo) &&
+                        values.assignTo.length > 0 && (
+                          <div className="selected-users">
+                            {values.assignTo.map((userId) => {
+                              const user = fnduserdatas.find(
+                                (u) => u.id === userId
+                              );
+                              return (
+                                user && (
+                                  <Tag key={userId} className="mb-1 mr-1">
+                                    {user.firstName ||
+                                      user.username ||
+                                      "Unnamed Client"}
+                                  </Tag>
+                                )
+                              );
+                            })}
+                          </div>
                         )}
-                      </Select>
-                    )}
-                  </Field>
-                  {/* Display selected users as tags */}
-                  <div className="mt-2">
-                    {Array.isArray(values.assignTo) && values.assignTo.length > 0 && (
-                      <div className="selected-users">
-                        {values.assignTo.map((userId) => {
-                          const user = fnduserdatas.find(u => u.id === userId);
-                          return user && (
-                            <Tag key={userId} className="mb-1 mr-1">
-                              {user.firstName || user.username || "Unnamed Client"}
-                            </Tag>
-                          );
-                        })}
-                      </div>
-                    )}
+                    </div>
+                    <ErrorMessage
+                      name="assignTo"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
                   </div>
-                  <ErrorMessage
-                    name="assignTo"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                </Col>
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Task Reporter <span className="text-rose-500">*</span></label>
+                    <label className="font-semibold">
+                      Task Reporter <span className="text-rose-500">*</span>
+                    </label>
                     <Field name="task_reporter">
                       {({ field }) => (
                         <Select
                           {...field}
                           className="w-full mt-1"
                           placeholder="Select Task Reporter"
-                          onChange={(value) => setFieldValue("task_reporter", value)}
+                          onChange={(value) =>
+                            setFieldValue("task_reporter", value)
+                          }
                           value={values.task_reporter}
                         >
-                          {Array.isArray(fnduserdatas) && fnduserdatas.length > 0 ? (
+                          {Array.isArray(fnduserdatas) &&
+                          fnduserdatas.length > 0 ? (
                             fnduserdatas.map((client) => (
                               <Option key={client.id} value={client.id}>
-                                {client.firstName || client.username || "Unnamed Client"}
+                                {client.firstName ||
+                                  client.username ||
+                                  "Unnamed Client"}
                               </Option>
                             ))
                           ) : (
@@ -485,102 +517,108 @@ const AddTask = ({ onClose }) => {
                   </div>
                 </Col>
 
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold mb-2">Status <span className="text-rose-500">*</span></label>
-                  <Field name="status">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        onChange={(value) => setFieldValue("status", value)}
-                        value={values.status}
-                      >
-                        <Option value="Incomplete">
-                          <div className="flex items-center">
-                            <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
-                            Incomplete
-                          </div>
-                        </Option>
-                        <Option value="To Do">
-                          <div className="flex items-center">
-                            <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
-                            To Do
-                          </div>
-                        </Option>
-                        <Option value="In Progress">
-                          <div className="flex items-center">
-                            <span className="h-2 w-2 rounded-full bg-orange-500 mr-2"></span>
-                            In Progress
-                          </div>
-                        </Option>
-                        <Option value="Completed">
-                          <div className="flex items-center">
-                            <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
-                            Completed
-                          </div>
-                        </Option>
-                        <Option value="On Hold">
-                          <div className="flex items-center">
-                            <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
-                            Waiting Approval
-                          </div>
-                        </Option>
-                      </Select>
-                      // </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="status"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold mb-2">
+                      Status <span className="text-rose-500">*</span>
+                    </label>
+                    <Field name="status">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-1"
+                          onChange={(value) => setFieldValue("status", value)}
+                          value={values.status}
+                        >
+                          <Option value="Incomplete">
+                            <div className="flex items-center">
+                              <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                              Incomplete
+                            </div>
+                          </Option>
+                          <Option value="To Do">
+                            <div className="flex items-center">
+                              <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
+                              To Do
+                            </div>
+                          </Option>
+                          <Option value="In Progress">
+                            <div className="flex items-center">
+                              <span className="h-2 w-2 rounded-full bg-orange-500 mr-2"></span>
+                              In Progress
+                            </div>
+                          </Option>
+                          <Option value="Completed">
+                            <div className="flex items-center">
+                              <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                              Completed
+                            </div>
+                          </Option>
+                          <Option value="On Hold">
+                            <div className="flex items-center">
+                              <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
+                              Waiting Approval
+                            </div>
+                          </Option>
+                        </Select>
+                        // </Select>
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="status"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Priority <span className="text-rose-500">*</span></label>
-                  <Field name="priority">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        onChange={(value) => setFieldValue("priority", value)}
-                        value={values.priority}
-                      >
-                        <Option value="Medium">
-                          <div className="flex items-center">
-                            <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
-                            Medium
-                          </div>
-                        </Option>
-                        <Option value="High">
-                          <div className="flex items-center">
-                            <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
-                            High
-                          </div>
-                        </Option>
-                        <Option value="Low">
-                          <div className="flex items-center">
-                            <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
-                            Low
-                          </div>
-                        </Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="priority"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-                
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">
+                      Priority <span className="text-rose-500">*</span>
+                    </label>
+                    <Field name="priority">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-1"
+                          onChange={(value) => setFieldValue("priority", value)}
+                          value={values.priority}
+                        >
+                          <Option value="Medium">
+                            <div className="flex items-center">
+                              <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
+                              Medium
+                            </div>
+                          </Option>
+                          <Option value="High">
+                            <div className="flex items-center">
+                              <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                              High
+                            </div>
+                          </Option>
+                          <Option value="Low">
+                            <div className="flex items-center">
+                              <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                              Low
+                            </div>
+                          </Option>
+                        </Select>
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="priority"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
                 <Col span={24} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Description <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">
+                      Description <span className="text-red-500">*</span>
+                    </label>
                     <ReactQuill
                       value={values.description}
                       className="mt-1"
@@ -598,46 +636,51 @@ const AddTask = ({ onClose }) => {
 
                 {/* File upload component */}
                 <Col span={24}>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Attachment (Optional)
-                  </label>
-                  <Upload
-                    {...uploadProps}
-                    fileList={fileList}
-                    onChange={({ fileList: newFileList }) => {
-                      // Update fileList state when files are added or removed
-                      setFileList(newFileList);
-                    }}
-                    beforeUpload={(file) => {
-                      const isValidFileType = ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type);
-                      const isValidFileSize = file.size / 1024 / 1024 < 5;
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Attachment (Optional)
+                    </label>
+                    <Upload
+                      {...uploadProps}
+                      fileList={fileList}
+                      onChange={({ fileList: newFileList }) => {
+                        // Update fileList state when files are added or removed
+                        setFileList(newFileList);
+                      }}
+                      beforeUpload={(file) => {
+                        const isValidFileType = [
+                          "image/jpeg",
+                          "image/png",
+                          "application/pdf",
+                        ].includes(file.type);
+                        const isValidFileSize = file.size / 1024 / 1024 < 5;
 
-                      if (!isValidFileType) {
-                        message.error('You can only upload JPG/PNG/PDF files!');
-                        return Upload.LIST_IGNORE;
-                      }
-                      if (!isValidFileSize) {
-                        message.error('File must be smaller than 5MB!');
-                        return Upload.LIST_IGNORE;
-                      }
+                        if (!isValidFileType) {
+                          message.error(
+                            "You can only upload JPG/PNG/PDF files!"
+                          );
+                          return Upload.LIST_IGNORE;
+                        }
+                        if (!isValidFileSize) {
+                          message.error("File must be smaller than 5MB!");
+                          return Upload.LIST_IGNORE;
+                        }
 
-                      // Don't actually upload, just add to fileList
-                      return false;
-                    }}
-                    multiple={true}
-                    maxCount={5}
-                  >
-                    <Button icon={<UploadOutlined />} className="bg-white">
-                      Select File
-                    </Button>
-                    <span className="ml-2 text-gray-500 text-sm">
-                      Supports: JPG, PNG, PDF (Max: 5MB)
-                    </span>
-                  </Upload>
-                </div>
-              </Col>
-
+                        // Don't actually upload, just add to fileList
+                        return false;
+                      }}
+                      multiple={true}
+                      maxCount={5}
+                    >
+                      <Button icon={<UploadOutlined />} className="bg-white">
+                        Select File
+                      </Button>
+                      <span className="ml-2 text-gray-500 text-sm">
+                        Supports: JPG, PNG, PDF (Max: 5MB)
+                      </span>
+                    </Upload>
+                  </div>
+                </Col>
               </Row>
 
               <div className="form-buttons text-right mt-4">
@@ -655,7 +698,15 @@ const AddTask = ({ onClose }) => {
               title="Add New priority"
               open={isPriorityModalVisible}
               onCancel={() => setIsPriorityModalVisible(false)}
-              onOk={() => handleAddNewLable("priority", newPriority, setNewPriority, setIsPriorityModalVisible, setFieldValue)}
+              onOk={() =>
+                handleAddNewLable(
+                  "priority",
+                  newPriority,
+                  setNewPriority,
+                  setIsPriorityModalVisible,
+                  setFieldValue
+                )
+              }
               okText="Add priority"
             >
               <Input
@@ -669,7 +720,15 @@ const AddTask = ({ onClose }) => {
               title="Add New Category"
               open={isCategoryModalVisible}
               onCancel={() => setIsCategoryModalVisible(false)}
-              onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible, setFieldValue)}
+              onOk={() =>
+                handleAddNewLable(
+                  "category",
+                  newCategory,
+                  setNewCategory,
+                  setIsCategoryModalVisible,
+                  setFieldValue
+                )
+              }
               okText="Add Category"
             >
               <Input
@@ -683,7 +742,15 @@ const AddTask = ({ onClose }) => {
               title="Add New Status"
               open={isStatusModalVisible}
               onCancel={() => setIsStatusModalVisible(false)}
-              onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible, setFieldValue)}
+              onOk={() =>
+                handleAddNewLable(
+                  "status",
+                  newStatus,
+                  setNewStatus,
+                  setIsStatusModalVisible,
+                  setFieldValue
+                )
+              }
               okText="Add Status"
             >
               <Input
@@ -700,5 +767,3 @@ const AddTask = ({ onClose }) => {
 };
 
 export default AddTask;
-
-

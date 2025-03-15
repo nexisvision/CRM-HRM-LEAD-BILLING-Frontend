@@ -1,16 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  Row,
-  Col,
-  Input,
-  message,
-  Button,
-  Modal,
-  Select,
-} from "antd";
-import {
-  PlusOutlined,
-} from "@ant-design/icons";
+import { Row, Col, Input, message, Button, Modal, Select } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -25,7 +15,8 @@ import AddPipeLine from "../Pipeline/AddPipeLine";
 const { Option } = Select;
 
 const AddDealStages = ({ onClose }) => {
-  const [isAddPipelineModalVisible, setAddPipelineModalVisible] = useState(false);
+  const [isAddPipelineModalVisible, setAddPipelineModalVisible] =
+    useState(false);
   const dispatch = useDispatch();
   const allpipline = useSelector((state) => state.Piplines);
   const fndpip = allpipline.Piplines.data;
@@ -40,7 +31,7 @@ const AddDealStages = ({ onClose }) => {
     dispatch(getstages());
     onClose();
     resetForm();
-    message.success("Lead stage added successfully!");
+    message.success("Deal stage added successfully!");
   };
 
   const initialValues = {
@@ -65,7 +56,7 @@ const AddDealStages = ({ onClose }) => {
     <>
       <div>
         <div className="">
-        <div className="border-b pb-[-10px] font-medium"></div>
+          <div className="border-b pb-[-10px] font-medium"></div>
 
           <div className="">
             <div className="">
@@ -86,7 +77,8 @@ const AddDealStages = ({ onClose }) => {
                       <Col span={24} className="mt-2">
                         <div className="form-item">
                           <label className="font-semibold">
-                            Deal Stage Name <span className="text-rose-500">*</span>
+                            Deal Stage Name{" "}
+                            <span className="text-rose-500">*</span>
                           </label>
                           <Field
                             name="stageName"
@@ -103,7 +95,9 @@ const AddDealStages = ({ onClose }) => {
                       </Col>
                       <Col span={24} className="mt-2">
                         <div className="form-item">
-                          <label className="font-semibold">Pipeline <span className="text-rose-500">*</span></label>
+                          <label className="font-semibold">
+                            Pipeline <span className="text-rose-500">*</span>
+                          </label>
                           <Field name="pipeline">
                             {({ field }) => (
                               <Select
@@ -115,13 +109,13 @@ const AddDealStages = ({ onClose }) => {
                                 }
                                 value={values.pipeline}
                                 onBlur={() => setFieldTouched("pipeline", true)}
-                                dropdownRender={menu => (
+                                dropdownRender={(menu) => (
                                   <>
                                     {menu}
                                     <div
                                       style={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
+                                        display: "flex",
+                                        justifyContent: "center",
                                         padding: 8,
                                       }}
                                     >

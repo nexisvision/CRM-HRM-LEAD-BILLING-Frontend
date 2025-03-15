@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Row,
-  Col,
-  Input,
-  message,
-  Button,
-} from "antd";
+import { Row, Col, Input, message, Button } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import {
@@ -15,7 +9,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 const EditContractType = ({ idd, onClose }) => {
-  ;
   const dispatch = useDispatch();
   const allloggeddata = useSelector((state) => state.user);
   const userdata = allloggeddata.loggedInUser;
@@ -38,7 +31,6 @@ const EditContractType = ({ idd, onClose }) => {
     dispatch(GetLable(lid));
     onClose();
     resetForm();
-    message.success("Country added successfully!");
   };
 
   const [initialValues, setInitialValues] = useState({
@@ -59,7 +51,7 @@ const EditContractType = ({ idd, onClose }) => {
     <>
       <div>
         <div className="">
-        <div className="mb-2 border-b pb-[-10px] font-medium"></div>
+          <div className="mb-2 border-b pb-[-10px] font-medium"></div>
           <div className="">
             <div className="">
               <Formik
@@ -79,7 +71,10 @@ const EditContractType = ({ idd, onClose }) => {
                     <Row gutter={16}>
                       <Col span={24} className="mt-2">
                         <div className="form-item">
-                          <label className="font-semibold">Contract Type Name <span className="text-rose-500">*</span></label>
+                          <label className="font-semibold">
+                            Contract Type Name{" "}
+                            <span className="text-rose-500">*</span>
+                          </label>
                           <Field
                             name="name"
                             as={Input}

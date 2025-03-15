@@ -1,10 +1,19 @@
-import React, { useEffect } from 'react';
-import { Modal, Form, Input, Select, Button, DatePicker, TimePicker, message } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
-import { AddInterviews, getInterview } from './interviewReducer/interviewSlice';
-import { GetJobdata } from '../JobReducer/JobSlice';
-import { getjobapplication } from '../JobApplication/JobapplicationReducer/JobapplicationSlice';
-import moment from 'moment';
+import React, { useEffect } from "react";
+import {
+  Modal,
+  Form,
+  Input,
+  Select,
+  Button,
+  DatePicker,
+  TimePicker,
+  message,
+} from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { AddInterviews, getInterview } from "./interviewReducer/interviewSlice";
+import { GetJobdata } from "../JobReducer/JobSlice";
+import { getjobapplication } from "../JobApplication/JobapplicationReducer/JobapplicationSlice";
+import moment from "moment";
 
 const { Option } = Select;
 
@@ -13,7 +22,8 @@ const AddInterviewModal = ({ open, onCancel, onAddInterview, initialDate }) => {
   const dispatch = useDispatch();
 
   const jobsData = useSelector((state) => state.Jobs.Jobs.data) || [];
-  const jobApplications = useSelector((state) => state.jobapplications.jobapplications.data) || [];
+  const jobApplications =
+    useSelector((state) => state.jobapplications.jobapplications.data) || [];
 
   useEffect(() => {
     dispatch(GetJobdata());
@@ -30,19 +40,27 @@ const AddInterviewModal = ({ open, onCancel, onAddInterview, initialDate }) => {
 
   const handleFinish = async (values) => {
     try {
+      const timeValue = values.startTime
+        ? values.startTime.format("HH:mm:ss")
+        : null;
 
       const dataa = {
         ...values,
-        startOn: moment(values.startOn).format('YYYY-MM-DD'),
-        startTime: moment(values.startTime).format('HH:mm'),
+        startOn: moment(values.startOn).format("YYYY-MM-DD"),
+        startTime: timeValue,
       };
+
+      console.log("Time being sent:", timeValue);
+
       await dispatch(AddInterviews(dataa)).then(() => {
-        message.success('Interview added successfully');
+        message.success("Interview added successfully");
         dispatch(getInterview());
-        onAddInterview(); // Call the function to refresh the interview list
-        onCancel(); // Close the modal
+        onAddInterview();
+        onCancel();
+        form.resetFields();
       });
     } catch (error) {
+      message.error("Failed to add interview");
     }
   };
 
@@ -50,7 +68,10 @@ const AddInterviewModal = ({ open, onCancel, onAddInterview, initialDate }) => {
     <Modal
       title="Add Interview"
       visible={open}
-      onCancel={onCancel}
+      onCancel={() => {
+        form.resetFields();
+        onCancel();
+      }}
       footer={null}
     >
       <div className="mb-3 border-b pb-1 font-medium"></div>
@@ -58,7 +79,7 @@ const AddInterviewModal = ({ open, onCancel, onAddInterview, initialDate }) => {
         <Form.Item
           name="job"
           label="Job"
-          rules={[{ required: true, message: 'Please select a job!' }]}
+          rules={[{ required: true, message: "Please select a job!" }]}
         >
           <Select placeholder="Select a job">
             {jobsData.map((job) => (
@@ -71,7 +92,7 @@ const AddInterviewModal = ({ open, onCancel, onAddInterview, initialDate }) => {
         <Form.Item
           name="candidate"
           label="Candidate"
-          rules={[{ required: true, message: 'Please select a candidate!' }]}
+          rules={[{ required: true, message: "Please select a candidate!" }]}
         >
           <Select placeholder="Select a Candidate">
             {jobApplications.map((application) => (
@@ -84,21 +105,23 @@ const AddInterviewModal = ({ open, onCancel, onAddInterview, initialDate }) => {
         <Form.Item
           name="interviewer"
           label="Interviewer"
-          rules={[{ required: true, message: 'Please input the interviewer!' }]}
+          rules={[{ required: true, message: "Please input the interviewer!" }]}
         >
           <Input autoComplete="off" />
         </Form.Item>
         <Form.Item
           name="round"
           label="Round"
-          rules={[{ required: true, message: 'Please input the round!' }]}
+          rules={[{ required: true, message: "Please input the round!" }]}
         >
           <Input autoComplete="off" />
         </Form.Item>
         <Form.Item
           name="interviewType"
           label="Interview Type"
-          rules={[{ required: true, message: 'Please select the interview type!' }]}
+          rules={[
+            { required: true, message: "Please select the interview type!" },
+          ]}
         >
           <Select placeholder="Select interview type">
             <Option value="Online">Online</Option>
@@ -108,16 +131,21 @@ const AddInterviewModal = ({ open, onCancel, onAddInterview, initialDate }) => {
         <Form.Item
           name="startOn"
           label="Start On"
-          rules={[{ required: true, message: 'Please select start date!' }]}
+          rules={[{ required: true, message: "Please select start date!" }]}
         >
           <DatePicker format="DD-MM-YYYY" />
         </Form.Item>
         <Form.Item
           name="startTime"
           label="Start Time"
-          rules={[{ required: true, message: 'Please select start time!' }]}
+          rules={[{ required: true, message: "Please select start time!" }]}
         >
-          <TimePicker format="HH:mm" />
+          <TimePicker
+            format="HH:mm:ss"
+            use12Hours={false}
+            defaultValue={moment("09:00:00", "HH:mm:ss")}
+            minuteStep={5}
+          />
         </Form.Item>
         <Form.Item name="commentForInterviewer" label="Comment For Interviewer">
           <Input autoComplete="off" />

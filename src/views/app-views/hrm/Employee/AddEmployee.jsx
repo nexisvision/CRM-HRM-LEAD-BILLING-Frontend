@@ -125,14 +125,16 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
         message.success("OTP Verified Successfully");
         setShowOtpModal(false);
         dispatch(empdata());
+        onClose();
 
-
-        const payloadss = {
-          ...formValues2,
-          employeeId: response.data.user.id,
+        if (salary) {
+          const payloadss = {
+            ...formValues2,
+            employeeId: response.data.user.id,
+          }
+          await dispatch(AddSalaryss(payloadss));
+          onClose();
         }
-
-        await dispatch(AddSalaryss(payloadss));
       } else {
         message.error("Invalid OTP. Please try again.");
       }

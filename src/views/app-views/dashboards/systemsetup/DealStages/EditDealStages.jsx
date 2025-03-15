@@ -1,16 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  Row,
-  Col,
-  Input,
-  message,
-  Button,
-  Modal,
-  Select,
-} from "antd";
-import {
-  PlusOutlined,
-} from "@ant-design/icons";
+import { Row, Col, Input, message, Button, Modal, Select } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -30,7 +20,8 @@ const EditDealStages = ({ idd, onClose }) => {
   const fndpip = allpipline.StagesLeadsDeals.data;
   const allpiplines = useSelector((state) => state.Piplines);
   const fndpips = allpiplines.Piplines.data;
-  const [isAddPipelineModalVisible, setAddPipelineModalVisible] = useState(false);
+  const [isAddPipelineModalVisible, setAddPipelineModalVisible] =
+    useState(false);
 
   useEffect(() => {
     dispatch(GetPip());
@@ -55,7 +46,7 @@ const EditDealStages = ({ idd, onClose }) => {
     dispatch(getstages());
     dispatch(getstages());
     onClose();
-    message.success("Lead stage added successfully!");
+    message.success("Deal stage updated successfully!");
   };
 
   const [initialValues, setInitialValues] = useState({
@@ -79,7 +70,7 @@ const EditDealStages = ({ idd, onClose }) => {
   return (
     <div>
       <div className="">
-      <div className="border-b pb-[-10px] font-medium"></div>
+        <div className="border-b pb-[-10px] font-medium"></div>
         <div className="p-2">
           <Formik
             initialValues={initialValues}
@@ -99,7 +90,9 @@ const EditDealStages = ({ idd, onClose }) => {
                   {/* Editable Stage Name Field */}
                   <Col span={24} className="mt-2">
                     <div className="form-item">
-                      <label className="font-semibold">Deal Stage Name <span className="text-rose-500">*</span></label>
+                      <label className="font-semibold">
+                        Deal Stage Name <span className="text-rose-500">*</span>
+                      </label>
                       <Field
                         name="stageName"
                         as={Input}
@@ -121,7 +114,9 @@ const EditDealStages = ({ idd, onClose }) => {
                   {/* Editable Pipeline Field */}
                   <Col span={24} className="mt-2">
                     <div className="form-item">
-                      <label className="font-semibold">Pipeline <span className="text-rose-500">*</span></label>
+                      <label className="font-semibold">
+                        Pipeline <span className="text-rose-500">*</span>
+                      </label>
                       <Field name="pipeline">
                         {({ field }) => (
                           <Select
@@ -133,13 +128,13 @@ const EditDealStages = ({ idd, onClose }) => {
                               setFieldValue("pipeline", value)
                             }
                             onBlur={() => setFieldTouched("pipeline", true)}
-                            dropdownRender={menu => (
+                            dropdownRender={(menu) => (
                               <>
                                 {menu}
                                 <div
                                   style={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
+                                    display: "flex",
+                                    justifyContent: "center",
                                     padding: 8,
                                   }}
                                 >

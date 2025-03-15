@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Row,
-  Col,
-  Input,
-  message,
-  Button,
-  Select,
-} from "antd";
+import { Row, Col, Input, message, Button, Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Editstages,
@@ -53,7 +46,7 @@ const EditLabels = ({ idd, onClose }) => {
     dispatch(getstages());
     dispatch(getstages());
     onClose();
-    message.success("Lead stage added successfully!");
+    message.success("Lable updated successfully!");
   };
 
   const [initialValues, setInitialValues] = useState({
@@ -69,7 +62,7 @@ const EditLabels = ({ idd, onClose }) => {
   return (
     <div>
       <div className="">
-        <div className="mb-2 border-b pb-[-10px] font-medium"></div>           
+        <div className="mb-2 border-b pb-[-10px] font-medium"></div>
         <div className="p-2">
           <Formik
             initialValues={initialValues}
@@ -77,17 +70,14 @@ const EditLabels = ({ idd, onClose }) => {
             onSubmit={onSubmit}
             enableReinitialize
           >
-            {({
-              values,
-              setFieldValue,
-              handleSubmit,
-              setFieldTouched,
-            }) => (
+            {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
               <Form className="formik-form" onSubmit={handleSubmit}>
                 <Row gutter={16}>
                   <Col span={24} className="mt-2">
                     <div className="form-item">
-                      <label className="font-semibold">Label Name <span className="text-rose-500">*</span></label>
+                      <label className="font-semibold">
+                        Label Name <span className="text-rose-500">*</span>
+                      </label>
                       <Field
                         name="stageName"
                         as={Input}
@@ -108,7 +98,9 @@ const EditLabels = ({ idd, onClose }) => {
 
                   <Col span={24} className="mt-2">
                     <div className="form-item">
-                      <label className="font-semibold">Pipeline <span className="text-rose-500">*</span></label>
+                      <label className="font-semibold">
+                        Pipeline <span className="text-rose-500">*</span>
+                      </label>
                       <Field name="pipeline">
                         {({ field }) => (
                           <Select

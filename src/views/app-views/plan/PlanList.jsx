@@ -1,12 +1,41 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, Modal, message, Switch, Tag, Row, Col, Typography, Empty, Dropdown } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, UserOutlined, CloudUploadOutlined, TeamOutlined, CalendarOutlined, CrownOutlined, MoreOutlined, InfoCircleOutlined, EyeOutlined } from "@ant-design/icons";
+import {
+  Card,
+  Button,
+  Modal,
+  message,
+  Switch,
+  Tag,
+  Row,
+  Col,
+  Typography,
+  Empty,
+  Dropdown,
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  UserOutlined,
+  CloudUploadOutlined,
+  TeamOutlined,
+  CalendarOutlined,
+  CrownOutlined,
+  MoreOutlined,
+  InfoCircleOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import AddPlan from "./AddPlan";
 import EditPlan from "./EditPlan";
 import ViewPlanModal from "./ViewPlanModal";
 import { useDispatch, useSelector } from "react-redux";
-import { DeleteP, Editplan, GetPlan, planbutus } from "./PlanReducers/PlanSlice";
-import './PlanList.css'; // Import the CSS file
+import {
+  DeleteP,
+  Editplan,
+  GetPlan,
+  planbutus,
+} from "./PlanReducers/PlanSlice";
+import "./PlanList.css"; // Import the CSS file
 import { getcurren } from "../setting/currencies/currenciesSlice/currenciesSlice";
 import { getRoles } from "../hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice";
 import moment from "moment";
@@ -26,13 +55,12 @@ const PlanList = () => {
   const Plandata = useSelector((state) => state.Plan);
   const allPlans = Plandata.Plan || [];
 
-
   const roleid = useSelector((state) => state.user.loggedInUser.role_id);
 
   const role = useSelector((state) => state.role.role.data || []);
 
   const roleidd = role.find((item) => item.id === roleid);
-  const isAdmin = roleidd?.role_name === 'super-admin';
+  const isAdmin = roleidd?.role_name === "super-admin";
 
   const userid = useSelector((state) => state.user.loggedInUser.id);
 
@@ -42,27 +70,21 @@ const PlanList = () => {
   const alldatas = useSelector((state) => state.subplan);
   const fnddtat = alldatas.subplan.data || [];
 
-
   const userplan = fnddtat.find((item) => item.client_id === userid);
-
 
   const userplanstatus = userplan?.plan_id;
 
   const allPlansStatus = allPlans.find((item) => item.id === userplanstatus);
 
-
   const userplanstatuss = allPlans.find((item) => item.id === selectedPlan);
 
-
-
   useEffect(() => {
-    dispatch(getcurren())
-  }, [dispatch])
+    dispatch(getcurren());
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(getsubplandata());
   }, [dispatch]);
-
 
   useEffect(() => {
     dispatch(GetPlan());
@@ -78,7 +100,7 @@ const PlanList = () => {
         dispatch(GetPlan());
       });
     } catch (error) {
-      console.error('Error deleting plan:', error);
+      console.error("Error deleting plan:", error);
     }
   };
 
@@ -88,11 +110,11 @@ const PlanList = () => {
   const closeEditPlanModal = () => setIsEditPlanModalVisible(false);
 
   const togglePlan = (id, currentStatus, plan) => {
-    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    const newStatus = currentStatus === "active" ? "inactive" : "active";
 
     const submitValues = {
       ...plan,
-      status: newStatus
+      status: newStatus,
     };
 
     dispatch(Editplan({ id, values: submitValues }))
@@ -113,24 +135,24 @@ const PlanList = () => {
 
   const getMenuItems = (plan) => [
     {
-      key: 'view',
+      key: "view",
       icon: <EyeOutlined />,
-      label: 'View Details',
-      onClick: () => handleViewPlan(plan)
+      label: "View Details",
+      onClick: () => handleViewPlan(plan),
     },
     {
-      key: 'edit',
+      key: "edit",
       icon: <EditOutlined />,
-      label: 'Edit',
-      onClick: () => EditP(plan.id)
+      label: "Edit",
+      onClick: () => EditP(plan.id),
     },
     {
-      key: 'delete',
+      key: "delete",
       icon: <DeleteOutlined />,
-      label: 'Delete',
+      label: "Delete",
       danger: true,
-      onClick: () => deletePlan(plan.id)
-    }
+      onClick: () => deletePlan(plan.id),
+    },
   ];
 
   const handleBuyClick = (plan) => {
@@ -145,32 +167,35 @@ const PlanList = () => {
     const handlePurchase = async () => {
       try {
         setLoading(true);
-        const startDate = moment().format('YYYY-MM-DD');
-        const endDate = userplanstatuss?.duration === 'Lifetime'
-          ? null
-          : calculateEndDate(moment(), userplanstatuss?.duration).format('YYYY-MM-DD');
+        const startDate = moment().format("YYYY-MM-DD");
+        const endDate =
+          userplanstatuss?.duration === "Lifetime"
+            ? null
+            : calculateEndDate(moment(), userplanstatuss?.duration).format(
+                "YYYY-MM-DD"
+              );
 
         const purchasePayload = {
-          client_id: loggedInUser?.id || '',
+          client_id: loggedInUser?.id || "",
           plan_id: selectedPlan,
-          payment_status: 'paid',
+          payment_status: "paid",
           start_date: startDate,
-          end_date: endDate
+          end_date: endDate,
         };
 
         await dispatch(planbutus(purchasePayload)).then(() => {
           dispatch(getsubplandata());
           onCancel();
         });
-
       } catch (error) {
-        console.error('Purchase error:', error);
+        console.error("Purchase error:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    const selectedCurrency = Array.isArray(currencyData) &&
+    const selectedCurrency =
+      Array.isArray(currencyData) &&
       currencyData.find((item) => item.id === plan?.currency);
 
     return (
@@ -200,7 +225,8 @@ const PlanList = () => {
                     <div className="space-y-1">
                       <Text type="secondary">Amount</Text>
                       <div className="text-lg font-semibold text-blue-600">
-                        {selectedCurrency?.currencyIcon}{userplanstatuss?.price}
+                        {selectedCurrency?.currencyIcon}
+                        {userplanstatuss?.price}
                         <span className="text-sm text-gray-500 ml-1">
                           /{plan?.duration?.toLowerCase()}
                         </span>
@@ -211,7 +237,7 @@ const PlanList = () => {
                     <div className="space-y-1">
                       <Text type="secondary">Start Date</Text>
                       <div className="text-lg font-semibold text-gray-800">
-                        {moment().format('DD MMM, YYYY')}
+                        {moment().format("DD MMM, YYYY")}
                       </div>
                     </div>
                   </Col>
@@ -219,11 +245,12 @@ const PlanList = () => {
                     <div className="space-y-1">
                       <Text type="secondary">End Date</Text>
                       <div className="text-lg font-semibold text-gray-800">
-                        {userplanstatuss?.duration === 'Lifetime' ? (
-                          'Lifetime'
-                        ) : (
-                          calculateEndDate(moment(), userplanstatuss?.duration)?.format('DD MMM, YYYY') || 'N/A'
-                        )}
+                        {userplanstatuss?.duration === "Lifetime"
+                          ? "Lifetime"
+                          : calculateEndDate(
+                              moment(),
+                              userplanstatuss?.duration
+                            )?.format("DD MMM, YYYY") || "N/A"}
                       </div>
                     </div>
                   </Col>
@@ -241,7 +268,9 @@ const PlanList = () => {
                       <UserOutlined className="text-blue-500" />
                       <div>
                         <div className="text-sm text-gray-600">Users</div>
-                        <div className="font-medium">{userplanstatuss?.max_users}</div>
+                        <div className="font-medium">
+                          {userplanstatuss?.max_users}
+                        </div>
                       </div>
                     </div>
                   </Col>
@@ -250,7 +279,9 @@ const PlanList = () => {
                       <TeamOutlined className="text-green-500" />
                       <div>
                         <div className="text-sm text-gray-600">Clients</div>
-                        <div className="font-medium">{userplanstatuss?.max_clients}</div>
+                        <div className="font-medium">
+                          {userplanstatuss?.max_clients}
+                        </div>
                       </div>
                     </div>
                   </Col>
@@ -259,7 +290,9 @@ const PlanList = () => {
                       <CloudUploadOutlined className="text-purple-500" />
                       <div>
                         <div className="text-sm text-gray-600">Storage</div>
-                        <div className="font-medium">{userplanstatuss?.storage_limit} GB</div>
+                        <div className="font-medium">
+                          {userplanstatuss?.storage_limit} GB
+                        </div>
                       </div>
                     </div>
                   </Col>
@@ -268,7 +301,9 @@ const PlanList = () => {
                       <CalendarOutlined className="text-orange-500" />
                       <div>
                         <div className="text-sm text-gray-600">Duration</div>
-                        <div className="font-medium">{userplanstatuss?.duration}</div>
+                        <div className="font-medium">
+                          {userplanstatuss?.duration}
+                        </div>
                       </div>
                     </div>
                   </Col>
@@ -282,10 +317,13 @@ const PlanList = () => {
                 <div className="flex items-start gap-3">
                   <InfoCircleOutlined className="text-blue-500 mt-0.5" />
                   <div>
-                    <Text strong className="text-blue-600">Trial Period</Text>
+                    <Text strong className="text-blue-600">
+                      Trial Period
+                    </Text>
                     <p className="text-sm text-gray-600 mt-1">
-                      You will get a {userplanstatuss?.trial_period} days trial period with this plan.
-                      No charges will be applied during the trial period.
+                      You will get a {userplanstatuss?.trial_period} days trial
+                      period with this plan. No charges will be applied during
+                      the trial period.
                     </p>
                   </div>
                 </div>
@@ -295,9 +333,7 @@ const PlanList = () => {
             {/* Action Buttons */}
             <Col span={24}>
               <div className="flex justify-end gap-4 pt-4 border-t">
-                <Button onClick={onCancel}>
-                  Cancel
-                </Button>
+                <Button onClick={onCancel}>Cancel</Button>
                 <Button
                   type="primary"
                   loading={loading}
@@ -315,9 +351,6 @@ const PlanList = () => {
   };
 
   const renderUserPlanStatus = () => {
-    // Assuming you have the user's current plan data in your state
-    // const userCurrentPlan = allPlans?.find(plan => plan.status === 'active');
-
     return (
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
@@ -325,11 +358,9 @@ const PlanList = () => {
             <h2 className="text-xl font-semibold text-gray-800">
               Your Current Subscription
             </h2>
-            <p className="text-gray-600">
-              Plan details and status
-            </p>
+            <p className="text-gray-600">Plan details and status</p>
           </div>
-          {allPlansStatus?.status === 'active' && (
+          {allPlansStatus?.status === "active" && (
             <Tag color="success" className="px-4 py-1 text-sm">
               Active
             </Tag>
@@ -340,29 +371,25 @@ const PlanList = () => {
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-gray-600 mb-1">Current Plan</p>
             <p className="text-lg font-semibold text-gray-800">
-              {allPlansStatus?.name || 'No active plan'}
+              {allPlansStatus?.name || "No active plan"}
             </p>
           </div>
 
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-gray-600 mb-1">Expiry Date</p>
             <p className="text-lg font-semibold text-gray-800">
-              {userplan?.end_date ? (
-                moment(userplan.end_date).format('DD MMM, YYYY')
-              ) : (
-                'N/A'
-              )}
+              {userplan?.end_date
+                ? moment(userplan.end_date).format("DD MMM, YYYY")
+                : "N/A"}
             </p>
           </div>
 
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-gray-600 mb-1">Days Remaining</p>
             <p className="text-lg font-semibold text-gray-800">
-              {userplan?.end_date ? (
-                `${moment(userplan?.end_date).diff(moment(), 'days')} days`
-              ) : (
-                'N/A'
-              )}
+              {userplan?.end_date
+                ? `${moment(userplan?.end_date).diff(moment(), "days")} days`
+                : "N/A"}
             </p>
           </div>
         </div>
@@ -374,7 +401,8 @@ const PlanList = () => {
               <div>
                 <p className="text-gray-600 text-sm">Users</p>
                 <p className="font-semibold">
-                  {allPlansStatus?.current_users || 0}/{allPlansStatus?.max_users || 0}
+                  {allPlansStatus?.current_users || 0}/
+                  {allPlansStatus?.max_users || 0}
                 </p>
               </div>
             </div>
@@ -384,7 +412,8 @@ const PlanList = () => {
               <div>
                 <p className="text-gray-600 text-sm">Clients</p>
                 <p className="font-semibold">
-                  {allPlansStatus?.current_clients || 0}/{allPlansStatus?.max_clients || 0}
+                  {allPlansStatus?.current_clients || 0}/
+                  {allPlansStatus?.max_clients || 0}
                 </p>
               </div>
             </div>
@@ -394,7 +423,8 @@ const PlanList = () => {
               <div>
                 <p className="text-gray-600 text-sm">Storage</p>
                 <p className="font-semibold">
-                  {allPlansStatus?.used_storage || 0}/{allPlansStatus?.storage_limit || 0} GB
+                  {allPlansStatus?.used_storage || 0}/
+                  {allPlansStatus?.storage_limit || 0} GB
                 </p>
               </div>
             </div>
@@ -404,7 +434,7 @@ const PlanList = () => {
               <div>
                 <p className="text-gray-600 text-sm">Billing Cycle</p>
                 <p className="font-semibold">
-                  {allPlansStatus?.duration || 'N/A'}
+                  {allPlansStatus?.duration || "N/A"}
                 </p>
               </div>
             </div>
@@ -417,19 +447,18 @@ const PlanList = () => {
   const calculateEndDate = (startDate, duration) => {
     if (!duration) return null;
 
-    const [amount, unit] = duration.split(' ');
+    const [amount, unit] = duration.split(" ");
 
-    if (unit.toLowerCase() === 'lifetime') {
-      return 'Lifetime';
+    if (unit.toLowerCase() === "lifetime") {
+      return "Lifetime";
     }
 
     const start = moment(startDate);
 
-    // Add the duration based on the unit
-    if (unit.toLowerCase().includes('month')) {
-      return start.clone().add(amount, 'months');
-    } else if (unit.toLowerCase().includes('year')) {
-      return start.clone().add(amount, 'years');
+    if (unit.toLowerCase().includes("month")) {
+      return start.clone().add(amount, "months");
+    } else if (unit.toLowerCase().includes("year")) {
+      return start.clone().add(amount, "years");
     }
 
     return null;
@@ -464,16 +493,15 @@ const PlanList = () => {
           )}
         </Row>
 
-        {/* Show current plan status for non-admin users */}
         {!isAdmin && renderUserPlanStatus()}
 
-        {/* Show all plans for everyone */}
         {allPlans?.length === 0 ? (
           <Empty description="No plans found" className="my-12" />
         ) : (
           <Row gutter={[24, 24]}>
             {allPlans?.map((plan) => {
-              const selectedCurrency = Array.isArray(currencyData) &&
+              const selectedCurrency =
+                Array.isArray(currencyData) &&
                 currencyData.find((item) => item.id === plan.currency);
 
               return (
@@ -488,11 +516,11 @@ const PlanList = () => {
                           <CrownOutlined className="text-2xl text-yellow-500" />
                           <div
                             style={{
-                              maxWidth: '180px',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              marginBottom: '8px'
+                              maxWidth: "180px",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              marginBottom: "8px",
                             }}
                             title={plan.name}
                           >
@@ -502,19 +530,28 @@ const PlanList = () => {
                         {isAdmin && (
                           <div
                             className="flex items-center gap-2"
-                            onClick={e => e.stopPropagation()}
+                            onClick={(e) => e.stopPropagation()}
                           >
                             <Switch
-                              checked={plan.status === 'active'}
-                              onChange={() => togglePlan(plan.id, plan.status, plan)}
-                              className={plan.status === 'active' ? 'bg-blue-600' : ''}
+                              checked={plan.status === "active"}
+                              onChange={() =>
+                                togglePlan(plan.id, plan.status, plan)
+                              }
+                              className={
+                                plan.status === "active" ? "bg-blue-600" : ""
+                              }
                             />
                             <Dropdown
                               menu={{ items: getMenuItems(plan) }}
                               placement="bottomRight"
-                              trigger={['click']}
+                              trigger={["click"]}
                             >
-                              <Button type="text" icon={<MoreOutlined className="text-gray-600" />} />
+                              <Button
+                                type="text"
+                                icon={
+                                  <MoreOutlined className="text-gray-600" />
+                                }
+                              />
                             </Dropdown>
                           </div>
                         )}
@@ -525,11 +562,16 @@ const PlanList = () => {
                       {/* Price Section */}
                       <div className="text-center bg-blue-50 p-8 rounded-xl shadow-inner">
                         <div className="text-6xl font-bold text-blue-600">
-                          <span className="text-3xl">{selectedCurrency?.currencyIcon || ''}</span>
+                          <span className="text-3xl">
+                            {selectedCurrency?.currencyIcon || ""}
+                          </span>
                           {plan?.price}
                         </div>
                         <div className="text-gray-600 font-medium mt-2">
-                          per {plan?.duration ? plan?.duration.toLowerCase() : 'N/A'}
+                          per{" "}
+                          {plan?.duration
+                            ? plan?.duration.toLowerCase()
+                            : "N/A"}
                         </div>
                       </div>
 
@@ -538,7 +580,9 @@ const PlanList = () => {
                         <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
                           <CalendarOutlined className="text-blue-500 text-xl" />
                           <div>
-                            <div className="text-sm text-gray-500">Duration</div>
+                            <div className="text-sm text-gray-500">
+                              Duration
+                            </div>
                             <div className="font-semibold">{plan.duration}</div>
                           </div>
                         </div>
@@ -547,7 +591,9 @@ const PlanList = () => {
                           <UserOutlined className="text-blue-500 text-xl" />
                           <div>
                             <div className="text-sm text-gray-500">Users</div>
-                            <div className="font-semibold">{plan.max_users} users</div>
+                            <div className="font-semibold">
+                              {plan.max_users} users
+                            </div>
                           </div>
                         </div>
 
@@ -555,7 +601,9 @@ const PlanList = () => {
                           <TeamOutlined className="text-blue-500 text-xl" />
                           <div>
                             <div className="text-sm text-gray-500">Clients</div>
-                            <div className="font-semibold">{plan.max_clients} clients</div>
+                            <div className="font-semibold">
+                              {plan.max_clients} clients
+                            </div>
                           </div>
                         </div>
 
@@ -563,7 +611,9 @@ const PlanList = () => {
                           <CloudUploadOutlined className="text-blue-500 text-xl" />
                           <div>
                             <div className="text-sm text-gray-500">Storage</div>
-                            <div className="font-semibold">{plan.storage_limit} GB</div>
+                            <div className="font-semibold">
+                              {plan.storage_limit} GB
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -571,7 +621,10 @@ const PlanList = () => {
                       {/* Trial Badge */}
                       {plan.trial && (
                         <div className="absolute top-4 right-4">
-                          <Tag color="gold" className="px-3 py-1 rounded-full text-sm font-medium">
+                          <Tag
+                            color="gold"
+                            className="px-3 py-1 rounded-full text-sm font-medium"
+                          >
                             {plan.trial_period} Days Trial
                           </Tag>
                         </div>
@@ -585,7 +638,7 @@ const PlanList = () => {
                           onClick={() => handleBuyClick(plan)}
                           className="mt-6 h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 border-0 rounded-lg transform transition-all duration-300 hover:scale-105"
                         >
-                          {plan.status === 'active' ? 'Choose Plan' : ''}
+                          {plan.status === "active" ? "Choose Plan" : ""}
                         </Button>
                       )}
                     </div>
@@ -623,7 +676,6 @@ const PlanList = () => {
           onCancel={() => setIsPurchaseModalVisible(false)}
           plan={selectedPlan}
           currencyData={currencyData}
-
         />
 
         <ViewPlanModal

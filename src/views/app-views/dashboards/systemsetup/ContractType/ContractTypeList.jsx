@@ -1,18 +1,8 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  Table,
-  Button,
-  Modal,
-  message,
-} from "antd";
+import { Card, Table, Button, Modal, message } from "antd";
 import OrderListData from "../../../../../assets/data/order-list.data.json";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import Flex from "components/shared-components/Flex";
 import utils from "utils";
 import {
@@ -39,7 +29,7 @@ const ContractTypeList = () => {
   const lid = userdata.id;
   const alltagdata = useSelector((state) => state.Lable);
   const fndddata = alltagdata.Lable.data || [];
-  const datas = fndddata?.filter(item => item.lableType === "contract");
+  const datas = fndddata?.filter((item) => item.lableType === "contract");
 
   const openAddSourcesModal = () => {
     setIsAddSourcesModalVisible(true);
@@ -71,7 +61,6 @@ const ContractTypeList = () => {
     try {
       await dispatch(Deletemins(userId));
       await dispatch(GetLable(lid));
-      message.success("Source deleted successfully!");
     } catch (error) {
       message.error("Failed to delete the source. Please try again.");
     }
@@ -140,18 +129,12 @@ const ContractTypeList = () => {
           <Flex
             className="flex flex-wrap gap-4 mb-4 md:mb-0"
             mobileFlex={false}
-          >
-
-          </Flex>
-        </Flex >
+          ></Flex>
+        </Flex>
         <div className="table-responsive">
-          <Table
-            columns={tableColumns}
-            dataSource={list}
-            rowKey="id"
-          />
+          <Table columns={tableColumns} dataSource={list} rowKey="id" />
         </div>
-      </Card >
+      </Card>
 
       <Modal
         title="Add Contract Type"

@@ -1,13 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  Row,
-  Col,
-  Input,
-  message,
-  Button,
-  Select,
-
-} from "antd";
+import { Row, Col, Input, message, Button, Select } from "antd";
 import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -25,7 +17,7 @@ const AddLabels = ({ onClose }) => {
   const loggeduser = useSelector((state) => state.user.loggedInUser.username);
   const allpipline = useSelector((state) => state.Piplines);
   const fndpipp = allpipline.Piplines.data;
-  const fndpip = fndpipp.filter((item) => item.created_by === loggeduser)
+  const fndpip = fndpipp.filter((item) => item.created_by === loggeduser);
   useEffect(() => {
     dispatch(GetPip());
   }, [dispatch]);
@@ -37,7 +29,7 @@ const AddLabels = ({ onClose }) => {
     dispatch(getstages());
     onClose();
     resetForm();
-    message.success("Lead stage added successfully!");
+    message.success("Lable added successfully!");
   };
 
   const initialValues = {
@@ -54,7 +46,7 @@ const AddLabels = ({ onClose }) => {
     <>
       <div>
         <div className="">
-        <div className="mb-2 border-b pb-[-10px] font-medium"></div>
+          <div className="mb-2 border-b pb-[-10px] font-medium"></div>
 
           <div className="">
             <div className="">
@@ -92,7 +84,9 @@ const AddLabels = ({ onClose }) => {
                       </Col>
                       <Col span={24} className="mt-2">
                         <div className="form-item">
-                          <label className="font-semibold">Pipeline <span className="text-rose-500">*</span></label>
+                          <label className="font-semibold">
+                            Pipeline <span className="text-rose-500">*</span>
+                          </label>
                           <Field name="pipeline">
                             {({ field }) => (
                               <Select

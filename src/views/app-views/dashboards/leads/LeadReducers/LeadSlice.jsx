@@ -16,7 +16,6 @@ export const LeadsAdd = createAsyncThunk(
   }
 );
 
-
 export const GetLeads = createAsyncThunk("emp/GetLeads", async (thunkAPI) => {
   try {
     const response = await UserService.GetLeads();
@@ -74,9 +73,6 @@ export const LeadsEdit = createAsyncThunk(
     }
   }
 );
-
-
-
 
 const LeadSlice = createSlice({
   name: "Leads",
