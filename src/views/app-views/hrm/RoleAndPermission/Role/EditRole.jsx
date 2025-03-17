@@ -70,10 +70,14 @@ const EditRole = ({ id, onClose }) => {
     Account: [
       { key: 'dashboards-sales-customer', title: 'Customer' },
       { key: 'dashboards-sales-invoice', title: 'Invoice' },
-      { key: 'dashboards-sales-billing', title: 'Billing' },
+      { key: 'dashboards-purchase-billing', title: 'Billing' },
+      { key: 'dashboards-purchase-vendor', title: 'Vendor' },
+      { key: 'dashboards-purchase-debitnote', title: 'Debit Note' },
       { key: 'dashboards-sales-revenue', title: 'Revenue' },
       { key: 'dashboards-sales-estimates', title: 'Estimates' },
       { key: 'dashboards-sales-creditnotes', title: 'Credit Notes' },
+      { key: 'dashboards-banking-account', title: 'Account' },
+      { key: 'dashboards-banking-transfer', title: 'Transfer' },
     ],
   };
 

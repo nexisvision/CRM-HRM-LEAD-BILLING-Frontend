@@ -421,10 +421,11 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                   <label className="font-semibold">Joining Date <span className="text-red-500">*</span></label>
                   <Field name="joiningDate">
                     {({ field }) => (
-                      <DatePicker
+                      <Input
+                        {...field}
                         className="w-full mt-1"
-                        format="DD-MM-YYYY"
-                        onChange={(date) => setFieldValue("joiningDate", date)}
+                        type="date"
+                        onChange={(e) => setFieldValue("joiningDate", e.target.value)}
                       />
                     )}
                   </Field>
