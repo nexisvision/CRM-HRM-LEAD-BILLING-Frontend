@@ -235,44 +235,44 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
               <Col span={12} className='mt-3'>
                 <div className="form-item">
                   <label className='font-semibold'>Offer Expire On <span className="text-red-500">*</span></label>
-                  <DatePicker
-                    className="w-full mt-1"
-                    format="DD-MM-YYYY"
-                    value={values.offer_expiry ? dayjs(values.offer_expiry) : null}
-                    onChange={(date) => setFieldValue('offer_expiry', date)}
-                    onBlur={() => setFieldTouched("offer_expiry", true)}
-                    disabledDate={(current) => {
-                      return current && current < dayjs().startOf('day');
-                    }}
-                    placeholder="Select expiry date"
-                    style={{ width: '100%' }}
-                    showToday
-                    allowClear
-                  />
+                  <Field name="offer_expiry">
+                    {({ field }) => (
+                      <input
+                        type="date"
+                        {...field}
+                        className="w-full mt-1 p-2 border rounded" 
+                        min={new Date().toISOString().split('T')[0]}
+                        value={values.offer_expiry ? dayjs(values.offer_expiry).format('YYYY-MM-DD') : ''}
+                        onChange={(e) => {
+                          const date = dayjs(e.target.value);
+                          setFieldValue('offer_expiry', date);
+                        }}
+                        onBlur={() => setFieldTouched("offer_expiry", true)}
+                      />
+                    )}
+                  </Field>
                   <ErrorMessage name="offer_expiry" component="div" className="error-message text-red-500 my-1" />
                 </div>
               </Col>
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Expected Joining Date <span className="text-red-500">*</span></label>
-                  <DatePicker
-                    className="w-full mt-1"
-                    format="DD-MM-YYYY"
-                    value={values.expected_joining_date ? dayjs(values.expected_joining_date) : null}
-                    onChange={(date) => setFieldValue("expected_joining_date", date)}
-                    onBlur={() => setFieldTouched("expected_joining_date", true)}
-                    disabledDate={(current) => {
-                      const offerExpiryDate = values.offer_expiry ? dayjs(values.offer_expiry) : null;
-                      return current && (
-                        current < dayjs().startOf('day') ||
-                        (offerExpiryDate && current < offerExpiryDate)
-                      );
-                    }}
-                    placeholder="Select joining date"
-                    style={{ width: '100%' }}
-                    showToday
-                    allowClear
-                  />
+                  <Field name="expected_joining_date">
+                    {({ field }) => (
+                      <input
+                        type="date"
+                        {...field}
+                        className="w-full mt-1 p-2 border rounded"
+                        min={values.offer_expiry ? dayjs(values.offer_expiry).format('YYYY-MM-DD') : new Date().toISOString().split('T')[0]}
+                        value={values.expected_joining_date ? dayjs(values.expected_joining_date).format('YYYY-MM-DD') : ''}
+                        onChange={(e) => {
+                          const date = dayjs(e.target.value);
+                          setFieldValue('expected_joining_date', date);
+                        }}
+                        onBlur={() => setFieldTouched("expected_joining_date", true)}
+                      />
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="expected_joining_date"
                     component="div"

@@ -130,15 +130,16 @@ const AddHoliday = ({ onClose }) => {
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
-                  <DatePicker
+                  <Input
+                    type="date"
                     style={{ width: "100%" }}
-                    className="w-full mt-1"
+                    className="w-full mt-1" 
                     placeholder="Select start date"
-                    value={values.start_date ? moment(values.start_date) : null}
-                    format="DD-MM-YYYY"
-                    onChange={(date) => {
-                      setFieldValue("start_date", date ? date.format("YYYY-MM-DD") : null);
-                      if (values.end_date && date && moment(date).isAfter(values.end_date)) {
+                    value={values.start_date || ''}
+                    onChange={(e) => {
+                      const date = e.target.value;
+                      setFieldValue("start_date", date);
+                      if (values.end_date && date && new Date(date) > new Date(values.end_date)) {
                         setFieldValue("end_date", null);
                       }
                     }}
@@ -154,16 +155,17 @@ const AddHoliday = ({ onClose }) => {
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
-                  <DatePicker
+                  <Input
+                    type="date"
                     style={{ width: "100%" }}
                     className="w-full mt-1"
                     placeholder="Select end date"
-                    format="DD-MM-YYYY"
-                    value={values.end_date ? moment(values.end_date) : null}
-                    onChange={(date) => setFieldValue("end_date", date ? date.format("YYYY-MM-DD") : null)}
-                    disabledDate={(current) => {
-                      return values.start_date ? current && current.isBefore(moment(values.start_date), 'day') : false;
+                    value={values.end_date || ''}
+                    onChange={(e) => {
+                      const date = e.target.value;
+                      setFieldValue("end_date", date);
                     }}
+                    min={values.start_date} // Disable dates before start date
                   />
                   {errors.end_date && touched.end_date && (
                     <div style={{ color: "red", fontSize: "12px" }}>

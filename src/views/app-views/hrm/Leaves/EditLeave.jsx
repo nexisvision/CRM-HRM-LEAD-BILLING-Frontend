@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import moment from "moment";
-import { Button, DatePicker, Select, message } from "antd";
+import { Button, DatePicker, Input, Select, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Formik, Form, Field } from "formik";
@@ -139,12 +139,12 @@ const EditLeave = ({ editid, onClose }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Start Date <span className="text-red-500">*</span>
                 </label>
-                <DatePicker
+                <Input
+                  type="date"
                   className="w-full"
-                  format="YYYY-MM-DD"
                   value={values.startDate}
-                  onChange={(date) => setFieldValue("startDate", date)}
-                  disabledDate={(current) => current && current < moment().startOf('day')}
+                  onChange={(e) => setFieldValue("startDate", e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
                 />
                 {errors.startDate && touched.startDate && (
                   <div className="text-red-500 text-sm mt-1">{errors.startDate}</div>
@@ -155,12 +155,12 @@ const EditLeave = ({ editid, onClose }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   End Date <span className="text-red-500">*</span>
                 </label>
-                <DatePicker
+                <Input
+                  type="date"
                   className="w-full"
-                  format="YYYY-MM-DD"
                   value={values.endDate}
-                  onChange={(date) => setFieldValue("endDate", date)}
-                  disabledDate={(current) => current && current < moment().startOf('day')}
+                  onChange={(e) => setFieldValue("endDate", e.target.value)}
+                  min={values.startDate || new Date().toISOString().split('T')[0]}
                 />
                 {errors.endDate && touched.endDate && (
                   <div className="text-red-500 text-sm mt-1">{errors.endDate}</div>

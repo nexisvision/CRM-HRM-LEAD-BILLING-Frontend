@@ -179,25 +179,19 @@ const AddAttendance = ({ onClose }) => {
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Date <span className="text-red-500">*</span></label>
-                  <DatePicker
+                  <Input
+                    type="date"
                     style={{ width: "100%" }}
                     className="w-full mt-1"
                     placeholder="Select date"
-                    format="DD-MM-YYYY"
-                    allowClear={false}
-                    showToday
-                    value={values.date ? moment(values.date) : null}
-                    onChange={(date) => {
-                      const formattedDate = date ? date.format('YYYY-MM-DD') : null;
-                      console.log("Selected Date in DatePicker:", formattedDate);
-                      setFieldValue("date", formattedDate);
+                    value={values.date || ''}
+                    onChange={(e) => {
+                      const date = e.target.value;
+                      console.log("Selected Date:", date);
+                      setFieldValue("date", date);
                     }}
-                    disabledDate={(current) => {
-                      return current && (
-                        current > moment().endOf('day') ||
-                        current.day() === 0
-                      );
-                    }}
+                    max={new Date().toISOString().split('T')[0]}
+                    onKeyDown={(e) => e.preventDefault()}
                   />
                   {errors.date && touched.date && (
                     <div style={{ color: "red", fontSize: "12px" }}>
