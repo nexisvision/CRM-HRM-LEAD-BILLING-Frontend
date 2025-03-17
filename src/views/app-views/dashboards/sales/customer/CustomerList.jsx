@@ -210,6 +210,16 @@ const CustomerList = () => {
       },
     },
     {
+      title: "Email",
+      dataIndex: "email",
+      render: (email) => email || 'N/A',
+    },
+    {
+      title: "Contact",
+      dataIndex: "contact",
+      render: (contact) => contact || 'N/A',
+    },
+    {
       title: "Tax Number",
       dataIndex: "tax_number",
       render: (tax_number) => tax_number || 'N/A',

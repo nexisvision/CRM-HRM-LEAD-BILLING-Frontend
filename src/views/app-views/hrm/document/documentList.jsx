@@ -156,6 +156,16 @@ const DocumentList = () => {
       sorter: (a, b) => a.name.length - b.name.length,
     },
     {
+      title: "Role",  // New column for role
+      dataIndex: "role",
+      render: (role) => (
+        <span style={{ textTransform: 'capitalize' }}>
+          {role || 'N/A'}
+        </span>
+      ),
+      sorter: (a, b) => (a.role || '').localeCompare(b.role || ''),
+    },  
+    {
       title: "description",
       dataIndex: "description",
       sorter: (a, b) => a.description.length - b.description.length,

@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useMemo, useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, Grid } from 'antd';
 import IntlMessage from '../util-components/IntlMessage';
 import Icon from '../util-components/Icon';
@@ -8,6 +8,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { SIDE_NAV_LIGHT, NAV_TYPE_SIDE } from "constants/ThemeConstant";
 import utils from 'utils'
 import { onMobileNavToggle } from 'store/slices/themeSlice';
+import { THEME_CONFIG, DEFAULT_SELECTED_KEY, AUTHENTICATED_ENTRY } from 'configs/AppConfig';
+// import 'index.css';
 
 const { useBreakpoint } = Grid;
 
@@ -66,23 +68,55 @@ const getTopNavMenuItem = (navItem) => navItem.map(nav => {
 	}
 })
 
-
-
 const SideNavContent = (props) => {
-	const { routeInfo, hideGroupTitle, sideNavTheme = SIDE_NAV_LIGHT } = props;
+	const { hideGroupTitle, sideNavTheme = SIDE_NAV_LIGHT } = props;
+	const location = useLocation();
+	const [selectedKeys, setSelectedKeys] = useState([]);
+	
 	const roleId = useSelector((state) => state.user.loggedInUser.role_id);
 	const roles = useSelector((state) => state.role?.role?.data);
 	const roleData = roles?.find(role => role.id === roleId);
 	const isSuperAdmin = roleData?.role_name === 'client';
-
 	const isSuper = roleData?.role_name === 'super-admin';
+
+	// Set initial selected key when component mounts
+	useEffect(() => {
+		if (location.pathname === AUTHENTICATED_ENTRY) {
+			// Set default key based on user role
+			const defaultKey = isSuper ? 'superadmin-dashboard' : 'extra-pages-profile';
+			setSelectedKeys([defaultKey]);
+		} else {
+			// Find the menu item that matches the current path
+			const findKeyByPath = (items) => {
+				for (const item of items) {
+					if (item.path === location.pathname) {
+						return item.key;
+					}
+					if (item.submenu?.length > 0) {
+						const subKey = findKeyByPath(item.submenu);
+						if (subKey) return subKey;
+					}
+				}
+				return null;
+			};
+
+			const currentKey = findKeyByPath([...extraNavvvTree, ...dashBoardNavTree, ...extraNavvTree]);
+			if (currentKey) {
+				setSelectedKeys([currentKey]);
+			}
+		}
+	}, [location.pathname, isSuper]);
+
+	// Handle menu item clicks
+	const handleMenuClick = ({ key }) => {
+		setSelectedKeys([key]);
+	};
+
 	const menuItems = useMemo(() => {
 		// Parse permissions if it's a string
 		const parsedPermissions = typeof roleData?.permissions === 'string'
 			? JSON.parse(roleData?.permissions)
 			: roleData?.permissions;
-
-
 
 		if (isSuper) {
 			return getSideNavMenuItem(extraNavvvTree);
@@ -91,7 +125,6 @@ const SideNavContent = (props) => {
 		if (isSuperAdmin) {
 			return getSideNavMenuItem([...dashBoardNavTree, ...extraNavvTree]);
 		}
-
 
 		if (!parsedPermissions) {
 			console.warn('No permissions found for role ID:', roleId);
@@ -168,28 +201,51 @@ const SideNavContent = (props) => {
 
 		// console.log('Relevant HRM Titles:', relevantTitles);
 		return getSideNavMenuItem(relevantNavigation);
-
-
 	}, [isSuper, isSuperAdmin, roleId, roleData]);
-
-
-
-
-
 
 	return (
 		<Menu
 			mode="inline"
 			theme={sideNavTheme === SIDE_NAV_LIGHT ? "light" : "dark"}
 			style={{ height: "100%", borderInlineEnd: 0 }}
-			defaultSelectedKeys={[routeInfo?.key]}
-			defaultOpenKeys={setDefaultOpen(routeInfo?.key)}
-			className={hideGroupTitle ? "hide-group-title" : ""}
+			selectedKeys={selectedKeys}
+			onClick={handleMenuClick}
+			className={`${hideGroupTitle ? "hide-group-title" : ""} custom-menu`}
 			items={menuItems}
 		/>
 	);
 };
 
+// Update these styles
+const styles = `
+	.custom-menu .ant-menu-item-selected {
+		background-color: rgba(62, 130, 247, 0.1) !important;
+	}
+
+	// .custom-menu .ant-menu-item:hover {
+	// 	background-color: transparent !important;
+	// }
+
+	.custom-menu .ant-menu-item-selected::after {
+		border-right: 3px solid #3e82f7 !important;
+	}
+`;
+
+// Add the styles to your component
+const MenuContent = (props) => {
+	useEffect(() => {
+		const styleSheet = document.createElement("style");
+		styleSheet.innerText = styles;
+		document.head.appendChild(styleSheet);
+		return () => styleSheet.remove();
+	}, []);
+
+	return props.type === NAV_TYPE_SIDE ? (
+		<SideNavContent {...props} />
+	) : (
+		<TopNavContent {...props} />
+	);
+};
 
 const TopNavContent = () => {
 
@@ -203,14 +259,6 @@ const TopNavContent = () => {
 			style={{ backgroundColor: topNavColor }}
 			items={menuItems}
 		/>
-	);
-};
-
-const MenuContent = (props) => {
-	return props.type === NAV_TYPE_SIDE ? (
-		<SideNavContent {...props} />
-	) : (
-		<TopNavContent {...props} />
 	);
 };
 

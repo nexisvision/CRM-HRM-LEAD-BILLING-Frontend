@@ -22,9 +22,18 @@ const getUserRole = () => {
 	}
 };
 
+// Define the default selected key based on role
+export const getDefaultSelectedKey = () => {
+	const role = getUserRole();
+	return role === 'super-admin' ? 'superadmin-dashboard' : 'extra-pages-profile';
+};
+
+// Define the default path based on role
 export const AUTHENTICATED_ENTRY = getUserRole() === 'super-admin'
 	? `${APP_PREFIX_PATH}/superadmin/dashboard`
 	: `${APP_PREFIX_PATH}/pages/profile`;
+
+export const DEFAULT_SELECTED_KEY = getDefaultSelectedKey();
 
 export const UNAUTHENTICATED_ENTRY = '/login'
 

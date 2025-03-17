@@ -39,13 +39,21 @@ const calculateDuration = (startDate, endDate) => {
 
   const years = diff.years();
   const months = diff.months();
+  const days = diff.days();
 
   let displayValue = '';
-  if (years > 0) {
-    displayValue += `${years} year${years > 1 ? 's' : ''} `;
-  }
-  if (months > 0) {
-    displayValue += `${months} month${months > 1 ? 's' : ''}`;
+  
+  // If there are years or months, only show those
+  if (years > 0 || months > 0) {
+    if (years > 0) {
+      displayValue += `${years} year${years > 1 ? 's' : ''} `;
+    }
+    if (months > 0) {
+      displayValue += `${months} month${months > 1 ? 's' : ''}`;
+    }
+  } else {
+    // If no years and months, show only days
+    displayValue = `${days} day${days !== 1 ? 's' : ''}`;
   }
 
   return displayValue.trim();

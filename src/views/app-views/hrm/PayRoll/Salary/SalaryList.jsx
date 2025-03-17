@@ -12,6 +12,7 @@ import SetSalary from "./SetSalary";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteSalaryss, getSalaryss, editSalaryss } from "./SalaryReducers/SalarySlice";
 import { empdata } from "../../Employee/EmployeeReducers/EmployeeSlice";
+import dayjs from "dayjs";
 
 const SalaryList = () => {
   const dispatch = useDispatch();
@@ -167,8 +168,14 @@ const SalaryList = () => {
       dataIndex: "netSalary",
       render: (salary) => salary || 'N/A',
     },
+
     {
-      title: "bankAccount",
+      title: "Payment Date",
+      dataIndex: "paymentDate",
+      render: (date) => (date ? dayjs(date).format("DD-MM-YYYY") : "N/A"),
+    },
+    {
+      title: "Bank Account",
       dataIndex: "bankAccount",
       render: (account) => account || 'N/A',
     },

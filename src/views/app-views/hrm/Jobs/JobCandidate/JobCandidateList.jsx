@@ -195,6 +195,35 @@ const JobCandidateList = () => {
       sorter: (a, b) => a.leavereason.length - b.leavereason.length,
     },
     {
+      title: "Applied Source",
+      dataIndex: "applied_source",
+      sorter: (a, b) => a.applied_source.localeCompare(b.applied_source),
+    },
+    {
+      title: "Cover Letter",
+      dataIndex: "cover_letter",
+      render: (text) => {
+        const stripHtml = (html) => {
+          if (!html) return 'N/A';
+          const tmp = document.createElement('DIV');
+          tmp.innerHTML = html;
+          return tmp.textContent || tmp.innerText || 'N/A';
+        };
+        
+        const plainText = stripHtml(text);
+        return plainText.length > 50 ? `${plainText.substring(0, 50)}...` : plainText;
+      },
+      sorter: (a, b) => {
+        const stripHtml = (html) => {
+          if (!html) return '';
+          const tmp = document.createElement('DIV');
+          tmp.innerHTML = html;
+          return tmp.textContent || tmp.innerText || '';
+        };
+        return stripHtml(a.cover_letter).localeCompare(stripHtml(b.cover_letter));
+      },
+    },
+    {
       title: "Status",
       dataIndex: "status",
       render: (_, record) => (

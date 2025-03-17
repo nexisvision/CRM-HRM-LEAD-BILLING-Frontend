@@ -272,23 +272,29 @@ const ProposalList = () => {
       sorter: (a, b) => a.lead_title.length - b.lead_title.length,
     },
 
-
+    {
+      title: "Date",
+      dataIndex: "valid_till",
+      render: (date) => (date ? dayjs(date).format("DD-MM-YYYY") : "N/A"),
+      sorter: (a, b) => a.valid_till.length - b.valid_till.length,
+    },  
     {
       title: "Tax",
       dataIndex: "tax",
       sorter: (a, b) => a.tax.length - b.tax.length,
     },
     {
-      title: "Total",
-      dataIndex: "total",
-      sorter: (a, b) => a.total.length - b.total.length,
+      title: "Description",
+      dataIndex: "description",
+      render: (description) => <span>{description || 'N/A'}</span>,
     },
     {
-      title: "Date",
-      dataIndex: "valid_till",
-      render: (date) => (date ? dayjs(date).format("DD-MM-YYYY") : "N/A"),
-      sorter: (a, b) => a.valid_till.length - b.valid_till.length,
+      title: "Total",
+      dataIndex: "total",
+      render: (total) => <span>{total || 'N/A'}</span>,
+      sorter: (a, b) => a.total - b.total,
     },
+    
 
     // {
     //   title: "created_by ",

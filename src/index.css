@@ -57,3 +57,24 @@
 .price-input .ant-input-prefix {
     margin-right: 8px !important;
 }
+
+.ant-menu-item-selected {
+    background-color: rgba(62, 130, 247, 0.1) !important;
+    color: #3e82f7 !important;
+  }
+  
+  .ant-menu-item:hover {
+    color: #3e82f7 !important;
+  }
+  
+  .ant-menu-item-active {
+    background-color: rgba(62, 130, 247, 0.05) !important;
+  }
+  
+  .ant-menu-light .ant-menu-item-selected {
+    font-weight: 500;
+  }
+  
+  .ant-menu-inline .ant-menu-item::after {
+    border-right: 3px solid #3e82f7 !important;
+  }

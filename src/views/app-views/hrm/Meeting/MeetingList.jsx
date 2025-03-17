@@ -10,6 +10,7 @@ import EditMeeting from './EditMeeting';
 import { deleteM, MeetData } from './MeetingReducer/MeetingSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import ViewMeeting from './ViewMeeting';
+import { getDept } from '../Department/DepartmentReducers/DepartmentSlice';
 
 const MeetingList = () => {
   const [isAddMeetingModalVisible, setIsAddMeetingModalVisible] = useState(false);
@@ -24,6 +25,7 @@ const MeetingList = () => {
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Meeting?.Meeting?.data || []);
+  const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const filteredData = tabledata.filter((item) => item.created_by === user) || [];
 
   // Open Add Job Modal
@@ -77,28 +79,27 @@ const MeetingList = () => {
     setSearchText(value);
   };
 
-  // Update getFilteredMeetings to include date filtering
+  const getDepartmentNameById = (departmentId) => {
+    const department = departmentData.find(dept => dept.id === departmentId);
+    return department ? department.department_name : 'N/A';
+  };
+
   const getFilteredMeetings = () => {
     if (!filteredData) return [];
 
     let result = [...filteredData];
 
-    // Apply text search filter
     if (searchText) {
       const searchValue = searchText.toLowerCase().trim();
       result = result.filter(meeting => {
         return (
           meeting.title?.toLowerCase().includes(searchValue) ||
           meeting.startTime?.toLowerCase().includes(searchValue) ||
-          meeting.status?.toLowerCase().includes(searchValue) ||
-          (searchValue === 'completed' && meeting.status?.toLowerCase() === 'completed') ||
-          (searchValue === 'scheduled' && meeting.status?.toLowerCase() === 'scheduled') ||
-          (searchValue === 'cancelled' && meeting.status?.toLowerCase() === 'cancelled')
+          meeting.status?.toLowerCase().includes(searchValue)
         );
       });
     }
 
-    // Apply date filter
     if (selectedDate) {
       const filterDate = dayjs(selectedDate).format('YYYY-MM-DD');
       result = result.filter(meeting => {
@@ -107,7 +108,6 @@ const MeetingList = () => {
       });
     }
 
-    // Apply status filter
     if (selectedStatus) {
       result = result.filter(meeting =>
         meeting.status?.toLowerCase() === selectedStatus.toLowerCase()
@@ -144,6 +144,7 @@ const MeetingList = () => {
 
   useEffect(() => {
     dispatch(MeetData());
+    dispatch(getDept());
   }, [dispatch]);
 
 
@@ -195,7 +196,7 @@ const MeetingList = () => {
 
   const tableColumns = [
     {
-      title: 'Meeting title',
+      title: 'Meeting Title',
       dataIndex: 'title',
       sorter: {
         compare: (a, b) => a.title.length - b.title.length,
@@ -210,17 +211,15 @@ const MeetingList = () => {
           {record.date ? dayjs(record.date).format('DD-MM-YYYY') : ''}
         </span>
       ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "date"),
+      sorter: (a, b) => dayjs(a.date).unix() - dayjs(b.date).unix(),
     },
-
-
     {
       title: 'Start Time',
       dataIndex: 'startTime',
       render: (startTime) => {
         return startTime ? dayjs(`2000-01-01 ${startTime}`).format('h:mm A') : '-';
       },
-      sorter: (a, b) => utils.antdTableSorter(a, b, 'startTime')
+      sorter: (a, b) => dayjs(a.startTime).unix() - dayjs(b.startTime).unix(),
     },
     {
       title: 'End Time',
@@ -228,7 +227,22 @@ const MeetingList = () => {
       render: (endTime) => {
         return endTime ? dayjs(`2000-01-01 ${endTime}`).format('h:mm A') : '-';
       },
-      sorter: (a, b) => utils.antdTableSorter(a, b, 'endTime')
+      sorter: (a, b) => dayjs(a.endTime).unix() - dayjs(b.endTime).unix(),
+    },
+    {
+      title: 'Meeting Link',
+      dataIndex: 'meetingLink',
+      render: (link) => <a href={link} target="_blank" rel="noopener noreferrer">{link}</a>,
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      render: (description) => <span>{description.replace(/<[^>]*>/g, '')}</span>,
+    },
+    {
+      title: 'Department',
+      dataIndex: 'department',
+      render: (departmentId) => <span>{getDepartmentNameById(departmentId)}</span>,
     },
     {
       title: 'Status',
@@ -250,7 +264,7 @@ const MeetingList = () => {
         }
         return <Tag color={color}>{status?.toUpperCase() || 'N/A'}</Tag>;
       },
-      sorter: (a, b) => utils.antdTableSorter(a, b, 'status')
+      sorter: (a, b) => a.status.localeCompare(b.status),
     },
     {
       title: 'Action',

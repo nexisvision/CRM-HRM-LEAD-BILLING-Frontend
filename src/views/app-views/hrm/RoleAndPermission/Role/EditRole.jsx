@@ -197,11 +197,10 @@ const EditRole = ({ id, onClose }) => {
             .map(([perm]) => perm.toLowerCase());
 
         if (selectedPermissions.length > 0) {
-            const moduleName = activeTab; // Get active module
-            if (!payload.permissions[moduleName]) {
-                payload.permissions[moduleName] = []; 
+            if (!payload.permissions[submoduleKey]) {
+                payload.permissions[submoduleKey] = [];
             }
-            payload.permissions[moduleName].push({
+            payload.permissions[submoduleKey].push({
                 key: submoduleKey,
                 permissions: selectedPermissions
             });

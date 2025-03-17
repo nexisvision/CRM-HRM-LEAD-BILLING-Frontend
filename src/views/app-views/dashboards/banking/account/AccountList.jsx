@@ -191,6 +191,11 @@ const AccountList = () => {
       dataIndex: "contactNumber",
     },
     {
+      title: "Bank Address",
+      dataIndex: "bankAddress",
+      render: (address) => <span>{address || 'N/A'}</span>,
+    },
+    {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (

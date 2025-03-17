@@ -98,19 +98,19 @@ const HolidayList = () => {
   };
 
   const getDropdownItems = (record) => [
-    {
-      key: 'edit',
-      icon: <EditOutlined />,
-      label: 'Edit',
-      onClick: () => openEditHolidayModal(record)
-    },
-    {
-      key: 'delete',
-      icon: <DeleteOutlined />,
-      label: 'Delete',
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => openEditHolidayModal(record)
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
       onClick: () => deleteHoliday(record.id),
       danger: true
-    }
+      }
   ];
 
   const tableColumns = [
@@ -283,71 +283,71 @@ const HolidayList = () => {
   return (
     <>
       <style>{styles}</style>
-      <Card bodyStyle={{ padding: '-3px' }}>
-        <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
-          <div className="mr-md-3 mb-3 flex items-center gap-4">
-            <Input 
-              placeholder="Search Holiday" 
-              prefix={<SearchOutlined />} 
-              onChange={onSearch}
-              className="min-w-[200px]"
-            />
-            <Select
-              value={selectedLeaveType}
-              onChange={handleLeaveTypeFilter}
-              style={{ width: 120 }}
-              className="ml-2"
-            >
-              <Option value="all">All Types</Option>
-              <Option value="paid">Paid</Option>
-              <Option value="unpaid">Unpaid</Option>
-            </Select>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button type="primary" onClick={openAddHolidayModal}>
-              <PlusOutlined />
-              <span>Add Holiday</span>
-            </Button>
-          </div>
-        </Flex>
-
-        <div className="table-responsive">
-          <Table
-            columns={tableColumns}
-            dataSource={filteredHolidays}
-            rowKey="id"
-            scroll={{ x: 1200 }}
+    <Card bodyStyle={{ padding: '-3px' }}>
+      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+        <div className="mr-md-3 mb-3 flex items-center gap-4">
+          <Input 
+            placeholder="Search Holiday" 
+            prefix={<SearchOutlined />} 
+            onChange={onSearch}
+            className="min-w-[200px]"
           />
+          <Select
+            value={selectedLeaveType}
+            onChange={handleLeaveTypeFilter}
+            style={{ width: 120 }}
+            className="ml-2"
+          >
+            <Option value="all">All Types</Option>
+            <Option value="paid">Paid</Option>
+            <Option value="unpaid">Unpaid</Option>
+          </Select>
         </div>
+        <div className="flex items-center gap-2">
+          <Button type="primary" onClick={openAddHolidayModal}>
+            <PlusOutlined />
+            <span>Add Holiday</span>
+          </Button>
+        </div>
+      </Flex>
 
-        <Modal
-          title="Add Holiday"
-          visible={isAddHolidayModalVisible}
-          onCancel={closeAddHolidayModal}
-          footer={null}
-          width={800}
-        >
-          <AddHoliday
-            onClose={closeAddHolidayModal}
-            onSuccess={handleAddSuccess}
-          />
-        </Modal>
+      <div className="table-responsive">
+        <Table
+          columns={tableColumns}
+          dataSource={filteredHolidays}
+          rowKey="id"
+          scroll={{ x: 1200 }}
+        />
+      </div>
 
-        <Modal
-          title="Edit Holiday"
-          visible={isEditHolidayModalVisible}
-          onCancel={closeEditHolidayModal}
-          footer={null}
-          width={800}
-        >
-          <EditHoliday
-            idd={idd}
-            holiday={selectedHoliday}
-            onClose={closeEditHolidayModal}
-            onSuccess={handleEditSuccess}
-          />
-        </Modal>
-      </Card>
+      <Modal
+        title="Add Holiday"
+        visible={isAddHolidayModalVisible}
+        onCancel={closeAddHolidayModal}
+        footer={null}
+        width={800}
+      >
+        <AddHoliday
+          onClose={closeAddHolidayModal}
+          onSuccess={handleAddSuccess}
+        />
+      </Modal>
+
+      <Modal
+        title="Edit Holiday"
+        visible={isEditHolidayModalVisible}
+        onCancel={closeEditHolidayModal}
+        footer={null}
+        width={800}
+      >
+        <EditHoliday
+          idd={idd}
+          holiday={selectedHoliday}
+          onClose={closeEditHolidayModal}
+          onSuccess={handleEditSuccess}
+        />
+      </Modal>
+    </Card>
     </>
   );
 };

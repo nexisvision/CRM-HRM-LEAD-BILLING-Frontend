@@ -80,7 +80,10 @@ const JobList = () => {
       filtered = filtered.filter(job => {
         return (
           job.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-          job.job_type?.toLowerCase().includes(searchText.toLowerCase()) ||
+          job.category?.toLowerCase().includes(searchText.toLowerCase()) ||
+          job.jobType?.toLowerCase().includes(searchText.toLowerCase()) ||
+          job.recruiter?.toLowerCase().includes(searchText.toLowerCase()) ||
+          job.workExperience?.toLowerCase().includes(searchText.toLowerCase()) ||
           job.location?.toLowerCase().includes(searchText.toLowerCase())
         );
       });
@@ -225,7 +228,47 @@ const JobList = () => {
       title: "Title",
       dataIndex: "title",
       sorter: {
-        compare: (a, b) => a.title.length - b.title.length,
+        compare: (a, b) => a.title.localeCompare(b.title),
+      },
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      sorter: {
+        compare: (a, b) => a.category.localeCompare(b.category),
+      },
+    },
+    {
+      title: "Interview Rounds",
+      dataIndex: "interviewRounds",
+      render: (rounds) => {
+        try {
+          const parsedRounds = JSON.parse(rounds);
+          return parsedRounds.InterviewRounds?.join(', ') || 'N/A';
+        } catch (e) {
+          return 'N/A';
+        }
+      },
+    },
+    {
+      title: "Job Type",
+      dataIndex: "jobType",
+      sorter: {
+        compare: (a, b) => a.jobType.localeCompare(b.jobType),
+      },
+    },
+    {
+      title: "Recruiter",
+      dataIndex: "recruiter",
+      sorter: {
+        compare: (a, b) => a.recruiter.localeCompare(b.recruiter),
+      },
+    },
+    {
+      title: "Work Experience",
+      dataIndex: "workExperience",
+      sorter: {
+        compare: (a, b) => a.workExperience.localeCompare(b.workExperience),
       },
     },
     {
@@ -238,20 +281,28 @@ const JobList = () => {
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "startDate"),
     },
-
     {
       title: "End Date",
       dataIndex: "endDate",
       render: (_, record) => (
-
         <span>
           {record.endDate ? dayjs(record.endDate).format('DD-MM-YYYY') : ''}
         </span>
-
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "endDate"),
     },
-
+    {
+      title: "Expected Salary",
+      dataIndex: "expectedSalary",
+      render: (salary, record) => (
+        <span>
+          {salary ? `${salary}` : 'N/A'}
+        </span>
+      ),
+      sorter: {
+        compare: (a, b) => a.expectedSalary - b.expectedSalary,
+      },
+    },
     {
       title: "Status",
       dataIndex: "status",
@@ -262,7 +313,6 @@ const JobList = () => {
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
     },
-
     {
       title: "Action",
       dataIndex: "actions",

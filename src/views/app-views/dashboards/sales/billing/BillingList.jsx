@@ -224,7 +224,19 @@ export const BillingList = () => {
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "billDate"),
     },
-
+    {
+      title: "Description",
+      dataIndex: "discription",
+      render: (discription) => (
+        <span>{discription ? discription.replace(/"/g, '') : 'N/A'}</span>
+      ),
+    },
+    {
+      title: "Total",
+      dataIndex: "total",
+      render: (total) => <span>{total || 'N/A'}</span>,
+      sorter: (a, b) => a.total - b.total,
+    },
     {
       title: "note",
       dataIndex: "note",

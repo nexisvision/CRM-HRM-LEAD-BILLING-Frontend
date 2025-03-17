@@ -99,7 +99,9 @@ const JobApplicationList = () => {
         return (
           application.name?.toLowerCase().includes(searchText.toLowerCase()) ||
           application.status?.toLowerCase().includes(searchText.toLowerCase()) ||
-          application.notice_period?.toLowerCase().includes(searchText.toLowerCase())
+          application.notice_period?.toLowerCase().includes(searchText.toLowerCase()) ||
+          application.applied_source?.toLowerCase().includes(searchText.toLowerCase()) ||
+          (application.cover_letter && application.cover_letter.replace(/<[^>]*>/g, '').toLowerCase().includes(searchText.toLowerCase()))
         );
       });
     }
@@ -253,6 +255,35 @@ const JobApplicationList = () => {
       sorter: (a, b) => a.leavereason.length - b.leavereason.length,
     },
     {
+      title: "Applied Source",
+      dataIndex: "applied_source",
+      sorter: (a, b) => a.applied_source.localeCompare(b.applied_source),
+    },
+    {
+      title: "Cover Letter",
+      dataIndex: "cover_letter",
+      render: (text) => {
+        const stripHtml = (html) => {
+          if (!html) return 'N/A';
+          const tmp = document.createElement('DIV');
+          tmp.innerHTML = html;
+          return tmp.textContent || tmp.innerText || 'N/A';
+        };
+        
+        const plainText = stripHtml(text);
+        return plainText.length > 50 ? `${plainText.substring(0, 50)}...` : plainText;
+      },
+      sorter: (a, b) => {
+        const stripHtml = (html) => {
+          if (!html) return '';
+          const tmp = document.createElement('DIV');
+          tmp.innerHTML = html;
+          return tmp.textContent || tmp.innerText || '';
+        };
+        return stripHtml(a.cover_letter).localeCompare(stripHtml(b.cover_letter));
+      },
+    },
+    {
       title: "Status",
       dataIndex: "status",
       render: (_, record) => (
@@ -304,7 +335,7 @@ const JobApplicationList = () => {
           <div className="mr-md-3 mb-3">
             <Input.Group compact>
               <Input
-                placeholder="Search"
+                placeholder="Search by name, status, source..."
                 prefix={<SearchOutlined />}
                 onChange={onSearch}
                 value={searchText}
@@ -359,6 +390,7 @@ const JobApplicationList = () => {
             columns={tableColumns}
             dataSource={getFilteredApplications()}
             rowKey="id"
+            scroll={{ x: 1400 }}
             pagination={{
               total: getFilteredApplications().length,
               pageSize: 10,
@@ -483,6 +515,18 @@ const styles = `
 
   .table-responsive {
     overflow-x: auto;
+    min-width: 100%;
+  }
+
+  .ant-table-thead > tr > th {
+    white-space: nowrap;
+    min-width: 100px;
+  }
+
+  .ant-table-tbody > tr > td {
+    white-space: normal;
+    word-break: break-word;
+    max-width: 300px;
   }
 `;
 
