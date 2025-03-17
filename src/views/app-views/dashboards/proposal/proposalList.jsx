@@ -23,7 +23,6 @@ import dayjs from "dayjs";
 import { debounce } from 'lodash';
 
 import Flex from "components/shared-components/Flex";
-import userData from "../../../../assets/data/user-list.data.json";
 import { utils, writeFile } from "xlsx";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
@@ -36,7 +35,7 @@ import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/cu
 
 
 const ProposalList = () => {
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
   const [isAddProposalModalVisible, setIsAddProposalSetupModalVisible] =
     useState(false);

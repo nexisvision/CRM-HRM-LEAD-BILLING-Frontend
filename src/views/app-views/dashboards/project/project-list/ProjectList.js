@@ -27,6 +27,7 @@ import {
   ExclamationCircleOutlined,
   CloseCircleOutlined,
   EllipsisOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import EditProject from "./EditProject";
@@ -344,17 +345,23 @@ const ProjectList = () => {
     setView(e.target.value);
   };
 
-  const dropdownMenu = (id) => (
-    <Menu>
-      <Menu.Item key="edit" onClick={() => editp(id)}>
-        <EditOutlined /> Edit
-      </Menu.Item>
-
-      <Menu.Item key="delete" onClick={() => deleteItem(id)}>
-        <DeleteOutlined /> Delete
-      </Menu.Item>
-    </Menu>
-  );
+  const getDropdownItems = (elm) => {
+    return [
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => editp(elm.id)
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteItem(elm.id),
+        danger: true
+      }
+    ];
+  };
 
   const tableColumns = [
     {
@@ -519,10 +526,25 @@ const ProjectList = () => {
     },
     {
       title: "Action",
-      key: "action",
-      render: (_, record) => (
+      dataIndex: "actions",
+      render: (_, elm) => (
         <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(record.id)} />
+          <Dropdown
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+              style={{
+                borderRadius: '10px',
+                padding: 0
+              }}
+            >
+              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+            </Button>
+          </Dropdown>
         </div>
       ),
     },
@@ -751,18 +773,20 @@ const ProjectList = () => {
                           </p>
                         </div>
                         <Dropdown
-                          overlay={dropdownMenu(item.id)}
-                          trigger={["click"]}
+                          overlay={<Menu items={getDropdownItems(item)} />}
+                          trigger={['click']}
                           placement="bottomRight"
                         >
                           <Button
                             type="text"
-                            className="hover:bg-gray-100 flex items-center justify-center w-8 h-8 rounded-full"
-                            icon={
-                              <EllipsisOutlined style={{ fontSize: "20px" }} />
-                            }
-                            onClick={(e) => e.stopPropagation()}
-                          />
+                            className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+                            style={{
+                              borderRadius: '10px',
+                              padding: 0
+                            }}
+                          >
+                            <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+                          </Button>
                         </Dropdown>
                       </div>
 

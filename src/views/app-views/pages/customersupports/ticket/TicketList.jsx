@@ -185,38 +185,7 @@ export const TicketList = () => {
     {
       title: "Subject",
       dataIndex: "ticketSubject",
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <Input
-            placeholder="Search subject"
-            value={selectedKeys[0]}
-            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-            onPressEnter={() => confirm()}
-            style={{ width: 188, marginBottom: 8, display: 'block' }}
-          />
-          <Space>
-            <Button
-              type="primary"
-              onClick={() => confirm()}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Search
-            </Button>
-            <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
-              Reset
-            </Button>
-          </Space>
-        </div>
-      ),
-      filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
-      onFilter: (value, record) =>
-        record.ticketSubject
-          ? record.ticketSubject.toString().toLowerCase().includes(value.toLowerCase())
-          : '',
-      sorter: {
-        compare: (a, b) => (a.subject?.length || 0) - (b.subject?.length || 0),
-      },
+      sorter: (a, b) => utils.antdTableSorter(a, b, ""),
     },
     {
       title: "requestor",
@@ -305,6 +274,12 @@ export const TicketList = () => {
               <Select
                 defaultValue="All"
                 style={{ width: 120 }}
+                onChange={(value) => {
+                  const filteredData = value === "All" 
+                    ? fnddata
+                    : fnddata.filter(item => item.priority === value);
+                  setList(filteredData);
+                }}
               >
                 <Option value="All">All Priority</Option>
                 {priorityList.map((priority) => (

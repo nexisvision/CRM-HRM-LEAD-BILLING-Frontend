@@ -325,6 +325,27 @@ const IndicatorList = () => {
     </Select>
   );
 
+  const checkIndicatorExists = (branch, department, designation) => {
+    return users.some(indicator => 
+      indicator.branch === branch && 
+      indicator.department === department && 
+      indicator.designation === designation
+    );
+  };
+
+  const handleAddIndicator = (values) => {
+    // Check if indicator already exists
+    const exists = checkIndicatorExists(values.branch, values.department, values.designation);
+    
+    if (exists) {
+      message.error('An indicator already exists for this branch, department, and designation combination.');
+      return false;
+    }
+    
+    // Proceed with adding the indicator
+    return true;
+  };
+
   return (
     <Card bodyStyle={{ padding: '-3px' }}>
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
@@ -383,7 +404,7 @@ const IndicatorList = () => {
         footer={null}
         width={1000}
       >
-        <AddIndicator onClose={closeAddIndicatorModal} />
+        <AddIndicator onClose={closeAddIndicatorModal} onValidate={handleAddIndicator} />
       </Modal>
 
       <Modal
