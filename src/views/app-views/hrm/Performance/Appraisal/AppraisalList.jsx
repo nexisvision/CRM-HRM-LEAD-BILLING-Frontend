@@ -1,16 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Input, message, Button, Modal, Select, Dropdown } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, FileExcelOutlined, MoreOutlined } from '@ant-design/icons';
-import UserView from '../../../Users/user-list/UserView';
-import Flex from 'components/shared-components/Flex';
-import AddAppraisal from './AddAppraisal';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Input,
+  message,
+  Button,
+  Modal,
+  Select,
+  Dropdown,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  EditOutlined,
+  PlusOutlined,
+  FileExcelOutlined,
+  MoreOutlined,
+} from "@ant-design/icons";
+import UserView from "../../../Users/user-list/UserView";
+import Flex from "components/shared-components/Flex";
+import AddAppraisal from "./AddAppraisal";
 import { utils, writeFile } from "xlsx";
-import EditAppraisal from './EditAppraisal';
-import ViewAppraisal from './ViewAppraisal';
-import { empdata } from '../../Employee/EmployeeReducers/EmployeeSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import { getBranch } from '../../Branch/BranchReducer/BranchSlice';
-import { deleteAppraisal, getAppraisals } from './AppraisalReducers/AppraisalSlice';
+import EditAppraisal from "./EditAppraisal";
+import ViewAppraisal from "./ViewAppraisal";
+import { empdata } from "../../Employee/EmployeeReducers/EmployeeSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { getBranch } from "../../Branch/BranchReducer/BranchSlice";
+import {
+  deleteAppraisal,
+  getAppraisals,
+} from "./AppraisalReducers/AppraisalSlice";
 
 const { Option } = Select;
 
@@ -19,44 +40,52 @@ const AppraisalList = () => {
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [id, setId] = useState(null);
-  const [isAddAppraisalModalVisible, setIsAddAppraisalModalVisible] = useState(false);
-  const [isEditAppraisalModalVisible, setIsEditAppraisalModalVisible] = useState(false);
-  const [isViewAppraisalModalVisible, setIsViewAppraisalModalVisible] = useState(false);
+  const [isAddAppraisalModalVisible, setIsAddAppraisalModalVisible] =
+    useState(false);
+  const [isEditAppraisalModalVisible, setIsEditAppraisalModalVisible] =
+    useState(false);
+  const [isViewAppraisalModalVisible, setIsViewAppraisalModalVisible] =
+    useState(false);
   const dispatch = useDispatch();
-  const [selectedEmployee, setSelectedEmployee] = useState('all');
-  const [searchText, setSearchText] = useState('');
+  const [selectedEmployee, setSelectedEmployee] = useState("all");
+  const [searchText, setSearchText] = useState("");
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.appraisal);
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
-  const employeeDaata = useSelector((state) => state.employee?.employee?.data || []);
+  const employeeDaata = useSelector(
+    (state) => state.employee?.employee?.data || []
+  );
 
-  const employeeDataa = employeeDaata.filter(item => item.created_by === user);
+  const employeeDataa = employeeDaata.filter(
+    (item) => item.created_by === user
+  );
   //// permission
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
+  let allpermisson = [];
 
-  let allpermisson;
-
-  if (parsedPermissions["extra-hrm-performance-appraisal"] && parsedPermissions["extra-hrm-performance-appraisal"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-performance-appraisal"][0].permissions;
-
+  if (parsedPermissions["extra-hrm-performance-appraisal"]) {
+    allpermisson =
+      parsedPermissions["extra-hrm-performance-appraisal"][0]?.permissions ||
+      [];
   }
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+
+  const canCreate = allpermisson?.includes("create");
+  const canEdit = allpermisson?.includes("update");
+  const canDelete = allpermisson?.includes("delete");
+  const canView = allpermisson?.includes("view");
 
   ///endpermission
 
@@ -75,8 +104,6 @@ const AppraisalList = () => {
   const closeViewAppraisalModal = () => {
     setIsViewAppraisalModalVisible(false);
   };
-
-
 
   const openEditAppraisalModal = () => {
     setIsEditAppraisalModalVisible(true);
@@ -98,22 +125,24 @@ const AppraisalList = () => {
     dispatch(empdata());
   }, [dispatch]);
 
-
-
-
   useEffect(() => {
     if (tabledata?.Appraisals?.data) {
-      const mappedData = tabledata.Appraisals.data.filter((item) => item.created_by === user).map((appraisal) => {
-        const branch = branchData.find((b) => b.id === appraisal.branch)?.branchName || 'N/A';
-        const employee = employeeDataa.find((e) => e.id === appraisal.employee)?.username || 'N/A';
+      const mappedData = tabledata.Appraisals.data
+        .filter((item) => item.created_by === user)
+        .map((appraisal) => {
+          const branch =
+            branchData.find((b) => b.id === appraisal.branch)?.branchName ||
+            "N/A";
+          const employee =
+            employeeDataa.find((e) => e.id === appraisal.employee)?.username ||
+            "N/A";
 
-
-        return {
-          ...appraisal,
-          branch,
-          employee,
-        };
-      });
+          return {
+            ...appraisal,
+            branch,
+            employee,
+          };
+        });
       setUsers(mappedData);
     }
   }, [tabledata, branchData, employeeDataa, user]);
@@ -138,8 +167,8 @@ const AppraisalList = () => {
 
   const editfun = (id) => {
     openEditAppraisalModal();
-    setId(id)
-  }
+    setId(id);
+  };
 
   const deleteAppraisals = (userId) => {
     // setUsers(users.filter(item => item.id !== userId));
@@ -150,43 +179,43 @@ const AppraisalList = () => {
     dispatch(deleteAppraisal(userId))
       .then(() => {
         dispatch(getAppraisals());
-        message.success('Appraisal Deleted successfully!');
-        setUsers(users.filter(item => item.id !== userId));
-
+        message.success("Appraisal Deleted successfully!");
+        setUsers(users.filter((item) => item.id !== userId));
       })
       .catch((error) => {
         // message.error('Failed to delete Indicator.');
-        console.error('Edit API error:', error);
+        console.error("Edit API error:", error);
       });
   };
 
-
   const getDropdownItems = (elm) => {
-    const items = [
-      {
-        key: 'view',
-        icon: <EyeOutlined />,
-        label: 'View Details',
-        onClick: openViewAppraisalModal
-      }
-    ];
+    const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (whorole === "super-admin" || whorole === "client" || canView) {
       items.push({
-        key: 'edit',
-        icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editfun(elm.id)
+        key: "view",
+        icon: <EyeOutlined />,
+        label: "View Details",
+        onClick: openViewAppraisalModal,
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (whorole === "super-admin" || whorole === "client" || canEdit) {
       items.push({
-        key: 'delete',
+        key: "edit",
+        icon: <EditOutlined />,
+        label: "Edit",
+        onClick: () => editfun(elm.id),
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || canDelete) {
+      items.push({
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteAppraisals(elm.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -195,21 +224,21 @@ const AppraisalList = () => {
 
   const tableColumns = [
     {
-      title: 'Branch',
-      dataIndex: 'branch',
+      title: "Branch",
+      dataIndex: "branch",
       sorter: (a, b) => a.branch.length - b.branch.length,
     },
 
     {
-      title: 'Employee',
-      dataIndex: 'employee',
+      title: "Employee",
+      dataIndex: "employee",
       sorter: (a, b) => a.employee.length - b.employee.length,
     },
 
     {
-      title: 'Overall Rating',
-      dataIndex: 'overallRating',
-      key: 'overallRating',
+      title: "Overall Rating",
+      dataIndex: "overallRating",
+      key: "overallRating",
       // render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
         compare: (a, b) => a.overallRating - b.overallRating,
@@ -217,18 +246,18 @@ const AppraisalList = () => {
     },
 
     {
-      title: 'Business Process',
-      dataIndex: 'businessProcess',
-      key: 'businessProcess',
+      title: "Business Process",
+      dataIndex: "businessProcess",
+      key: "businessProcess",
       // render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
         compare: (a, b) => a.businessProcess - b.businessProcess,
       },
     },
     {
-      title: 'Oral Communication',
-      dataIndex: 'oralCommunication',
-      key: 'oralCommunication',
+      title: "Oral Communication",
+      dataIndex: "oralCommunication",
+      key: "oralCommunication",
       // render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
         compare: (a, b) => a.oralCommunication - b.oralCommunication,
@@ -236,9 +265,9 @@ const AppraisalList = () => {
     },
 
     {
-      title: 'Leadership',
-      dataIndex: 'leadership',
-      key: 'leadership',
+      title: "Leadership",
+      dataIndex: "leadership",
+      key: "leadership",
       // render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
         compare: (a, b) => a.leadership - b.leadership,
@@ -246,49 +275,47 @@ const AppraisalList = () => {
     },
 
     {
-      title: 'Project Management',
-      dataIndex: 'projectManagement',
-      key: 'projectManagement',
+      title: "Project Management",
+      dataIndex: "projectManagement",
+      key: "projectManagement",
       // render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
         compare: (a, b) => a.projectManagement - b.projectManagement,
       },
     },
     {
-      title: 'Allocating Resources',
-      dataIndex: 'allocatingResources',
-      key: 'allocatingResources',
+      title: "Allocating Resources",
+      dataIndex: "allocatingResources",
+      key: "allocatingResources",
       // render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
         compare: (a, b) => a.allocatingResources - b.allocatingResources,
       },
     },
 
-
-
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center" onClick={(e) => e.stopPropagation()}>
           <Dropdown
             menu={{ items: getDropdownItems(elm) }}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
-      )
+      ),
     },
   ];
 
@@ -298,16 +325,16 @@ const AppraisalList = () => {
     let filteredData = [...users];
 
     // Filter by employee
-    if (selectedEmployee !== 'all') {
-      filteredData = filteredData.filter(appraisal =>
-        appraisal.employee === selectedEmployee
+    if (selectedEmployee !== "all") {
+      filteredData = filteredData.filter(
+        (appraisal) => appraisal.employee === selectedEmployee
       );
     }
 
     // Filter by search text
     if (searchText) {
       const searchLower = searchText.toLowerCase();
-      filteredData = filteredData.filter(appraisal => {
+      filteredData = filteredData.filter((appraisal) => {
         return (
           appraisal.employee?.toLowerCase().includes(searchLower) ||
           appraisal.branch?.toLowerCase().includes(searchLower) ||
@@ -328,7 +355,7 @@ const AppraisalList = () => {
       className="mr-2"
     >
       <Option value="all">All Employees</Option>
-      {employeeDataa.map(employee => (
+      {employeeDataa.map((employee) => (
         <Option key={employee.id} value={employee.username}>
           {employee.username}
         </Option>
@@ -337,8 +364,12 @@ const AppraisalList = () => {
   );
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
@@ -371,19 +402,16 @@ const AppraisalList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-
-
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {(whorole === "super-admin" || whorole === "client" || canCreate) && (
             <Button type="primary" onClick={openAddAppraisalModal}>
               <PlusOutlined />
               New
             </Button>
-
-          ) : null}
+          )}
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
-            onClick={exportToExcel} // Call export function when the button is clicked
+            onClick={exportToExcel}
             block
           >
             Export All
@@ -391,16 +419,19 @@ const AppraisalList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-
-          <Table columns={tableColumns} dataSource={getFilteredAppraisals()} rowKey="id" />
-
-        ) : null}
-
-
+        {(whorole === "super-admin" || whorole === "client" || canView) && (
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredAppraisals()}
+            rowKey="id"
+          />
+        )}
       </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+      <UserView
+        data={selectedUser}
+        visible={userProfileVisible}
+        close={closeUserProfile}
+      />
 
       {/* Add Employee Modal */}
       <Modal
@@ -409,7 +440,7 @@ const AppraisalList = () => {
         onCancel={closeAddAppraisalModal}
         footer={null}
         width={1000}
-        className='mt-[-70px]'
+        className="mt-[-70px]"
       >
         <AddAppraisal onClose={closeAddAppraisalModal} />
       </Modal>
@@ -420,7 +451,7 @@ const AppraisalList = () => {
         onCancel={closeEditAppraisalModal}
         footer={null}
         width={1000}
-        className='mt-[-70px]'
+        className="mt-[-70px]"
       >
         <EditAppraisal onClose={closeEditAppraisalModal} id={id} />
       </Modal>
@@ -430,7 +461,7 @@ const AppraisalList = () => {
         onCancel={closeViewAppraisalModal}
         footer={null}
         width={1000}
-        className='mt-[-70px]'
+        className="mt-[-70px]"
       >
         <ViewAppraisal onClose={closeViewAppraisalModal} />
       </Modal>
@@ -444,7 +475,6 @@ const AppraisalList = () => {
       >
         <ViewAppraisal onClose={closeViewAppraisalModal} />
       </Model> */}
-
     </Card>
   );
 };

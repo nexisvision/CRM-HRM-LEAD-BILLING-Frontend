@@ -34,8 +34,8 @@ import { useNavigate } from "react-router-dom";
 import LeadCards from "./LeadCards/LeadCards";
 import ConvertDeal from "./ConvertDeal";
 
-const VIEW_LIST = 'LIST';
-const VIEW_GRID = 'GRID';
+const VIEW_LIST = "LIST";
+const VIEW_GRID = "GRID";
 
 const LeadList = () => {
   const [users, setUsers] = useState([]);
@@ -44,13 +44,14 @@ const LeadList = () => {
   const [isEditLeadModalVisible, setIsEditLeadModalVisible] = useState(false);
   const navigate = useNavigate();
   const [id, setId] = useState("null");
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState("all");
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
   const [view, setView] = useState(VIEW_LIST);
-  const [isConvertDealModalVisible, setIsConvertDealModalVisible] = useState(false);
+  const [isConvertDealModalVisible, setIsConvertDealModalVisible] =
+    useState(false);
   const [selectedLead, setSelectedLead] = useState(null);
 
   const handleFileChange = (event) => {
@@ -74,24 +75,28 @@ const LeadList = () => {
 
   const getUniqueStatuses = () => {
     if (!tabledata?.Leads?.data) return [];
-    const statuses = [...new Set(tabledata.Leads.data.map(item => item.status))];
+    const statuses = [
+      ...new Set(tabledata.Leads.data.map((item) => item.status)),
+    ];
     return [
-      { value: 'all', label: 'All Status' },
-      ...statuses.map(status => ({
+      { value: "all", label: "All Status" },
+      ...statuses.map((status) => ({
         value: status,
-        label: status
-      }))
+        label: status,
+      })),
     ];
   };
 
   const handleStatusChange = (value) => {
     setSelectedStatus(value);
     if (!tabledata?.Leads?.data) return;
-    if (value === 'all') {
+    if (value === "all") {
       setFilteredData(tabledata.Leads.data);
       return;
     }
-    const filtered = tabledata.Leads.data.filter(lead => lead.status === value);
+    const filtered = tabledata.Leads.data.filter(
+      (lead) => lead.status === value
+    );
     setFilteredData(filtered);
   };
 
@@ -102,10 +107,11 @@ const LeadList = () => {
       setFilteredData(tabledata.Leads.data);
       return;
     }
-    const filtered = tabledata.Leads.data.filter(lead =>
-      (lead.leadTitle?.toString().toLowerCase().includes(value) ||
-        lead.status?.toString().toLowerCase().includes(value)) &&
-      (selectedStatus === 'all' || lead.status === selectedStatus)
+    const filtered = tabledata.Leads.data.filter(
+      (lead) =>
+        (lead.leadTitle?.toString().toLowerCase().includes(value) ||
+          lead.status?.toString().toLowerCase().includes(value)) &&
+        (selectedStatus === "all" || lead.status === selectedStatus)
     );
     setFilteredData(filtered);
   };
@@ -120,23 +126,33 @@ const LeadList = () => {
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
   const whorole = roleData.role_name;
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
-  let allpermisson;
-  if (parsedPermissions["dashboards-lead"] && parsedPermissions["dashboards-lead"][0]?.permissions) {
-    allpermisson = parsedPermissions["dashboards-lead"][0].permissions;
-  }
+  const leadPermissions =
+    parsedPermissions["dashboards-lead"]?.[0]?.permissions || [];
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const canCreateLead =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    leadPermissions.includes("create");
+  const canEditLead =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    leadPermissions.includes("update");
+  const canDeleteLead =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    leadPermissions.includes("delete");
+  const canViewLead =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    leadPermissions.includes("view");
 
   const deleteUser = async (userId) => {
     try {
@@ -191,28 +207,28 @@ const LeadList = () => {
     const items = [];
 
     items.push({
-      key: 'convert',
+      key: "convert",
       icon: <RetweetOutlined />,
-      label: 'Convert to Deal',
-      onClick: () => openConvertDealModal(elm)
+      label: "Convert to Deal",
+      onClick: () => openConvertDealModal(elm),
     });
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canEditLead) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => EditFun(elm.id)
+        label: "Edit",
+        onClick: () => EditFun(elm.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canDeleteLead) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(elm.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -224,7 +240,10 @@ const LeadList = () => {
       title: "leadTitle",
       dataIndex: "leadTitle",
       render: (leadTitle, record) => (
-        <div onClick={() => handleLeadClick(record.id)} className="cursor-pointer hover:text-blue-600">
+        <div
+          onClick={() => handleLeadClick(record.id)}
+          className="cursor-pointer hover:text-blue-600"
+        >
           <h4 className="mb-0">{leadTitle}</h4>
         </div>
       ),
@@ -257,7 +276,10 @@ const LeadList = () => {
       title: "Status",
       dataIndex: "status",
       render: (status) => (
-        <Tag className="text-capitalize" color={status === "active" ? "cyan" : "red"}>
+        <Tag
+          className="text-capitalize"
+          color={status === "active" ? "cyan" : "red"}
+        >
           {status}
         </Tag>
       ),
@@ -279,18 +301,18 @@ const LeadList = () => {
         <div className="text-center">
           <Dropdown
             overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -317,7 +339,11 @@ const LeadList = () => {
   return (
     <div>
       <Card bodyStyle={{ padding: "-3px" }}>
-        <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+        <Flex
+          alignItems="center"
+          justifyContent="space-between"
+          mobileFlex={false}
+        >
           <Flex className="mb-1" mobileFlex={false}>
             <div className="mr-md-3 mb-3">
               <Input
@@ -334,10 +360,10 @@ const LeadList = () => {
                 placeholder="Filter by status"
                 onChange={handleStatusChange}
                 value={selectedStatus}
-                style={{ width: '200px' }}
+                style={{ width: "200px" }}
                 className="status-select"
               >
-                {getUniqueStatuses().map(status => (
+                {getUniqueStatuses().map((status) => (
                   <Select.Option key={status.value} value={status.value}>
                     {status.label}
                   </Select.Option>
@@ -347,7 +373,12 @@ const LeadList = () => {
           </Flex>
 
           <Flex gap="7px" className="items-center">
-            <Radio.Group defaultValue={VIEW_LIST} onChange={(e) => setView(e.target.value)} value={view} className="mr-2">
+            <Radio.Group
+              defaultValue={VIEW_LIST}
+              onChange={(e) => setView(e.target.value)}
+              value={view}
+              className="mr-2"
+            >
               <Radio.Button value={VIEW_GRID}>
                 <AppstoreOutlined />
               </Radio.Button>
@@ -356,14 +387,18 @@ const LeadList = () => {
               </Radio.Button>
             </Radio.Group>
 
-            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) && (
+            {canCreateLead && (
               <Button type="primary" onClick={openAddLeadModal}>
                 <PlusOutlined />
                 <span>New</span>
               </Button>
             )}
 
-            <Button type="primary" icon={<FileExcelOutlined />} onClick={exportToExcel}>
+            <Button
+              type="primary"
+              icon={<FileExcelOutlined />}
+              onClick={exportToExcel}
+            >
               Export All
             </Button>
           </Flex>
@@ -371,7 +406,7 @@ const LeadList = () => {
 
         {view === VIEW_LIST ? (
           <div className="table-responsive">
-            {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
+            {canViewLead && (
               <Table
                 columns={tableColumns}
                 dataSource={getFilteredLeads()}
@@ -380,7 +415,8 @@ const LeadList = () => {
                   total: getFilteredLeads().length,
                   pageSize: 10,
                   showSizeChanger: true,
-                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                  showTotal: (total, range) =>
+                    `${range[0]}-${range[1]} of ${total} items`,
                 }}
               />
             )}
@@ -389,22 +425,56 @@ const LeadList = () => {
           <LeadCards data={getFilteredLeads()} />
         )}
 
-        <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: "none" }}
+          onChange={handleFileChange}
+        />
 
-        <Modal visible={isAddLeadModalVisible} onCancel={closeAddLeadModal} footer={null} width={800} className="mt-[-70px]">
+        <Modal
+          visible={isAddLeadModalVisible}
+          onCancel={closeAddLeadModal}
+          footer={null}
+          width={800}
+          className="mt-[-70px]"
+        >
           <AddLead onClose={closeAddLeadModal} />
         </Modal>
 
-        <Modal visible={isEditLeadModalVisible} onCancel={closeEditLeadModal} footer={null} width={800} className="mt-[-70px]">
+        <Modal
+          visible={isEditLeadModalVisible}
+          onCancel={closeEditLeadModal}
+          footer={null}
+          width={800}
+          className="mt-[-70px]"
+        >
           <EditLead onClose={closeEditLeadModal} id={id} />
         </Modal>
 
-        <Modal title="View Lead" visible={isViewLeadModalVisible} onCancel={closeViewLeadModal} footer={null} width={1800} className="mt-[-70px]">
+        <Modal
+          title="View Lead"
+          visible={isViewLeadModalVisible}
+          onCancel={closeViewLeadModal}
+          footer={null}
+          width={1800}
+          className="mt-[-70px]"
+        >
           <ViewLead onClose={closeViewLeadModal} />
         </Modal>
 
-        <Modal title="Convert to Deal" visible={isConvertDealModalVisible} onCancel={closeConvertDealModal} footer={null} width={800} className="mt-[-70px]">
-          <ConvertDeal onClose={closeConvertDealModal} leadData={selectedLead} />
+        <Modal
+          title="Convert to Deal"
+          visible={isConvertDealModalVisible}
+          onCancel={closeConvertDealModal}
+          footer={null}
+          width={800}
+          className="mt-[-70px]"
+        >
+          <ConvertDeal
+            onClose={closeConvertDealModal}
+            leadData={selectedLead}
+          />
         </Modal>
       </Card>
       <style jsx>{styles}</style>

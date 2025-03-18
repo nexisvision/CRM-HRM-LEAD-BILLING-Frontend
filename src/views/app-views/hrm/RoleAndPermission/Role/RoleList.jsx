@@ -1,12 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Table, Menu, Button, Input, message, Modal, Dropdown } from 'antd';
-import { DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, MoreOutlined, EditOutlined } from '@ant-design/icons';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import { useDispatch, useSelector } from 'react-redux';
-import AddRole from './AddRole';
-import { deleteRole, getRoles } from '../RoleAndPermissionReducers/RoleAndPermissionSlice';
-import EditRole from './EditRole';
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Button,
+  Input,
+  message,
+  Modal,
+  Dropdown,
+} from "antd";
+import {
+  DeleteOutlined,
+  SearchOutlined,
+  PlusOutlined,
+  FileExcelOutlined,
+  MoreOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import { useDispatch, useSelector } from "react-redux";
+import AddRole from "./AddRole";
+import {
+  deleteRole,
+  getRoles,
+} from "../RoleAndPermissionReducers/RoleAndPermissionSlice";
+import EditRole from "./EditRole";
 
 const RoleList = () => {
   const [users, setUsers] = useState([]);
@@ -23,7 +42,7 @@ const RoleList = () => {
     return tabledata.filter((item) => item.created_by === loginUser.username);
   }, [tabledata, loginUser]);
 
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
 
   const closeEditRoleModal = () => {
     setIsEditRoleModalVisible(false);
@@ -50,11 +69,11 @@ const RoleList = () => {
     dispatch(deleteRole(userId))
       .then(() => {
         dispatch(getRoles());
-        message.success('Appraisal Deleted successfully!');
-        setUsers(users.filter(item => item.id !== userId));
+        message.success("Role Deleted successfully!");
+        setUsers(users.filter((item) => item.id !== userId));
       })
       .catch((error) => {
-        console.error('Edit API error:', error);
+        console.error("Edit API error:", error);
       });
   };
 
@@ -68,10 +87,12 @@ const RoleList = () => {
 
     if (!searchText) return users;
 
-    return users.filter(role => {
+    return users.filter((role) => {
       return (
         role.role_name?.toLowerCase().includes(searchText.toLowerCase()) ||
-        JSON.stringify(role.permissions)?.toLowerCase().includes(searchText.toLowerCase())
+        JSON.stringify(role.permissions)
+          ?.toLowerCase()
+          .includes(searchText.toLowerCase())
       );
     });
   };
@@ -84,46 +105,56 @@ const RoleList = () => {
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
   let allpermisson;
 
-  if (parsedPermissions["extra-hrm-role"] && parsedPermissions["extra-hrm-role"][0]?.permissions) {
+  if (
+    parsedPermissions["extra-hrm-role"] &&
+    parsedPermissions["extra-hrm-role"][0]?.permissions
+  ) {
     allpermisson = parsedPermissions["extra-hrm-role"][0].permissions;
-
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const canCreateClient = allpermisson?.includes("create");
+  const canDeleteClient = allpermisson?.includes("delete");
+  const canViewClient = allpermisson?.includes("view");
 
   const getDropdownItems = (elm) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canCreateClient && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
+        label: "Edit",
         onClick: () => openEditRoleModal(elm.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canDeleteClient && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteRoles(elm.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -133,20 +164,22 @@ const RoleList = () => {
   const renderPermissions = (permissions) => {
     try {
       const parsedPermissions =
-        permissions && typeof permissions === "string" ? JSON.parse(permissions) : {};
+        permissions && typeof permissions === "string"
+          ? JSON.parse(permissions)
+          : {};
 
       return (
         <div className="permissions-container">
-          {Object.keys(parsedPermissions).map(moduleKey => (
+          {Object.keys(parsedPermissions).map((moduleKey) => (
             <div key={moduleKey} className="module-permissions">
-              {parsedPermissions[moduleKey].map(permission => (
+              {parsedPermissions[moduleKey].map((permission) => (
                 <div key={permission.key}>
-                  {permission.permissions.map(action => (
+                  {permission.permissions.map((action) => (
                     <span
                       key={`${permission.key}-${action}`}
                       className="permission-tag"
                     >
-                      {`${permission.key.replace('extra-hrm-', '')} ${action}`}
+                      {`${permission.key.replace("extra-hrm-", "")} ${action}`}
                     </span>
                   ))}
                 </div>
@@ -163,50 +196,54 @@ const RoleList = () => {
 
   const tableColumns = [
     {
-      title: 'Role',
-      dataIndex: 'role_name',
+      title: "Role",
+      dataIndex: "role_name",
       sorter: {
         compare: (a, b) => a.role_name.length - b.role_name.length,
       },
     },
     {
-      title: 'Permissions',
-      dataIndex: 'permissions',
+      title: "Permissions",
+      dataIndex: "permissions",
       render: (permissions) => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
           {renderPermissions(permissions)}
         </div>
       ),
     },
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center" onClick={(e) => e.stopPropagation()}>
           <Dropdown
             overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
-      )
+      ),
     },
   ];
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
@@ -220,7 +257,11 @@ const RoleList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {whorole === "super-admin" ||
+          whorole === "client" ||
+          (canCreateClient &&
+            whorole !== "super-admin" &&
+            whorole !== "client") ? (
             <Button type="primary" className="ml-2" onClick={openAddRoleModal}>
               <PlusOutlined />
               <span>New</span>
@@ -232,7 +273,9 @@ const RoleList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        {whorole === "super-admin" ||
+        whorole === "client" ||
+        (canViewClient && whorole !== "super-admin" && whorole !== "client") ? (
           <Table
             columns={tableColumns}
             dataSource={getFilteredRoles()}
@@ -241,7 +284,8 @@ const RoleList = () => {
               total: getFilteredRoles().length,
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
             }}
           />
         ) : null}
@@ -253,7 +297,7 @@ const RoleList = () => {
         onCancel={closeAddRoleModal}
         footer={null}
         width={800}
-        className='mt-[-70px]'
+        className="mt-[-70px]"
       >
         <AddRole onClose={closeAddRoleModal} />
       </Modal>
@@ -264,7 +308,7 @@ const RoleList = () => {
         onCancel={closeEditRoleModal}
         footer={null}
         width={1000}
-        className='mt-[-70px]'
+        className="mt-[-70px]"
       >
         <EditRole onClose={closeEditRoleModal} id={selectedRoleId} />
       </Modal>

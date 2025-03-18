@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  Table,
-  message,
-  Button,
-  Modal,
-  Dropdown,
-} from "antd";
+import { Card, Table, message, Button, Modal, Dropdown } from "antd";
 import {
   DeleteOutlined,
   PlusOutlined,
@@ -86,38 +79,39 @@ const DocumentList = () => {
     });
   };
 
-
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
   let allpermisson;
 
-  if (parsedPermissions["extra-hrm-document"] && parsedPermissions["extra-hrm-document"][0]?.permissions) {
+  if (
+    parsedPermissions["extra-hrm-document"] &&
+    parsedPermissions["extra-hrm-document"][0]?.permissions
+  ) {
     allpermisson = parsedPermissions["extra-hrm-document"][0].permissions;
-
   } else {
+    allpermisson = [];
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const canCreateDocument = allpermisson?.includes("create");
+  const canUpdateDocument = allpermisson?.includes("update");
+  const canDeleteDocument = allpermisson?.includes("delete");
+  const canViewDocument = allpermisson?.includes("view");
 
   useEffect(() => {
     if (fnddata) {
       setUsers(fnddata);
     }
   }, [fnddata]);
-
 
   const editfun = (idd) => {
     openEditTrainingSetupModal();
@@ -127,22 +121,30 @@ const DocumentList = () => {
   const getDropdownItems = (row) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canUpdateDocument && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editfun(row.id)
+        label: "Edit",
+        onClick: () => editfun(row.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canDeleteDocument && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(row.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -156,20 +158,18 @@ const DocumentList = () => {
       sorter: (a, b) => a.name.length - b.name.length,
     },
     {
-      title: "Role",  // New column for role
+      title: "Role", // New column for role
       dataIndex: "role",
       render: (role) => (
-        <span style={{ textTransform: 'capitalize' }}>
-          {role || 'N/A'}
-        </span>
+        <span style={{ textTransform: "capitalize" }}>{role || "N/A"}</span>
       ),
-      sorter: (a, b) => (a.role || '').localeCompare(b.role || ''),
-    },  
+      sorter: (a, b) => (a.role || "").localeCompare(b.role || ""),
+    },
     {
       title: "description",
       dataIndex: "description",
       sorter: (a, b) => a.description.length - b.description.length,
-      render: (text) => <div dangerouslySetInnerHTML={{ __html: text }} />
+      render: (text) => <div dangerouslySetInnerHTML={{ __html: text }} />,
     },
     {
       title: "Action",
@@ -178,18 +178,18 @@ const DocumentList = () => {
         <div className="text-center">
           <Dropdown
             menu={{ items: getDropdownItems(elm) }}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -237,12 +237,13 @@ const DocumentList = () => {
         justifyContent="space-between"
         mobileFlex={false}
       >
-        <Flex className="mb-1" mobileFlex={false}>
-        </Flex >
+        <Flex className="mb-1" mobileFlex={false}></Flex>
         <Flex gap="7px">
-
-
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {whorole === "super-admin" ||
+          whorole === "client" ||
+          (canCreateDocument &&
+            whorole !== "super-admin" &&
+            whorole !== "client") ? (
             <Button
               type="primary"
               className="ml-2"
@@ -251,7 +252,6 @@ const DocumentList = () => {
               <PlusOutlined />
               <span>New</span>
             </Button>
-
           ) : null}
 
           <Button
@@ -263,10 +263,13 @@ const DocumentList = () => {
             Export All
           </Button>
         </Flex>
-      </Flex >
+      </Flex>
       <div className="table-responsive mt-4">
-
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        {whorole === "super-admin" ||
+        whorole === "client" ||
+        (canViewDocument &&
+          whorole !== "super-admin" &&
+          whorole !== "client") ? (
           <Table
             columns={tableColumns}
             dataSource={users}
@@ -274,8 +277,6 @@ const DocumentList = () => {
             scroll={{ x: 1200 }}
           />
         ) : null}
-
-
       </div>
 
       <Modal
@@ -299,7 +300,7 @@ const DocumentList = () => {
       >
         <EditDocument onClose={closeEditTrainingSetupModal} idd={idd} />
       </Modal>
-    </Card >
+    </Card>
   );
 };
 

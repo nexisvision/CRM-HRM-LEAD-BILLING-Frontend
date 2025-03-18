@@ -48,13 +48,16 @@ const JobApplicationList = () => {
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const alldata = useSelector((state) => state.jobapplications);
-  const fnddta = React.useMemo(() => alldata.jobapplications.data || [], [alldata.jobapplications.data]);
+  const fnddta = React.useMemo(
+    () => alldata.jobapplications.data || [],
+    [alldata.jobapplications.data]
+  );
 
   const fnddtaa = fnddta.filter((item) => item.created_by === user);
 
-  const [searchText, setSearchText] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('All');
-  const [uniqueStatuses, setUniqueStatuses] = useState(['All']);
+  const [searchText, setSearchText] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [uniqueStatuses, setUniqueStatuses] = useState(["All"]);
 
   useEffect(() => {
     dispatch(getjobapplication());
@@ -63,7 +66,10 @@ const JobApplicationList = () => {
   useEffect(() => {
     if (fnddta) {
       setUsers(fnddtaa);
-      const statuses = ['All', ...new Set(fnddtaa.map(item => item.status).filter(Boolean))];
+      const statuses = [
+        "All",
+        ...new Set(fnddtaa.map((item) => item.status).filter(Boolean)),
+      ];
       setUniqueStatuses(statuses);
     }
   }, [fnddtaa, fnddta]);
@@ -95,20 +101,31 @@ const JobApplicationList = () => {
     let filtered = [...users];
 
     if (searchText) {
-      filtered = filtered.filter(application => {
+      filtered = filtered.filter((application) => {
         return (
           application.name?.toLowerCase().includes(searchText.toLowerCase()) ||
-          application.status?.toLowerCase().includes(searchText.toLowerCase()) ||
-          application.notice_period?.toLowerCase().includes(searchText.toLowerCase()) ||
-          application.applied_source?.toLowerCase().includes(searchText.toLowerCase()) ||
-          (application.cover_letter && application.cover_letter.replace(/<[^>]*>/g, '').toLowerCase().includes(searchText.toLowerCase()))
+          application.status
+            ?.toLowerCase()
+            .includes(searchText.toLowerCase()) ||
+          application.notice_period
+            ?.toLowerCase()
+            .includes(searchText.toLowerCase()) ||
+          application.applied_source
+            ?.toLowerCase()
+            .includes(searchText.toLowerCase()) ||
+          (application.cover_letter &&
+            application.cover_letter
+              .replace(/<[^>]*>/g, "")
+              .toLowerCase()
+              .includes(searchText.toLowerCase()))
         );
       });
     }
 
-    if (selectedStatus && selectedStatus !== 'All') {
-      filtered = filtered.filter(application =>
-        application.status?.toLowerCase() === selectedStatus.toLowerCase()
+    if (selectedStatus && selectedStatus !== "All") {
+      filtered = filtered.filter(
+        (application) =>
+          application.status?.toLowerCase() === selectedStatus.toLowerCase()
       );
     }
 
@@ -116,33 +133,29 @@ const JobApplicationList = () => {
   };
 
   const handleSearch = () => {
-    message.success('Search completed');
+    message.success("Search completed");
   };
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
-  let allpermisson;
+  // Updated permissions check
+  const jobApplicationPermissions =
+    parsedPermissions["extra-hrm-jobs-jobapplication"]?.[0]?.permissions || [];
 
-  if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
-  }
-
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
-
-
+  const canViewJobApplication = jobApplicationPermissions.includes("view");
+  const canCreateJobApplication = jobApplicationPermissions.includes("create");
+  const canEditJobApplication = jobApplicationPermissions.includes("update");
+  const canDeleteJobApplication = jobApplicationPermissions.includes("delete");
 
   const exportToExcel = () => {
     try {
@@ -165,7 +178,6 @@ const JobApplicationList = () => {
     });
   };
 
-
   const closeUserProfile = () => {
     setUserProfileVisible(false);
     setSelectedUser(null);
@@ -181,7 +193,6 @@ const JobApplicationList = () => {
     return "";
   };
 
-
   const eidtfun = (idd) => {
     openEditJobApplicationModal();
     setIdd(idd);
@@ -190,22 +201,28 @@ const JobApplicationList = () => {
   const getDropdownItems = (row) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      (canEditJobApplication && whorole !== "super-admin")
+    ) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => eidtfun(row.id)
+        label: "Edit",
+        onClick: () => eidtfun(row.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      (canDeleteJobApplication && whorole !== "super-admin")
+    ) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(row.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -264,23 +281,27 @@ const JobApplicationList = () => {
       dataIndex: "cover_letter",
       render: (text) => {
         const stripHtml = (html) => {
-          if (!html) return 'N/A';
-          const tmp = document.createElement('DIV');
+          if (!html) return "N/A";
+          const tmp = document.createElement("DIV");
           tmp.innerHTML = html;
-          return tmp.textContent || tmp.innerText || 'N/A';
+          return tmp.textContent || tmp.innerText || "N/A";
         };
-        
+
         const plainText = stripHtml(text);
-        return plainText.length > 50 ? `${plainText.substring(0, 50)}...` : plainText;
+        return plainText.length > 50
+          ? `${plainText.substring(0, 50)}...`
+          : plainText;
       },
       sorter: (a, b) => {
         const stripHtml = (html) => {
-          if (!html) return '';
-          const tmp = document.createElement('DIV');
+          if (!html) return "";
+          const tmp = document.createElement("DIV");
           tmp.innerHTML = html;
-          return tmp.textContent || tmp.innerText || '';
+          return tmp.textContent || tmp.innerText || "";
         };
-        return stripHtml(a.cover_letter).localeCompare(stripHtml(b.cover_letter));
+        return stripHtml(a.cover_letter).localeCompare(
+          stripHtml(b.cover_letter)
+        );
       },
     },
     {
@@ -300,18 +321,18 @@ const JobApplicationList = () => {
         <div className="text-center">
           <Dropdown
             menu={{ items: getDropdownItems(elm) }}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -347,7 +368,7 @@ const JobApplicationList = () => {
           <div className="mr-md-3 mb-3">
             <Select
               defaultValue="All"
-              style={{ minWidth: '120px' }}
+              style={{ minWidth: "120px" }}
               onChange={handleStatusChange}
               value={selectedStatus}
             >
@@ -360,9 +381,8 @@ const JobApplicationList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-
-
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {(whorole === "super-admin" ||
+            (canCreateJobApplication && whorole !== "super-admin")) && (
             <Button
               type="primary"
               className="ml-2"
@@ -371,8 +391,7 @@ const JobApplicationList = () => {
               <PlusOutlined />
               <span>New</span>
             </Button>
-
-          ) : null}
+          )}
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
@@ -384,8 +403,8 @@ const JobApplicationList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        {(whorole === "super-admin" ||
+          (canViewJobApplication && whorole !== "super-admin")) && (
           <Table
             columns={tableColumns}
             dataSource={getFilteredApplications()}
@@ -395,11 +414,11 @@ const JobApplicationList = () => {
               total: getFilteredApplications().length,
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
             }}
           />
-        ) : null}
-
+        )}
       </div>
       <UserView
         data={selectedUser}

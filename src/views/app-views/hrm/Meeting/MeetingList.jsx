@@ -1,23 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Tag, Input, message, Button, Modal, DatePicker, Select, Dropdown } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import AddMeeting from './AddMeeting';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Tag,
+  Input,
+  message,
+  Button,
+  Modal,
+  DatePicker,
+  Select,
+  Dropdown,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  PlusOutlined,
+  FileExcelOutlined,
+  EditOutlined,
+  MoreOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import AddMeeting from "./AddMeeting";
 import { utils, writeFile } from "xlsx";
-import EditMeeting from './EditMeeting';
-import { deleteM, MeetData } from './MeetingReducer/MeetingSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import ViewMeeting from './ViewMeeting';
-import { getDept } from '../Department/DepartmentReducers/DepartmentSlice';
+import EditMeeting from "./EditMeeting";
+import { deleteM, MeetData } from "./MeetingReducer/MeetingSlice";
+import { useDispatch, useSelector } from "react-redux";
+import ViewMeeting from "./ViewMeeting";
+import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 
 const MeetingList = () => {
-  const [isAddMeetingModalVisible, setIsAddMeetingModalVisible] = useState(false);
-  const [isEditMeetingModalVisible, setIsEditMeetingModalVisible] = useState(false);
+  const [isAddMeetingModalVisible, setIsAddMeetingModalVisible] =
+    useState(false);
+  const [isEditMeetingModalVisible, setIsEditMeetingModalVisible] =
+    useState(false);
   const [meetid, setMeetid] = useState("");
-  const [searchText, setSearchText] = useState('');
-  const [isViewMeetingModalVisible, setIsViewMeetingModalVisible] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [isViewMeetingModalVisible, setIsViewMeetingModalVisible] =
+    useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);
 
@@ -25,8 +48,11 @@ const MeetingList = () => {
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Meeting?.Meeting?.data || []);
-  const departmentData = useSelector((state) => state.Department?.Department?.data || []);
-  const filteredData = tabledata.filter((item) => item.created_by === user) || [];
+  const departmentData = useSelector(
+    (state) => state.Department?.Department?.data || []
+  );
+  const filteredData =
+    tabledata.filter((item) => item.created_by === user) || [];
 
   // Open Add Job Modal
   const openAddMeetingModal = () => {
@@ -37,7 +63,6 @@ const MeetingList = () => {
   const closeAddMeetingModal = () => {
     setIsAddMeetingModalVisible(false);
   };
-
 
   // Open Add Job Modal
   const openEditMeetingModal = () => {
@@ -53,26 +78,29 @@ const MeetingList = () => {
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data || []);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
   let allpermisson;
 
-  if (parsedPermissions["extra-hrm-meeting"] && parsedPermissions["extra-hrm-meeting"][0]?.permissions) {
+  if (
+    parsedPermissions["extra-hrm-meeting"] &&
+    parsedPermissions["extra-hrm-meeting"][0]?.permissions
+  ) {
     allpermisson = parsedPermissions["extra-hrm-meeting"][0].permissions;
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const canCreateClient = allpermisson?.includes("create");
+  const canEditClient = allpermisson?.includes("edit");
+  const canDeleteClient = allpermisson?.includes("delete");
+  const canViewClient = allpermisson?.includes("view");
 
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
@@ -80,8 +108,8 @@ const MeetingList = () => {
   };
 
   const getDepartmentNameById = (departmentId) => {
-    const department = departmentData.find(dept => dept.id === departmentId);
-    return department ? department.department_name : 'N/A';
+    const department = departmentData.find((dept) => dept.id === departmentId);
+    return department ? department.department_name : "N/A";
   };
 
   const getFilteredMeetings = () => {
@@ -91,7 +119,7 @@ const MeetingList = () => {
 
     if (searchText) {
       const searchValue = searchText.toLowerCase().trim();
-      result = result.filter(meeting => {
+      result = result.filter((meeting) => {
         return (
           meeting.title?.toLowerCase().includes(searchValue) ||
           meeting.startTime?.toLowerCase().includes(searchValue) ||
@@ -101,16 +129,17 @@ const MeetingList = () => {
     }
 
     if (selectedDate) {
-      const filterDate = dayjs(selectedDate).format('YYYY-MM-DD');
-      result = result.filter(meeting => {
-        const meetingDate = dayjs(meeting.date).format('YYYY-MM-DD');
+      const filterDate = dayjs(selectedDate).format("YYYY-MM-DD");
+      result = result.filter((meeting) => {
+        const meetingDate = dayjs(meeting.date).format("YYYY-MM-DD");
         return meetingDate === filterDate;
       });
     }
 
     if (selectedStatus) {
-      result = result.filter(meeting =>
-        meeting.status?.toLowerCase() === selectedStatus.toLowerCase()
+      result = result.filter(
+        (meeting) =>
+          meeting.status?.toLowerCase() === selectedStatus.toLowerCase()
       );
     }
 
@@ -121,13 +150,15 @@ const MeetingList = () => {
     try {
       await dispatch(deleteM(userId));
 
-      message.success({ content: 'Deleted meeting successfully.', duration: 2 });
+      message.success({
+        content: "Deleted meeting successfully.",
+        duration: 2,
+      });
     } catch (error) {
-      message.error({ content: 'Failed to delete meeting', duration: 2 });
-      console.error('Error deleting meeting:', error);
+      message.error({ content: "Failed to delete meeting", duration: 2 });
+      console.error("Error deleting meeting:", error);
     }
   };
-
 
   const exportToExcel = () => {
     try {
@@ -147,11 +178,10 @@ const MeetingList = () => {
     dispatch(getDept());
   }, [dispatch]);
 
-
   const EditMeet = (id) => {
     openEditMeetingModal();
-    setMeetid(id)
-  }
+    setMeetid(id);
+  };
 
   const closeViewMeetingModal = () => {
     setIsViewMeetingModalVisible(false);
@@ -165,29 +195,37 @@ const MeetingList = () => {
   const getDropdownItems = (elm) => {
     const items = [
       {
-        key: 'view',
+        key: "view",
         icon: <EyeOutlined />,
-        label: 'View',
-        onClick: () => openViewMeetingModal(elm.id)
-      }
+        label: "View",
+        onClick: () => openViewMeetingModal(elm.id),
+      },
     ];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canEditClient && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => EditMeet(elm.id)
+        label: "Edit",
+        onClick: () => EditMeet(elm.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canDeleteClient && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(elm.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -196,99 +234,109 @@ const MeetingList = () => {
 
   const tableColumns = [
     {
-      title: 'Meeting Title',
-      dataIndex: 'title',
+      title: "Meeting Title",
+      dataIndex: "title",
       sorter: {
         compare: (a, b) => a.title.length - b.title.length,
       },
-      render: (text) => <span className="meeting-title">{text}</span>
+      render: (text) => <span className="meeting-title">{text}</span>,
     },
     {
       title: "Meeting Date",
       dataIndex: "date",
       render: (_, record) => (
         <span>
-          {record.date ? dayjs(record.date).format('DD-MM-YYYY') : ''}
+          {record.date ? dayjs(record.date).format("DD-MM-YYYY") : ""}
         </span>
       ),
       sorter: (a, b) => dayjs(a.date).unix() - dayjs(b.date).unix(),
     },
     {
-      title: 'Start Time',
-      dataIndex: 'startTime',
+      title: "Start Time",
+      dataIndex: "startTime",
       render: (startTime) => {
-        return startTime ? dayjs(`2000-01-01 ${startTime}`).format('h:mm A') : '-';
+        return startTime
+          ? dayjs(`2000-01-01 ${startTime}`).format("h:mm A")
+          : "-";
       },
       sorter: (a, b) => dayjs(a.startTime).unix() - dayjs(b.startTime).unix(),
     },
     {
-      title: 'End Time',
-      dataIndex: 'endTime',
+      title: "End Time",
+      dataIndex: "endTime",
       render: (endTime) => {
-        return endTime ? dayjs(`2000-01-01 ${endTime}`).format('h:mm A') : '-';
+        return endTime ? dayjs(`2000-01-01 ${endTime}`).format("h:mm A") : "-";
       },
       sorter: (a, b) => dayjs(a.endTime).unix() - dayjs(b.endTime).unix(),
     },
     {
-      title: 'Meeting Link',
-      dataIndex: 'meetingLink',
-      render: (link) => <a href={link} target="_blank" rel="noopener noreferrer">{link}</a>,
+      title: "Meeting Link",
+      dataIndex: "meetingLink",
+      render: (link) => (
+        <a href={link} target="_blank" rel="noopener noreferrer">
+          {link}
+        </a>
+      ),
     },
     {
-      title: 'Description',
-      dataIndex: 'description',
-      render: (description) => <span>{description.replace(/<[^>]*>/g, '')}</span>,
+      title: "Description",
+      dataIndex: "description",
+      render: (description) => (
+        <span>{description.replace(/<[^>]*>/g, "")}</span>
+      ),
     },
     {
-      title: 'Department',
-      dataIndex: 'department',
-      render: (departmentId) => <span>{getDepartmentNameById(departmentId)}</span>,
+      title: "Department",
+      dataIndex: "department",
+      render: (departmentId) => (
+        <span>{getDepartmentNameById(departmentId)}</span>
+      ),
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
+      title: "Status",
+      dataIndex: "status",
       render: (status) => {
-        let color = 'default';
+        let color = "default";
         switch (status?.toLowerCase()) {
-          case 'completed':
-            color = 'success';
+          case "completed":
+            color = "success";
             break;
-          case 'pending':
-            color = 'warning';
+          case "pending":
+            color = "warning";
             break;
-          case 'cancelled':
-            color = 'error';
+          case "cancelled":
+            color = "error";
             break;
           default:
-            color = 'default';
+            color = "default";
         }
-        return <Tag color={color}>{status?.toUpperCase() || 'N/A'}</Tag>;
+        return <Tag color={color}>{status?.toUpperCase() || "N/A"}</Tag>;
       },
       sorter: (a, b) => a.status.localeCompare(b.status),
     },
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center" onClick={(e) => e.stopPropagation()}>
           <Dropdown
             overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
-      )
+      ),
     },
   ];
 
@@ -301,9 +349,12 @@ const MeetingList = () => {
   };
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input.Group compact>
@@ -324,7 +375,7 @@ const MeetingList = () => {
               format="DD-MM-YYYY"
               placeholder="Filter by date"
               allowClear
-              style={{ width: '200px' }}
+              style={{ width: "200px" }}
             />
           </div>
           <div className="mr-md-3 mb-3">
@@ -332,7 +383,7 @@ const MeetingList = () => {
               placeholder="Filter by status"
               onChange={handleStatusChange}
               value={selectedStatus}
-              style={{ width: '200px' }}
+              style={{ width: "200px" }}
               allowClear
             >
               <Select.Option value="completed">Completed</Select.Option>
@@ -342,14 +393,19 @@ const MeetingList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-
-
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-            <Button type="primary" className="ml-2" onClick={openAddMeetingModal}>
+          {whorole === "super-admin" ||
+          whorole === "client" ||
+          (canCreateClient &&
+            whorole !== "super-admin" &&
+            whorole !== "client") ? (
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddMeetingModal}
+            >
               <PlusOutlined />
               <span>New</span>
             </Button>
-
           ) : null}
           <Button
             type="primary"
@@ -362,8 +418,9 @@ const MeetingList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        {whorole === "super-admin" ||
+        whorole === "client" ||
+        (canViewClient && whorole !== "super-admin" && whorole !== "client") ? (
           <Table
             columns={tableColumns}
             dataSource={getFilteredMeetings()}
@@ -372,13 +429,11 @@ const MeetingList = () => {
               total: getFilteredMeetings().length,
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
             }}
           />
         ) : null}
-
-
-
       </div>
       {/* <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} /> */}
 
@@ -531,4 +586,3 @@ const MeetingListWithStyles = () => (
 );
 
 export default MeetingListWithStyles;
-

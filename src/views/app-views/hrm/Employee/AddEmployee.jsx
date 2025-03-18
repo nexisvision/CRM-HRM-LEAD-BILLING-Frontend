@@ -1,4 +1,4 @@
-  import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Input,
@@ -18,10 +18,10 @@ import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
 import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
 import { getBranch } from "../Branch/BranchReducer/BranchSlice";
-import AddBranch from '../../hrm/Branch/AddBranch';
-import { PlusOutlined } from '@ant-design/icons';
-import AddDepartment from '../Department/AddDepartment';
-import AddDesignation from '../Designation/AddDesignation';
+import AddBranch from "../../hrm/Branch/AddBranch";
+import { PlusOutlined } from "@ant-design/icons";
+import AddDepartment from "../Department/AddDepartment";
+import AddDesignation from "../Designation/AddDesignation";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 import { env } from "configs/EnvironmentConfig";
@@ -39,27 +39,44 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
   const [salary, setSalary] = useState(false);
   const [formValues, setFormValues] = useState({});
   const [formValues2, setFormValues2] = useState({});
-  const departmentData = useSelector((state) => state.Department?.Department?.data || []);
-  const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
-  const loggedusername = useSelector((state) => state.user.loggedInUser.username);
+  const departmentData = useSelector(
+    (state) => state.Department?.Department?.data || []
+  );
+  const designationData = useSelector(
+    (state) => state.Designation?.Designation?.data || []
+  );
+  const loggedusername = useSelector(
+    (state) => state.user.loggedInUser.username
+  );
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
-  const fndbranchdata = branchData.filter((item) => item.created_by === loggedusername);
-  const fnddepart = departmentData.filter((item) => item.created_by === loggedusername);
-  const fnddesi = designationData.filter((item) => item.created_by === loggedusername);
+  const fndbranchdata = branchData.filter(
+    (item) => item.created_by === loggedusername
+  );
+  const fnddepart = departmentData.filter(
+    (item) => item.created_by === loggedusername
+  );
+  const fnddesi = designationData.filter(
+    (item) => item.created_by === loggedusername
+  );
   const [selectedBranch, setSelectedBranch] = useState(null);
-  const filteredDepartments = fnddepart.filter((dept) => dept.branch === selectedBranch);
-  const filteredDesignations = fnddesi.filter((des) => des.branch === selectedBranch);
+  const filteredDepartments = fnddepart.filter(
+    (dept) => dept.branch === selectedBranch
+  );
+  const filteredDesignations = fnddesi.filter(
+    (des) => des.branch === selectedBranch
+  );
   const countries = useSelector((state) => state.countries.countries);
   const { currencies } = useSelector((state) => state.currencies);
 
   useEffect(() => {
     dispatch(empdata());
-  }, [dispatch])
-  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
+  }, [dispatch]);
+  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] =
+    useState(false);
 
   const getInitialCountry = () => {
     if (countries?.length > 0) {
-      const indiaCode = countries.find(c => c.countryCode === 'IN');
+      const indiaCode = countries.find((c) => c.countryCode === "IN");
       return indiaCode?.phoneCode || "+91";
     }
     return "+91";
@@ -67,7 +84,8 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
 
   const generatePassword = () => {
     const length = 8;
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const charset =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let password = "";
     for (let i = 0; i < length; i++) {
       password += charset[Math.floor(Math.random() * charset.length)];
@@ -79,8 +97,8 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     return password;
   };
   useEffect(() => {
-    dispatch(empdata())
-  }, [dispatch])
+    dispatch(empdata());
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(getallcountries());
@@ -131,7 +149,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
           const payloadss = {
             ...formValues2,
             employeeId: response.data.user.id,
-          }
+          };
           await dispatch(AddSalaryss(payloadss));
           onClose();
         }
@@ -144,9 +162,9 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
   };
 
   const handlePhoneNumberChange = (e, setFieldValue) => {
-    const value = e.target.value.replace(/\D/g, '');
+    const value = e.target.value.replace(/\D/g, "");
     if (value.length <= 15) {
-      setFieldValue('phone', value);
+      setFieldValue("phone", value);
     }
   };
 
@@ -164,15 +182,13 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
 
       if (response.payload?.data?.employeeId) {
         updatedFormValues.employeeId = response.payload.data.employeeId;
-        setFormValues(updatedFormValues); // Set formValues here
+        setFormValues(updatedFormValues);
 
-        // Only reset form and close modal after successful employee creation
         if (!response.payload?.data?.sessionToken) {
           resetForm();
           onClose();
         }
       }
-
     } catch (error) {
       console.error("Error submitting form:", error);
       message.error("Failed to add employee. Please try again.");
@@ -226,7 +242,8 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     dispatch(getBranch());
   };
 
-  const [isAddDepartmentModalVisible, setIsAddDepartmentModalVisible] = useState(false);
+  const [isAddDepartmentModalVisible, setIsAddDepartmentModalVisible] =
+    useState(false);
 
   const openAddDepartmentModal = () => {
     setIsAddDepartmentModalVisible(true);
@@ -237,7 +254,8 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     dispatch(getDept());
   };
 
-  const [isAddDesignationModalVisible, setIsAddDesignationModalVisible] = useState(false);
+  const [isAddDesignationModalVisible, setIsAddDesignationModalVisible] =
+    useState(false);
 
   const openAddDesignationModal = () => {
     setIsAddDesignationModalVisible(true);
@@ -252,7 +270,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     <div className="add-employee p-6">
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}  
+        // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({
@@ -268,35 +286,69 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
             onSubmit={handleSubmit}
             onFinishFailed={onFinishFailed}
           >
-
             <h1 className="text-lg font-bold mb-4">Personal Details</h1>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">First Name <span className="text-red-500">*</span></label>
-                  <Field name="firstName" as={Input} placeholder="John" className="mt-1" />
-                  <ErrorMessage name="firstName" component="div" className="text-red-500" />
+                  <label className="font-semibold">
+                    First Name <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    name="firstName"
+                    as={Input}
+                    placeholder="John"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="firstName"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Last Name <span className="text-red-500">*</span></label>
-                  <Field name="lastName" as={Input} placeholder="Doe" className="mt-1" />
-                  <ErrorMessage name="lastName" component="div" className="text-red-500" />
+                  <label className="font-semibold">
+                    Last Name <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    name="lastName"
+                    as={Input}
+                    placeholder="Doe"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="lastName"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Username <span className="text-red-500">*</span></label>
-                  <Field name="username" as={Input} placeholder="john_doe" className="mt-1" />
-                  <ErrorMessage name="username" component="div" className="text-red-500" />
+                  <label className="font-semibold">
+                    Username <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    name="username"
+                    as={Input}
+                    placeholder="john_doe"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="username"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label className="font-semibold">Password <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">
+                    Password <span className="text-red-500">*</span>
+                  </label>
                   <div className="relative">
                     <Field
                       name="password"
@@ -306,7 +358,9 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                     />
                     <Button
                       className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
-                      onClick={() => setFieldValue("password", generatePassword())}
+                      onClick={() =>
+                        setFieldValue("password", generatePassword())
+                      }
                     >
                       <ReloadOutlined />
                     </Button>
@@ -322,14 +376,27 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Email <span className="text-red-500">*</span></label>
-                  <Field name="email" as={Input} placeholder="johndoe@example.com" className="mt-1" />
-                  <ErrorMessage name="email" component="div" className="text-red-500" />
+                  <label className="font-semibold">
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    name="email"
+                    as={Input}
+                    placeholder="johndoe@example.com"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="email"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-group">
-                  <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
+                  <label className="text-gray-600 font-semibold mb-2 block">
+                    Phone <span className="text-red-500">*</span>
+                  </label>
                   <div className="flex gap-0">
                     <Field name="phoneCode">
                       {({ field }) => (
@@ -337,28 +404,34 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                           {...field}
                           className="phone-code-select"
                           style={{
-                            width: '80px',
+                            width: "80px",
                             borderTopRightRadius: 0,
                             borderBottomRightRadius: 0,
                             borderRight: 0,
-                            backgroundColor: '#f8fafc',
+                            backgroundColor: "#f8fafc",
                           }}
-                          placeholder={<span className="text-gray-400">+91</span>}
+                          placeholder={
+                            <span className="text-gray-400">+91</span>
+                          }
                           onChange={(value) => {
-                            if (value === 'add_new') {
+                            if (value === "add_new") {
                               setIsAddPhoneCodeModalVisible(true);
                             } else {
-                              setFieldValue('phoneCode', value);
+                              setFieldValue("phoneCode", value);
                             }
                           }}
                           value={values.phoneCode}
-                          dropdownStyle={{ minWidth: '180px' }}
-                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                          dropdownRender={menu => (
+                          dropdownStyle={{ minWidth: "180px" }}
+                          suffixIcon={
+                            <span className="text-gray-400 text-xs">▼</span>
+                          }
+                          dropdownRender={(menu) => (
                             <div>
                               <div
                                 className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                                onClick={() =>
+                                  setIsAddPhoneCodeModalVisible(true)
+                                }
                               >
                                 <PlusOutlined className="mr-2" />
                                 <span className="text-sm">Add New</span>
@@ -370,9 +443,15 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                           {countries?.map((country) => (
                             <Option key={country.id} value={country.phoneCode}>
                               <div className="flex items-center w-full px-1">
-                                <span className="text-base min-w-[40px]">{country.phoneCode}</span>
-                                <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
-                                <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                                <span className="text-base min-w-[40px]">
+                                  {country.phoneCode}
+                                </span>
+                                <span className="text-gray-600 text-sm ml-3">
+                                  {country.countryName}
+                                </span>
+                                <span className="text-gray-400 text-xs ml-auto">
+                                  {country.countryCode}
+                                </span>
                               </div>
                             </Option>
                           ))}
@@ -387,38 +466,57 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                           style={{
                             borderTopLeftRadius: 0,
                             borderBottomLeftRadius: 0,
-                            borderLeft: '1px solid #d9d9d9',
-                            width: 'calc(100% - 80px)'
+                            borderLeft: "1px solid #d9d9d9",
+                            width: "calc(100% - 80px)",
                           }}
                           type="number"
                           placeholder="Enter phone number"
-                          onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                        // prefix={
-                        //   values.phoneCode && (
-                        //     <span className="text-gray-600 font-medium mr-1">
-                        //       {values.phoneCode}
-                        //     </span>
-                        //   )
-                        // }
+                          onChange={(e) =>
+                            handlePhoneNumberChange(e, setFieldValue)
+                          }
+                          // prefix={
+                          //   values.phoneCode && (
+                          //     <span className="text-gray-600 font-medium mr-1">
+                          //       {values.phoneCode}
+                          //     </span>
+                          //   )
+                          // }
                         />
                       )}
                     </Field>
                   </div>
-                  <ErrorMessage name="phone" component="div" className="text-red-500 mt-1 text-sm" />
+                  <ErrorMessage
+                    name="phone"
+                    component="div"
+                    className="text-red-500 mt-1 text-sm"
+                  />
                 </div>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Address <span className="text-red-500">*</span></label>
-                  <Field name="address" as={Input} placeholder="Enter Address" className="mt-1" />
-                  <ErrorMessage name="address" component="div" className="text-red-500" />
+                  <label className="font-semibold">
+                    Address <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    name="address"
+                    as={Input}
+                    placeholder="Enter Address"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="address"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Joining Date <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">
+                    Joining Date <span className="text-red-500">*</span>
+                  </label>
                   <Field name="joiningDate">
                     {({ field }) => (
                       <Input
@@ -429,14 +527,20 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                       />
                     )}
                   </Field>
-                  <ErrorMessage name="joiningDate" component="div" className="text-red-500" />
+                  <ErrorMessage
+                    name="joiningDate"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">
+                    Branch <span className="text-red-500">*</span>
+                  </label>
                   <Field name="branch">
                     {({ field }) => (
                       <Select
@@ -473,13 +577,19 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                       </Select>
                     )}
                   </Field>
-                  <ErrorMessage name="branch" component="div" className="text-red-500" />
+                  <ErrorMessage
+                    name="branch"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
 
               <Col span={12}>
                 <div className="form-item mt-1">
-                  <label className="font-semibold">Department <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">
+                    Department <span className="text-red-500">*</span>
+                  </label>
                   <Field name="department">
                     {({ field }) => (
                       <Select
@@ -509,13 +619,19 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                       </Select>
                     )}
                   </Field>
-                  <ErrorMessage name="department" component="div" className="text-red-500" />
+                  <ErrorMessage
+                    name="department"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label className="font-semibold">Designation <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">
+                    Designation <span className="text-red-500">*</span>
+                  </label>
                   <Field name="designation">
                     {({ field }) => (
                       <Select
@@ -523,7 +639,9 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                         className="w-full mt-1"
                         placeholder="Select Designation"
                         disabled={!selectedBranch}
-                        onChange={(value) => setFieldValue("designation", value)}
+                        onChange={(value) =>
+                          setFieldValue("designation", value)
+                        }
                         dropdownRender={(menu) => (
                           <>
                             {menu}
@@ -545,15 +663,31 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                       </Select>
                     )}
                   </Field>
-                  <ErrorMessage name="designation" component="div" className="text-red-500" />
+                  <ErrorMessage
+                    name="designation"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label className="font-semibold">Salary <span className="text-red-500">*</span></label>
-                  <Field name="salary" as={Input} placeholder="$" type="number" className="mt-1" />
-                  <ErrorMessage name="salary" component="div" className="text-red-500" />
+                  <label className="font-semibold">
+                    Salary <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    name="salary"
+                    as={Input}
+                    placeholder="$"
+                    type="number"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="salary"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
             </Row>
@@ -562,15 +696,34 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
               <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Account Holder Name </label>
-                  <Field name="accountholder" as={Input} placeholder="John Doe" className="mt-1" />
-                  <ErrorMessage name="accountholder" component="div" className="text-red-500" />
+                  <Field
+                    name="accountholder"
+                    as={Input}
+                    placeholder="John Doe"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="accountholder"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Account Number </label>
-                  <Field name="accountnumber" as={Input} placeholder="123456789" type="number" className="mt-1" />
-                  <ErrorMessage name="accountnumber" component="div" className="text-red-500" />
+                  <Field
+                    name="accountnumber"
+                    as={Input}
+                    placeholder="123456789"
+                    type="number"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="accountnumber"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
             </Row>
@@ -578,40 +731,70 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
               <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Bank Name </label>
-                  <Field name="bankname" as={Input} placeholder="Bank Name" className="mt-1" />
-                  <ErrorMessage name="bankname" component="div" className="text-red-500" />
+                  <Field
+                    name="bankname"
+                    as={Input}
+                    placeholder="Bank Name"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="bankname"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">IFSC </label>
-                  <Field name="ifsc" as={Input} placeholder="IFSC" className="mt-1" />
-                  <ErrorMessage name="ifsc" component="div" className="text-red-500" />
+                  <Field
+                    name="ifsc"
+                    as={Input}
+                    placeholder="IFSC"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="ifsc"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Bank Location   </label>
-                  <Field name="banklocation" as={Input} placeholder="Bank Location" className="mt-1" />
-                  <ErrorMessage name="banklocation" component="div" className="text-red-500" />
+                  <label className="font-semibold">Bank Location </label>
+                  <Field
+                    name="banklocation"
+                    as={Input}
+                    placeholder="Bank Location"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="banklocation"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
             </Row>
 
-            <Col span={24} className="mt-4 "><div className="flex justify-between items-center">
-              <label className="text-lg font-semibold mb-3 mt-4">Salary</label>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={salary}
-                  onChange={(e) => setSalary(e.target.checked)}
-                />
-                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-              </label>
-            </div>
+            <Col span={24} className="mt-4 ">
+              <div className="flex justify-between items-center">
+                <label className="text-lg font-semibold mb-3 mt-4">
+                  Salary
+                </label>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={salary}
+                    onChange={(e) => setSalary(e.target.checked)}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                </label>
+              </div>
             </Col>
             {salary && (
               <>
@@ -625,7 +808,9 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                             {...field}
                             className="w-full mt-1"
                             placeholder="Select Payroll Type"
-                            onChange={(value) => setFieldValue("payslipType", value)}
+                            onChange={(value) =>
+                              setFieldValue("payslipType", value)
+                            }
                             onBlur={() => setFieldTouched("payslipType", true)}
                           >
                             <Option value="monthly">Monthly</Option>
@@ -651,11 +836,14 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                             {...field}
                             className="w-full mt-1"
                             placeholder="Select Currency"
-                            onChange={(value) => setFieldValue("currency", value)}
+                            onChange={(value) =>
+                              setFieldValue("currency", value)
+                            }
                           >
                             {currencies?.data?.map((currency) => (
                               <Option key={currency.id} value={currency.id}>
-                                {currency.currencyCode} ({currency.currencyIcon})
+                                {currency.currencyCode} ({currency.currencyIcon}
+                                )
                               </Option>
                             ))}
                           </Select>
@@ -714,7 +902,6 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                     </div>
                   </Col>
 
-
                   <Col span={12}>
                     <div className="form-item mt-3">
                       <label className="font-semibold">Bank Account</label>
@@ -732,7 +919,6 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                       />
                     </div>
                   </Col>
-
                 </Row>
               </>
             )}
@@ -740,11 +926,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
               <Button type="default" className="mr-2" onClick={() => onClose()}>
                 Cancel
               </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={isSubmitting}
-              >
+              <Button type="primary" htmlType="submit" loading={isSubmitting}>
                 {isSubmitting ? "Submitting..." : "Submit"}
               </Button>
             </div>
@@ -820,7 +1002,6 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
         />
       </Modal>
       <style jsx>{`
-
         .ant-select-dropdown .ant-select-item {
           padding: 8px 12px !important;
         }

@@ -1,17 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Button, Input, message, Modal, Select, Dropdown } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, MoreOutlined } from '@ant-design/icons';
-import UserView from '../../Users/user-list/UserView';
-import Flex from 'components/shared-components/Flex';
-import { useNavigate } from 'react-router-dom';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import AddDesignation from './AddDesignation';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Button,
+  Input,
+  message,
+  Modal,
+  Select,
+  Dropdown,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  EditOutlined,
+  PlusOutlined,
+  PushpinOutlined,
+  FileExcelOutlined,
+  MoreOutlined,
+} from "@ant-design/icons";
+import UserView from "../../Users/user-list/UserView";
+import Flex from "components/shared-components/Flex";
+import { useNavigate } from "react-router-dom";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import AddDesignation from "./AddDesignation";
 import { utils, writeFile } from "xlsx";
-import ParticularDesignation from './ParticularDesignation';
-import EditDesignation from './EditDesignation';
-import { useDispatch, useSelector } from 'react-redux';
-import { DeleteDes, getDes } from './DesignationReducers/DesignationSlice';
-import { getBranch } from '../Branch/BranchReducer/BranchSlice';
+import ParticularDesignation from "./ParticularDesignation";
+import EditDesignation from "./EditDesignation";
+import { useDispatch, useSelector } from "react-redux";
+import { DeleteDes, getDes } from "./DesignationReducers/DesignationSlice";
+import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 
 const { Option } = Select;
 
@@ -21,8 +40,10 @@ const DesignationList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [isAddDesignationModalVisible, setIsAddDesignationModalVisible] = useState(false);
-  const [isEditDesignationModalVisible, setIsEditDesignationModalVisible] = useState(false);
+  const [isAddDesignationModalVisible, setIsAddDesignationModalVisible] =
+    useState(false);
+  const [isEditDesignationModalVisible, setIsEditDesignationModalVisible] =
+    useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -30,48 +51,58 @@ const DesignationList = () => {
   const tabledata = useSelector((state) => state.Designation);
 
   const [id, setId] = useState("");
-  const [searchText, setSearchText] = useState('');
-  const [selectedBranch, setSelectedBranch] = useState('all');
+  const [searchText, setSearchText] = useState("");
+  const [selectedBranch, setSelectedBranch] = useState("all");
 
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
 
-  const userBranches = branchData.filter(branch => branch.created_by === user);
+  const userBranches = branchData.filter(
+    (branch) => branch.created_by === user
+  );
 
   useEffect(() => {
     dispatch(getDes());
     dispatch(getBranch());
   }, [dispatch]);
 
-
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
-  let allpermisson;
+  // Updated permission checks
+  const designationPermissions =
+    parsedPermissions["extra-hrm-designation"]?.[0]?.permissions || [];
 
-  if (parsedPermissions["extra-hrm-designation"] && parsedPermissions["extra-hrm-designation"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-designation"][0].permissions;
-
-  } else {
-  }
-
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
-
+  const canViewDesignation =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    designationPermissions.includes("view");
+  const canCreateDesignation =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    designationPermissions.includes("create");
+  const canEditDesignation =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    designationPermissions.includes("update");
+  const canDeleteDesignation =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    designationPermissions.includes("delete");
 
   useEffect(() => {
     if (tabledata && tabledata.Designation && tabledata.Designation.data) {
-      const filteredData = tabledata.Designation.data.filter((item) => item.created_by === user);
+      const filteredData = tabledata.Designation.data.filter(
+        (item) => item.created_by === user
+      );
       setUsers(filteredData);
     }
   }, [tabledata]);
@@ -93,7 +124,9 @@ const DesignationList = () => {
   };
 
   const handleParticularDesignationModal = () => {
-    navigate('/app/hrm/designation/particulardesignation', { state: { user: selectedUser } });
+    navigate("/app/hrm/designation/particulardesignation", {
+      state: { user: selectedUser },
+    });
   };
 
   const onSearch = (e) => {
@@ -102,8 +135,8 @@ const DesignationList = () => {
   };
 
   const getBranchNameById = (branchId) => {
-    const branch = branchData.find(branch => branch.id === branchId);
-    return branch ? branch.branchName : 'N/A';
+    const branch = branchData.find((branch) => branch.id === branchId);
+    return branch ? branch.branchName : "N/A";
   };
 
   const getFilteredDesignations = () => {
@@ -112,14 +145,16 @@ const DesignationList = () => {
     let filtered = users;
 
     if (searchText) {
-      filtered = filtered.filter(designation =>
-        designation.designation_name?.toLowerCase().includes(searchText.toLowerCase())
+      filtered = filtered.filter((designation) =>
+        designation.designation_name
+          ?.toLowerCase()
+          .includes(searchText.toLowerCase())
       );
     }
 
-    if (selectedBranch !== 'all') {
-      filtered = filtered.filter(designation =>
-        designation.branch === selectedBranch
+    if (selectedBranch !== "all") {
+      filtered = filtered.filter(
+        (designation) => designation.branch === selectedBranch
       );
     }
 
@@ -134,11 +169,11 @@ const DesignationList = () => {
     dispatch(DeleteDes(userId))
       .then(() => {
         dispatch(getDes());
-        setUsers(users.filter(item => item.id !== userId));
-        navigate('/app/hrm/designation');
+        setUsers(users.filter((item) => item.id !== userId));
+        navigate("/app/hrm/designation");
       })
       .catch((error) => {
-        console.error('Edit API error:', error);
+        console.error("Edit API error:", error);
       });
   };
 
@@ -167,28 +202,28 @@ const DesignationList = () => {
 
   const editfun = (id) => {
     openEditDesignationModal();
-    setId(id)
-  }
+    setId(id);
+  };
 
   const getDropdownItems = (elm) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canEditDesignation) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editfun(elm.id)
+        label: "Edit",
+        onClick: () => editfun(elm.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canDeleteDesignation) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(elm.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -197,16 +232,17 @@ const DesignationList = () => {
 
   const tableColumns = [
     {
-      title: 'Designation',
-      dataIndex: 'designation_name',
+      title: "Designation",
+      dataIndex: "designation_name",
       sorter: {
-        compare: (a, b) => a.designation_name.length - b.designation_name.length,
+        compare: (a, b) =>
+          a.designation_name.length - b.designation_name.length,
       },
-      render: (text) => <span className="designation-cell">{text}</span>
+      render: (text) => <span className="designation-cell">{text}</span>,
     },
     {
-      title: 'Branch',
-      dataIndex: 'branch',
+      title: "Branch",
+      dataIndex: "branch",
       render: (branchId) => (
         <span className="branch-cell">{getBranchNameById(branchId)}</span>
       ),
@@ -219,34 +255,38 @@ const DesignationList = () => {
       },
     },
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center" onClick={(e) => e.stopPropagation()}>
           <Dropdown
             overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
@@ -267,7 +307,7 @@ const DesignationList = () => {
               className="branch-select"
             >
               <Option value="all">All Branches</Option>
-              {userBranches.map(branch => (
+              {userBranches.map((branch) => (
                 <Option key={branch.id} value={branch.id}>
                   {branch.branchName}
                 </Option>
@@ -276,12 +316,16 @@ const DesignationList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-            <Button type="primary" className="ml-2" onClick={openAddDesignationModal}>
+          {canCreateDesignation && (
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddDesignationModal}
+            >
               <PlusOutlined />
               <span>New</span>
             </Button>
-          ) : null}
+          )}
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
@@ -293,7 +337,7 @@ const DesignationList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        {canViewDesignation && (
           <Table
             columns={tableColumns}
             dataSource={getFilteredDesignations()}
@@ -302,12 +346,17 @@ const DesignationList = () => {
               total: getFilteredDesignations().length,
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
             }}
           />
-        ) : null}
+        )}
       </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+      <UserView
+        data={selectedUser}
+        visible={userProfileVisible}
+        close={closeUserProfile}
+      />
 
       <Modal
         title="Add Designation"
@@ -319,7 +368,6 @@ const DesignationList = () => {
         <AddDesignation onClose={closeAddDesignationModal} />
       </Modal>
 
-
       <Modal
         title="Edit Designation"
         visible={isEditDesignationModalVisible}
@@ -329,7 +377,6 @@ const DesignationList = () => {
       >
         <EditDesignation onClose={closeEditDesignationModal} id={id} />
       </Modal>
-
     </Card>
   );
 };
@@ -454,6 +501,3 @@ const DesignationListWithStyles = () => (
 );
 
 export default DesignationListWithStyles;
-
-
-

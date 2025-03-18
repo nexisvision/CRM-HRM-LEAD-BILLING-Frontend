@@ -1,34 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { Badge, Card, Row, Col, Modal, Form, Input, Select, TimePicker, Button, Tooltip, message } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
-import { useDispatch, useSelector } from 'react-redux';
-import { addcalends, getcalends, deletecalends } from './calanderReducer/calanderSlice';
-import moment from 'moment';
+import React, { useState, useEffect } from "react";
+import {
+  Badge,
+  Card,
+  Row,
+  Col,
+  Modal,
+  Form,
+  Input,
+  Select,
+  TimePicker,
+  Button,
+  Tooltip,
+  message,
+} from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addcalends,
+  getcalends,
+  deletecalends,
+} from "./calanderReducer/calanderSlice";
+import moment from "moment";
 
 const { Option } = Select;
 
-const badgeColors = [
-  'pink', 'red', 'orange', 'green'
-];
+const badgeColors = ["pink", "red", "orange", "green"];
 
 const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
   const [currentDate, setCurrentDate] = useState(moment());
 
   const generateCalendarDays = () => {
-    const firstDay = moment(currentDate).startOf('month');
-    const lastDay = moment(currentDate).endOf('month');
-    const startDate = moment(firstDay).startOf('week');
-    const endDate = moment(lastDay).endOf('week');
+    const firstDay = moment(currentDate).startOf("month");
+    const lastDay = moment(currentDate).endOf("month");
+    const startDate = moment(firstDay).startOf("week");
+    const endDate = moment(lastDay).endOf("week");
     const calendar = [];
     let week = [];
 
-    for (let day = moment(startDate); day.isSameOrBefore(endDate); day.add(1, 'day')) {
+    for (
+      let day = moment(startDate);
+      day.isSameOrBefore(endDate);
+      day.add(1, "day")
+    ) {
       week.push({
         date: moment(day),
         isCurrentMonth: day.month() === currentDate.month(),
-        events: eventData.filter(event =>
-          moment(event.startDate).format('YYYY-MM-DD') === day.format('YYYY-MM-DD')
-        )
+        events: eventData.filter(
+          (event) =>
+            moment(event.startDate).format("YYYY-MM-DD") ===
+            day.format("YYYY-MM-DD")
+        ),
       });
       if (week.length === 7) {
         calendar.push(week);
@@ -39,7 +60,7 @@ const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
   };
 
   const formatEventTime = (time) => {
-    return moment(time).format('hh:mm A');
+    return moment(time).format("hh:mm A");
   };
 
   const renderEventBadge = (event) => {
@@ -48,9 +69,11 @@ const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
       <Tooltip
         title={
           <div>
-            <div><strong>{event.name}</strong></div>
-            <div>Start: {moment(event.startDate).format('hh:mm A')}</div>
-            <div>End: {moment(event.endDate).format('hh:mm A')}</div>
+            <div>
+              <strong>{event.name}</strong>
+            </div>
+            <div>Start: {moment(event.startDate).format("hh:mm A")}</div>
+            <div>End: {moment(event.endDate).format("hh:mm A")}</div>
           </div>
         }
       >
@@ -59,8 +82,8 @@ const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
           className="event-badge"
           style={{
             backgroundColor: event.color,
-            color: 'white',
-            height: '24px'
+            color: "white",
+            height: "24px",
           }}
         >
           {`${timeStr} ${event.name}`}
@@ -82,13 +105,15 @@ const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
     <div className="custom-calendar">
       <div className="calendar-header">
         <Button
-          onClick={() => setCurrentDate(moment(currentDate).subtract(1, 'month'))}
+          onClick={() =>
+            setCurrentDate(moment(currentDate).subtract(1, "month"))
+          }
         >
           Previous
         </Button>
-        <h2>{currentDate.format('MMMM YYYY')}</h2>
+        <h2>{currentDate.format("MMMM YYYY")}</h2>
         <Button
-          onClick={() => setCurrentDate(moment(currentDate).add(1, 'month'))}
+          onClick={() => setCurrentDate(moment(currentDate).add(1, "month"))}
         >
           Next
         </Button>
@@ -96,7 +121,7 @@ const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
       <table className="calendar-table">
         <thead>
           <tr>
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
               <th key={day}>{day}</th>
             ))}
           </tr>
@@ -107,13 +132,15 @@ const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
               {week.map((day, dayIndex) => (
                 <td
                   key={dayIndex}
-                  className={`calendar-cell ${!day.isCurrentMonth ? 'other-month' : ''}`}
+                  className={`calendar-cell ${
+                    !day.isCurrentMonth ? "other-month" : ""
+                  }`}
                   onClick={() => onDateSelect(day.date)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 >
                   <div className="date-number">{day.date.date()}</div>
                   <div className="event-list">
-                    {day.events.map(event => renderEventBadge(event))}
+                    {day.events.map((event) => renderEventBadge(event))}
                   </div>
                 </td>
               ))}
@@ -142,100 +169,121 @@ const CalendarApp = () => {
     try {
       await dispatch(deletecalends(eventId));
       await dispatch(getcalends());
-      message.success('Event deleted successfully');
+      message.success("Event deleted successfully");
     } catch (error) {
-      message.error('Failed to delete event');
-      console.error('Delete error:', error);
+      message.error("Failed to delete event");
+      console.error("Delete error:", error);
     }
   };
 
   const onAddEvent = async (values) => {
     try {
       if (!selectedDate) {
-        message.error('Please select a date first');
+        message.error("Please select a date first");
         return;
       }
       const eventData = {
         name: values.title,
         color: values.bullet,
-        startDate: moment(selectedDate).set({ hour: values.start.hour(), minute: values.start.minute() }).toISOString(),
-        endDate: moment(selectedDate).set({ hour: values.end.hour(), minute: values.end.minute() }).toISOString(),
+        startDate: moment(selectedDate)
+          .set({ hour: values.start.hour(), minute: values.start.minute() })
+          .toISOString(),
+        endDate: moment(selectedDate)
+          .set({ hour: values.end.hour(), minute: values.end.minute() })
+          .toISOString(),
       };
 
       await dispatch(addcalends(eventData));
       await dispatch(getcalends());
       setModalVisible(false);
       form.resetFields();
-      message.success('Event added successfully');
+      message.success("Event added successfully");
     } catch (error) {
-      message.error('Failed to add event');
-      console.error('Add event error:', error);
+      message.error("Failed to add event");
+      console.error("Add event error:", error);
     }
   };
 
   const handleDateSelect = (date) => {
-    setSelectedDate(date.format('YYYY-MM-DD'));
+    setSelectedDate(date.format("YYYY-MM-DD"));
     setModalVisible(true);
   };
 
-
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
   let allpermisson;
 
-  if (parsedPermissions["extra-hrm-trainingSetup"] && parsedPermissions["extra-hrm-trainingSetup"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-trainingSetup"][0].permissions;
-
+  if (
+    parsedPermissions["dashboards-calendar"] &&
+    parsedPermissions["dashboards-calendar"][0]?.permissions
+  ) {
+    allpermisson = parsedPermissions["dashboards-calendar"][0].permissions;
   } else {
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const canCreateClient = allpermisson?.includes("create");
+  const canDeleteClient = allpermisson?.includes("delete");
+  const canViewClient = allpermisson?.includes("view");
   const handleStartTimeChange = (time) => {
     form.setFieldsValue({ end: null }); // Reset end time when start time changes
-    form.validateFields(['end']); // Revalidate end time
+    form.validateFields(["end"]); // Revalidate end time
   };
 
   return (
     <div className="calendar-container">
-
       <Row gutter={16}>
         <Col xs={24} sm={24} md={8} lg={6}>
           <Card className="sidebar-card">
-            {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            {whorole === "super-admin" ||
+            whorole === "client" ||
+            (canViewClient &&
+              whorole !== "super-admin" &&
+              whorole !== "client") ? (
               <div className="sidebar-events">
-
                 <h4 className="mb-3">Upcoming Events</h4>
                 {fndata.length === 0 ? (
                   <div className="text-muted">No events scheduled</div>
                 ) : (
                   fndata.map((event) => (
                     <div key={event.id} className="event-card-wrapper">
-                      <div className="event-card mb-3" style={{ borderLeft: `4px solid ${event.color}`, paddingLeft: '12px' }}>
+                      <div
+                        className="event-card mb-3"
+                        style={{
+                          borderLeft: `4px solid ${event.color}`,
+                          paddingLeft: "12px",
+                        }}
+                      >
                         <h5 className="event-card-title">{event.name}</h5>
                         <div className="event-card-time">
-                          <div>{moment(event.startDate).format('MMM DD, YYYY')}</div>
+                          <div>
+                            {moment(event.startDate).format("MMM DD, YYYY")}
+                          </div>
                           <div className="text-muted">
-                            {moment(event.startDate).format('HH:mm')} - {moment(event.endDate).format('HH:mm')}
+                            {moment(event.startDate).format("HH:mm")} -{" "}
+                            {moment(event.endDate).format("HH:mm")}
                           </div>
                         </div>
                         <div className="event-card-actions">
-
-
-                          {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                          {whorole === "super-admin" ||
+                          whorole === "client" ||
+                          (canDeleteClient &&
+                            whorole !== "super-admin" &&
+                            whorole !== "client") ? (
                             <Tooltip title="Delete event">
-                              <DeleteOutlined onClick={() => onDeleteEvent(event.id)} className="delete-icon" />
+                              <DeleteOutlined
+                                onClick={() => onDeleteEvent(event.id)}
+                                className="delete-icon"
+                              />
                             </Tooltip>
                           ) : null}
                         </div>
@@ -245,11 +293,14 @@ const CalendarApp = () => {
                 )}
               </div>
             ) : null}
-
           </Card>
         </Col>
         <Col xs={24} sm={24} md={16} lg={18}>
-          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {whorole === "super-admin" ||
+          whorole === "client" ||
+          (canViewClient &&
+            whorole !== "super-admin" &&
+            whorole !== "client") ? (
             <Card className="mb-4">
               <CustomCalendar
                 eventData={fndata}
@@ -258,11 +309,12 @@ const CalendarApp = () => {
               />
             </Card>
           ) : null}
-
         </Col>
       </Row>
 
-      {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+      {whorole === "super-admin" ||
+      whorole === "client" ||
+      (canCreateClient && whorole !== "super-admin" && whorole !== "client") ? (
         <Modal
           title="New Event"
           open={modalVisible}
@@ -271,13 +323,29 @@ const CalendarApp = () => {
           onCancel={() => setModalVisible(false)}
         >
           <div className="mb-3 border-b pb-[-10px] font-medium"></div>
-          <Form form={form} layout="vertical" name="new-event" preserve={false} onFinish={onAddEvent}>
-            <Form.Item name="title" label="Title" rules={[{ required: true, message: 'Please enter event title' }]} >
+          <Form
+            form={form}
+            layout="vertical"
+            name="new-event"
+            preserve={false}
+            onFinish={onAddEvent}
+          >
+            <Form.Item
+              name="title"
+              label="Title"
+              rules={[{ required: true, message: "Please enter event title" }]}
+            >
               <Input autoComplete="off" />
             </Form.Item>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item name="start" label="Start" rules={[{ required: true, message: 'Please select start time' }]}>
+                <Form.Item
+                  name="start"
+                  label="Start"
+                  rules={[
+                    { required: true, message: "Please select start time" },
+                  ]}
+                >
                   <TimePicker
                     className="w-100"
                     onChange={handleStartTimeChange}
@@ -289,14 +357,16 @@ const CalendarApp = () => {
                   name="end"
                   label="End"
                   rules={[
-                    { required: true, message: 'Please select end time' },
+                    { required: true, message: "Please select end time" },
                     ({ getFieldValue }) => ({
                       validator(_, value) {
-                        const startTime = getFieldValue('start');
+                        const startTime = getFieldValue("start");
                         if (!value || !startTime || value.isAfter(startTime)) {
                           return Promise.resolve();
                         }
-                        return Promise.reject(new Error('End time must be after start time'));
+                        return Promise.reject(
+                          new Error("End time must be after start time")
+                        );
                       },
                     }),
                   ]}
@@ -304,7 +374,7 @@ const CalendarApp = () => {
                   <TimePicker
                     className="w-100"
                     disabledTime={() => {
-                      const startTime = form.getFieldValue('start');
+                      const startTime = form.getFieldValue("start");
                       if (!startTime) return {};
 
                       return {
@@ -323,20 +393,26 @@ const CalendarApp = () => {
                             }
                           }
                           return minutes;
-                        }
+                        },
                       };
                     }}
                   />
                 </Form.Item>
               </Col>
             </Row>
-            <Form.Item name="bullet" label="Label" initialValue={badgeColors[0]}>
+            <Form.Item
+              name="bullet"
+              label="Label"
+              initialValue={badgeColors[0]}
+            >
               <Select>
                 {badgeColors.map((elm) => (
                   <Option value={elm} key={elm}>
                     <div className="flex items-center gap-2">
                       <Badge color={elm} />
-                      <span className="text-capitalize font-weight-semibold">{elm}</span>
+                      <span className="text-capitalize font-weight-semibold">
+                        {elm}
+                      </span>
                     </div>
                   </Option>
                 ))}
@@ -350,7 +426,6 @@ const CalendarApp = () => {
           </Form>
         </Modal>
       ) : null}
-
     </div>
   );
 };

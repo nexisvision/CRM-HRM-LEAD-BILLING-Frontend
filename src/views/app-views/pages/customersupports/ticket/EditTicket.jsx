@@ -32,19 +32,17 @@ const validationSchema = Yup.object().shape({
 });
 
 const EditTicket = ({ idd, onClose }) => {
-
   const dispatch = useDispatch();
   const [fileList, setFileList] = useState([]);
-
 
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
   const loggedInUser = useSelector((state) => state.user.loggedInUser);
   const roles = useSelector((state) => state.role?.role?.data);
-  const userRole = roles?.find(role => role.id === loggedInUser.role_id);
+  const userRole = roles?.find((role) => role.id === loggedInUser.role_id);
 
-  const fnddatass = empData.filter(emp => {
-    if (userRole?.role_name === 'client') {
+  const fnddatass = empData.filter((emp) => {
+    if (userRole?.role_name === "client") {
       return emp.client_id === loggedInUser.id;
     } else {
       return emp.client_id === loggedInUser.client_id;
@@ -65,9 +63,11 @@ const EditTicket = ({ idd, onClose }) => {
     requestor: perfectdata?.requestor || "",
     priority: perfectdata?.priority || "Low",
     status: perfectdata?.status || "Open",
-    endDate: perfectdata?.endDate ? dayjs(perfectdata.endDate).format('YYYY-MM-DD') : "",
+    endDate: perfectdata?.endDate
+      ? dayjs(perfectdata.endDate).format("YYYY-MM-DD")
+      : "",
     description: perfectdata?.description || "",
-    file: null
+    file: null,
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -76,29 +76,30 @@ const EditTicket = ({ idd, onClose }) => {
 
       // Handle file upload
       if (values.file) {
-        formData.append('file', values.file);
+        formData.append("file", values.file);
       }
 
       // Format the date before sending to the database
       const formattedValues = {
         ...values,
-        endDate: values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : null
+        endDate: values.endDate
+          ? dayjs(values.endDate).format("YYYY-MM-DD")
+          : null,
       };
 
       // Append formatted values to formData
-      Object.keys(formattedValues).forEach(key => {
-        if (key !== 'file' && formattedValues[key] !== null) {
+      Object.keys(formattedValues).forEach((key) => {
+        if (key !== "file" && formattedValues[key] !== null) {
           formData.append(key, formattedValues[key]);
         }
       });
 
       await dispatch(Editicket({ idd, formData })).unwrap();
-      message.success('Ticket updated successfully');
       dispatch(getAllTicket());
       onClose();
     } catch (error) {
       console.error("Error updating ticket:", error);
-      message.error('Failed to update ticket');
+      message.error("Failed to update ticket");
     } finally {
       setSubmitting(false);
     }
@@ -106,7 +107,7 @@ const EditTicket = ({ idd, onClose }) => {
 
   return (
     <div className="">
-       <div className="border-b pb-[-10px] font-medium"></div>
+      <div className="border-b pb-[-10px] font-medium"></div>
 
       <Formik
         initialValues={initialValues}
@@ -230,14 +231,18 @@ const EditTicket = ({ idd, onClose }) => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     End Date <span className="text-red-500">*</span>
                   </label>
-                  <input 
+                  <input
                     type="date"
                     className="w-full mt-1 p-2 border rounded"
-                    value={values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : ''}
-                    min={dayjs().format('YYYY-MM-DD')}
+                    value={
+                      values.endDate
+                        ? dayjs(values.endDate).format("YYYY-MM-DD")
+                        : ""
+                    }
+                    min={dayjs().format("YYYY-MM-DD")}
                     onChange={(e) => {
                       const selectedDate = e.target.value;
-                      setFieldValue('endDate', selectedDate);
+                      setFieldValue("endDate", selectedDate);
                     }}
                   />
                   <ErrorMessage
@@ -282,12 +287,14 @@ const EditTicket = ({ idd, onClose }) => {
                     fileList={fileList}
                     beforeUpload={(file) => {
                       setFieldValue("file", file);
-                      setFileList([{
-                        uid: '-1',
-                        name: file.name,
-                        status: 'done',
-                        originFileObj: file
-                      }]);
+                      setFileList([
+                        {
+                          uid: "-1",
+                          name: file.name,
+                          status: "done",
+                          originFileObj: file,
+                        },
+                      ]);
                       return false;
                     }}
                     onRemove={() => {

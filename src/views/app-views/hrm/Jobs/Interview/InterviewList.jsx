@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import moment from "moment";
-import { Card, Form, Button, Tooltip, message } from 'antd';
+import { Card, Form, Button, Tooltip, message } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   DeleteInterview,
   getInterview,
-  AddInterviews
+  AddInterviews,
 } from "./interviewReducer/interviewSlice";
-import AddInterviewModal from './AddInterview';
+import AddInterviewModal from "./AddInterview";
 const SidebarInterviews = ({ interviews, onDeleteInterview }) => {
   const sortedInterviews = Array.isArray(interviews)
-    ? [...interviews].sort((a, b) => moment(a.startOn).valueOf() - moment(b.startOn).valueOf())
+    ? [...interviews].sort(
+        (a, b) => moment(a.startOn).valueOf() - moment(b.startOn).valueOf()
+      )
     : [];
   return (
     <div className="sidebar-interviews">
@@ -24,15 +26,18 @@ const SidebarInterviews = ({ interviews, onDeleteInterview }) => {
             <div
               className="interview-card mb-3"
               style={{
-                borderLeft: `4px solid ${interview.interviewType === 'Online' ? '#5B5FC7' : '#4CAF50'}`,
-                paddingLeft: '12px'
+                borderLeft: `4px solid ${
+                  interview.interviewType === "Online" ? "#5B5FC7" : "#4CAF50"
+                }`,
+                paddingLeft: "12px",
               }}
             >
               <h5 className="interview-card-title">{interview.interviewer}</h5>
               <div className="interview-card-time">
-                <div>{moment(interview.startOn).format('MMM DD, YYYY')}</div>
+                <div>{moment(interview.startOn).format("MMM DD, YYYY")}</div>
                 <div className="text-muted">
-                  {moment(interview.startTime, 'HH:mm:ss').format('h:mm a')} - {interview.interviewType}
+                  {moment(interview.startTime, "HH:mm:ss").format("h:mm a")} -{" "}
+                  {interview.interviewType}
                 </div>
               </div>
               <div className="interview-card-actions">
@@ -53,19 +58,25 @@ const SidebarInterviews = ({ interviews, onDeleteInterview }) => {
 const CustomCalendar = ({ interviewData, onDeleteInterview, onDateSelect }) => {
   const [currentDate, setCurrentDate] = useState(moment());
   const generateCalendarDays = () => {
-    const firstDay = moment(currentDate).startOf('month');
-    const lastDay = moment(currentDate).endOf('month');
-    const startDate = moment(firstDay).startOf('week');
-    const endDate = moment(lastDay).endOf('week');
+    const firstDay = moment(currentDate).startOf("month");
+    const lastDay = moment(currentDate).endOf("month");
+    const startDate = moment(firstDay).startOf("week");
+    const endDate = moment(lastDay).endOf("week");
     const calendar = [];
     let week = [];
-    for (let day = moment(startDate); day.isSameOrBefore(endDate); day.add(1, 'day')) {
+    for (
+      let day = moment(startDate);
+      day.isSameOrBefore(endDate);
+      day.add(1, "day")
+    ) {
       week.push({
         date: moment(day),
         isCurrentMonth: day.month() === currentDate.month(),
-        interviews: interviewData.filter(interview =>
-          moment(interview.startOn).format('YYYY-MM-DD') === day.format('YYYY-MM-DD')
-        )
+        interviews: interviewData.filter(
+          (interview) =>
+            moment(interview.startOn).format("YYYY-MM-DD") ===
+            day.format("YYYY-MM-DD")
+        ),
       });
       if (week.length === 7) {
         calendar.push(week);
@@ -75,8 +86,10 @@ const CustomCalendar = ({ interviewData, onDeleteInterview, onDateSelect }) => {
     return calendar;
   };
   const formatInterviewTime = (time) => {
-    const momentTime = moment(time, 'HH:mm:ss');
-    return `${momentTime.format('h')}${momentTime.format('a').toLowerCase()[0]}`;
+    const momentTime = moment(time, "HH:mm:ss");
+    return `${momentTime.format("h")}${
+      momentTime.format("a").toLowerCase()[0]
+    }`;
   };
   const renderInterviewBadge = (interview) => {
     const timeStr = formatInterviewTime(interview.startTime);
@@ -99,18 +112,24 @@ const CustomCalendar = ({ interviewData, onDeleteInterview, onDateSelect }) => {
   return (
     <div className="custom-calendar">
       <div className="calendar-header">
-        <Button onClick={() => setCurrentDate(moment(currentDate).subtract(1, 'month'))}>
+        <Button
+          onClick={() =>
+            setCurrentDate(moment(currentDate).subtract(1, "month"))
+          }
+        >
           Previous
         </Button>
-        <h2>{currentDate.format('MMMM YYYY')}</h2>
-        <Button onClick={() => setCurrentDate(moment(currentDate).add(1, 'month'))}>
+        <h2>{currentDate.format("MMMM YYYY")}</h2>
+        <Button
+          onClick={() => setCurrentDate(moment(currentDate).add(1, "month"))}
+        >
           Next
         </Button>
       </div>
       <table className="calendar-table">
         <thead>
           <tr>
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
               <th key={day}>{day}</th>
             ))}
           </tr>
@@ -121,13 +140,17 @@ const CustomCalendar = ({ interviewData, onDeleteInterview, onDateSelect }) => {
               {week.map((day, dayIndex) => (
                 <td
                   key={dayIndex}
-                  className={`calendar-cell ${!day.isCurrentMonth ? 'other-month' : ''}`}
+                  className={`calendar-cell ${
+                    !day.isCurrentMonth ? "other-month" : ""
+                  }`}
                   onClick={() => onDateSelect(day.date)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 >
                   <div className="date-number">{day.date.date()}</div>
                   <div className="interview-list">
-                    {day.interviews.map(interview => renderInterviewBadge(interview))}
+                    {day.interviews.map((interview) =>
+                      renderInterviewBadge(interview)
+                    )}
                   </div>
                 </td>
               ))}
@@ -151,17 +174,17 @@ const InterviewCalendarApp = () => {
   }, [dispatch]);
 
   const handleDateSelect = (date) => {
-    setSelectedDate(date.format('YYYY-MM-DD'));
+    setSelectedDate(date.format("YYYY-MM-DD"));
     setModalVisible(true);
   };
 
   const onDeleteInterview = async (interviewId) => {
     try {
       await dispatch(DeleteInterview(interviewId));
-      message.success('Interview deleted successfully');
+      message.success("Interview deleted successfully");
       dispatch(getInterview());
     } catch (error) {
-      message.error('Failed to delete Interview');
+      message.error("Failed to delete Interview");
     }
   };
 
@@ -182,14 +205,16 @@ const InterviewCalendarApp = () => {
       dispatch(getInterview());
       setModalVisible(false);
       form.resetFields();
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   return (
     <div className="interview-calendar-container">
       <div className="sidebar-card">
-        <SidebarInterviews interviews={interviewData} onDeleteInterview={onDeleteInterview} />
+        <SidebarInterviews
+          interviews={interviewData}
+          onDeleteInterview={onDeleteInterview}
+        />
       </div>
       <div className="calendar-container">
         <Card className="mb-4">
@@ -325,5 +350,3 @@ const InterviewCalendarAppWithStyles = () => (
   </>
 );
 export default InterviewCalendarAppWithStyles;
-
-

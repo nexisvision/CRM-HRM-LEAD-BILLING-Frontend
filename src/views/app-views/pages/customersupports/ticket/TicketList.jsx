@@ -28,7 +28,7 @@ import AddTicket from "./AddTicket";
 import ViewTicket from "./ViewTicket";
 import { DeleteTicket, getAllTicket } from "./TicketReducer/TicketSlice";
 import { useSelector, useDispatch } from "react-redux";
-import { debounce } from 'lodash';
+import { debounce } from "lodash";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
@@ -40,28 +40,35 @@ export const TicketList = () => {
   const [pinnedTasks, setPinnedTasks] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddTicketModalVisible, setIsAddTicketModalVisible] = useState(false);
-  const [isEditTicketModalVisible, setIsEditTicketModalVisible] = useState(false);
-  const [isViewTicketModalVisible, setIsViewTicketModalVisible] = useState(false);
+  const [isEditTicketModalVisible, setIsEditTicketModalVisible] =
+    useState(false);
+  const [isViewTicketModalVisible, setIsViewTicketModalVisible] =
+    useState(false);
   const [idd, setIdd] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
   const dispatch = useDispatch();
   const alldatat = useSelector((state) => state?.Ticket);
-  const fnddata = useMemo(() => alldatat?.Ticket?.data || [], [alldatat?.Ticket?.data]);
+  const fnddata = useMemo(
+    () => alldatat?.Ticket?.data || [],
+    [alldatat?.Ticket?.data]
+  );
 
   useEffect(() => {
-    dispatch(empdata())
-  }, [dispatch])
+    dispatch(empdata());
+  }, [dispatch]);
 
-  const alldatass = useSelector((state) => state?.employee?.employee?.data || []);
+  const alldatass = useSelector(
+    (state) => state?.employee?.employee?.data || []
+  );
 
   useEffect(() => {
     dispatch(empdata());
     dispatch(getAllTicket());
-    const storedPinnedTasks = JSON.parse(localStorage.getItem("pinnedTasks")) || [];
+    const storedPinnedTasks =
+      JSON.parse(localStorage.getItem("pinnedTasks")) || [];
     setPinnedTasks(storedPinnedTasks);
   }, [dispatch]);
-
 
   useEffect(() => {
     dispatch(getAllTicket());
@@ -92,12 +99,10 @@ export const TicketList = () => {
     try {
       await dispatch(DeleteTicket(userId));
       await dispatch(getAllTicket());
-      message.success('Ticket deleted successfully');
     } catch (error) {
-      message.error('Failed to delete ticket');
+      message.error("Failed to delete ticket");
     }
   };
-
 
   const editfun = (idd) => {
     setIdd(idd);
@@ -124,13 +129,17 @@ export const TicketList = () => {
       return;
     }
 
-    const filteredData = data?.filter(ticket => {
-      return (
-        ticket.ticketSubject?.toString().toLowerCase().includes(searchValue) ||
-        ticket.requestor?.toString().toLowerCase().includes(searchValue) ||
-        ticket.priority?.toString().toLowerCase().includes(searchValue)
-      );
-    }) || [];
+    const filteredData =
+      data?.filter((ticket) => {
+        return (
+          ticket.ticketSubject
+            ?.toString()
+            .toLowerCase()
+            .includes(searchValue) ||
+          ticket.requestor?.toString().toLowerCase().includes(searchValue) ||
+          ticket.priority?.toString().toLowerCase().includes(searchValue)
+        );
+      }) || [];
 
     setList(filteredData);
   }, 300); // 300ms delay
@@ -145,26 +154,28 @@ export const TicketList = () => {
   const getDropdownItems = (record) => {
     return [
       {
-        key: 'pin',
-        icon: pinnedTasks.includes(record.id) ?
-          <PushpinOutlined style={{ color: "gold" }} /> :
-          <PushpinOutlined />,
-        label: pinnedTasks.includes(record.id) ? 'Unpin' : 'Pin',
-        onClick: () => togglePinTask(record.id)
+        key: "pin",
+        icon: pinnedTasks.includes(record.id) ? (
+          <PushpinOutlined style={{ color: "gold" }} />
+        ) : (
+          <PushpinOutlined />
+        ),
+        label: pinnedTasks.includes(record.id) ? "Unpin" : "Pin",
+        onClick: () => togglePinTask(record.id),
       },
       {
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editfun(record.id)
+        label: "Edit",
+        onClick: () => editfun(record.id),
       },
       {
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deletfun(record.id),
-        danger: true
-      }
+        danger: true,
+      },
     ];
   };
 
@@ -192,14 +203,18 @@ export const TicketList = () => {
       dataIndex: "requestor",
       sorter: (a, b) => {
         if (!Array.isArray(alldatass)) return 0;
-        const requestorNameA = alldatass.find(emp => emp?.id === a?.requestor)?.username || '';
-        const requestorNameB = alldatass.find(emp => emp?.id === b?.requestor)?.username || '';
+        const requestorNameA =
+          alldatass.find((emp) => emp?.id === a?.requestor)?.username || "";
+        const requestorNameB =
+          alldatass.find((emp) => emp?.id === b?.requestor)?.username || "";
         return requestorNameA.localeCompare(requestorNameB);
       },
       render: (requestorId) => {
         if (!Array.isArray(alldatass)) return <span>N/A</span>;
-        const requestorName = alldatass.find(emp => emp?.id === requestorId)?.username;
-        return <span>{requestorName || 'N/A'}</span>;
+        const requestorName = alldatass.find(
+          (emp) => emp?.id === requestorId
+        )?.username;
+        return <span>{requestorName || "N/A"}</span>;
       },
     },
     {
@@ -236,18 +251,18 @@ export const TicketList = () => {
         <div className="text-center">
           <Dropdown
             menu={{ items: getDropdownItems(record) }}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -258,7 +273,11 @@ export const TicketList = () => {
   return (
     <div className="container">
       <Card>
-        <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+        <Flex
+          alignItems="center"
+          justifyContent="space-between"
+          mobileFlex={false}
+        >
           <Flex className="mb-1" mobileFlex={false}>
             <div className="mr-md-3 mb-3">
               <Input
@@ -267,7 +286,7 @@ export const TicketList = () => {
                 onChange={onSearch}
                 value={searchValue}
                 allowClear
-                style={{ width: '250px' }}
+                style={{ width: "250px" }}
               />
             </div>
             <div className="mr-md-3 mb-3">
@@ -275,9 +294,10 @@ export const TicketList = () => {
                 defaultValue="All"
                 style={{ width: 120 }}
                 onChange={(value) => {
-                  const filteredData = value === "All" 
-                    ? fnddata
-                    : fnddata.filter(item => item.priority === value);
+                  const filteredData =
+                    value === "All"
+                      ? fnddata
+                      : fnddata.filter((item) => item.priority === value);
                   setList(filteredData);
                 }}
               >
@@ -299,11 +319,7 @@ export const TicketList = () => {
             >
               New
             </Button>
-            <Button
-              type="primary"
-              icon={<FileExcelOutlined />}
-              block
-            >
+            <Button type="primary" icon={<FileExcelOutlined />} block>
               Export All
             </Button>
           </Flex>

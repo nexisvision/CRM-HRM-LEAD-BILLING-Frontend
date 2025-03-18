@@ -1,20 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Input, message, Button, Modal, Select, Dropdown } from 'antd';
-import { DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, FileExcelOutlined, MoreOutlined } from '@ant-design/icons';
-import UserView from '../../../Users/user-list/UserView';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import AddIndicator from './AddIndicator';
-import EditIndicator from './EditIndicator';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Input,
+  message,
+  Button,
+  Modal,
+  Select,
+  Dropdown,
+} from "antd";
+import {
+  DeleteOutlined,
+  SearchOutlined,
+  EditOutlined,
+  PlusOutlined,
+  FileExcelOutlined,
+  MoreOutlined,
+} from "@ant-design/icons";
+import UserView from "../../../Users/user-list/UserView";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import AddIndicator from "./AddIndicator";
+import EditIndicator from "./EditIndicator";
 import { utils, writeFile } from "xlsx";
-import ViewIndicator from './ViewIndicator';
-import { deleteIndicator, getIndicators } from './IndicatorReducers/indicatorSlice';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
-import { navigate } from 'react-big-calendar/lib/utils/constants';
-import { getBranch } from '../../Branch/BranchReducer/BranchSlice';
-import { getDept } from '../../Department/DepartmentReducers/DepartmentSlice';
-import { getDes } from '../../Designation/DesignationReducers/DesignationSlice';
+import ViewIndicator from "./ViewIndicator";
+import {
+  deleteIndicator,
+  getIndicators,
+} from "./IndicatorReducers/indicatorSlice";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { navigate } from "react-big-calendar/lib/utils/constants";
+import { getBranch } from "../../Branch/BranchReducer/BranchSlice";
+import { getDept } from "../../Department/DepartmentReducers/DepartmentSlice";
+import { getDes } from "../../Designation/DesignationReducers/DesignationSlice";
 
 const { Option } = Select;
 
@@ -23,11 +43,14 @@ const IndicatorList = () => {
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [id, setId] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isAddIndicatorModalVisible, setIsAddIndicatorModalVisible] = useState(false);
-  const [isEditIndicatorModalVisible, setIsEditIndicatorModalVisible] = useState(false);
-  const [isViewIndicatorModalVisible, setIsViewIndicatorModalVisible] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState('all');
-  const [searchText, setSearchText] = useState('');
+  const [isAddIndicatorModalVisible, setIsAddIndicatorModalVisible] =
+    useState(false);
+  const [isEditIndicatorModalVisible, setIsEditIndicatorModalVisible] =
+    useState(false);
+  const [isViewIndicatorModalVisible, setIsViewIndicatorModalVisible] =
+    useState(false);
+  const [selectedBranch, setSelectedBranch] = useState("all");
+  const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch();
 
   const openAddIndicatorModal = () => setIsAddIndicatorModalVisible(true);
@@ -39,35 +62,52 @@ const IndicatorList = () => {
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.indicator);
 
-
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
-  const departmentData = useSelector((state) => state.Department?.Department?.data || []);
-  const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
+  const departmentData = useSelector(
+    (state) => state.Department?.Department?.data || []
+  );
+  const designationData = useSelector(
+    (state) => state.Designation?.Designation?.data || []
+  );
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
+  let allpermisson = [];
 
-  let allpermisson;
-
-  if (parsedPermissions["extra-hrm-performance-indicator"] && parsedPermissions["extra-hrm-performance-indicator"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-performance-indicator"][0].permissions;
-
+  if (
+    parsedPermissions["extra-hrm-performance-indicator"] &&
+    parsedPermissions["extra-hrm-performance-indicator"][0]?.permissions
+  ) {
+    allpermisson =
+      parsedPermissions["extra-hrm-performance-indicator"][0].permissions;
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const canCreateIndicator =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    allpermisson?.includes("create");
+  const canEditIndicator =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    allpermisson?.includes("update");
+  const canDeleteIndicator =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    allpermisson?.includes("delete");
+  const canViewIndicator =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    allpermisson?.includes("view");
 
   useEffect(() => {
     dispatch(getBranch());
@@ -81,20 +121,24 @@ const IndicatorList = () => {
     dispatch(getDes());
   }, [dispatch]);
 
-
   useEffect(() => {
     dispatch(getIndicators());
   }, [dispatch]);
 
-
   useEffect(() => {
     if (tabledata?.Indicators?.data) {
       const mappedData = tabledata.Indicators.data
-        .filter(indicator => indicator.created_by === user) // Filter by created_by matching the username
+        .filter((indicator) => indicator.created_by === user) // Filter by created_by matching the username
         .map((indicator) => {
-          const branch = branchData.find((b) => b.id === indicator.branch)?.branchName || 'N/A';
-          const department = departmentData.find((d) => d.id === indicator.department)?.department_name || 'N/A';
-          const designation = designationData.find((des) => des.id === indicator.designation)?.designation_name || 'N/A';
+          const branch =
+            branchData.find((b) => b.id === indicator.branch)?.branchName ||
+            "N/A";
+          const department =
+            departmentData.find((d) => d.id === indicator.department)
+              ?.department_name || "N/A";
+          const designation =
+            designationData.find((des) => des.id === indicator.designation)
+              ?.designation_name || "N/A";
 
           return {
             ...indicator,
@@ -106,10 +150,6 @@ const IndicatorList = () => {
       setUsers(mappedData);
     }
   }, [tabledata, departmentData, designationData, user, branchData]);
-
-
-
-
 
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
@@ -137,42 +177,40 @@ const IndicatorList = () => {
 
   const editfun = (id) => {
     openEditIndicatorModal();
-    setId(id)
-  }
+    setId(id);
+  };
 
   const deleteIndicators = (userId) => {
-
-
     dispatch(deleteIndicator(userId))
       .then(() => {
         dispatch(getIndicators());
-        setUsers(users.filter(item => item.id !== userId));
-        navigate('/app/hrm/performance/indicator');
+        setUsers(users.filter((item) => item.id !== userId));
+        navigate("/app/hrm/performance/indicator");
       })
       .catch((error) => {
-        console.error('Edit API error:', error);
+        console.error("Edit API error:", error);
       });
   };
 
   const getDropdownItems = (elm) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canEditIndicator) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editfun(elm.id)
+        label: "Edit",
+        onClick: () => editfun(elm.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canDeleteIndicator) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteIndicators(elm.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -181,101 +219,101 @@ const IndicatorList = () => {
 
   const tableColumns = [
     {
-      title: 'Branch',
-      dataIndex: 'branch',
+      title: "Branch",
+      dataIndex: "branch",
       sorter: {
         compare: (a, b) => a.branch.length - b.branch.length,
       },
     },
     {
-      title: 'Designation',
-      dataIndex: 'designation',
+      title: "Designation",
+      dataIndex: "designation",
       sorter: {
         compare: (a, b) => a.designation.length - b.designation.length,
       },
     },
     {
-      title: 'Department',
-      dataIndex: 'department',
+      title: "Department",
+      dataIndex: "department",
       sorter: {
         compare: (a, b) => a.department.length - b.department.length,
       },
     },
 
     {
-      title: 'Overall Rating',
-      dataIndex: 'overallRating',
-      key: 'overallRating',
+      title: "Overall Rating",
+      dataIndex: "overallRating",
+      key: "overallRating",
       sorter: {
         compare: (a, b) => a.overallRating - b.overallRating,
       },
     },
     {
-      title: 'Business Process',
-      dataIndex: 'businessProcess',
-      key: 'businessProcess',
+      title: "Business Process",
+      dataIndex: "businessProcess",
+      key: "businessProcess",
       sorter: {
         compare: (a, b) => a.businessProcess - b.businessProcess,
       },
     },
     {
-      title: 'Oral Communication',
-      dataIndex: 'oralCommunication',
-      key: 'oralCommunication',
+      title: "Oral Communication",
+      dataIndex: "oralCommunication",
+      key: "oralCommunication",
       sorter: {
         compare: (a, b) => a.oralCommunication - b.oralCommunication,
       },
     },
 
     {
-      title: 'Leadership',
-      dataIndex: 'leadership',
-      key: 'leadership',
+      title: "Leadership",
+      dataIndex: "leadership",
+      key: "leadership",
       sorter: {
         compare: (a, b) => a.leadership - b.leadership,
       },
     },
 
     {
-      title: 'Project Management',
-      dataIndex: 'projectManagement',
-      key: 'projectManagement',
+      title: "Project Management",
+      dataIndex: "projectManagement",
+      key: "projectManagement",
       sorter: {
         compare: (a, b) => a.projectManagement - b.projectManagement,
       },
     },
     {
-      title: 'Allocating Resources',
-      dataIndex: 'allocatingResources',
-      key: 'allocatingResources',
+      title: "Allocating Resources",
+      dataIndex: "allocatingResources",
+      key: "allocatingResources",
       sorter: {
         compare: (a, b) => a.allocatingResources - b.allocatingResources,
       },
     },
 
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center" onClick={(e) => e.stopPropagation()}>
           <Dropdown
             overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
-      )
+      ),
     },
   ];
 
@@ -285,7 +323,7 @@ const IndicatorList = () => {
     let filteredData = [...users];
     if (searchText) {
       const searchLower = searchText.toLowerCase();
-      filteredData = filteredData.filter(indicator => {
+      filteredData = filteredData.filter((indicator) => {
         return (
           indicator.branch?.toLowerCase().includes(searchLower) ||
           indicator.department?.toLowerCase().includes(searchLower) ||
@@ -299,9 +337,9 @@ const IndicatorList = () => {
         );
       });
     }
-    if (selectedBranch !== 'all') {
-      filteredData = filteredData.filter(indicator =>
-        indicator.branch === selectedBranch
+    if (selectedBranch !== "all") {
+      filteredData = filteredData.filter(
+        (indicator) => indicator.branch === selectedBranch
       );
     }
 
@@ -317,7 +355,7 @@ const IndicatorList = () => {
       className="mr-2"
     >
       <Option value="all">All Branches</Option>
-      {branchData.map(branch => (
+      {branchData.map((branch) => (
         <Option key={branch.id} value={branch.branchName}>
           {branch.branchName}
         </Option>
@@ -347,8 +385,12 @@ const IndicatorList = () => {
   };
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
@@ -365,16 +407,16 @@ const IndicatorList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-
-
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-            <Button type="primary" className="ml-2" onClick={openAddIndicatorModal}>
+          {canCreateIndicator && (
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddIndicatorModal}
+            >
               <PlusOutlined />
               <span>New</span>
             </Button>
-
-          ) : null}
-
+          )}
 
           <Button
             type="primary"
@@ -387,15 +429,19 @@ const IndicatorList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-
-          <Table columns={tableColumns} dataSource={getFilteredIndicators()} rowKey="id" />
-
-        ) : null}
-
+        {canViewIndicator && (
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredIndicators()}
+            rowKey="id"
+          />
+        )}
       </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+      <UserView
+        data={selectedUser}
+        visible={userProfileVisible}
+        close={closeUserProfile}
+      />
 
       <Modal
         title="Add New Indicator"
@@ -532,4 +578,3 @@ const IndicatorListWithStyles = () => (
 );
 
 export default IndicatorListWithStyles;
-

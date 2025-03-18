@@ -190,6 +190,36 @@ const ProjectList = () => {
     }
   }, [state]);
 
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find((role) => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
+
+  console.log("Parsed Permissions:", parsedPermissions);
+
+  let projectPermissions = [];
+
+  if (parsedPermissions["dashboards-project-list"]) {
+    const projectList = parsedPermissions["dashboards-project-list"].find(
+      (item) => item.key === "dashboards-project-list"
+    );
+    if (projectList) {
+      projectPermissions = projectList.permissions;
+    }
+  }
+
+  const canCreateProject = projectPermissions.includes("create");
+  const canEditProject = projectPermissions.includes("update");
+  const canDeleteProject = projectPermissions.includes("delete");
+  const canViewProject = projectPermissions.includes("view");
+
   const dispatch = useDispatch();
 
   const Allclientdata = useSelector((state) => state.SubClient);
@@ -345,23 +375,52 @@ const ProjectList = () => {
     setView(e.target.value);
   };
 
-  const getDropdownItems = (elm) => {
-    return [
-      {
-        key: 'edit',
-        icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editp(elm.id)
-      },
-      {
-        key: 'delete',
-        icon: <DeleteOutlined />,
-        label: 'Delete',
-        onClick: () => deleteItem(elm.id),
-        danger: true
-      }
-    ];
-  };
+  const dropdownMenu = (id) => (
+    <Menu>
+      {(whorole === "super-admin" ||
+        whorole === "client" ||
+        canEditProject) && (
+        <Menu.Item key="edit" onClick={() => editp(id)}>
+          <EditOutlined /> Edit
+        </Menu.Item>
+      )}
+
+      {(whorole === "super-admin" ||
+        whorole === "client" ||
+        canDeleteProject) && (
+        <Menu.Item key="delete" onClick={() => deleteItem(id)}>
+          <DeleteOutlined /> Delete
+        </Menu.Item>
+      )}
+    </Menu>
+  );
+
+  const getDropdownItems = (item) => [
+    ...(whorole === "super-admin" || whorole === "client" || canEditProject
+      ? [
+          {
+            key: "edit",
+            label: (
+              <div onClick={() => editp(item.id)}>
+                <EditOutlined /> Edit
+              </div>
+            ),
+          },
+        ]
+      : []),
+    ...(whorole === "super-admin" || whorole === "client" || canDeleteProject
+      ? [
+          {
+            key: "delete",
+            label: (
+              <div onClick={() => deleteItem(item.id)}>
+                <DeleteOutlined /> Delete
+              </div>
+            ),
+          },
+        ]
+      : []),
+  ];
 
   const tableColumns = [
     {
@@ -529,22 +588,9 @@ const ProjectList = () => {
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
-          <Dropdown
-            overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
-            placement="bottomRight"
-          >
-            <Button
-              type="text"
-              className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
-              style={{
-                borderRadius: '10px',
-                padding: 0
-              }}
-            >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
-            </Button>
-          </Dropdown>
+          {(whorole === "super-admin" ||
+            whorole === "client" ||
+            canViewProject) && <EllipsisDropdown menu={dropdownMenu(elm.id)} />}
         </div>
       ),
     },
@@ -703,14 +749,18 @@ const ProjectList = () => {
                     <UnorderedListOutlined />
                   </Radio.Button>
                 </Radio.Group>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={openAddProjectModal}
-                  className="flex items-center"
-                >
-                  New Project
-                </Button>
+                {(whorole === "super-admin" ||
+                  whorole === "client" ||
+                  canCreateProject) && (
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={openAddProjectModal}
+                    className="flex items-center"
+                  >
+                    New Project
+                  </Button>
+                )}
               </div>
             </Flex>
           </div>
@@ -774,18 +824,20 @@ const ProjectList = () => {
                         </div>
                         <Dropdown
                           overlay={<Menu items={getDropdownItems(item)} />}
-                          trigger={['click']}
+                          trigger={["click"]}
                           placement="bottomRight"
                         >
                           <Button
                             type="text"
                             className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
                             style={{
-                              borderRadius: '10px',
-                              padding: 0
+                              borderRadius: "10px",
+                              padding: 0,
                             }}
                           >
-                            <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+                            <MoreOutlined
+                              style={{ fontSize: "18px", color: "#1890ff" }}
+                            />
                           </Button>
                         </Dropdown>
                       </div>

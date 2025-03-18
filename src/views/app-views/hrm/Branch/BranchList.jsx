@@ -18,7 +18,7 @@ import EditBranch from "./EditBranch";
 import { utils, writeFile } from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteBranch, getBranch } from "./BranchReducer/BranchSlice";
-import { GetUsers } from '../../Users/UserReducers/UserSlice';
+import { GetUsers } from "../../Users/UserReducers/UserSlice";
 
 const BranchList = () => {
   const [users, setUsers] = useState([]);
@@ -31,12 +31,12 @@ const BranchList = () => {
     useState(false);
   const [dept, setDept] = useState("");
   const [idd, setIdd] = useState("");
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const tabledata = useSelector((state) => state.Branch);
 
   useEffect(() => {
     dispatch(getBranch());
-    dispatch(GetUsers())
+    dispatch(GetUsers());
   }, [dispatch]);
 
   const alluserdata = useSelector((state) => state.Users.Users.data);
@@ -51,31 +51,46 @@ const BranchList = () => {
   }, [tabledata]);
 
   useEffect(() => {
-    dispatch(GetUsers())
+    dispatch(GetUsers());
   }, [dispatch]);
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
-  let allpermisson;
+  let branchPermissions = [];
 
-  if (parsedPermissions["extra-hrm-branch"] && parsedPermissions["extra-hrm-branch"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-branch"][0].permissions;
+  if (
+    parsedPermissions["extra-hrm-branch"] &&
+    parsedPermissions["extra-hrm-branch"][0]?.permissions
+  ) {
+    branchPermissions = parsedPermissions["extra-hrm-branch"][0].permissions;
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const canView =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    branchPermissions.includes("view");
+  const canCreate =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    branchPermissions.includes("create");
+  const canUpdate =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    branchPermissions.includes("update");
+  const canDelete =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    branchPermissions.includes("delete");
 
   const openAddBranchModal = () => {
     setIsAddBranchModalVisible(true);
@@ -109,10 +124,10 @@ const BranchList = () => {
 
     if (!searchText) return users;
 
-    return users.filter(branch => {
-      return (
-        branch?.branchName?.toLowerCase().includes(searchText.toLowerCase())
-      );
+    return users.filter((branch) => {
+      return branch?.branchName
+        ?.toLowerCase()
+        .includes(searchText.toLowerCase());
     });
   };
 
@@ -159,37 +174,41 @@ const BranchList = () => {
   };
 
   const getDropdownItems = (row) => {
-    const items = [
-      {
-        key: 'view',
-        icon: <EyeOutlined />,
-        label: 'View Details',
-        onClick: handleParticularBranchModal
-      },
-      {
-        key: 'pin',
-        icon: <PushpinOutlined />,
-        label: 'Pin',
-        onClick: () => showUserProfile(row)
-      }
-    ];
+    const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canView) {
+      items.push(
+        {
+          key: "view",
+          icon: <EyeOutlined />,
+          label: "View Details",
+          onClick: handleParticularBranchModal,
+        },
+        {
+          key: "pin",
+          icon: <PushpinOutlined />,
+          label: "Pin",
+          onClick: () => showUserProfile(row),
+        }
+      );
+    }
+
+    if (canUpdate) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editDept(row.id)
+        label: "Edit",
+        onClick: () => editDept(row.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canDelete) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(row.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -206,12 +225,18 @@ const BranchList = () => {
       title: "Branch Manager",
       dataIndex: "branchManager",
       render: (branchManagerId) => {
-        const manager = alluserdata?.find((item) => item?.id === branchManagerId);
-        return manager ? manager?.username : 'Unknown';
+        const manager = alluserdata?.find(
+          (item) => item?.id === branchManagerId
+        );
+        return manager ? manager?.username : "Unknown";
       },
       sorter: (a, b) => {
-        const nameA = alluserdata?.find((item) => item?.id === a?.branchManager)?.username || '';
-        const nameB = alluserdata?.find((item) => item?.id === b?.branchManager)?.username || '';
+        const nameA =
+          alluserdata?.find((item) => item?.id === a?.branchManager)
+            ?.username || "";
+        const nameB =
+          alluserdata?.find((item) => item?.id === b?.branchManager)
+            ?.username || "";
         return nameA?.length - nameB?.length;
       },
     },
@@ -227,18 +252,18 @@ const BranchList = () => {
         <div className="text-center">
           <Dropdown
             menu={{ items: getDropdownItems(elm) }}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -266,20 +291,21 @@ const BranchList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-
-
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-            <Button type="primary" className="ml-2" onClick={openAddBranchModal}>
+          {canCreate && (
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddBranchModal}
+            >
               <PlusOutlined />
               <span>New</span>
             </Button>
-          ) : null}
-
+          )}
 
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
-            onClick={exportToExcel} // Call export function when the button is clicked
+            onClick={exportToExcel}
             block
           >
             Export All
@@ -287,9 +313,8 @@ const BranchList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        {canView && (
           <Table
-
             columns={tableColumns}
             dataSource={getFilteredBranches()}
             rowKey="id"
@@ -297,10 +322,11 @@ const BranchList = () => {
               total: getFilteredBranches()?.length || 0,
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
             }}
           />
-        ) : null}
+        )}
       </div>
       <UserView
         data={selectedUser}

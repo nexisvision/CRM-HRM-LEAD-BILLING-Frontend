@@ -1,16 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Input, Button, Modal, message, Select, Dropdown } from 'antd';
-import { DeleteOutlined, SearchOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
-import UserView from '../../Users/user-list/UserView';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import { useNavigate } from 'react-router-dom';
-import AddDepartment from './AddDepartment';
-import EditDepartment from './EditDepartment';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Input,
+  Button,
+  Modal,
+  message,
+  Select,
+  Dropdown,
+} from "antd";
+import {
+  DeleteOutlined,
+  SearchOutlined,
+  PlusOutlined,
+  PushpinOutlined,
+  FileExcelOutlined,
+  EditOutlined,
+  MoreOutlined,
+} from "@ant-design/icons";
+import UserView from "../../Users/user-list/UserView";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import { useNavigate } from "react-router-dom";
+import AddDepartment from "./AddDepartment";
+import EditDepartment from "./EditDepartment";
 import { utils, writeFile } from "xlsx";
-import { useDispatch, useSelector } from 'react-redux';
-import { DeleteDept, getDept } from './DepartmentReducers/DepartmentSlice';
-import { getBranch } from '../Branch/BranchReducer/BranchSlice';
+import { useDispatch, useSelector } from "react-redux";
+import { DeleteDept, getDept } from "./DepartmentReducers/DepartmentSlice";
+import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 
 const { Option } = Select;
 
@@ -19,40 +37,40 @@ const DepartmentList = () => {
   const dispatch = useDispatch();
 
   const [users, setUsers] = useState([]);
-  const [isAddDepartmentModalVisible, setIsAddDepartmentModalVisible] = useState(false);
-  const [isEditDepartmentModalVisible, setIsEditDepartmentModalVisible] = useState(false);
-  const  [dept,setDept] = useState("");
+  const [isAddDepartmentModalVisible, setIsAddDepartmentModalVisible] =
+    useState(false);
+  const [isEditDepartmentModalVisible, setIsEditDepartmentModalVisible] =
+    useState(false);
+  const [dept, setDept] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const [selectedBranch, setSelectedBranch] = useState('all');
+  const [searchText, setSearchText] = useState("");
+  const [selectedBranch, setSelectedBranch] = useState("all");
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Department);
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
+    : typeof roleData?.permissions === "string"
     ? JSON.parse(roleData.permissions)
     : [];
 
-  let allpermisson;  
+  // Update permission checks
 
-  if (parsedPermissions["extra-hrm-department"] && parsedPermissions["extra-hrm-department"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-department"][0].permissions;
-  } else {
-  }
-  
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const departmentPermissions =
+    parsedPermissions["extra-hrm-department"]?.[0]?.permissions || [];
+
+  const canViewDepartment = departmentPermissions.includes("view");
+  const canCreateDepartment = departmentPermissions.includes("create");
+  const canEditDepartment = departmentPermissions.includes("update");
+  const canDeleteDepartment = departmentPermissions.includes("delete");
 
   const openAddDepartmentModal = () => {
     setIsAddDepartmentModalVisible(true);
@@ -77,27 +95,31 @@ const DepartmentList = () => {
 
   // Get branch data from Redux store
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
-  
+
   // Filter branches for current user
-  const userBranches = branchData.filter(branch => branch.created_by === user);
+  const userBranches = branchData.filter(
+    (branch) => branch.created_by === user
+  );
 
   // Function to filter departments based on search and branch
   const getFilteredDepartments = () => {
     if (!users) return [];
-    
+
     let filtered = users;
 
     // Apply search filter
     if (searchText) {
-      filtered = filtered.filter(department => 
-        department.department_name?.toLowerCase().includes(searchText.toLowerCase())
+      filtered = filtered.filter((department) =>
+        department.department_name
+          ?.toLowerCase()
+          .includes(searchText.toLowerCase())
       );
     }
 
     // Apply branch filter
-    if (selectedBranch !== 'all') {
-      filtered = filtered.filter(department => 
-        department.branch === selectedBranch
+    if (selectedBranch !== "all") {
+      filtered = filtered.filter(
+        (department) => department.branch === selectedBranch
       );
     }
 
@@ -114,26 +136,28 @@ const DepartmentList = () => {
   }, [dispatch]);
 
   const getBranchNameById = (branchId) => {
-    const branch = branchData.find(branch => branch.id === branchId);
-    return branch ? branch.branchName : 'N/A';
+    const branch = branchData.find((branch) => branch.id === branchId);
+    return branch ? branch.branchName : "N/A";
   };
 
   useEffect(() => {
     if (tabledata && tabledata.Department && tabledata.Department.data) {
-      const filteredData = tabledata.Department.data.filter((item) => item.created_by === user);
+      const filteredData = tabledata.Department.data.filter(
+        (item) => item.created_by === user
+      );
       setUsers(filteredData);
     }
-  }, [tabledata,user]);
+  }, [tabledata, user]);
 
   const deleteUser = (userId) => {
-    dispatch(DeleteDept( userId ))
+    dispatch(DeleteDept(userId))
       .then(() => {
         dispatch(getDept());
-        setUsers(users.filter(item => item.id !== userId));
-        navigate('/app/hrm/department');
+        setUsers(users.filter((item) => item.id !== userId));
+        navigate("/app/hrm/department");
       })
       .catch((error) => {
-        console.error('Edit API error:', error);
+        console.error("Edit API error:", error);
       });
   };
 
@@ -161,30 +185,38 @@ const DepartmentList = () => {
     setSelectedUser(null);
   };
 
-  const editDept = (Deptid) =>{
+  const editDept = (Deptid) => {
     openEditDepartmentModal();
-    setDept(Deptid)
-  }
+    setDept(Deptid);
+  };
 
   const getDropdownItems = (elm) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      canEditDepartment
+    ) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editDept(elm.id)
+        label: "Edit",
+        onClick: () => editDept(elm.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      canDeleteDepartment
+    ) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(elm.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -193,14 +225,14 @@ const DepartmentList = () => {
 
   const tableColumns = [
     {
-      title: 'Department',
-      dataIndex: 'department_name',
+      title: "Department",
+      dataIndex: "department_name",
       sorter: (a, b) => a.department_name.length - b.department_name.length,
-      render: (text) => <span className="department-cell">{text}</span>
+      render: (text) => <span className="department-cell">{text}</span>,
     },
     {
-      title: 'Branch',
-      dataIndex: 'branch',
+      title: "Branch",
+      dataIndex: "branch",
       render: (branchId) => (
         <span className="branch-cell">{getBranchNameById(branchId)}</span>
       ),
@@ -211,34 +243,38 @@ const DepartmentList = () => {
       },
     },
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center" onClick={(e) => e.stopPropagation()}>
           <Dropdown
             overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
-      )
+      ),
     },
   ];
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
@@ -259,7 +295,7 @@ const DepartmentList = () => {
               className="branch-select"
             >
               <Option value="all">All Branches</Option>
-              {userBranches.map(branch => (
+              {userBranches.map((branch) => (
                 <Option key={branch.id} value={branch.id}>
                   {branch.branchName}
                 </Option>
@@ -268,46 +304,53 @@ const DepartmentList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-          
-
-           {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                 <Button type="primary" className="ml-2" onClick={openAddDepartmentModal}>
-                                                                 <PlusOutlined />
-                                                                 <span>New</span>
-                                                               </Button>                                                                                                                                           
-                                                                                                                                                                                              
-                                                                            ) : null}
-
+          {(whorole === "super-admin" ||
+            whorole === "client" ||
+            canCreateDepartment) && (
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddDepartmentModal}
+            >
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+          )}
 
           <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel}
+            block
+          >
+            Export All
+          </Button>
         </Flex>
-      </Flex> 
+      </Flex>
+
       <div className="table-responsive mt-2">
-
-            {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                                                                          
-                              <Table 
-                                columns={tableColumns} 
-                                dataSource={getFilteredDepartments()} 
-                                rowKey="id"
-                                pagination={{
-                                  total: getFilteredDepartments().length,
-                                  pageSize: 10,
-                                  showSizeChanger: true,
-                                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                                }}
-                              />
-
-                                            ) : null}
+        {(whorole === "super-admin" ||
+          whorole === "client" ||
+          canViewDepartment) && (
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredDepartments()}
+            rowKey="id"
+            pagination={{
+              total: getFilteredDepartments().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
+            }}
+          />
+        )}
       </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+      <UserView
+        data={selectedUser}
+        visible={userProfileVisible}
+        close={closeUserProfile}
+      />
 
       {/* Add Department Modal */}
       <Modal
@@ -320,8 +363,6 @@ const DepartmentList = () => {
         <AddDepartment onClose={closeAddDepartmentModal} />
       </Modal>
 
-
-
       {/* Edit Department Modal */}
       <Modal
         title="Edit Department"
@@ -330,9 +371,8 @@ const DepartmentList = () => {
         footer={null}
         width={800}
       >
-        <EditDepartment onClose={closeEditDepartmentModal} comnyid={dept}/>
+        <EditDepartment onClose={closeEditDepartmentModal} comnyid={dept} />
       </Modal>
-
     </Card>
   );
 };
@@ -455,6 +495,3 @@ const DepartmentListWithStyles = () => (
 );
 
 export default DepartmentListWithStyles;
-
-
-

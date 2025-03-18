@@ -30,7 +30,7 @@ import { Dleteusetr, GetUsers } from "../UserReducers/UserSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { MdOutlineEmail } from "react-icons/md";
 import EmailVerification from "../../company/EmailVerification";
-import { debounce } from 'lodash';
+import { debounce } from "lodash";
 
 const UserList = () => {
   const dispatch = useDispatch();
@@ -38,9 +38,11 @@ const UserList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false);
   const [isEditUserModalVisible, setIsEditUserModalVisible] = useState(false);
-  const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] = useState(false);
+  const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] =
+    useState(false);
   const [idd, setIdd] = useState("");
-  const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
+  const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] =
+    useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
 
   const paymentStatusList = ["active", "blocked"];
@@ -63,40 +65,40 @@ const UserList = () => {
     }
   }, [finddata]);
 
-
   //// permission
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
-
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
   let allpermisson;
 
-  if (parsedPermissions["extra-users-list"] && parsedPermissions["extra-users-list"][0]?.permissions) {
+  if (
+    parsedPermissions["extra-users-list"] &&
+    parsedPermissions["extra-users-list"][0]?.permissions
+  ) {
     allpermisson = parsedPermissions["extra-users-list"][0].permissions;
-
   } else {
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const canCreateClient = allpermisson?.includes("create");
+  const canEditClient = allpermisson?.includes("edit");
+  const canDeleteClient = allpermisson?.includes("delete");
+  const canViewClient = allpermisson?.includes("view");
 
   ///endpermission
 
   const handleShowStatus = (value) => {
     if (value !== "All") {
-      const data = users.filter(user => user.status === value);
+      const data = users.filter((user) => user.status === value);
       setUsers(data);
     } else {
       dispatch(GetUsers());
@@ -112,13 +114,14 @@ const UserList = () => {
       return;
     }
 
-    const filteredData = data?.filter(user => {
-      return (
-        user.name?.toString().toLowerCase().includes(searchValue) ||
-        user.email?.toString().toLowerCase().includes(searchValue) ||
-        user.status?.toString().toLowerCase().includes(searchValue)
-      );
-    }) || [];
+    const filteredData =
+      data?.filter((user) => {
+        return (
+          user.name?.toString().toLowerCase().includes(searchValue) ||
+          user.email?.toString().toLowerCase().includes(searchValue) ||
+          user.status?.toString().toLowerCase().includes(searchValue)
+        );
+      }) || [];
 
     setUsers(filteredData);
   }, 300); // 300ms delay
@@ -133,15 +136,14 @@ const UserList = () => {
     dispatch(Dleteusetr(userId));
     dispatch(GetUsers());
     setUsers(users.filter((user) => user.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
 
   const showUserProfile = (userInfo) => {
     // Find the role name for the user
-    const role = fnddata?.find(role => role.id === userInfo.role_id);
+    const role = fnddata?.find((role) => role.id === userInfo.role_id);
     setSelectedUser({
       ...userInfo,
-      role_name: role?.role_name || 'N/A'
+      role_name: role?.role_name || "N/A",
     });
     setUserProfileVisible(true);
   };
@@ -179,41 +181,53 @@ const UserList = () => {
   const getDropdownItems = (record) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canViewClient && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'view',
+        key: "view",
         icon: <EyeOutlined />,
-        label: 'View Details',
-        onClick: () => showUserProfile(record)
+        label: "View Details",
+        onClick: () => showUserProfile(record),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canEditClient && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => Editfun(record.id)
+        label: "Edit",
+        onClick: () => Editfun(record.id),
       });
     }
 
     items.push({
-      key: 'email',
+      key: "email",
       icon: <MdOutlineEmail />,
-      label: 'Update Email',
+      label: "Update Email",
       onClick: () => {
         setIsEmailVerificationModalVisible(true);
         setSelectedUserId(record.id);
-      }
+      },
     });
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canDeleteClient && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(record.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -238,16 +252,16 @@ const UserList = () => {
                 size={40}
                 className="bg-indigo-600 border-2 border-white shadow-md flex items-center justify-center"
               >
-                {record.username?.[0]?.toUpperCase() || 'U'}
+                {record.username?.[0]?.toUpperCase() || "U"}
               </Avatar>
             )}
           </div>
           <div>
             <div className="font-medium text-gray-900">
-              {record.username || 'N/A'}
+              {record.username || "N/A"}
             </div>
             <div className="text-gray-500 text-sm">
-              {record.email || 'No email'}
+              {record.email || "No email"}
             </div>
           </div>
         </div>
@@ -257,21 +271,24 @@ const UserList = () => {
       title: "Role",
       dataIndex: "role_id",
       render: (role_id) => {
-        const role = fnddata?.find(role => role.id === role_id);
+        const role = fnddata?.find((role) => role.id === role_id);
         return (
-          <Tag color="blue" className="text-sm px-3 py-1 rounded-full font-medium">
-            {role?.role_name || 'N/A'}
+          <Tag
+            color="blue"
+            className="text-sm px-3 py-1 rounded-full font-medium"
+          >
+            {role?.role_name || "N/A"}
           </Tag>
         );
-      }
+      },
     },
-  
+
     {
       title: "Created",
       dataIndex: "createdAt",
       render: (date) => (
         <div className="text-gray-600">
-          {date ? dayjs(date).format('DD MMM YYYY') : 'N/A'}
+          {date ? dayjs(date).format("DD MMM YYYY") : "N/A"}
         </div>
       ),
       sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
@@ -283,18 +300,18 @@ const UserList = () => {
         <div className="text-center">
           <Dropdown
             menu={{ items: getDropdownItems(record) }}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -318,7 +335,7 @@ const UserList = () => {
                 onChange={onSearch}
                 allowClear
                 className="min-w-[250px] hover:border-blue-400 focus:border-blue-500"
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: "8px" }}
               />
             </div>
             <div className="mb-3">
@@ -327,7 +344,7 @@ const UserList = () => {
                 className="min-w-[180px]"
                 onChange={handleShowStatus}
                 placeholder="Status"
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: "8px" }}
               >
                 <Select.Option value="All">All Status</Select.Option>
                 {paymentStatusList.map((elm) => (
@@ -339,7 +356,11 @@ const UserList = () => {
             </div>
           </Flex>
           <Flex gap="7px">
-            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) && (
+            {(whorole === "super-admin" ||
+              whorole === "client" ||
+              (canCreateClient &&
+                whorole !== "super-admin" &&
+                whorole !== "client")) && (
               <Button
                 type="primary"
                 className="rounded-lg flex items-center shadow-md hover:shadow-lg transition-all"
@@ -360,14 +381,18 @@ const UserList = () => {
         </Flex>
       </div>
       <div className="overflow-hidden">
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
+        {(whorole === "super-admin" ||
+          whorole === "client" ||
+          (canViewClient &&
+            whorole !== "super-admin" &&
+            whorole !== "client")) && (
           <Table
             columns={tableColumns}
             dataSource={users}
             rowKey="id"
             className="ant-table-striped"
             rowClassName={(record, index) =>
-              index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+              index % 2 === 0 ? "bg-gray-50" : "bg-white"
             }
           />
         )}
@@ -409,7 +434,7 @@ const UserList = () => {
       <EmailVerification
         visible={isEmailVerificationModalVisible}
         onCancel={() => setIsEmailVerificationModalVisible(false)}
-        initialEmail={users.find(user => user.id === selectedUserId)?.email}
+        initialEmail={users.find((user) => user.id === selectedUserId)?.email}
         idd={selectedUserId}
       />
     </Card>
