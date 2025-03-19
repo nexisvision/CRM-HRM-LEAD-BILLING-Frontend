@@ -158,8 +158,7 @@ const AddProject = ({ onClose }) => {
     budget: Yup.number()
       .required("Please enter a Project Budget.")
       .positive("Budget must be positive."),
-    estimatedmonths: Yup.string()
-      .required("Please enter Estimated Months."),
+
     estimatedhours: Yup.number()
       .required("Please enter Estimated Hours.")
       .positive("Hours must be positive.")

@@ -271,7 +271,7 @@ export const LoginForm = (props) => {
                   <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#4169E1" />
                 </svg>
               </div>
-              <span className="text-white text-xl">Woorkroom</span>
+              <span className="text-white text-xl">Raiser</span>
             </div>
 
             {/* Main Content */}
@@ -300,7 +300,7 @@ export const LoginForm = (props) => {
         <div className="w-full max-w-[360px]">
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Sign In to Woorkroom
+              Sign In to Raiser
             </h1>
           </div>
 
