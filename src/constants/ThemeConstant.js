@@ -44,6 +44,10 @@ export const BODY_BACKGROUND = '#fafafb';
 
 export const FONT_SIZE_BASE = 14;
 
+export const MENU_SELECTED_BG = 'rgba(62, 130, 247, 0.1)';
+// export const MENU_HOVER_BG = 'rgba(62, 130, 247, 0.05)';
+export const MENU_SELECTED_COLOR = '#3e82f7';
+
 export const TEMPLATE = {
     HEADER_HEIGHT,
     FOOTER_HEIGHT,
@@ -62,7 +66,9 @@ export const TEMPLATE = {
     SIDE_NAV_LIGHT,
     SIDE_NAV_DARK,
     DIR_LTR,
-    DIR_RTL
+    DIR_RTL,
+    MENU_SELECTED_BG,
+    MENU_SELECTED_COLOR
 }
 
 export const THEME_COLOR = {
@@ -146,3 +152,10 @@ export const DARK_MODE = {
     ACTIVE_BG_COLOR: '#293956',
     DROP_DOWN_SHADOW: '0 3px 6px -4px rgb(0 0 0 / 12%), 0 6px 16px 0 rgb(0 0 0 / 58%), 0 9px 28px 8px rgb(0 0 0 / 15%)'
 }
+
+export const MENU_STYLES = {
+    light: {
+        backgroundColor: MENU_SELECTED_BG,
+        color: MENU_SELECTED_COLOR
+    }
+};

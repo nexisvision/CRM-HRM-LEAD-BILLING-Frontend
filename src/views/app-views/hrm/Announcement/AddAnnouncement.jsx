@@ -141,15 +141,23 @@ const AddAnnouncement = ({ onClose }) => {
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Date <span className="text-red-500">*</span></label>
-                  <DatePicker
-                    className="w-full mt-1"
-                    format="DD-MM-YYYY"
-                    value={values.date ? dayjs(values.date) : null}
-                    onChange={(date) => setFieldValue("date", date)}
-                    onBlur={() => setFieldTouched("date", true)}
-                  />
+                  <Field name="date">
+                    {({ field }) => (
+                      <input
+                        type="date"
+                        {...field}
+                        className="w-full mt-1 p-2 border rounded"
+                        value={values.date ? dayjs(values.date).format('YYYY-MM-DD') : ''}
+                        onChange={(e) => {
+                          const date = dayjs(e.target.value);
+                          setFieldValue('date', date);
+                        }}
+                        onBlur={() => setFieldTouched("date", true)}
+                      />
+                    )}
+                  </Field>
                   <ErrorMessage
-                    name="date"
+                    name="date" 
                     component="div"
                     className="error-message text-red-500 my-1"
                   />

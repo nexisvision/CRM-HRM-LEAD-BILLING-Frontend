@@ -43,15 +43,18 @@ const JobOnBordingList = () => {
   const [isEditJobOnBordingModalVisible, setIsEditJobOnBordingModalVisible] =
     useState(false);
   const [idd, setIdd] = useState("");
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState('All');
-  const [uniqueStatuses, setUniqueStatuses] = useState(['All']);
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [uniqueStatuses, setUniqueStatuses] = useState(["All"]);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
 
   const alldata = useSelector((state) => state.jobonboarding);
-  const fnddata = useMemo(() => alldata.jobonboarding.data || [], [alldata.jobonboarding.data]);
+  const fnddata = useMemo(
+    () => alldata.jobonboarding.data || [],
+    [alldata.jobonboarding.data]
+  );
 
   const filteredData = fnddata.filter((item) => item.created_by === user);
 
@@ -62,7 +65,10 @@ const JobOnBordingList = () => {
   useEffect(() => {
     if (fnddata) {
       setUsers(filteredData);
-      const statuses = ['All', ...new Set(filteredData.map(item => item.Status).filter(Boolean))];
+      const statuses = [
+        "All",
+        ...new Set(filteredData.map((item) => item.Status).filter(Boolean)),
+      ];
       setUniqueStatuses(statuses);
     }
   }, [fnddata, filteredData]);
@@ -76,7 +82,7 @@ const JobOnBordingList = () => {
     setIsAddJobOnBordingModalVisible(false);
   };
   const editfunction = (idd) => {
-    setIdd(idd)
+    setIdd(idd);
     setIsEditJobOnBordingModalVisible(true);
   };
 
@@ -99,9 +105,11 @@ const JobOnBordingList = () => {
 
     // Text search filter
     if (searchText) {
-      filtered = filtered.filter(onboarding => {
+      filtered = filtered.filter((onboarding) => {
         return (
-          onboarding.Interviewer?.toLowerCase().includes(searchText.toLowerCase()) ||
+          onboarding.Interviewer?.toLowerCase().includes(
+            searchText.toLowerCase()
+          ) ||
           onboarding.Status?.toLowerCase().includes(searchText.toLowerCase()) ||
           onboarding.JobType?.toLowerCase().includes(searchText.toLowerCase())
         );
@@ -109,17 +117,20 @@ const JobOnBordingList = () => {
     }
 
     // Status filter from dropdown
-    if (selectedStatus && selectedStatus !== 'All') {
-      filtered = filtered.filter(onboarding =>
-        onboarding.Status?.toLowerCase() === selectedStatus.toLowerCase()
+    if (selectedStatus && selectedStatus !== "All") {
+      filtered = filtered.filter(
+        (onboarding) =>
+          onboarding.Status?.toLowerCase() === selectedStatus.toLowerCase()
       );
     }
 
     // Date filter
     if (selectedDate) {
-      const filterDate = dayjs(selectedDate).format('YYYY-MM-DD');
-      filtered = filtered.filter(onboarding => {
-        return dayjs(onboarding.JoiningDate).format('YYYY-MM-DD') === filterDate;
+      const filterDate = dayjs(selectedDate).format("YYYY-MM-DD");
+      filtered = filtered.filter((onboarding) => {
+        return (
+          dayjs(onboarding.JoiningDate).format("YYYY-MM-DD") === filterDate
+        );
       });
     }
 
@@ -131,41 +142,45 @@ const JobOnBordingList = () => {
   };
 
   const handleSearch = () => {
-    message.success('Search completed');
+    message.success("Search completed");
   };
 
-  //// permission
-
+  //// permission handling
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
-  let allpermisson;
+  // Get permissions for job onboarding
+  const jobOnboardingPermissions =
+    parsedPermissions["extra-hrm-jobs-jobonbording"]?.[0]?.permissions || [];
 
-  if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
-    // console.log('Parsed Permissions:', allpermisson);
-
-  } else {
-    // console.log('extra-hrm-jobs-jobonbording is not available');
-  }
-
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  // Define permission checks
+  const canView =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    jobOnboardingPermissions.includes("view");
+  const canCreate =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    jobOnboardingPermissions.includes("create");
+  const canUpdate =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    jobOnboardingPermissions.includes("update");
+  const canDelete =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    jobOnboardingPermissions.includes("delete");
 
   ///endpermission
-
-
 
   const deleteUser = (userId) => {
     dispatch(deleteJobonBoarding(userId)).then(() => {
@@ -193,22 +208,22 @@ const JobOnBordingList = () => {
   const getDropdownItems = (row) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canUpdate) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editfunction(row.id)
+        label: "Edit",
+        onClick: () => editfunction(row.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canDelete) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(row.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -243,11 +258,10 @@ const JobOnBordingList = () => {
       title: "JoiningDate",
       dataIndex: "JoiningDate",
       render: (text) => (
-        <span>
-          {text ? dayjs(text).format('DD-MM-YYYY') : '-'}
-        </span>
+        <span>{text ? dayjs(text).format("DD-MM-YYYY") : "-"}</span>
       ),
-      sorter: (a, b) => dayjs(a.JoiningDate).unix() - dayjs(b.JoiningDate).unix(),
+      sorter: (a, b) =>
+        dayjs(a.JoiningDate).unix() - dayjs(b.JoiningDate).unix(),
     },
 
     {
@@ -277,18 +291,18 @@ const JobOnBordingList = () => {
         <div className="text-center">
           <Dropdown
             menu={{ items: getDropdownItems(elm) }}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -329,13 +343,13 @@ const JobOnBordingList = () => {
               placeholder="Filter by Joining Date"
               className="w-100"
               allowClear={true}
-              style={{ minWidth: '200px' }}
+              style={{ minWidth: "200px" }}
             />
           </div>
           <div className="mr-md-3 mb-3">
             <Select
               defaultValue="All"
-              style={{ minWidth: '120px' }}
+              style={{ minWidth: "120px" }}
               onChange={handleStatusChange}
               value={selectedStatus}
             >
@@ -348,9 +362,7 @@ const JobOnBordingList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-
-
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {canCreate && (
             <Button
               type="primary"
               className="ml-2"
@@ -359,9 +371,7 @@ const JobOnBordingList = () => {
               <PlusOutlined />
               <span>New</span>
             </Button>
-
-          ) : null}
-
+          )}
 
           <Button type="primary" icon={<FileExcelOutlined />} block>
             Export All
@@ -369,8 +379,7 @@ const JobOnBordingList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        {canView && (
           <Table
             columns={tableColumns}
             dataSource={getFilteredOnboarding()}
@@ -379,13 +388,11 @@ const JobOnBordingList = () => {
               total: getFilteredOnboarding().length,
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
             }}
           />
-        ) : null}
-
-
-
+        )}
       </div>
       <UserView
         data={selectedUser}

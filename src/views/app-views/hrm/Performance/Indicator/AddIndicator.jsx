@@ -11,7 +11,7 @@ import AddBranch from '../../Branch/AddBranch';
 const { Option } = Select;
 
 
-const AddIndicator = ({ onClose }) => {
+const AddIndicator = ({ onClose, onValidate }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -43,15 +43,21 @@ const AddIndicator = ({ onClose }) => {
   }, [dispatch]);
 
   const handleSubmit = (values) => {
-    dispatch(addIndicator(values)) // Fixed naming
+    // First check if the combination already exists
+    if (!onValidate(values)) {
+      return; // Stop if validation fails
+    }
+
+    // Proceed with your existing submit logic
+    dispatch(addIndicator(values))
       .then(() => {
         dispatch(getIndicators());
-        // message.success('Indicator added successfully!');
+        message.success('Indicator added successfully');
         onClose();
         navigate('/app/hrm/performance/indicator');
       })
       .catch((error) => {
-        console.error('Add API error:', error);
+        message.error('Failed to add indicator');
       });
   };
 

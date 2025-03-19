@@ -93,6 +93,16 @@ const VendorList = () => {
       },
     },
     {
+      title: 'Contact',
+      dataIndex: 'contact',
+      render: (contact) => <span>{contact || 'N/A'}</span>,
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      render: (email) => <span>{email || 'N/A'}</span>,
+    },
+    {
       title: 'Address',
       dataIndex: 'address',
       render: (address) => (

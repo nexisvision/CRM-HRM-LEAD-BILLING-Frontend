@@ -1,5 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Menu, Input, message, Button, Modal, Select, Switch, Badge, Avatar, Tag, Dropdown } from "antd";
+import {
+  Card,
+  Table,
+  Menu,
+  Input,
+  message,
+  Button,
+  Modal,
+  Select,
+  Switch,
+  Badge,
+  Avatar,
+  Tag,
+  Dropdown,
+} from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
@@ -23,32 +37,41 @@ import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 import moment from "moment";
 import { MdOutlineEmail } from "react-icons/md";
 import EmailVerification from "views/app-views/company/EmailVerification";
-import { handleSalaryStatusChange } from '../PayRoll/Salary/SalaryList';
-import { getSalaryss } from '../PayRoll/Salary/SalaryReducers/SalarySlice';
+import { handleSalaryStatusChange } from "../PayRoll/Salary/SalaryList";
+import { getSalaryss } from "../PayRoll/Salary/SalaryReducers/SalarySlice";
 import { Option } from "antd/es/mentions";
-import { addAttendance, editAttendance } from "../Attendance/AttendanceReducer/AttendanceSlice";
+import {
+  addAttendance,
+  editAttendance,
+} from "../Attendance/AttendanceReducer/AttendanceSlice";
 
 const EmployeeList = () => {
   const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
-  const [isAddEmployeeModalVisible, setIsAddEmployeeModalVisible] = useState(false);
-  const [isEditEmployeeModalVisible, setIsEditEmployeeModalVisible] = useState(false);
-  const [isViewEmployeeModalVisible, setIsViewEmployeeModalVisible] = useState(false);
-  const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
+  const [isAddEmployeeModalVisible, setIsAddEmployeeModalVisible] =
+    useState(false);
+  const [isEditEmployeeModalVisible, setIsEditEmployeeModalVisible] =
+    useState(false);
+  const [isViewEmployeeModalVisible, setIsViewEmployeeModalVisible] =
+    useState(false);
+  const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] =
+    useState(false);
   const [comnyid, setCompnyid] = useState("");
-  const [selectedBranch, setSelectedBranch] = useState('all');
-  const [searchText, setSearchText] = useState('');
+  const [selectedBranch, setSelectedBranch] = useState("all");
+  const [searchText, setSearchText] = useState("");
   const [sub, setSub] = useState(false);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.employee);
-  const departmentData = useSelector((state) => state.Department?.Department?.data || []);
-  const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
+  const departmentData = useSelector(
+    (state) => state.Department?.Department?.data || []
+  );
+  const designationData = useSelector(
+    (state) => state.Designation?.Designation?.data || []
+  );
   const branchDataa = useSelector((state) => state.Branch?.Branch?.data || []);
   const salaryData = useSelector((state) => state.salary?.salary?.data || []);
-
-
 
   useEffect(() => {
     dispatch(roledata());
@@ -64,16 +87,20 @@ const EmployeeList = () => {
 
   useEffect(() => {
     if (tabledata?.employee?.data) {
-      const mappedData = tabledata.employee.data.map(employee => {
-        const department = departmentData.find(dept => dept.id === employee.department);
-        const designation = designationData.find(desig => desig.id === employee.designation);
-        const branch = branchDataa.find(br => br.id === employee.branch);
+      const mappedData = tabledata.employee.data.map((employee) => {
+        const department = departmentData.find(
+          (dept) => dept.id === employee.department
+        );
+        const designation = designationData.find(
+          (desig) => desig.id === employee.designation
+        );
+        const branch = branchDataa.find((br) => br.id === employee.branch);
 
         return {
           ...employee,
-          department: department?.department_name || 'N/A',
-          designation: designation?.designation_name || 'N/A',
-          branch: branch?.branchName || 'N/A'
+          department: department?.department_name || "N/A",
+          designation: designation?.designation_name || "N/A",
+          branch: branch?.branchName || "N/A",
         };
       });
 
@@ -88,47 +115,50 @@ const EmployeeList = () => {
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
   const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
-  const allpermisson = parsedPermissions["extra-hrm-employee"]?.[0]?.permissions;
+  const employeePermissions =
+    parsedPermissions["extra-hrm-employee"]?.[0]?.permissions || [];
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const canCreateEmployee = employeePermissions.includes("create");
+  const canEditEmployee = employeePermissions.includes("update");
+  const canDeleteEmployee = employeePermissions.includes("delete");
+  const canViewEmployee = employeePermissions.includes("view");
 
-  const checkAndUpdateSalaryStatus = React.useCallback((salaryRecord) => {
-    if (!salaryRecord || !salaryRecord.paymentDate) return salaryRecord;
+  const checkAndUpdateSalaryStatus = React.useCallback(
+    (salaryRecord) => {
+      if (!salaryRecord || !salaryRecord.paymentDate) return salaryRecord;
 
-    const lastPaymentDate = moment(salaryRecord.paymentDate);
-    const today = moment();
-    const nextPaymentDue = lastPaymentDate.add(1, 'month');
+      const lastPaymentDate = moment(salaryRecord.paymentDate);
+      const today = moment();
+      const nextPaymentDue = lastPaymentDate.add(1, "month");
 
-    if (today.isAfter(nextPaymentDue) && salaryRecord.status === 'paid') {
-      handleSalaryStatusChange(dispatch, salaryRecord, false)
-        .then(() => {
-          dispatch(getSalaryss());
-        })
-        .catch((error) => {
-          console.error('Error updating salary status:', error);
-        });
-      return { ...salaryRecord, status: 'unpaid' };
-    }
+      if (today.isAfter(nextPaymentDue) && salaryRecord.status === "paid") {
+        handleSalaryStatusChange(dispatch, salaryRecord, false)
+          .then(() => {
+            dispatch(getSalaryss());
+          })
+          .catch((error) => {
+            console.error("Error updating salary status:", error);
+          });
+        return { ...salaryRecord, status: "unpaid" };
+      }
 
-    return salaryRecord;
-  }, [dispatch]);
+      return salaryRecord;
+    },
+    [dispatch]
+  );
 
   const getEmployeeSalaryStatus = (employeeId) => {
-    const salaryRecord = salaryData.find(salary =>
-      salary.employeeId === employeeId &&
-      salary.created_by === user
+    const salaryRecord = salaryData.find(
+      (salary) => salary.employeeId === employeeId && salary.created_by === user
     );
 
     if (salaryRecord) {
@@ -140,7 +170,7 @@ const EmployeeList = () => {
   useEffect(() => {
     const checkSalaryStatuses = () => {
       if (salaryData && salaryData.length > 0) {
-        salaryData.forEach(salary => {
+        salaryData.forEach((salary) => {
           checkAndUpdateSalaryStatus(salary);
         });
       }
@@ -154,16 +184,17 @@ const EmployeeList = () => {
   }, [salaryData, checkAndUpdateSalaryStatus]);
 
   const handleEmployeeSalaryStatus = (record, checked) => {
-    const salaryRecord = salaryData.find(salary =>
-      salary.employeeId === record.id &&
-      salary.created_by === user
+    const salaryRecord = salaryData.find(
+      (salary) => salary.employeeId === record.id && salary.created_by === user
     );
 
     if (salaryRecord) {
       const updates = {
         ...salaryRecord,
-        status: checked ? 'paid' : 'unpaid',
-        paymentDate: checked ? moment().format('YYYY-MM-DD') : salaryRecord.paymentDate
+        status: checked ? "paid" : "unpaid",
+        paymentDate: checked
+          ? moment().format("YYYY-MM-DD")
+          : salaryRecord.paymentDate,
       };
 
       handleSalaryStatusChange(dispatch, updates, checked)
@@ -172,11 +203,11 @@ const EmployeeList = () => {
           dispatch(getSalaryss());
         })
         .catch((error) => {
-          message.error('Failed to update salary status');
-          console.error('Error:', error);
+          message.error("Failed to update salary status");
+          console.error("Error:", error);
         });
     } else {
-      message.warning('No salary record found for this employee');
+      message.warning("No salary record found for this employee");
     }
   };
 
@@ -185,13 +216,15 @@ const EmployeeList = () => {
 
     let filteredData = users;
 
-    if (selectedBranch !== 'all') {
-      filteredData = filteredData.filter(employee => employee.branch === selectedBranch);
+    if (selectedBranch !== "all") {
+      filteredData = filteredData.filter(
+        (employee) => employee.branch === selectedBranch
+      );
     }
 
     if (searchText) {
       const searchLower = searchText.toLowerCase();
-      filteredData = filteredData.filter(employee => {
+      filteredData = filteredData.filter((employee) => {
         return (
           employee.username?.toLowerCase().includes(searchLower) ||
           employee.firstName?.toLowerCase().includes(searchLower) ||
@@ -207,30 +240,34 @@ const EmployeeList = () => {
   };
 
   const handleCheckIn = (empId) => {
-    const currentDate = moment().format('YYYY-MM-DD');
-    const currentTime = moment().format('HH:mm:ss');
+    const currentDate = moment().format("YYYY-MM-DD");
+    const currentTime = moment().format("HH:mm:ss");
 
-    dispatch(addAttendance({
-      employee: empId,
-      date: currentDate,
-      startTime: currentTime,
-    }))
+    dispatch(
+      addAttendance({
+        employee: empId,
+        date: currentDate,
+        startTime: currentTime,
+      })
+    )
       .then(() => message.success("Checked in successfully!"))
       .catch(() => message.error("Failed to check in. Please try again."));
   };
 
   const handleCheckOut = (empId) => {
-    const currentDate = moment().format('YYYY-MM-DD');
-    const currentTime = moment().format('HH:mm:ss');
+    const currentDate = moment().format("YYYY-MM-DD");
+    const currentTime = moment().format("HH:mm:ss");
 
-    dispatch(editAttendance({
-      id: empId,
-      values: {
-        employee: empId,
-        endTime: currentTime,
-        date: currentDate,
-      }
-    }))
+    dispatch(
+      editAttendance({
+        id: empId,
+        values: {
+          employee: empId,
+          endTime: currentTime,
+          date: currentDate,
+        },
+      })
+    )
       .then(() => message.success("Checked out successfully!"))
       .catch(() => message.error("Failed to check out. Please try again."));
   };
@@ -261,59 +298,73 @@ const EmployeeList = () => {
   const getDropdownItems = (elm) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canEditEmployee && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
+        label: "Edit",
         onClick: () => {
           setSelectedEmployeeId(elm.id);
           setIsEditEmployeeModalVisible(true);
-        }
+        },
       });
     }
 
-    items.push({
-      key: 'email',
-      icon: <MdOutlineEmail />,
-      label: 'Update Email',
-      onClick: () => {
-        setIsEmailVerificationModalVisible(true);
-        setCompnyid(elm.id);
-      }
-    });
-
-    items.push({
-      key: 'view',
-      icon: <EyeOutlined />,
-      label: 'View',
-      onClick: () => {
-        setSelectedEmployeeId(elm.id);
-        setIsViewEmployeeModalVisible(true);
-      }
-    });
-
-    items.push({
-      key: 'checkin',
-      icon: <EditOutlined />,
-      label: 'Check In',
-      onClick: () => handleCheckIn(elm.id)
-    });
-
-    items.push({
-      key: 'checkout',
-      icon: <EditOutlined />,
-      label: 'Check Out',
-      onClick: () => handleCheckOut(elm.id)
-    });
-
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canEditEmployee || whorole === "super-admin" || whorole === "client") {
       items.push({
-        key: 'delete',
+        key: "email",
+        icon: <MdOutlineEmail />,
+        label: "Update Email",
+        onClick: () => {
+          setIsEmailVerificationModalVisible(true);
+          setCompnyid(elm.id);
+        },
+      });
+    }
+
+    if (canViewEmployee || whorole === "super-admin" || whorole === "client") {
+      items.push({
+        key: "view",
+        icon: <EyeOutlined />,
+        label: "View",
+        onClick: () => {
+          setSelectedEmployeeId(elm.id);
+          setIsViewEmployeeModalVisible(true);
+        },
+      });
+    }
+
+    if (canEditEmployee || whorole === "super-admin" || whorole === "client") {
+      items.push({
+        key: "checkin",
+        icon: <EditOutlined />,
+        label: "Check In",
+        onClick: () => handleCheckIn(elm.id),
+      });
+
+      items.push({
+        key: "checkout",
+        icon: <EditOutlined />,
+        label: "Check Out",
+        onClick: () => handleCheckOut(elm.id),
+      });
+    }
+
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canDeleteEmployee && whorole !== "super-admin" && whorole !== "client")
+    ) {
+      items.push({
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(elm.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -323,15 +374,24 @@ const EmployeeList = () => {
   const tableColumns = [
     {
       title: "Employee",
-      dataIndex: 'profilePic',
+      dataIndex: "profilePic",
       render: (_, record) => (
         <div className="flex items-center">
           <div className="mr-3">
             {record.profilePic ? (
-              <Avatar src={record.profilePic} size={40} className="border-2 border-white shadow-md" />
+              <Avatar
+                src={record.profilePic}
+                size={40}
+                className="border-2 border-white shadow-md"
+              />
             ) : (
-              <Avatar size={40} className="bg-indigo-600 border-2 border-white shadow-md flex items-center justify-center">
-                {record.firstName?.charAt(0)?.toUpperCase() || record.username?.charAt(0)?.toUpperCase() || 'U'}
+              <Avatar
+                size={40}
+                className="bg-indigo-600 border-2 border-white shadow-md flex items-center justify-center"
+              >
+                {record.firstName?.charAt(0)?.toUpperCase() ||
+                  record.username?.charAt(0)?.toUpperCase() ||
+                  "U"}
               </Avatar>
             )}
           </div>
@@ -339,10 +399,11 @@ const EmployeeList = () => {
             <div className="font-medium text-gray-900">
               {record.firstName && record.lastName
                 ? `${record.firstName} ${record.lastName}`
-                : record.username || 'N/A'
-              }
+                : record.username || "N/A"}
             </div>
-            <div className="text-gray-500 text-sm">{record.email || 'No email'}</div>
+            <div className="text-gray-500 text-sm">
+              {record.email || "No email"}
+            </div>
           </div>
         </div>
       ),
@@ -352,8 +413,12 @@ const EmployeeList = () => {
       dataIndex: "branch",
       render: (branch) => (
         <div className="flex items-center">
-          <span className={`w-2 h-2 rounded-full mr-2 ${branch ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-          <span className="text-gray-700">{branch || 'N/A'}</span>
+          <span
+            className={`w-2 h-2 rounded-full mr-2 ${
+              branch ? "bg-green-500" : "bg-gray-400"
+            }`}
+          ></span>
+          <span className="text-gray-700">{branch || "N/A"}</span>
         </div>
       ),
       sorter: (a, b) => a.branch?.localeCompare(b.branch) || 0,
@@ -362,8 +427,11 @@ const EmployeeList = () => {
       title: "Department",
       dataIndex: "department",
       render: (department) => (
-        <Tag color="blue" className="text-sm px-3 py-1 rounded-full font-medium">
-          {department || 'N/A'}
+        <Tag
+          color="blue"
+          className="text-sm px-3 py-1 rounded-full font-medium"
+        >
+          {department || "N/A"}
         </Tag>
       ),
       sorter: (a, b) => a.department?.localeCompare(b.department) || 0,
@@ -372,8 +440,11 @@ const EmployeeList = () => {
       title: "Designation",
       dataIndex: "designation",
       render: (designation) => (
-        <Tag color="purple" className="text-sm px-3 py-1 rounded-full font-medium">
-          {designation || 'N/A'}
+        <Tag
+          color="purple"
+          className="text-sm px-3 py-1 rounded-full font-medium"
+        >
+          {designation || "N/A"}
         </Tag>
       ),
       sorter: (a, b) => a.designation?.localeCompare(b.designation) || 0,
@@ -383,7 +454,7 @@ const EmployeeList = () => {
       dataIndex: "joiningDate",
       render: (text) => (
         <div className="text-gray-600">
-          {text ? moment(text).format('DD MMM YYYY') : 'N/A'}
+          {text ? moment(text).format("DD MMM YYYY") : "N/A"}
         </div>
       ),
       sorter: (a, b) => moment(a.joiningDate) - moment(b.joiningDate),
@@ -393,7 +464,7 @@ const EmployeeList = () => {
       dataIndex: "leaveDate",
       render: (text) => (
         <div className="text-gray-600">
-          {text ? moment(text).format('DD MMM YYYY') : 'N/A'}
+          {text ? moment(text).format("DD MMM YYYY") : "N/A"}
         </div>
       ),
       sorter: (a, b) => moment(a.leaveDate) - moment(b.leaveDate),
@@ -404,27 +475,42 @@ const EmployeeList = () => {
       render: (_, record) => {
         const salaryRecord = getEmployeeSalaryStatus(record.id);
         const nextPaymentDate = salaryRecord?.paymentDate
-          ? moment(salaryRecord.paymentDate).add(1, 'month').format('DD MMM YYYY')
-          : 'N/A';
+          ? moment(salaryRecord.paymentDate)
+              .add(1, "month")
+              .format("DD MMM YYYY")
+          : "N/A";
 
         return (
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <Switch
-                checked={salaryRecord?.status === 'paid'}
-                onChange={(checked) => handleEmployeeSalaryStatus(record, checked)}
+                checked={salaryRecord?.status === "paid"}
+                onChange={(checked) =>
+                  handleEmployeeSalaryStatus(record, checked)
+                }
                 checkedChildren="Paid"
                 unCheckedChildren="Unpaid"
-                disabled={!(whorole === "super-admin" || whorole === "client" || canEditClient)}
-                className={`${salaryRecord?.status === 'paid' ? 'bg-green-500' : 'bg-gray-400'} shadow-sm`}
+                disabled={
+                  !(
+                    whorole === "super-admin" ||
+                    whorole === "client" ||
+                    canEditEmployee
+                  )
+                }
+                className={`${
+                  salaryRecord?.status === "paid"
+                    ? "bg-green-500"
+                    : "bg-gray-400"
+                } shadow-sm`}
               />
               <Badge
-                status={salaryRecord?.status === 'paid' ? 'success' : 'error'}
+                status={salaryRecord?.status === "paid" ? "success" : "error"}
                 text={
                   <span className="text-sm font-medium">
                     {salaryRecord?.status
-                      ? salaryRecord.status.charAt(0).toUpperCase() + salaryRecord.status.slice(1)
-                      : 'No Salary'}
+                      ? salaryRecord.status.charAt(0).toUpperCase() +
+                        salaryRecord.status.slice(1)
+                      : "No Salary"}
                   </span>
                 }
               />
@@ -443,18 +529,18 @@ const EmployeeList = () => {
         <div className="text-center">
           <Dropdown
             overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -466,7 +552,11 @@ const EmployeeList = () => {
     <Card bodyStyle={{ padding: "0" }} className="rounded-lg shadow-sm">
       <div className="bg-white border-b">
         <div className="p-6">
-          <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+          <Flex
+            alignItems="center"
+            justifyContent="space-between"
+            mobileFlex={false}
+          >
             <Flex className="mb-1" mobileFlex={false}>
               <div className="mr-md-3 mb-3">
                 <Input
@@ -486,7 +576,7 @@ const EmployeeList = () => {
                   className="rounded-md border-gray-300"
                 >
                   <Option value="all">All Branches</Option>
-                  {branchDataa.map(branch => (
+                  {branchDataa.map((branch) => (
                     <Option key={branch.id} value={branch.branchName}>
                       {branch.branchName}
                     </Option>
@@ -495,7 +585,11 @@ const EmployeeList = () => {
               </div>
             </Flex>
             <Flex gap="8px">
-              {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) && (
+              {(whorole === "super-admin" ||
+                whorole === "client" ||
+                (canCreateEmployee &&
+                  whorole !== "super-admin" &&
+                  whorole !== "client")) && (
                 <Button
                   type="primary"
                   onClick={() => setIsAddEmployeeModalVisible(true)}
@@ -518,13 +612,19 @@ const EmployeeList = () => {
       </div>
 
       <div className="bg-white">
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
+        {(whorole === "super-admin" ||
+          whorole === "client" ||
+          (canViewEmployee &&
+            whorole !== "super-admin" &&
+            whorole !== "client")) && (
           <Table
             columns={tableColumns}
             dataSource={getFilteredEmployees()}
             rowKey="id"
             className="ant-table-striped"
-            rowClassName={(record, index) => index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
+            rowClassName={(record, index) =>
+              index % 2 === 0 ? "bg-gray-50" : "bg-white"
+            }
           />
         )}
       </div>
@@ -561,7 +661,9 @@ const EmployeeList = () => {
         <EditEmployee
           onClose={() => setIsEditEmployeeModalVisible(false)}
           idd={selectedEmployeeId}
-          initialData={users.find(user => user.id === selectedEmployeeId) || {}}
+          initialData={
+            users.find((user) => user.id === selectedEmployeeId) || {}
+          }
         />
       </Modal>
 
@@ -588,7 +690,7 @@ const EmployeeList = () => {
       <EmailVerification
         visible={isEmailVerificationModalVisible}
         onCancel={() => setIsEmailVerificationModalVisible(false)}
-        initialEmail={users.find(user => user.id === comnyid)?.email}
+        initialEmail={users.find((user) => user.id === comnyid)?.email}
         idd={comnyid}
       />
 
@@ -645,7 +747,7 @@ const EmployeeList = () => {
         }
         .ant-dropdown-menu {
           border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
           padding: 4px;
         }
         .ant-dropdown-menu-item {

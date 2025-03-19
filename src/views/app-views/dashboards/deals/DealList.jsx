@@ -31,13 +31,13 @@ import ViewDeal from "./ViewDeal";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteDeals, GetDeals } from "./DealReducers/DealSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
-import { getstages } from '../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice';
+import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { GetPip } from "../systemsetup/Pipeline/PiplineReducer/piplineSlice";
-import { debounce } from 'lodash';
+import { debounce } from "lodash";
 import DealCards from "./DealCards";
 
-const VIEW_LIST = 'LIST';
-const VIEW_GRID = 'GRID';
+const VIEW_LIST = "LIST";
+const VIEW_GRID = "GRID";
 
 const DealList = () => {
   const [users, setUsers] = useState([]);
@@ -63,10 +63,11 @@ const DealList = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
 
-
   useEffect(() => {
     if (tabledata?.Deals?.data) {
-      const filteredDeals = tabledata.Deals.data.filter(deal => deal.created_by === user);
+      const filteredDeals = tabledata.Deals.data.filter(
+        (deal) => deal.created_by === user
+      );
       setUsers(filteredDeals);
     }
   }, [tabledata, user]);
@@ -82,20 +83,20 @@ const DealList = () => {
         return;
       }
 
-      const filteredData = tabledata.Deals.data.filter(deal => {
+      const filteredData = tabledata.Deals.data.filter((deal) => {
         const matchesUser = deal.created_by === user;
-        const matchesSearch = !searchValue || (
-          (deal.dealName?.toString().toLowerCase().includes(searchValue)) ||
-          (deal.leadTitle?.toString().toLowerCase().includes(searchValue)) ||
-          (deal.project?.toString().toLowerCase().includes(searchValue))
-        );
+        const matchesSearch =
+          !searchValue ||
+          deal.dealName?.toString().toLowerCase().includes(searchValue) ||
+          deal.leadTitle?.toString().toLowerCase().includes(searchValue) ||
+          deal.project?.toString().toLowerCase().includes(searchValue);
 
         // Add date filtering
         let matchesDate = true;
         if (date) {
-          const dealDate = dayjs(deal.closedDate).startOf('day');
-          const selectedDay = dayjs(date).startOf('day');
-          matchesDate = dealDate.isSame(selectedDay, 'day');
+          const dealDate = dayjs(deal.closedDate).startOf("day");
+          const selectedDay = dayjs(date).startOf("day");
+          matchesDate = dealDate.isSame(selectedDay, "day");
         }
 
         return matchesUser && matchesSearch && matchesDate;
@@ -103,7 +104,7 @@ const DealList = () => {
 
       setUsers(filteredData);
     } catch (error) {
-      console.error('Search error:', error);
+      console.error("Search error:", error);
     } finally {
       setIsSearching(false);
     }
@@ -121,8 +122,8 @@ const DealList = () => {
   };
 
   useEffect(() => {
-    dispatch(GetPip())
-  }, [dispatch])
+    dispatch(GetPip());
+  }, [dispatch]);
 
   const stagesData = useSelector((state) => state.StagesLeadsDeals);
 
@@ -160,115 +161,47 @@ const DealList = () => {
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : {};
 
+  // Get deal-specific permissions
+  const dealPermissions =
+    parsedPermissions["dashboards-deal"]?.[0]?.permissions || [];
 
-  let allpermisson;
+  // Define permission checks
+  const canViewDeal = dealPermissions.includes("view");
+  const canCreateDeal = dealPermissions.includes("create");
+  const canEditDeal = dealPermissions.includes("update");
+  const canDeleteDeal = dealPermissions.includes("delete");
 
-  if (parsedPermissions["dashboards-deal"] && parsedPermissions["dashboards-deal"][0]?.permissions) {
-    allpermisson = parsedPermissions["dashboards-deal"][0].permissions;
-    console.log('Parsed Permissions:', allpermisson);
-
-  } else {
-    // console.log('dashboards-deal is not available');
-  }
-
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
-
-
-  // Close Add Job Modal
-  const closeViewDealModal = () => {
-    setIsViewDealModalVisible(false);
-  };
-
-
-  const deleteUser = async (userId) => {
-    try {
-      await dispatch(DeleteDeals(userId));
-
-      await dispatch(GetDeals());
-
-      setUsers(users.filter((item) => item.id !== userId));
-
-    } catch (error) {
-      console.error("Error deleting user:", error);
-    }
-  };
-
-
-  const closeUserProfile = () => {
-    setSelectedUser(null);
-    setUserProfileVisible(false);
-  };
-
-  useEffect(() => {
-    dispatch(GetDeals());
-    dispatch(ClientData());
-    dispatch(getstages());
-  }, [dispatch]);
-
-
-  useEffect(() => {
-    if (tabledata && tabledata.Deals && tabledata.Deals.data) {
-      const filteredDeals = tabledata.Deals.data.filter(deal => deal.created_by === user);
-      setUsers(filteredDeals);
-    }
-  }, [tabledata, user]);
-
-
-  useEffect(() => {
-    if (stagesData && stagesData.StagesLeadsDeals && stagesData.StagesLeadsDeals.data) {
-      setStagesList(stagesData.StagesLeadsDeals.data);
-    }
-  }, [stagesData]);
-
-  useEffect(() => {
-    if (stagesList?.StagesLeadsDeals?.data) {
-      setStagesList(stagesList.StagesLeadsDeals.data);
-    }
-  }, [stagesList]);
-
-
-  const EditDelas = (id) => {
-    openEditDealModal();
-    setIdd(id);
-  };
-
-  const getStageName = (stageId) => {
-    const stage = stagesList.find(stage => stage.id === stageId);
-    return stage ? stage.stageName : 'N/A';
-  };
-
-  const getDropdownItems = (elm, whorole, canEditClient, canDeleteClient, EditDelas, deleteUser) => {
+  const getDropdownItems = (elm) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    // Only add edit option if user has edit permission
+    if (canEditDeal) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => EditDelas(elm.id)
+        label: "Edit",
+        onClick: () => EditDelas(elm.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    // Only add delete option if user has delete permission
+    if (canDeleteDeal) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(elm.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -329,7 +262,9 @@ const DealList = () => {
       dataIndex: "closedDate",
       render: (_, record) => (
         <span>
-          {record.closedDate ? dayjs(record.closedDate).format('DD-MM-YYYY') : ''}
+          {record.closedDate
+            ? dayjs(record.closedDate).format("DD-MM-YYYY")
+            : ""}
         </span>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "closedDate"),
@@ -342,27 +277,25 @@ const DealList = () => {
       },
     },
 
-
-
     {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
           <Dropdown
-            overlay={<Menu items={getDropdownItems(elm, whorole, canEditClient, canDeleteClient, EditDelas, deleteUser)} />}
-            trigger={['click']}
+            overlay={<Menu items={getDropdownItems(elm)} />}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -386,6 +319,68 @@ const DealList = () => {
     }
   `;
 
+  const EditDelas = (id) => {
+    openEditDealModal();
+    setIdd(id);
+  };
+
+  const getStageName = (stageId) => {
+    const stage = stagesList.find((stage) => stage.id === stageId);
+    return stage ? stage.stageName : "N/A";
+  };
+
+  const deleteUser = async (userId) => {
+    try {
+      await dispatch(DeleteDeals(userId));
+
+      await dispatch(GetDeals());
+
+      setUsers(users.filter((item) => item.id !== userId));
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  };
+
+  const closeUserProfile = () => {
+    setSelectedUser(null);
+    setUserProfileVisible(false);
+  };
+
+  useEffect(() => {
+    dispatch(GetDeals());
+    dispatch(ClientData());
+    dispatch(getstages());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (tabledata && tabledata.Deals && tabledata.Deals.data) {
+      const filteredDeals = tabledata.Deals.data.filter(
+        (deal) => deal.created_by === user
+      );
+      setUsers(filteredDeals);
+    }
+  }, [tabledata, user]);
+
+  useEffect(() => {
+    if (
+      stagesData &&
+      stagesData.StagesLeadsDeals &&
+      stagesData.StagesLeadsDeals.data
+    ) {
+      setStagesList(stagesData.StagesLeadsDeals.data);
+    }
+  }, [stagesData]);
+
+  useEffect(() => {
+    if (stagesList?.StagesLeadsDeals?.data) {
+      setStagesList(stagesList.StagesLeadsDeals.data);
+    }
+  }, [stagesList]);
+
+  const closeViewDealModal = () => {
+    setIsViewDealModalVisible(false);
+  };
+
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
       <Flex
@@ -401,7 +396,7 @@ const DealList = () => {
               onChange={onSearch}
               value={searchValue}
               allowClear
-              style={{ width: '300px' }}
+              style={{ width: "300px" }}
               loading={isSearching}
             />
           </div>
@@ -412,33 +407,37 @@ const DealList = () => {
               format="DD-MM-YYYY"
               placeholder="Search closed date"
               allowClear
-              style={{ width: '200px' }}
+              style={{ width: "200px" }}
             />
           </div>
         </Flex>
         <Flex gap="7px" className="items-center">
-
           <Radio.Group
             defaultValue={VIEW_LIST}
             onChange={(e) => setView(e.target.value)}
             value={view}
             className="mr-2 flex items-center"
           >
-            <Radio.Button value={VIEW_GRID} className="flex items-center justify-center">
+            <Radio.Button
+              value={VIEW_GRID}
+              className="flex items-center justify-center"
+            >
               <AppstoreOutlined />
             </Radio.Button>
-            <Radio.Button value={VIEW_LIST} className="flex items-center justify-center">
+            <Radio.Button
+              value={VIEW_LIST}
+              className="flex items-center justify-center"
+            >
               <UnorderedListOutlined />
             </Radio.Button>
           </Radio.Group>
 
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {canCreateDeal && (
             <Button type="primary" className="ml-2" onClick={openAddDealModal}>
               <PlusOutlined />
               <span>New</span>
             </Button>
-
-          ) : null}
+          )}
 
           <Button
             type="primary"
@@ -454,10 +453,9 @@ const DealList = () => {
         </Flex>
       </Flex>
 
-
       {view === VIEW_LIST ? (
         <div className="table-responsive">
-          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
+          {canViewDeal && (
             <Table
               columns={tableColumns}
               dataSource={users}
@@ -466,15 +464,15 @@ const DealList = () => {
                 total: users.length,
                 pageSize: 10,
                 showSizeChanger: true,
-                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} of ${total} items`,
               }}
             />
           )}
         </div>
       ) : (
-        <DealCards data={users} />
+        canViewDeal && <DealCards data={users} />
       )}
-
 
       <UserView
         data={selectedUser}

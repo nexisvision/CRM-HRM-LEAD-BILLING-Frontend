@@ -133,17 +133,14 @@ const EditHoliday = ({ onClose, idd }) => {
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
-                  <DatePicker
+                  <Input
+                    type="date"
                     style={{ width: "100%" }}
                     className="w-full mt-1"
                     placeholder="Select start date"
                     value={values.start_date}
-                    onChange={(date) => {
-                      setFieldValue("start_date", date);
-                      if (values.end_date && date && moment(values.end_date).isBefore(date)) {
-                        setFieldValue("end_date", null);
-                      }
-                    }}
+                    onChange={(e) => setFieldValue("start_date", e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
                   />
                   {errors.start_date && touched.start_date && (
                     <div style={{ color: "red", fontSize: "12px" }}>
@@ -156,15 +153,14 @@ const EditHoliday = ({ onClose, idd }) => {
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
-                  <DatePicker
+                  <Input
+                    type="date"
                     style={{ width: "100%" }}
                     className="w-full mt-1"
                     placeholder="Select end date"
                     value={values.end_date}
-                    onChange={(date) => setFieldValue("end_date", date)}
-                    disabledDate={(current) => {
-                      return values.start_date ? current && current < values.start_date.startOf('day') : false;
-                    }}
+                    onChange={(e) => setFieldValue("end_date", e.target.value)}
+                    min={values.start_date}
                   />
                   {errors.end_date && touched.end_date && (
                     <div style={{ color: "red", fontSize: "12px" }}>

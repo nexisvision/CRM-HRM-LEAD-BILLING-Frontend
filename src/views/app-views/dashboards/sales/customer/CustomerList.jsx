@@ -46,7 +46,10 @@ const CustomerList = () => {
 
   const alldata = useSelector((state) => state.customers);
 
-  const fnddata = React.useMemo(() => alldata?.customers?.data || [], [alldata?.customers?.data]);
+  const fnddata = React.useMemo(
+    () => alldata?.customers?.data || [],
+    [alldata?.customers?.data]
+  );
   const loggid = useSelector((state) => state.user.loggedInUser);
 
   useEffect(() => {
@@ -59,32 +62,33 @@ const CustomerList = () => {
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
-
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
   let allpermisson;
 
-  if (parsedPermissions["dashboards-sales-customer"] && parsedPermissions["dashboards-sales-customer"][0]?.permissions) {
-    allpermisson = parsedPermissions["dashboards-sales-customer"][0].permissions;
+  if (
+    parsedPermissions["dashboards-sales-customer"] &&
+    parsedPermissions["dashboards-sales-customer"][0]?.permissions
+  ) {
+    allpermisson =
+      parsedPermissions["dashboards-sales-customer"][0].permissions;
     // console.log('Parsed Permissions:', allpermisson);
-
   } else {
     // console.log('dashboards-sales-customer is not available');
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
-
+  const canCreateClient = allpermisson?.includes("create");
+  const canUpdateClient = allpermisson?.includes("update");
+  const canDeleteClient = allpermisson?.includes("delete");
+  const canViewClient = allpermisson?.includes("view");
 
   ///endpermission
 
@@ -108,7 +112,6 @@ const CustomerList = () => {
     setIsEditCustomerModalVisible(false);
   };
 
-
   const closeViewCustomerModal = () => {
     setIsViewCustomerModalVisible(false);
   };
@@ -119,9 +122,10 @@ const CustomerList = () => {
       setUsers(fnddata); // Reset to original filtered data
       return;
     }
-    const filteredUsers = fnddata.filter(user =>
-      Object.values(user).some(val =>
-        val && val.toString().toLowerCase().includes(value.toLowerCase())
+    const filteredUsers = fnddata.filter((user) =>
+      Object.values(user).some(
+        (val) =>
+          val && val.toString().toLowerCase().includes(value.toLowerCase())
       )
     );
     setUsers(filteredUsers);
@@ -133,8 +137,8 @@ const CustomerList = () => {
         dispatch(Getcus()); // Refresh the customer list
       })
       .catch((error) => {
-        message.error('Failed to delete customer');
-        console.error('Delete error:', error);
+        message.error("Failed to delete customer");
+        console.error("Delete error:", error);
       });
   };
 
@@ -151,7 +155,6 @@ const CustomerList = () => {
     }
   };
 
-
   const closeUserProfile = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);
@@ -165,22 +168,30 @@ const CustomerList = () => {
   const getDropdownItems = (elm) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canUpdateClient && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editfun(elm.id)
+        label: "Edit",
+        onClick: () => editfun(elm.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canDeleteClient && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(elm.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -201,7 +212,7 @@ const CustomerList = () => {
     {
       title: "Name",
       dataIndex: "name",
-      render: (name) => name || 'N/A',
+      render: (name) => name || "N/A",
       sorter: (a, b) => {
         if (a.name && b.name) {
           return a.name.length - b.name.length;
@@ -210,9 +221,19 @@ const CustomerList = () => {
       },
     },
     {
+      title: "Email",
+      dataIndex: "email",
+      render: (email) => email || "N/A",
+    },
+    {
+      title: "Contact",
+      dataIndex: "contact",
+      render: (contact) => contact || "N/A",
+    },
+    {
       title: "Tax Number",
       dataIndex: "tax_number",
-      render: (tax_number) => tax_number || 'N/A',
+      render: (tax_number) => tax_number || "N/A",
       sorter: (a, b) => {
         if (a.tax_number && b.tax_number) {
           return a.tax_number.localeCompare(b.tax_number);
@@ -227,18 +248,18 @@ const CustomerList = () => {
         <div className="text-center">
           <Dropdown
             overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -264,9 +285,11 @@ const CustomerList = () => {
           </div>
         </Flex>
         <Flex gap="7px" className="flex">
-
-
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {whorole === "super-admin" ||
+          whorole === "client" ||
+          (canCreateClient &&
+            whorole !== "super-admin" &&
+            whorole !== "client") ? (
             <Button
               type="primary"
               className="flex items-center"
@@ -287,7 +310,9 @@ const CustomerList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        {whorole === "super-admin" ||
+        whorole === "client" ||
+        (canViewClient && whorole !== "super-admin" && whorole !== "client") ? (
           <Table
             columns={tableColumns}
             dataSource={users}

@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  Table,
-  message,
-  Button,
-  Modal,
-  Dropdown,
-} from "antd";
+import { Card, Table, message, Button, Modal, Dropdown } from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
@@ -95,26 +88,29 @@ const TrainingSetupList = () => {
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
   let allpermisson;
 
-  if (parsedPermissions["extra-hrm-trainingSetup"] && parsedPermissions["extra-hrm-trainingSetup"][0]?.permissions) {
+  if (
+    parsedPermissions["extra-hrm-trainingSetup"] &&
+    parsedPermissions["extra-hrm-trainingSetup"][0]?.permissions
+  ) {
     allpermisson = parsedPermissions["extra-hrm-trainingSetup"][0].permissions;
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const canCreateClient = allpermisson?.includes("create");
+  const canUpdateClient = allpermisson?.includes("update");
+  const canDeleteClient = allpermisson?.includes("delete");
+  const canViewClient = allpermisson?.includes("view");
 
   const editfun = (idd) => {
     openEditTrainingSetupModal();
@@ -129,29 +125,31 @@ const TrainingSetupList = () => {
   const getDropdownItems = (record) => {
     const items = [];
 
-    items.push({
-      key: 'view',
-      icon: <EyeOutlined />,
-      label: 'View Details',
-      onClick: () => viewfun(record.id)
-    });
-
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (whorole === "super-admin" || whorole === "client" || canViewClient) {
       items.push({
-        key: 'edit',
-        icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editfun(record.id)
+        key: "view",
+        icon: <EyeOutlined />,
+        label: "View Details",
+        onClick: () => viewfun(record.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (whorole === "super-admin" || whorole === "client" || canUpdateClient) {
       items.push({
-        key: 'delete',
+        key: "edit",
+        icon: <EditOutlined />,
+        label: "Edit",
+        onClick: () => editfun(record.id),
+      });
+    }
+
+    if (whorole === "super-admin" || whorole === "client" || canDeleteClient) {
+      items.push({
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(record.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -171,18 +169,18 @@ const TrainingSetupList = () => {
         <div className="text-center">
           <Dropdown
             menu={{ items: getDropdownItems(record) }}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -197,10 +195,11 @@ const TrainingSetupList = () => {
         justifyContent="space-between"
         mobileFlex={false}
       >
-        <Flex className="mb-1" mobileFlex={false}>
-        </Flex>
+        <Flex className="mb-1" mobileFlex={false}></Flex>
         <Flex gap="7px">
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) && (
+          {(whorole === "super-admin" ||
+            whorole === "client" ||
+            canCreateClient) && (
             <Button
               type="primary"
               className="ml-2"
@@ -218,10 +217,12 @@ const TrainingSetupList = () => {
           >
             Export All
           </Button>
-        </Flex >
-      </Flex >
+        </Flex>
+      </Flex>
       <div className="table-responsive mt-2">
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
+        {(whorole === "super-admin" ||
+          whorole === "client" ||
+          canViewClient) && (
           <Table
             columns={tableColumns}
             dataSource={users}
@@ -263,7 +264,7 @@ const TrainingSetupList = () => {
       >
         <ViewTrainingSetup onClose={closeViewTrainingSetupModal} idd={idd} />
       </Modal>
-    </Card >
+    </Card>
   );
 };
 

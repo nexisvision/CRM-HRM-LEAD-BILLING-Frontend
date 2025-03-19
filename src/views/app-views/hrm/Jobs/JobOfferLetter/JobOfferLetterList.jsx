@@ -40,8 +40,9 @@ const JobOfferLetterList = () => {
   const [isAddJobOfferLetterModalVisible, setIsAddJobOfferLetterModalVisible] =
     useState(false);
   const [idd, setIdd] = useState("");
-  const [searchText, setSearchText] = useState('');
-  const [isAddEmployeeModalVisible, setIsAddEmployeeModalVisible] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [isAddEmployeeModalVisible, setIsAddEmployeeModalVisible] =
+    useState(false);
   const [employeeData, setEmployeeData] = useState(null);
   const [dateRange, setDateRange] = useState(null);
 
@@ -54,15 +55,16 @@ const JobOfferLetterList = () => {
   const user = useSelector((state) => state.user.loggedInUser.username);
 
   const alldatas = useSelector((state) => state.joboffers);
-  const fnddata = useMemo(() => alldatas.joboffers.data || [], [alldatas.joboffers.data]);
-
-  console.log('fnddata', fnddata);
+  const fnddata = useMemo(
+    () => alldatas.joboffers.data || [],
+    [alldatas.joboffers.data]
+  );
 
   const alljob = useSelector((state) => state?.Jobs?.Jobs?.data);
-  console.log('alljob', alljob);
 
-  const jobappliaction = useSelector((state) => state?.jobapplications?.jobapplications?.data);
-  console.log('jobappliaction', jobappliaction);
+  const jobappliaction = useSelector(
+    (state) => state?.jobapplications?.jobapplications?.data
+  );
 
   const fnddtaa = fnddata.filter((item) => item.created_by === user);
 
@@ -77,29 +79,39 @@ const JobOfferLetterList = () => {
     setIsEditJobOfferLetterModalVisible,
   ] = useState(false);
 
-
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : {};
 
-  let allpermisson;
+  // Get permissions for job offer letter module
+  const jobOfferLetterPermissions =
+    parsedPermissions["extra-hrm-jobs-jobofferletter"]?.[0]?.permissions || [];
 
-  if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
-  }
-
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  // Define permission checks
+  const canView =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    jobOfferLetterPermissions.includes("view");
+  const canCreate =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    jobOfferLetterPermissions.includes("create");
+  const canUpdate =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    jobOfferLetterPermissions.includes("update");
+  const canDelete =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    jobOfferLetterPermissions.includes("delete");
 
   const openAddJobOfferLetterModal = () => {
     setIsAddJobOfferLetterModalVisible(true);
@@ -129,7 +141,7 @@ const JobOfferLetterList = () => {
 
     // Text search filter
     if (searchText) {
-      filtered = filtered.filter(offer => {
+      filtered = filtered.filter((offer) => {
         const offerSalary = offer.salary?.toString().toLowerCase();
         const searchValue = searchText.toLowerCase();
         return offerSalary?.includes(searchValue);
@@ -137,12 +149,14 @@ const JobOfferLetterList = () => {
     }
 
     if (dateRange && dateRange[0] && dateRange[1]) {
-      const startDate = dayjs(dateRange[0]).format('YYYY-MM-DD');
-      const endDate = dayjs(dateRange[1]).format('YYYY-MM-DD');
+      const startDate = dayjs(dateRange[0]).format("YYYY-MM-DD");
+      const endDate = dayjs(dateRange[1]).format("YYYY-MM-DD");
 
-      filtered = filtered.filter(offer => {
-        const offerExpiry = dayjs(offer.offer_expiry).format('YYYY-MM-DD');
-        const expectedJoining = dayjs(offer.expected_joining_date).format('YYYY-MM-DD');
+      filtered = filtered.filter((offer) => {
+        const offerExpiry = dayjs(offer.offer_expiry).format("YYYY-MM-DD");
+        const expectedJoining = dayjs(offer.expected_joining_date).format(
+          "YYYY-MM-DD"
+        );
 
         return offerExpiry >= startDate && expectedJoining <= endDate;
       });
@@ -152,7 +166,7 @@ const JobOfferLetterList = () => {
   };
 
   const handleSearch = () => {
-    message.success('Search completed');
+    message.success("Search completed");
   };
 
   const deleteUser = (userId) => {
@@ -177,7 +191,6 @@ const JobOfferLetterList = () => {
     }
   };
 
-
   const closeUserProfile = () => {
     setUserProfileVisible(false);
     setSelectedUser(null);
@@ -190,13 +203,15 @@ const JobOfferLetterList = () => {
 
   const convertemployee = (idd) => {
     const fndoffer = fnddata.find((item) => item.id === idd);
-    const jobappdata = jobappliaction.find((item) => item.job === fndoffer.job_applicant);
+    const jobappdata = jobappliaction.find(
+      (item) => item.job === fndoffer.job_applicant
+    );
 
     // Prepare the data to be passed to the AddEmployee component
     const data = {
-      firstName: jobappdata?.firstName || '',
-      lastName: jobappdata?.lastName || '',
-      email: jobappdata?.email || '',
+      firstName: jobappdata?.firstName || "",
+      lastName: jobappdata?.lastName || "",
+      email: jobappdata?.email || "",
       // Add other fields as necessary
     };
 
@@ -212,29 +227,29 @@ const JobOfferLetterList = () => {
   const getDropdownItems = (row) => {
     const items = [
       {
-        key: 'convert',
+        key: "convert",
         icon: <EditOutlined />,
-        label: 'Convert To Employee',
-        onClick: () => convertemployee(row.id)
-      }
+        label: "Convert To Employee",
+        onClick: () => convertemployee(row.id),
+      },
     ];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canUpdate) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => eidtfun(row.id)
+        label: "Edit",
+        onClick: () => eidtfun(row.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canDelete) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(row.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -246,12 +261,14 @@ const JobOfferLetterList = () => {
       title: "Job",
       dataIndex: "job_applicant",
       render: (_, record) => {
-        const job = alljob?.find(job => job.id === record.job_applicant);
+        const job = alljob?.find((job) => job.id === record.job_applicant);
         return job ? job.title : record.job_applicant;
       },
       sorter: (a, b) => {
-        const jobA = alljob?.find(job => job.id === a.job_applicant)?.title || '';
-        const jobB = alljob?.find(job => job.id === b.job_applicant)?.title || '';
+        const jobA =
+          alljob?.find((job) => job.id === a.job_applicant)?.title || "";
+        const jobB =
+          alljob?.find((job) => job.id === b.job_applicant)?.title || "";
         return jobA.localeCompare(jobB);
       },
     },
@@ -259,12 +276,16 @@ const JobOfferLetterList = () => {
       title: "Job Applicant",
       dataIndex: "job",
       render: (_, record) => {
-        const application = jobappliaction?.find(app => app.id === record.job);
+        const application = jobappliaction?.find(
+          (app) => app.id === record.job
+        );
         return application ? application.name : record.job;
       },
       sorter: (a, b) => {
-        const appA = jobappliaction?.find(app => app.id === a.job)?.name || '';
-        const appB = jobappliaction?.find(app => app.id === b.job)?.name || '';
+        const appA =
+          jobappliaction?.find((app) => app.id === a.job)?.name || "";
+        const appB =
+          jobappliaction?.find((app) => app.id === b.job)?.name || "";
         return appA.localeCompare(appB);
       },
     },
@@ -273,7 +294,7 @@ const JobOfferLetterList = () => {
       dataIndex: "salary",
       sorter: (a, b) => a.salary.length - b.salary.length,
     },
-   
+
     {
       title: "Expected Joining Date",
       dataIndex: "expected_joining_date",
@@ -287,9 +308,7 @@ const JobOfferLetterList = () => {
     {
       title: "Description",
       dataIndex: "description",
-      render: (text) => (
-        <div dangerouslySetInnerHTML={{ __html: text }} />
-      ),
+      render: (text) => <div dangerouslySetInnerHTML={{ __html: text }} />,
     },
 
     {
@@ -299,18 +318,18 @@ const JobOfferLetterList = () => {
         <div className="text-center">
           <Dropdown
             menu={{ items: getDropdownItems(elm) }}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -347,17 +366,15 @@ const JobOfferLetterList = () => {
               value={dateRange}
               onChange={handleDateRangeChange}
               format="DD-MM-YYYY"
-              placeholder={['Offer Expiry', 'Expected Joining']}
+              placeholder={["Offer Expiry", "Expected Joining"]}
               className="w-100"
               allowClear={true}
-              style={{ minWidth: '300px' }}
+              style={{ minWidth: "300px" }}
             />
           </div>
         </Flex>
         <Flex gap="7px">
-
-
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {canCreate && (
             <Button
               type="primary"
               className="ml-2"
@@ -366,14 +383,12 @@ const JobOfferLetterList = () => {
               <PlusOutlined />
               <span>New</span>
             </Button>
-
-          ) : null}
-
+          )}
 
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
-            onClick={exportToExcel} // Call export function when the button is clicked
+            onClick={exportToExcel}
             block
           >
             Export All
@@ -381,8 +396,7 @@ const JobOfferLetterList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        {canView && (
           <Table
             columns={tableColumns}
             dataSource={getFilteredOffers()}
@@ -391,12 +405,11 @@ const JobOfferLetterList = () => {
               total: getFilteredOffers().length,
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
             }}
           />
-        ) : null}
-
-
+        )}
       </div>
       <UserView
         data={selectedUser}
@@ -434,9 +447,11 @@ const JobOfferLetterList = () => {
         width={1000}
         className="mt-[-70px]"
       >
-        <AddEmployee onClose={closeAddEmployeeModal} initialData={employeeData} />
+        <AddEmployee
+          onClose={closeAddEmployeeModal}
+          initialData={employeeData}
+        />
       </Modal>
-
     </Card>
   );
 };

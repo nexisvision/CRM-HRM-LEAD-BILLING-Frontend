@@ -1,29 +1,48 @@
-import React, { useState } from 'react';
-import { Card, Menu, Table, Tag, Button, Modal, Select, Input, Dropdown } from 'antd';
-import { EyeOutlined, DeleteOutlined, MailOutlined, FileExcelOutlined, PlusOutlined, SearchOutlined, MoreOutlined } from '@ant-design/icons';
+import React, { useState } from "react";
+import {
+  Card,
+  Menu,
+  Table,
+  Tag,
+  Button,
+  Modal,
+  Select,
+  Input,
+  Dropdown,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  MailOutlined,
+  FileExcelOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  MoreOutlined,
+} from "@ant-design/icons";
 import { RiLockPasswordLine } from "react-icons/ri";
-import OrderListData from 'assets/data/order-list.data.json';
+import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import userData from "assets/data/user-list.data.json";
-import Flex from 'components/shared-components/Flex';
-import UserView from './UserView';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import { message } from 'antd';
-import AddClientUser from './AddClientUser';
-import EditClientUser from './EditClientUser';
+import Flex from "components/shared-components/Flex";
+import UserView from "./UserView";
+import AvatarStatus from "components/shared-components/AvatarStatus";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import { message } from "antd";
+import AddClientUser from "./AddClientUser";
+import EditClientUser from "./EditClientUser";
 
 const ClientUserList = () => {
   const [users, setUsers] = useState(userData);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [list, setList] = useState(OrderListData);
-  const [isAddClientUserModalVisible, setIsAddClientUserModalVisible] = useState(false);
-  const [isEditClientUserModalVisible, setIsEditClientUserModalVisible] = useState(false);
+  const [isAddClientUserModalVisible, setIsAddClientUserModalVisible] =
+    useState(false);
+  const [isEditClientUserModalVisible, setIsEditClientUserModalVisible] =
+    useState(false);
 
   const deleteUser = (userId) => {
-    setUsers(users.filter(item => item.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    setUsers(users.filter((item) => item.id !== userId));
   };
 
   const exportToExcel = () => {
@@ -40,11 +59,11 @@ const ClientUserList = () => {
     }
   };
 
-  const paymentStatusList = ['active', 'blocked'];
+  const paymentStatusList = ["active", "blocked"];
 
   const handleShowStatus = (value) => {
-    if (value !== 'All') {
-      const key = 'status';
+    if (value !== "All") {
+      const key = "status";
       const data = utils.filterArray(OrderListData, key, value);
       setList(data);
     } else {
@@ -87,39 +106,43 @@ const ClientUserList = () => {
 
   const getDropdownItems = (elm) => [
     {
-      key: 'view',
+      key: "view",
       icon: <EyeOutlined />,
-      label: 'View Details',
-      onClick: () => showUserProfile(elm)
+      label: "View Details",
+      onClick: () => showUserProfile(elm),
     },
     {
-      key: 'edit',
+      key: "edit",
       icon: <MailOutlined />,
-      label: 'Edit',
-      onClick: () => openEditClientUserModal()
+      label: "Edit",
+      onClick: () => openEditClientUserModal(),
     },
     {
-      key: 'password',
+      key: "password",
       icon: <RiLockPasswordLine />,
-      label: 'Update Password',
-      onClick: () => showUserProfile(elm)
+      label: "Update Password",
+      onClick: () => showUserProfile(elm),
     },
     {
-      key: 'delete',
+      key: "delete",
       icon: <DeleteOutlined />,
-      label: 'Delete',
+      label: "Delete",
       onClick: () => deleteUser(elm.id),
-      danger: true
-    }
+      danger: true,
+    },
   ];
 
   const tableColumns = [
     {
-      title: 'Client Users',
-      dataIndex: 'name',
+      title: "Client Users",
+      dataIndex: "name",
       render: (_, record) => (
         <div className="d-flex">
-          <AvatarStatus src={record.img} name={record.name} subTitle={record.email} />
+          <AvatarStatus
+            src={record.img}
+            name={record.name}
+            subTitle={record.email}
+          />
         </div>
       ),
       sorter: {
@@ -131,11 +154,15 @@ const ClientUserList = () => {
       },
     },
     {
-      title: 'Client',
-      dataIndex: 'name',
+      title: "Client",
+      dataIndex: "name",
       render: (_, record) => (
         <div className="d-flex">
-          <AvatarStatus src={record.img} name={record.client} subTitle={record.clientemail} />
+          <AvatarStatus
+            src={record.img}
+            name={record.client}
+            subTitle={record.clientemail}
+          />
         </div>
       ),
       sorter: {
@@ -147,59 +174,64 @@ const ClientUserList = () => {
       },
     },
     {
-      title: 'Phone Number',
-      dataIndex: 'phoneNumber',
+      title: "Phone Number",
+      dataIndex: "phoneNumber",
       sorter: {
         compare: (a, b) => a.phoneNumber.length - b.phoneNumber.length,
       },
     },
     {
-      title: 'Role',
-      dataIndex: 'role',
+      title: "Role",
+      dataIndex: "role",
       sorter: {
         compare: (a, b) => a.role.length - b.role.length,
       },
     },
     {
-      title: 'Last online',
-      dataIndex: 'lastOnline',
+      title: "Last online",
+      dataIndex: "lastOnline",
       sorter: {
         compare: (a, b) => a.lastOnline.length - b.lastOnline.length,
       },
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      render: status => (
-        <Tag className="text-capitalize" color={status === 'active' ? 'cyan' : 'red'}>{status}</Tag>
+      title: "Status",
+      dataIndex: "status",
+      render: (status) => (
+        <Tag
+          className="text-capitalize"
+          color={status === "active" ? "cyan" : "red"}
+        >
+          {status}
+        </Tag>
       ),
       sorter: {
         compare: (a, b) => a.status.length - b.status.length,
       },
     },
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center" onClick={(e) => e.stopPropagation()}>
           <Dropdown
             overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
-      )
+      ),
     },
   ];
 
@@ -316,8 +348,12 @@ const ClientUserList = () => {
   return (
     <>
       <style>{styles}</style>
-      <Card bodyStyle={{ 'padding': '0px' }}>
-        <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+      <Card bodyStyle={{ padding: "0px" }}>
+        <Flex
+          alignItems="center"
+          justifyContent="space-between"
+          mobileFlex={false}
+        >
           <Flex className="mb-1" mobileFlex={false}>
             <div className="mr-md-3 mb-3">
               <Input
@@ -344,7 +380,11 @@ const ClientUserList = () => {
             </div>
           </Flex>
           <Flex gap="7px">
-            <Button type="primary" className="ml-2" onClick={openAddClientUserModal}>
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddClientUserModal}
+            >
               <PlusOutlined />
               New
             </Button>
@@ -359,9 +399,13 @@ const ClientUserList = () => {
           </Flex>
         </Flex>
         <div className="table-responsive">
-          <Table columns={tableColumns} dataSource={users} rowKey='id' />
+          <Table columns={tableColumns} dataSource={users} rowKey="id" />
         </div>
-        <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+        <UserView
+          data={selectedUser}
+          visible={userProfileVisible}
+          close={closeUserProfile}
+        />
         <Modal
           title="Create Client"
           visible={isAddClientUserModalVisible}

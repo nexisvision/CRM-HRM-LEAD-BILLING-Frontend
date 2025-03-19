@@ -1,23 +1,42 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Input, message, Button, Modal, DatePicker, Dropdown } from 'antd';
-import { DeleteOutlined, SearchOutlined, PlusOutlined, FileExcelOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import UserView from '../../Users/user-list/UserView';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import AddAnnouncement from './AddAnnouncement';
+import {
+  Card,
+  Table,
+  Menu,
+  Input,
+  message,
+  Button,
+  Modal,
+  DatePicker,
+  Dropdown,
+} from "antd";
+import {
+  DeleteOutlined,
+  SearchOutlined,
+  PlusOutlined,
+  FileExcelOutlined,
+  EyeOutlined,
+  MoreOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import UserView from "../../Users/user-list/UserView";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import AddAnnouncement from "./AddAnnouncement";
 import userData from "assets/data/user-list.data.json";
 import { utils, writeFile } from "xlsx";
-import { useDispatch, useSelector } from 'react-redux';
-import { DeleteAnn, GetAnn } from './AnnouncementReducer/AnnouncementSlice';
-import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import { DeleteAnn, GetAnn } from "./AnnouncementReducer/AnnouncementSlice";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const AnnouncementList = () => {
   const [users, setUsers] = useState(userData);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isAddAnnouncementModalVisible, setIsAddAnnouncementModalVisible] = useState(false);
-  const [searchText, setSearchText] = useState('');
+  const [isAddAnnouncementModalVisible, setIsAddAnnouncementModalVisible] =
+    useState(false);
+  const [searchText, setSearchText] = useState("");
   const [searchDate, setSearchDate] = useState(null);
 
   const navigate = useNavigate();
@@ -26,8 +45,6 @@ const AnnouncementList = () => {
   const tabledata = useSelector((state) => state.Announce);
 
   const dispatch = useDispatch();
-
-
 
   const openAddAnnouncementModal = () => {
     setIsAddAnnouncementModalVisible(true);
@@ -49,33 +66,38 @@ const AnnouncementList = () => {
   const getFilteredAnnouncements = () => {
     if (!users) return [];
 
-    return users.filter(announcement => {
-      const matchesText = !searchText ||
+    return users.filter((announcement) => {
+      const matchesText =
+        !searchText ||
         announcement.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-        stripHtmlTags(announcement.description)?.toLowerCase().includes(searchText.toLowerCase());
+        stripHtmlTags(announcement.description)
+          ?.toLowerCase()
+          .includes(searchText.toLowerCase());
 
-      const matchesDate = !searchDate ||
-        dayjs(announcement.date).format('YYYY-MM-DD') === searchDate.format('YYYY-MM-DD');
+      const matchesDate =
+        !searchDate ||
+        dayjs(announcement.date).format("YYYY-MM-DD") ===
+          searchDate.format("YYYY-MM-DD");
 
       return matchesText && matchesDate;
     });
   };
 
   const handleSearch = () => {
-    message.success('Search completed');
+    message.success("Search completed");
   };
 
   const deleteUser = (userId) => {
     dispatch(DeleteAnn(userId))
       .then(() => {
         dispatch(GetAnn());
-        setUsers(prevUsers => prevUsers.filter(item => item.id !== userId));
-        navigate('/app/hrm/announcement');
+        setUsers((prevUsers) => prevUsers.filter((item) => item.id !== userId));
+        navigate("/app/hrm/announcement");
       })
       .catch((error) => {
-        console.error('Edit API error:', error);
+        console.error("Edit API error:", error);
       });
-  }
+  };
 
   const closeUserProfile = () => {
     setUserProfileVisible(false);
@@ -97,123 +119,155 @@ const AnnouncementList = () => {
   };
 
   useEffect(() => {
-    dispatch(GetAnn())
+    dispatch(GetAnn());
   }, [dispatch]);
-
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
-  let allpermisson;
+  // Simplified permission extraction
+  const announcementPermissions =
+    parsedPermissions["extra-hrm-announcement"]?.[0]?.permissions || [];
 
-  if (parsedPermissions["extra-hrm-announcement"] && parsedPermissions["extra-hrm-announcement"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-announcement"][0].permissions;
-    console.log('Parsed Permissions:', allpermisson);
+  // Individual permission checks
+  const canView =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    announcementPermissions.includes("view");
+  const canCreate =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    announcementPermissions.includes("create");
+  const canUpdate =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    announcementPermissions.includes("update");
+  const canDelete =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    announcementPermissions.includes("delete");
 
-  } else {
-    console.log('extra-hrm-announcement is not available');
-  }
-
-  const canCreateClient = allpermisson?.includes('create');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
-
-
-
-  useEffect(() => {
-    if
-      (tabledata && tabledata.Announce && tabledata.Announce.data) {
-      const filteredData = tabledata.Announce.data.filter((item) => item.created_by === user);
-      setUsers(filteredData);
-    }
-  }, [tabledata, user]);
-
-  const stripHtmlTags = (html) => {
-    if (!html) return '';
-    const tmp = document.createElement('div');
-    tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
-  };
-
-  // Update the dropdownMenu function
+  // Update the dropdownMenu items
   const getDropdownItems = (elm) => [
-    {
-      key: 'view',
-      icon: <EyeOutlined />,
-      label: 'View Details',
-      onClick: () => {
-        // Add your view logic here
-        message.info('View Details clicked');
-      }
-    },
-    ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
-      key: 'delete',
-      icon: <DeleteOutlined />,
-      label: 'Delete',
-      onClick: () => deleteUser(elm.id),
-      danger: true
-    }] : [])
+    ...(canView
+      ? [
+          {
+            key: "view",
+            icon: <EyeOutlined />,
+            label: "View Details",
+            onClick: () => {
+              message.info("View Details clicked");
+            },
+          },
+        ]
+      : []),
+    ...(canUpdate
+      ? [
+          {
+            key: "edit",
+            icon: <EditOutlined />,
+            label: "Edit",
+            onClick: () => {
+              navigate(`/app/hrm/announcement/edit/${elm.id}`);
+            },
+          },
+        ]
+      : []),
+    ...(canDelete
+      ? [
+          {
+            key: "delete",
+            icon: <DeleteOutlined />,
+            label: "Delete",
+            onClick: () => deleteUser(elm.id),
+            danger: true,
+          },
+        ]
+      : []),
   ];
 
   const tableColumns = [
     {
-      title: 'Title',
-      dataIndex: 'title',
+      title: "Title",
+      dataIndex: "title",
       sorter: {
         compare: (a, b) => a.title.localeCompare(b.title),
       },
     },
     {
-      title: 'Description',
-      dataIndex: 'description',
+      title: "Description",
+      dataIndex: "description",
       render: (text) => stripHtmlTags(text),
       sorter: {
-        compare: (a, b) => stripHtmlTags(a.description).localeCompare(stripHtmlTags(b.description)),
+        compare: (a, b) =>
+          stripHtmlTags(a.description).localeCompare(
+            stripHtmlTags(b.description)
+          ),
       },
     },
     {
-      title: 'Date',
-      dataIndex: 'date',
-      render: (text) => dayjs(text).format('DD-MM-YYYY'),
+      title: "Date",
+      dataIndex: "date",
+      render: (text) => dayjs(text).format("DD-MM-YYYY"),
     },
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center" onClick={(e) => e.stopPropagation()}>
           <Dropdown
             overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
-      )
+      ),
     },
   ];
 
+  useEffect(() => {
+    if (tabledata && tabledata.Announce && tabledata.Announce.data) {
+      const filteredData = tabledata.Announce.data.filter(
+        (item) => item.created_by === user
+      );
+      setUsers(filteredData);
+    }
+  }, [tabledata, user]);
+
+  const stripHtmlTags = (html) => {
+    if (!html) return "";
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
+  };
+
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="search-container mr-md-3 mb-3 flex gap-3">
             {/* <Input.Group compact className="search-group"> */}
@@ -236,12 +290,16 @@ const AnnouncementList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-            <Button type="primary" className="ml-2" onClick={openAddAnnouncementModal}>
+          {canCreate && (
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddAnnouncementModal}
+            >
               <PlusOutlined />
               <span>New</span>
             </Button>
-          ) : null}
+          )}
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
@@ -253,7 +311,7 @@ const AnnouncementList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        {canView && (
           <Table
             columns={tableColumns}
             dataSource={getFilteredAnnouncements()}
@@ -262,12 +320,17 @@ const AnnouncementList = () => {
               total: getFilteredAnnouncements().length,
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
             }}
           />
-        ) : null}
+        )}
       </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+      <UserView
+        data={selectedUser}
+        visible={userProfileVisible}
+        close={closeUserProfile}
+      />
 
       <Modal
         title="Add Announncement"

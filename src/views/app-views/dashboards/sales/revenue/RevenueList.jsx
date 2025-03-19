@@ -40,10 +40,10 @@ const RevenueList = () => {
     useState(false);
 
   const [idd, setIdd] = useState("");
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [dateRange, setDateRange] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [categoryOptions, setCategoryOptions] = useState(['All']);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [categoryOptions, setCategoryOptions] = useState(["All"]);
 
   const dispatch = useDispatch();
   const customerData = useSelector((state) => state.customers);
@@ -65,8 +65,10 @@ const RevenueList = () => {
 
   useEffect(() => {
     if (fnddata && fnddata.length > 0) {
-      const uniqueCategories = [...new Set(fnddata.map(revenue => revenue.category))].filter(Boolean);
-      setCategoryOptions(['All', ...uniqueCategories]);
+      const uniqueCategories = [
+        ...new Set(fnddata.map((revenue) => revenue.category)),
+      ].filter(Boolean);
+      setCategoryOptions(["All", ...uniqueCategories]);
     }
   }, [fnddata]);
 
@@ -87,35 +89,32 @@ const RevenueList = () => {
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
-
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
   let allpermisson;
 
-  if (parsedPermissions["dashboards-sales-revenue"] && parsedPermissions["dashboards-sales-revenue"][0]?.permissions) {
+  if (
+    parsedPermissions["dashboards-sales-revenue"] &&
+    parsedPermissions["dashboards-sales-revenue"][0]?.permissions
+  ) {
     allpermisson = parsedPermissions["dashboards-sales-revenue"][0].permissions;
-    console.log('Parsed Permissions:', allpermisson);
-
+    console.log("Parsed Permissions:", allpermisson);
   } else {
-    console.log('dashboards-sales-revenue is not available');
+    console.log("dashboards-sales-revenue is not available");
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
-
-  ///endpermission
-
-
+  const canCreateRevenue = allpermisson?.includes("create");
+  const canUpdateRevenue = allpermisson?.includes("update");
+  const canDeleteRevenue = allpermisson?.includes("delete");
+  const canViewRevenue = allpermisson?.includes("view");
 
   const exportToExcel = () => {
     try {
@@ -146,22 +145,30 @@ const RevenueList = () => {
   const getDropdownItems = (row) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canUpdateRevenue && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editfun(row.id)
+        label: "Edit",
+        onClick: () => editfun(row.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canDeleteRevenue && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => dletefun(row.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -183,12 +190,16 @@ const RevenueList = () => {
       title: "Customer",
       dataIndex: "customer",
       render: (_, record) => {
-        const customerData = fnddataCustomers?.find(cust => cust.id === record.customer);
+        const customerData = fnddataCustomers?.find(
+          (cust) => cust.id === record.customer
+        );
         return <span>{customerData?.name || "Unknown Customer"}</span>;
       },
       sorter: (a, b) => {
-        const customerA = fnddataCustomers?.find(cust => cust.id === a.customer)?.name || '';
-        const customerB = fnddataCustomers?.find(cust => cust.id === b.customer)?.name || '';
+        const customerA =
+          fnddataCustomers?.find((cust) => cust.id === a.customer)?.name || "";
+        const customerB =
+          fnddataCustomers?.find((cust) => cust.id === b.customer)?.name || "";
         return customerA.localeCompare(customerB);
       },
     },
@@ -202,7 +213,7 @@ const RevenueList = () => {
       dataIndex: "date",
       render: (_, record) => (
         <span>
-          {record.date ? dayjs(record.date).format('DD-MM-YYYY') : ''}
+          {record.date ? dayjs(record.date).format("DD-MM-YYYY") : ""}
         </span>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "date"),
@@ -213,21 +224,21 @@ const RevenueList = () => {
       render: (description) => (
         <div
           dangerouslySetInnerHTML={{
-            __html: description || 'N/A'
+            __html: description || "N/A",
           }}
           style={{
-            maxWidth: '300px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
+            maxWidth: "300px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
           }}
         />
       ),
       sorter: (a, b) => {
-        const descA = a.description?.replace(/<[^>]+>/g, '') || '';
-        const descB = b.description?.replace(/<[^>]+>/g, '') || '';
+        const descA = a.description?.replace(/<[^>]+>/g, "") || "";
+        const descB = b.description?.replace(/<[^>]+>/g, "") || "";
         return descA.localeCompare(descB);
-      }
+      },
     },
     {
       title: "Action",
@@ -236,18 +247,18 @@ const RevenueList = () => {
         <div className="text-center">
           <Dropdown
             overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -260,29 +271,31 @@ const RevenueList = () => {
     let filtered = [...fnddata];
 
     if (text) {
-      filtered = filtered.filter(revenue => {
-        const customerName = fnddataCustomers?.find(cust =>
-          cust.id === revenue.customer
-        )?.name?.toLowerCase();
-        const plainDescription = revenue.description?.replace(/<[^>]+>/g, '').toLowerCase() || '';
+      filtered = filtered.filter((revenue) => {
+        const customerName = fnddataCustomers
+          ?.find((cust) => cust.id === revenue.customer)
+          ?.name?.toLowerCase();
+        const plainDescription =
+          revenue.description?.replace(/<[^>]+>/g, "").toLowerCase() || "";
 
-        return customerName?.includes(text.toLowerCase()) || plainDescription.includes(text.toLowerCase());
+        return (
+          customerName?.includes(text.toLowerCase()) ||
+          plainDescription.includes(text.toLowerCase())
+        );
       });
     }
 
     if (date) {
-      const selectedDate = dayjs(date).startOf('day');
-      filtered = filtered.filter(revenue => {
+      const selectedDate = dayjs(date).startOf("day");
+      filtered = filtered.filter((revenue) => {
         if (!revenue.date) return false;
-        const revenueDate = dayjs(revenue.date).startOf('day');
-        return revenueDate.isSame(selectedDate, 'day');
+        const revenueDate = dayjs(revenue.date).startOf("day");
+        return revenueDate.isSame(selectedDate, "day");
       });
     }
 
-    if (category !== 'All') {
-      filtered = filtered.filter(revenue =>
-        revenue.category === category
-      );
+    if (category !== "All") {
+      filtered = filtered.filter((revenue) => revenue.category === category);
     }
 
     setList(filtered);
@@ -310,18 +323,18 @@ const RevenueList = () => {
     let filtered = list;
 
     if (searchText) {
-      filtered = filtered.filter(revenue => {
-        const customerName = fnddataCustomers?.find(cust =>
-          cust.id === revenue.customer
-        )?.name?.toLowerCase();
+      filtered = filtered.filter((revenue) => {
+        const customerName = fnddataCustomers
+          ?.find((cust) => cust.id === revenue.customer)
+          ?.name?.toLowerCase();
 
         return customerName?.includes(searchText.toLowerCase());
       });
     }
 
-    if (selectedCategory !== 'All') {
-      filtered = filtered.filter(revenue =>
-        revenue.category === selectedCategory
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter(
+        (revenue) => revenue.category === selectedCategory
       );
     }
 
@@ -337,7 +350,10 @@ const RevenueList = () => {
           mobileFlex={false}
           className="flex flex-wrap gap-4"
         >
-          <Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
+          <Flex
+            className="flex flex-wrap gap-4 mb-4 md:mb-0"
+            mobileFlex={false}
+          >
             <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
               <Input
                 placeholder="Search by customer name..."
@@ -369,16 +385,18 @@ const RevenueList = () => {
               >
                 {categoryOptions.map((category) => (
                   <Option key={category} value={category}>
-                    {category === 'All' ? 'All Categories' : category}
+                    {category === "All" ? "All Categories" : category}
                   </Option>
                 ))}
               </Select>
             </div>
           </Flex>
           <Flex gap="7px" className="flex">
-
-
-            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            {whorole === "super-admin" ||
+            whorole === "client" ||
+            (canCreateRevenue &&
+              whorole !== "super-admin" &&
+              whorole !== "client") ? (
               <Button
                 type="primary"
                 className="ml-2"
@@ -389,11 +407,10 @@ const RevenueList = () => {
               </Button>
             ) : null}
 
-
             <Button
               type="primary"
               icon={<FileExcelOutlined />}
-              onClick={exportToExcel} // Call export function when the button is clicked
+              onClick={exportToExcel}
               block
             >
               Export All
@@ -401,8 +418,11 @@ const RevenueList = () => {
           </Flex>
         </Flex>
         <div className="table-responsive">
-
-          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {whorole === "super-admin" ||
+          whorole === "client" ||
+          (canViewRevenue &&
+            whorole !== "super-admin" &&
+            whorole !== "client") ? (
             <Table
               columns={tableColumns}
               dataSource={getFilteredRevenues()}
@@ -411,12 +431,11 @@ const RevenueList = () => {
                 total: getFilteredRevenues().length,
                 pageSize: 10,
                 showSizeChanger: true,
-                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} of ${total} items`,
               }}
             />
           ) : null}
-
-
         </div>
       </Card>
 
@@ -441,7 +460,6 @@ const RevenueList = () => {
       >
         <EditRevenue onClose={closeEditRevenueModal} idd={idd} />
       </Modal>
-
     </>
   );
 };

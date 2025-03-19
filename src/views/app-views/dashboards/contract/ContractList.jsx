@@ -51,10 +51,14 @@ const ContractList = () => {
 
   useEffect(() => {
     if (tabledata?.Contract?.data) {
-      const contractsWithNames = tabledata.Contract.data.map(contract => ({
+      const contractsWithNames = tabledata.Contract.data.map((contract) => ({
         ...contract,
-        client: clientData?.find(client => client.id === contract.client)?.username || contract.client,
-        project: projectData?.find(project => project.id === contract.project)?.project_name || contract.project
+        client:
+          clientData?.find((client) => client.id === contract.client)
+            ?.username || contract.client,
+        project:
+          projectData?.find((project) => project.id === contract.project)
+            ?.project_name || contract.project,
       }));
       setUsers(contractsWithNames);
     }
@@ -83,7 +87,7 @@ const ContractList = () => {
   const closeEditContractModal = () => {
     setIsEditContractModalVisible(false);
   };
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [dateRange, setDateRange] = useState(null);
 
   const onSearch = (e) => {
@@ -95,11 +99,13 @@ const ContractList = () => {
       return;
     }
 
-    const filtered = tabledata?.Contract?.data?.filter(contract =>
-      contract.contract_number?.toLowerCase().includes(value) ||
-      contract.phone?.toLowerCase().includes(value) ||
-      contract.country?.toLowerCase().includes(value)
-    ) || [];
+    const filtered =
+      tabledata?.Contract?.data?.filter(
+        (contract) =>
+          contract.contract_number?.toLowerCase().includes(value) ||
+          contract.phone?.toLowerCase().includes(value) ||
+          contract.country?.toLowerCase().includes(value)
+      ) || [];
 
     setUsers(filtered);
   };
@@ -110,25 +116,27 @@ const ContractList = () => {
     let filtered = users;
 
     if (searchText) {
-      filtered = filtered.filter(contract => {
-        const clientName = clientData?.find(client =>
-          client.id === contract.client
-        )?.username?.toLowerCase();
+      filtered = filtered.filter((contract) => {
+        const clientName = clientData
+          ?.find((client) => client.id === contract.client)
+          ?.username?.toLowerCase();
 
         return clientName?.includes(searchText.toLowerCase());
       });
     }
 
     if (dateRange && dateRange.length === 2) {
-      filtered = filtered.filter(contract => {
+      filtered = filtered.filter((contract) => {
         const contractStartDate = dayjs(contract.startDate);
         const contractEndDate = dayjs(contract.endDate);
         const filterStartDate = dayjs(dateRange[0]);
         const filterEndDate = dayjs(dateRange[1]);
 
         return (
-          (contractStartDate.isAfter(filterStartDate) || contractStartDate.isSame(filterStartDate)) &&
-          (contractEndDate.isBefore(filterEndDate) || contractEndDate.isSame(filterEndDate))
+          (contractStartDate.isAfter(filterStartDate) ||
+            contractStartDate.isSame(filterStartDate)) &&
+          (contractEndDate.isBefore(filterEndDate) ||
+            contractEndDate.isSame(filterEndDate))
         );
       });
     }
@@ -143,7 +151,6 @@ const ContractList = () => {
       await dispatch(ContaractData());
 
       setUsers(users.filter((item) => item.id !== userId));
-
     } catch (error) {
       console.error("Error deleting user:", error);
     }
@@ -155,8 +162,6 @@ const ContractList = () => {
   };
   const exportToExcel = () => {
     try {
-
-
       // Create a worksheet from the formatted data
       const ws = utils.json_to_sheet(users);
       const wb = utils.book_new(); // Create a new workbook
@@ -178,63 +183,58 @@ const ContractList = () => {
 
   //// permission
 
-
-
-
-
-
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
+  console.log("parsedPermissions", parsedPermissions);
 
+  let contractPermissions = [];
 
-  let allpermisson;
-
-  if (parsedPermissions["dashboards-project-Contract"] && parsedPermissions["dashboards-project-Contract"][0]?.permissions) {
-    allpermisson = parsedPermissions["dashboards-project-Contract"][0].permissions;
-    // console.log('Parsed Permissions:', allpermisson);
-
-  } else {
-    // console.log('dashboards-project-Contract is not available');
+  if (parsedPermissions["dashboards-project-Contract"]) {
+    const contractList = parsedPermissions["dashboards-project-Contract"][0];
+    if (contractList) {
+      contractPermissions = contractList.permissions;
+    }
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
-
-
-
+  const canCreateContract = contractPermissions.includes("create");
+  const canEditContract = contractPermissions.includes("update");
+  const canDeleteContract = contractPermissions.includes("delete");
+  const canViewContract = contractPermissions.includes("view");
 
   ///endpermission
 
   const getDropdownItems = (elm) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (whorole === "super-admin" || whorole === "client" || canEditContract) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => Editfun(elm.id)
+        label: "Edit",
+        onClick: () => Editfun(elm.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      canDeleteContract
+    ) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(elm.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -243,58 +243,68 @@ const ContractList = () => {
 
   const tableColumns = [
     {
-      title: 'Contract Number',
-      dataIndex: 'contract_number',
+      title: "Contract Number",
+      dataIndex: "contract_number",
 
-      sorter: (a, b) => a.contract_number.localeCompare(b.contract_number)
+      sorter: (a, b) => a.contract_number.localeCompare(b.contract_number),
     },
     {
       title: "Client",
       dataIndex: "client",
       render: (_, record) => (
         <span>
-          {clientData?.find(client => client.id === record.client)?.username || record.client}
+          {clientData?.find((client) => client.id === record.client)
+            ?.username || record.client}
         </span>
       ),
       sorter: {
         compare: (a, b) => {
-          const clientA = String(clientData?.find(client => client.id === a.client)?.username || a.client);
-          const clientB = String(clientData?.find(client => client.id === b.client)?.username || b.client);
+          const clientA = String(
+            clientData?.find((client) => client.id === a.client)?.username ||
+              a.client
+          );
+          const clientB = String(
+            clientData?.find((client) => client.id === b.client)?.username ||
+              b.client
+          );
           return clientA.localeCompare(clientB);
-        }
-      }
+        },
+      },
     },
     {
       title: "Project",
       dataIndex: "project",
       render: (_, record) => (
         <span>
-          {projectData?.find(project => project.id === record.project)?.project_name || record.project}
+          {projectData?.find((project) => project.id === record.project)
+            ?.project_name || record.project}
         </span>
       ),
       sorter: {
         compare: (a, b) => {
-          const projectA = String(projectData?.find(project => project.id === a.project)?.project_name || a.project);
-          const projectB = String(projectData?.find(project => project.id === b.project)?.project_name || b.project);
+          const projectA = String(
+            projectData?.find((project) => project.id === a.project)
+              ?.project_name || a.project
+          );
+          const projectB = String(
+            projectData?.find((project) => project.id === b.project)
+              ?.project_name || b.project
+          );
           return projectA.localeCompare(projectB);
-        }
-      }
+        },
+      },
     },
     {
-      title: 'Phone',
-      dataIndex: 'phone',
-      render: phone => (
-        <span>{phone || '-'}</span>
-      ),
-      sorter: (a, b) => (a.phone || '').localeCompare(b.phone || '')
+      title: "Phone",
+      dataIndex: "phone",
+      render: (phone) => <span>{phone || "-"}</span>,
+      sorter: (a, b) => (a.phone || "").localeCompare(b.phone || ""),
     },
     {
-      title: 'Country',
-      dataIndex: 'country',
-      render: country => (
-        <span>{country || '-'}</span>
-      ),
-      sorter: (a, b) => (a.country || '').localeCompare(b.country || '')
+      title: "Country",
+      dataIndex: "country",
+      render: (country) => <span>{country || "-"}</span>,
+      sorter: (a, b) => (a.country || "").localeCompare(b.country || ""),
     },
     {
       title: "Subject",
@@ -315,7 +325,7 @@ const ContractList = () => {
       dataIndex: "startDate",
       render: (_, record) => (
         <span>
-          {record.startDate ? dayjs(record.startDate).format('DD-MM-YYYY') : ''}
+          {record.startDate ? dayjs(record.startDate).format("DD-MM-YYYY") : ""}
         </span>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "startDate"),
@@ -325,7 +335,7 @@ const ContractList = () => {
       dataIndex: "endDate",
       render: (_, record) => (
         <span>
-          {record.endDate ? dayjs(record.endDate).format('DD-MM-YYYY') : ''}
+          {record.endDate ? dayjs(record.endDate).format("DD-MM-YYYY") : ""}
         </span>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "endDate"),
@@ -337,18 +347,18 @@ const ContractList = () => {
         <div className="text-center">
           <Dropdown
             overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -375,7 +385,7 @@ const ContractList = () => {
           </div>
           <div className="mr-md-3 mb-3">
             <RangePicker
-              placeholder={['Contract Start Date', 'Contract End Date']}
+              placeholder={["Contract Start Date", "Contract End Date"]}
               onChange={(dates) => setDateRange(dates)}
               format="DD-MM-YYYY"
               allowClear
@@ -384,8 +394,9 @@ const ContractList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {(whorole === "super-admin" ||
+            whorole === "client" ||
+            canCreateContract) && (
             <Button
               type="primary"
               className="ml-2"
@@ -394,12 +405,12 @@ const ContractList = () => {
               <PlusOutlined />
               <span>New</span>
             </Button>
-          ) : null}
+          )}
 
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
-            onClick={exportToExcel} // Call export function when the button is clicked
+            onClick={exportToExcel}
             block
           >
             Export All
@@ -408,8 +419,9 @@ const ContractList = () => {
       </Flex>
 
       <div className="table-responsive mt-2">
-
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        {(whorole === "super-admin" ||
+          whorole === "client" ||
+          canViewContract) && (
           <Table
             columns={tableColumns}
             dataSource={getFilteredContracts()}
@@ -418,10 +430,11 @@ const ContractList = () => {
               total: getFilteredContracts().length,
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
             }}
           />
-        ) : null}
+        )}
       </div>
       <UserView
         data={selectedUser}

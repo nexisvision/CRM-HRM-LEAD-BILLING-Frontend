@@ -187,6 +187,11 @@ const PaymentList = () => {
       sorter: (a, b) => utils.antdTableSorter(a, b, "paymentMethod"),
     },
     {
+      title: "Remark",
+      dataIndex: "remark",
+      render: (remark) => <span>{remark.replace(/<[^>]*>/g, '')}</span>,
+    },
+    {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (

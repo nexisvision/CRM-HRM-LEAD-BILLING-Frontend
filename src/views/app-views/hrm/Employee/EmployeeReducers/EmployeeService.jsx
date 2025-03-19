@@ -1,7 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
-
 const fetchEmpData = async () => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -42,14 +41,11 @@ const Empdelete = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
-    const res = await axios.delete(
-      `${env.API_ENDPOINT_URL}/employees/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const res = await axios.delete(`${env.API_ENDPOINT_URL}/employees/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     return res.data;
   } catch (error) {
@@ -77,15 +73,11 @@ const EditEmp = async (idd, updatedFormValues) => {
   }
 };
 
-
-
 const UserService = {
-
   fetchEmpData,
   createEmp,
   Empdelete,
   EditEmp,
-
 };
 
 export default UserService;

@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Input, message, Button, Modal, DatePicker, Dropdown } from "antd";
+import {
+  Card,
+  Table,
+  Input,
+  message,
+  Button,
+  Modal,
+  DatePicker,
+  Dropdown,
+} from "antd";
 import {
   DeleteOutlined,
   SearchOutlined,
@@ -32,9 +41,9 @@ const LeaveList = () => {
   const [isViewLeaveModalVisible, setIsViewLeaveModalVisible] = useState(false);
   const [isEditLeaveModalVisible, setIsEditLeaveModalVisible] = useState(false);
   const [editid, setEditid] = useState(null);
-  const [users, setUsers] = useState([]);  // Changed to empty array instead of userData
+  const [users, setUsers] = useState([]); // Changed to empty array instead of userData
   const dispatch = useDispatch();
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [dateRange, setDateRange] = useState(null);
   const tabledata = useSelector((state) => state.Leave);
   const openAddLeaveModal = () => {
@@ -64,21 +73,23 @@ const LeaveList = () => {
     let result = [...users];
 
     if (searchText) {
-      result = result.filter(leave =>
-        leave.leaveType?.toLowerCase().includes(searchText.toLowerCase()) ||
-        leave.reason?.toLowerCase().includes(searchText.toLowerCase()) ||
-        leave.status?.toLowerCase().includes(searchText.toLowerCase())
+      result = result.filter(
+        (leave) =>
+          leave.leaveType?.toLowerCase().includes(searchText.toLowerCase()) ||
+          leave.reason?.toLowerCase().includes(searchText.toLowerCase()) ||
+          leave.status?.toLowerCase().includes(searchText.toLowerCase())
       );
     }
     if (dateRange && dateRange[0] && dateRange[1]) {
-      const startDate = dayjs(dateRange[0]).startOf('day');
-      const endDate = dayjs(dateRange[1]).endOf('day');
+      const startDate = dayjs(dateRange[0]).startOf("day");
+      const endDate = dayjs(dateRange[1]).endOf("day");
 
-      result = result.filter(leave => {
+      result = result.filter((leave) => {
         const leaveStartDate = dayjs(leave.startDate);
         const leaveEndDate = dayjs(leave.endDate);
         return (
-          (leaveStartDate.isAfter(startDate) || leaveStartDate.isSame(startDate)) &&
+          (leaveStartDate.isAfter(startDate) ||
+            leaveStartDate.isSame(startDate)) &&
           (leaveEndDate.isBefore(endDate) || leaveEndDate.isSame(endDate))
         );
       });
@@ -87,30 +98,41 @@ const LeaveList = () => {
     return result;
   };
 
-
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
-  let allpermisson;
+  let allpermisson = [];
 
-  if (parsedPermissions["extra-hrm-leave-leavelist"] && parsedPermissions["extra-hrm-leave-leavelist"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-leave-leavelist"][0].permissions;
-
+  if (parsedPermissions["extra-hrm-leave-leavelist"]) {
+    allpermisson =
+      parsedPermissions["extra-hrm-leave-leavelist"][0]?.permissions || [];
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const canView =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    allpermisson.includes("view");
+  const canCreate =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    allpermisson.includes("create");
+  const canUpdate =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    allpermisson.includes("update");
+  const canDelete =
+    whorole === "super-admin" ||
+    whorole === "client" ||
+    allpermisson.includes("delete");
 
   ///endpermission
 
@@ -162,7 +184,6 @@ const LeaveList = () => {
     setEditid(id);
   };
 
-
   const functionleaveok = async (id, status) => {
     const token = localStorage.getItem("auth_token");
     try {
@@ -170,7 +191,8 @@ const LeaveList = () => {
         `${env.API_ENDPOINT_URL}/leaves/approve/${id}`,
         {
           status: status,
-          remarks: status === "approved" ? "Leave approved." : "Leave rejected."
+          remarks:
+            status === "approved" ? "Leave approved." : "Leave rejected.",
         },
         {
           headers: {
@@ -184,27 +206,27 @@ const LeaveList = () => {
       console.error("Error fetching data:", error);
       throw error;
     }
-  }
+  };
 
   const getDropdownItems = (row) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canUpdate) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editleave(row.id)
+        label: "Edit",
+        onClick: () => editleave(row.id),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (canDelete) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(row.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -215,11 +237,7 @@ const LeaveList = () => {
     {
       title: "created_by",
       dataIndex: "created_by",
-      render: (_, record) => (
-        <div className="d-flex">
-          {record.created_by}
-        </div>
-      ),
+      render: (_, record) => <div className="d-flex">{record.created_by}</div>,
       sorter: (a, b) =>
         a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
     },
@@ -233,24 +251,22 @@ const LeaveList = () => {
       dataIndex: "startDate",
       render: (_, record) => (
         <span>
-          {record.startDate ? dayjs(record.startDate).format('DD-MM-YYYY') : ''}
+          {record.startDate ? dayjs(record.startDate).format("DD-MM-YYYY") : ""}
         </span>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "startDate"),
-
     },
     {
       title: "End Date",
       dataIndex: "endDate",
       render: (_, record) => (
         <span>
-          {record.endDate ? dayjs(record.endDate).format('DD-MM-YYYY') : ''}
+          {record.endDate ? dayjs(record.endDate).format("DD-MM-YYYY") : ""}
         </span>
       ),
 
       sorter: (a, b) => utils.antdTableSorter(a, b, "endDate"),
     },
-
 
     {
       title: "Leave Reason",
@@ -264,33 +280,34 @@ const LeaveList = () => {
       render: (_, record) => {
         const handleApprove = () => {
           Modal.confirm({
-            title: 'Approve Leave',
-            content: 'Are you sure you want to approve this leave request?',
-            okText: 'Yes',
-            okType: 'primary',
-            cancelText: 'No',
+            title: "Approve Leave",
+            content: "Are you sure you want to approve this leave request?",
+            okText: "Yes",
+            okType: "primary",
+            cancelText: "No",
             onOk: async () => {
               await functionleaveok(record.id, "approved");
-              message.success('Leave approved successfully');
-            }
+              message.success("Leave approved successfully");
+            },
           });
         };
 
         const handleReject = () => {
           Modal.confirm({
-            title: 'Reject Leave',
-            content: 'Are you sure you want to reject this leave request?',
-            okText: 'Yes',
-            okType: 'danger',
-            cancelText: 'No',
+            title: "Reject Leave",
+            content: "Are you sure you want to reject this leave request?",
+            okText: "Yes",
+            okType: "danger",
+            cancelText: "No",
             onOk: async () => {
               await functionleaveok(record.id, "rejected");
-              message.error('Leave rejected');
-            }
+              message.error("Leave rejected");
+            },
           });
         };
 
-        const isActionTaken = record.status === "approved" || record.status === "rejected";
+        const isActionTaken =
+          record.status === "approved" || record.status === "rejected";
 
         return (
           <Flex gap="8px" justifyContent="center">
@@ -310,11 +327,11 @@ const LeaveList = () => {
               size="small"
               onClick={handleReject}
               title="Reject"
-              disabled={isActionTaken} // Disable if action is taken
+              disabled={isActionTaken}
             />
           </Flex>
         );
-      }
+      },
     },
     {
       title: "Action",
@@ -323,18 +340,18 @@ const LeaveList = () => {
         <div className="text-center">
           <Dropdown
             menu={{ items: getDropdownItems(elm) }}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -371,27 +388,23 @@ const LeaveList = () => {
               onChange={handleDateRangeChange}
               value={dateRange}
               format="DD-MM-YYYY"
-              placeholder={['Start Date', 'End Date']}
+              placeholder={["Start Date", "End Date"]}
               allowClear
-              style={{ width: '280px' }}
-
+              style={{ width: "280px" }}
             />
           </div>
         </Flex>
         <Flex gap="7px">
-
-
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {canCreate && (
             <Button type="primary" className="ml-2" onClick={openAddLeaveModal}>
               <PlusOutlined />
               <span>New</span>
             </Button>
-
-          ) : null}
+          )}
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
-            onClick={exportToExcel} // Call export function when the button is clicked
+            onClick={exportToExcel}
             block
           >
             Export All
@@ -399,8 +412,7 @@ const LeaveList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        {canView && (
           <Table
             columns={tableColumns}
             dataSource={getFilteredLeaves()}
@@ -409,12 +421,11 @@ const LeaveList = () => {
               total: getFilteredLeaves().length,
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
             }}
           />
-        ) : null}
-
-
+        )}
       </div>
       <UserView
         data={selectedUser}

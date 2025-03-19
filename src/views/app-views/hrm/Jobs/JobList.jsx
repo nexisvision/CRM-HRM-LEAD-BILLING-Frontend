@@ -40,13 +40,16 @@ const JobList = () => {
   const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false);
   const [isEditJobModalVisible, setIsEditJobModalVisible] = useState(false);
   const [idd, setIdd] = useState("");
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [dateRange, setDateRange] = useState([null, null]);
-  const [selectedStatus, setSelectedStatus] = useState('All');
-  const [uniqueStatuses, setUniqueStatuses] = useState(['All']);
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [uniqueStatuses, setUniqueStatuses] = useState(["All"]);
   const user = useSelector((state) => state.user.loggedInUser.username);
   const allempdata = useSelector((state) => state.Jobs);
-  const filtermin = React.useMemo(() => allempdata.Jobs.data || [], [allempdata.Jobs.data]);
+  const filtermin = React.useMemo(
+    () => allempdata.Jobs.data || [],
+    [allempdata.Jobs.data]
+  );
   const filteredData = filtermin.filter((item) => item.created_by === user);
   const openAddJobModal = () => {
     setIsAddJobModalVisible(true);
@@ -56,7 +59,6 @@ const JobList = () => {
   const closeAddJobModal = () => {
     setIsAddJobModalVisible(false);
   };
-
 
   const openEditJobModal = () => {
     setIsEditJobModalVisible(true);
@@ -77,32 +79,40 @@ const JobList = () => {
     let filtered = [...filteredData];
 
     if (searchText) {
-      filtered = filtered.filter(job => {
+      filtered = filtered.filter((job) => {
         return (
           job.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-          job.job_type?.toLowerCase().includes(searchText.toLowerCase()) ||
+          job.category?.toLowerCase().includes(searchText.toLowerCase()) ||
+          job.jobType?.toLowerCase().includes(searchText.toLowerCase()) ||
+          job.recruiter?.toLowerCase().includes(searchText.toLowerCase()) ||
+          job.workExperience
+            ?.toLowerCase()
+            .includes(searchText.toLowerCase()) ||
           job.location?.toLowerCase().includes(searchText.toLowerCase())
         );
       });
     }
 
-    if (selectedStatus && selectedStatus !== 'All') {
-      filtered = filtered.filter(job => job.status === selectedStatus.toLowerCase());
+    if (selectedStatus && selectedStatus !== "All") {
+      filtered = filtered.filter(
+        (job) => job.status === selectedStatus.toLowerCase()
+      );
     }
 
     if (dateRange && dateRange[0] && dateRange[1]) {
-      const startDate = dayjs(dateRange[0]).startOf('day');
-      const endDate = dayjs(dateRange[1]).endOf('day');
+      const startDate = dayjs(dateRange[0]).startOf("day");
+      const endDate = dayjs(dateRange[1]).endOf("day");
 
-      filtered = filtered.filter(job => {
+      filtered = filtered.filter((job) => {
         if (!job.startDate || !job.endDate) return false;
 
         const jobStartDate = dayjs(job.startDate);
         const jobEndDate = dayjs(job.endDate);
 
         return (
-          (jobStartDate.isSame(startDate, 'day') || jobStartDate.isAfter(startDate)) &&
-          (jobEndDate.isSame(endDate, 'day') || jobEndDate.isBefore(endDate))
+          (jobStartDate.isSame(startDate, "day") ||
+            jobStartDate.isAfter(startDate)) &&
+          (jobEndDate.isSame(endDate, "day") || jobEndDate.isBefore(endDate))
         );
       });
     }
@@ -111,7 +121,7 @@ const JobList = () => {
   };
 
   const handleSearch = () => {
-    message.success('Search completed');
+    message.success("Search completed");
   };
 
   const deleteUser = (userId) => {
@@ -134,35 +144,62 @@ const JobList = () => {
     }
   };
 
-
-  //// permission
-
+  //// permission handling
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
+  const whorole = roleData?.role_name;
 
-  const whorole = roleData.role_name;
-
-  const parsedPermissions = Array.isArray(roleData?.permissions)
-    ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
+  // Parse permissions
+  const parsedPermissions =
+    typeof roleData?.permissions === "string"
       ? JSON.parse(roleData.permissions)
-      : [];
+      : roleData?.permissions || {};
 
-  let allpermisson;
+  // Get job list specific permissions
+  const jobListPermissions =
+    parsedPermissions["extra-hrm-jobs-joblist"]?.[0]?.permissions || [];
 
-  if (parsedPermissions["extra-hrm-jobs-joblist"] && parsedPermissions["extra-hrm-jobs-joblist"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-jobs-joblist"][0].permissions;
-    // console.log('Parsed Permissions:', allpermisson);
+  // Individual permission checks
+  const canView = jobListPermissions.includes("view");
+  const canCreate = jobListPermissions.includes("create");
+  const canUpdate = jobListPermissions.includes("update");
+  const canDelete = jobListPermissions.includes("delete");
 
-  } else {
-    // console.log('extra-hrm-jobs-joblist is not available');
-  }
+  // Helper function to check if user has permission
+  const hasPermission = (permission) => {
+    return (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      jobListPermissions.includes(permission)
+    );
+  };
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const getDropdownItems = (elm) => {
+    const items = [];
+
+    if (hasPermission("update")) {
+      items.push({
+        key: "edit",
+        icon: <EditOutlined />,
+        label: "Edit",
+        onClick: () => editFunc(elm.id),
+      });
+    }
+
+    if (hasPermission("delete")) {
+      items.push({
+        key: "delete",
+        icon: <DeleteOutlined />,
+        label: "Delete",
+        onClick: () => deleteUser(elm.id),
+        danger: true,
+      });
+    }
+
+    return items;
+  };
+
   // Close user profile
   const closeUserProfile = () => {
     setSelectedUser(null);
@@ -185,7 +222,10 @@ const JobList = () => {
   useEffect(() => {
     if (filtermin) {
       setList(filteredData);
-      const statuses = ['All', ...new Set(filteredData.map(job => job.status).filter(Boolean))];
+      const statuses = [
+        "All",
+        ...new Set(filteredData.map((job) => job.status).filter(Boolean)),
+      ];
       setUniqueStatuses(statuses);
     }
   }, [filtermin, filteredData]);
@@ -195,37 +235,52 @@ const JobList = () => {
     setIdd(idd);
   };
 
-  const getDropdownItems = (elm) => {
-    const items = [];
-
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
-      items.push({
-        key: 'edit',
-        icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => editFunc(elm.id)
-      });
-    }
-
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
-      items.push({
-        key: 'delete',
-        icon: <DeleteOutlined />,
-        label: 'Delete',
-        onClick: () => deleteUser(elm.id),
-        danger: true
-      });
-    }
-
-    return items;
-  };
-
   const tableColumns = [
     {
       title: "Title",
       dataIndex: "title",
       sorter: {
-        compare: (a, b) => a.title.length - b.title.length,
+        compare: (a, b) => a.title.localeCompare(b.title),
+      },
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      sorter: {
+        compare: (a, b) => a.category.localeCompare(b.category),
+      },
+    },
+    {
+      title: "Interview Rounds",
+      dataIndex: "interviewRounds",
+      render: (rounds) => {
+        try {
+          const parsedRounds = JSON.parse(rounds);
+          return parsedRounds.InterviewRounds?.join(", ") || "N/A";
+        } catch (e) {
+          return "N/A";
+        }
+      },
+    },
+    {
+      title: "Job Type",
+      dataIndex: "jobType",
+      sorter: {
+        compare: (a, b) => a.jobType.localeCompare(b.jobType),
+      },
+    },
+    {
+      title: "Recruiter",
+      dataIndex: "recruiter",
+      sorter: {
+        compare: (a, b) => a.recruiter.localeCompare(b.recruiter),
+      },
+    },
+    {
+      title: "Work Experience",
+      dataIndex: "workExperience",
+      sorter: {
+        compare: (a, b) => a.workExperience.localeCompare(b.workExperience),
       },
     },
     {
@@ -233,25 +288,29 @@ const JobList = () => {
       dataIndex: "startDate",
       render: (_, record) => (
         <span>
-          {record.startDate ? dayjs(record.startDate).format('DD-MM-YYYY') : ''}
+          {record.startDate ? dayjs(record.startDate).format("DD-MM-YYYY") : ""}
         </span>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "startDate"),
     },
-
     {
       title: "End Date",
       dataIndex: "endDate",
       render: (_, record) => (
-
         <span>
-          {record.endDate ? dayjs(record.endDate).format('DD-MM-YYYY') : ''}
+          {record.endDate ? dayjs(record.endDate).format("DD-MM-YYYY") : ""}
         </span>
-
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "endDate"),
     },
-
+    {
+      title: "Expected Salary",
+      dataIndex: "expectedSalary",
+      render: (salary, record) => <span>{salary ? `${salary}` : "N/A"}</span>,
+      sorter: {
+        compare: (a, b) => a.expectedSalary - b.expectedSalary,
+      },
+    },
     {
       title: "Status",
       dataIndex: "status",
@@ -262,7 +321,6 @@ const JobList = () => {
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
     },
-
     {
       title: "Action",
       dataIndex: "actions",
@@ -270,18 +328,18 @@ const JobList = () => {
         <div className="text-center">
           <Dropdown
             overlay={<Menu items={getDropdownItems(elm)} />}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -300,7 +358,6 @@ const JobList = () => {
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
-
       <Flex
         alignItems="center"
         justifyContent="space-between"
@@ -324,7 +381,7 @@ const JobList = () => {
               value={dateRange}
               onChange={handleDateRangeChange}
               format="DD-MM-YYYY"
-              placeholder={['Start Date', 'End Date']}
+              placeholder={["Start Date", "End Date"]}
               className="w-100"
               allowClear={true}
             />
@@ -345,22 +402,17 @@ const JobList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-
-
-
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {hasPermission("create") && (
             <Button type="primary" className="ml-2" onClick={openAddJobModal}>
               <PlusOutlined />
               <span>New</span>
             </Button>
-
-          ) : null}
-
+          )}
 
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
-            onClick={exportToExcel} // Call export function when the button is clicked
+            onClick={exportToExcel}
             block
           >
             Export All
@@ -368,8 +420,7 @@ const JobList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        {hasPermission("view") && (
           <Table
             columns={tableColumns}
             dataSource={getFilteredJobs()}
@@ -378,12 +429,11 @@ const JobList = () => {
               total: getFilteredJobs().length,
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
             }}
           />
-        ) : null}
-
-
+        )}
       </div>
       <UserView
         data={selectedUser}
@@ -398,7 +448,7 @@ const JobList = () => {
         footer={null}
         width={1000}
         className="mt-[-70px]"
-      // height={1000}
+        // height={1000}
       >
         <AddJob onClose={closeAddJobModal} />
       </Modal>
@@ -410,7 +460,7 @@ const JobList = () => {
         footer={null}
         width={1000}
         className="mt-[-70px]"
-      // height={1000}
+        // height={1000}
       >
         <EditJob onClose={closeEditJobModal} idd={idd} />
       </Modal>

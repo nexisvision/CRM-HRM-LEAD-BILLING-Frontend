@@ -153,14 +153,15 @@ const AddLeave = ({ onClose }) => {
                   </label>
                   <Field name="startDate">
                     {({ field }) => (
-                      <DatePicker
+                      <Input
                         {...field}
                         id="startDate"
+                        type="date"
                         className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                        format="DD-MM-YYYY"
-                        onChange={(date) => {
+                        onChange={(e) => {
+                          const date = e.target.value;
                           setFieldValue("startDate", date);
-                          if (values.endDate && date && values.endDate.isBefore(date)) {
+                          if (values.endDate && date && new Date(values.endDate) < new Date(date)) {
                             setFieldValue("endDate", null);
                           }
                         }}
@@ -185,15 +186,16 @@ const AddLeave = ({ onClose }) => {
                   </label>
                   <Field name="endDate">
                     {({ field }) => (
-                      <DatePicker
+                      <Input
                         {...field}
                         id="endDate"
+                        type="date"
                         className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                        format="DD-MM-YYYY"
-                        onChange={(date) => setFieldValue("endDate", date)}
-                        disabledDate={(current) => {
-                          return values.startDate ? current && current < values.startDate.startOf('day') : false;
+                        onChange={(e) => {
+                          const date = e.target.value;
+                          setFieldValue("endDate", date);
                         }}
+                        min={values.startDate} // Disable dates before start date
                       />
                     )}
                   </Field>

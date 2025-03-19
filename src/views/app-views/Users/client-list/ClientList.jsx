@@ -48,7 +48,8 @@ const ClientList = () => {
     useState(false);
   const [isUpgradePlanModalVisible, setIsUpgradePlanModalVisible] =
     useState(false);
-  const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
+  const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] =
+    useState(false);
   const [comnyid, setCompnyid] = useState("");
   const [clientid, setClientId] = useState("");
 
@@ -62,38 +63,37 @@ const ClientList = () => {
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
-  const roleData = roles?.find(role => role.id === roleId);
+  const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
-    : typeof roleData?.permissions === 'string'
-      ? JSON.parse(roleData.permissions)
-      : [];
-
+    : typeof roleData?.permissions === "string"
+    ? JSON.parse(roleData.permissions)
+    : [];
 
   let allpermisson;
 
-  if (parsedPermissions["extra-users-client-list"] && parsedPermissions["extra-users-client-list"][0]?.permissions) {
+  if (
+    parsedPermissions["extra-users-client-list"] &&
+    parsedPermissions["extra-users-client-list"][0]?.permissions
+  ) {
     allpermisson = parsedPermissions["extra-users-client-list"][0].permissions;
-
   } else {
   }
 
-  const canCreateClient = allpermisson?.includes('create');
-  const canEditClient = allpermisson?.includes('edit');
-  const canDeleteClient = allpermisson?.includes('delete');
-  const canViewClient = allpermisson?.includes('view');
+  const canCreateClient = allpermisson?.includes("create");
+  const canEditClient = allpermisson?.includes("edit");
+  const canDeleteClient = allpermisson?.includes("delete");
+  const canViewClient = allpermisson?.includes("view");
 
   ///endpermission
 
   const deleteUser = (userId) => {
-
     dispatch(deleteClient(userId));
     setUsers(users.filter((user) => user.id !== userId));
     dispatch(ClientData());
-    message.success({ content: `Deleted client successfully`, duration: 2 });
   };
 
   const getCompanyStatus = (status) => {
@@ -115,17 +115,18 @@ const ClientList = () => {
   const alldata = useSelector((state) => state.SubClient.SubClient.data);
 
   useEffect(() => {
-    setClientId(state?.idd)
-  }, [state?.idd])
+    setClientId(state?.idd);
+  }, [state?.idd]);
 
-  const matchingClients = alldata?.filter(client => client?.created_by === clientid);
-
+  const matchingClients = alldata?.filter(
+    (client) => client?.created_by === clientid
+  );
 
   useEffect(() => {
     if (loggedInUser.username === "superadmin" && !state) {
       setUsers(tabledata.ClientData.data);
     } else if (state && matchingClients) {
-      setUsers(matchingClients)
+      setUsers(matchingClients);
     } else {
       if (tabledata && tabledata.ClientData && tabledata.ClientData.data) {
         const filteredUsers = tabledata.ClientData.data.filter(
@@ -135,8 +136,6 @@ const ClientList = () => {
       }
     }
   }, [tabledata, loggedInUser.username, state, matchingClients]);
-
-
 
   const companyStatusList = ["active", "blocked"];
 
@@ -167,7 +166,7 @@ const ClientList = () => {
 
     // Then apply the search filter on the already filtered data
     if (searchValue) {
-      const filteredData = baseData.filter(user =>
+      const filteredData = baseData.filter((user) =>
         user.username.toLowerCase().includes(searchValue)
       );
       setUsers(filteredData);
@@ -198,7 +197,6 @@ const ClientList = () => {
   };
 
   const openEditCompanyModal = (userId) => {
-
     setCompnyid(userId);
     setIsEditCompanyModalVisible(true);
   };
@@ -207,11 +205,9 @@ const ClientList = () => {
     setIsEditCompanyModalVisible(false);
   };
 
-
   const closeViewCompanyModal = () => {
     setIsViewCompanyModalVisible(false);
   };
-
 
   const closeResetPasswordModal = () => {
     setIsResetPasswordModalVisible(false);
@@ -234,41 +230,53 @@ const ClientList = () => {
   const getDropdownItems = (record) => {
     const items = [];
 
-    if (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canViewClient && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'view',
+        key: "view",
         icon: <EyeOutlined />,
-        label: 'View Details',
-        onClick: () => showUserProfile(record)
+        label: "View Details",
+        onClick: () => showUserProfile(record),
       });
     }
 
-    if (whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canEditClient && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'edit',
+        key: "edit",
         icon: <EditOutlined />,
-        label: 'Edit',
-        onClick: () => openEditCompanyModal(record.id)
+        label: "Edit",
+        onClick: () => openEditCompanyModal(record.id),
       });
     }
 
     items.push({
-      key: 'email',
+      key: "email",
       icon: <MdOutlineEmail />,
-      label: 'Update Email',
+      label: "Update Email",
       onClick: () => {
         setIsEmailVerificationModalVisible(true);
         setCompnyid(record.id);
-      }
+      },
     });
 
-    if (whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) {
+    if (
+      whorole === "super-admin" ||
+      whorole === "client" ||
+      (canDeleteClient && whorole !== "super-admin" && whorole !== "client")
+    ) {
       items.push({
-        key: 'delete',
+        key: "delete",
         icon: <DeleteOutlined />,
-        label: 'Delete',
+        label: "Delete",
         onClick: () => deleteUser(record.id),
-        danger: true
+        danger: true,
       });
     }
 
@@ -293,16 +301,16 @@ const ClientList = () => {
                 size={40}
                 className="bg-indigo-600 border-2 border-white shadow-md flex items-center justify-center"
               >
-                {record.username?.[0]?.toUpperCase() || 'U'}
+                {record.username?.[0]?.toUpperCase() || "U"}
               </Avatar>
             )}
           </div>
           <div>
             <div className="font-medium text-gray-900">
-              {record.username || 'N/A'}
-            </div>     
+              {record.username || "N/A"}
+            </div>
             <div className="text-gray-500 text-sm">
-              {record.email || 'No email'}
+              {record.email || "No email"}
             </div>
           </div>
         </div>
@@ -312,19 +320,22 @@ const ClientList = () => {
       title: "Created By",
       dataIndex: "created_by",
       render: (created_by) => (
-        <Tag color="purple" className="text-sm px-3 py-1 rounded-full font-medium">
-          {created_by || 'N/A'}
+        <Tag
+          color="purple"
+          className="text-sm px-3 py-1 rounded-full font-medium"
+        >
+          {created_by || "N/A"}
         </Tag>
       ),
-      sorter: (a, b) => (a.created_by || '').localeCompare(b.created_by || ''),
+      sorter: (a, b) => (a.created_by || "").localeCompare(b.created_by || ""),
     },
-   
+
     {
       title: "Created",
       dataIndex: "createdAt",
       render: (date) => (
         <div className="text-gray-600">
-          {date ? dayjs(date).format('DD MMM YYYY') : 'N/A'}
+          {date ? dayjs(date).format("DD MMM YYYY") : "N/A"}
         </div>
       ),
       sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
@@ -336,18 +347,18 @@ const ClientList = () => {
         <div className="text-center">
           <Dropdown
             menu={{ items: getDropdownItems(record) }}
-            trigger={['click']}
+            trigger={["click"]}
             placement="bottomRight"
           >
             <Button
               type="text"
               className="border-0 shadow-sm flex items-center justify-center w-8 h-8 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
               style={{
-                borderRadius: '10px',
-                padding: 0
+                borderRadius: "10px",
+                padding: 0,
               }}
             >
-              <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+              <MoreOutlined style={{ fontSize: "18px", color: "#1890ff" }} />
             </Button>
           </Dropdown>
         </div>
@@ -371,7 +382,7 @@ const ClientList = () => {
                 onChange={(e) => onSearch(e)}
                 allowClear
                 className="min-w-[250px] hover:border-indigo-400 focus:border-indigo-500"
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: "8px" }}
               />
             </div>
             <div className="mb-3">
@@ -380,7 +391,7 @@ const ClientList = () => {
                 className="min-w-[180px]"
                 onChange={handleShowStatus}
                 placeholder="Status"
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: "8px" }}
               >
                 <Select.Option value="All">All Status</Select.Option>
                 {companyStatusList.map((elm) => (
@@ -392,7 +403,11 @@ const ClientList = () => {
             </div>
           </Flex>
           <Flex gap="7px">
-            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) && (
+            {(whorole === "super-admin" ||
+              whorole === "client" ||
+              (canCreateClient &&
+                whorole !== "super-admin" &&
+                whorole !== "client")) && (
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
@@ -414,14 +429,18 @@ const ClientList = () => {
         </Flex>
       </div>
       <div className="overflow-hidden">
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
+        {(whorole === "super-admin" ||
+          whorole === "client" ||
+          (canViewClient &&
+            whorole !== "super-admin" &&
+            whorole !== "client")) && (
           <Table
             columns={tableColumns}
             dataSource={users}
             rowKey="id"
             className="ant-table-striped"
             rowClassName={(record, index) =>
-              index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+              index % 2 === 0 ? "bg-gray-50" : "bg-white"
             }
           />
         )}
@@ -477,12 +496,11 @@ const ClientList = () => {
         onCancel={closeUpgradePlanModal}
         footer={null}
         width={1000}
-      >
-      </Modal>
+      ></Modal>
       <EmailVerification
         visible={isEmailVerificationModalVisible}
         onCancel={() => setIsEmailVerificationModalVisible(false)}
-        initialEmail={users.find(user => user.id === comnyid)?.email}
+        initialEmail={users.find((user) => user.id === comnyid)?.email}
       />
     </Card>
   );

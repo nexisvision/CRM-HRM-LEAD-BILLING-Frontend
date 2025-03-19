@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Input,
   Button,
@@ -6,7 +6,6 @@ import {
   Row,
   Col,
   Upload,
-  message,
 } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import { useFormik } from 'formik';
@@ -19,29 +18,15 @@ const { Option } = Select;
 const EditCompany = ({ comnyid, onClose }) => {
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries.countries);
-  const [fileList, setFileList] = useState([]);
-  const [existingProfilePic, setExistingProfilePic] = useState(null);
 
   useEffect(() => {
     dispatch(ClientData());
     dispatch(getallcountries());
-  }, [dispatch]);
+  }, []);
 
   const alldatas = useSelector((state) => state.ClientData.ClientData.data);
 
   const loggedInUser = alldatas?.find((item) => item?.id === comnyid);
-
-  useEffect(() => {
-    if (loggedInUser?.profilePic) {
-      setExistingProfilePic(loggedInUser.profilePic);
-      setFileList([{
-        uid: '-1',
-        name: 'Profile Picture',
-        status: 'done',
-        url: loggedInUser.profilePic,
-      }]);
-    }
-  }, [loggedInUser]);
 
   const formik = useFormik({
     initialValues: {
@@ -62,44 +47,20 @@ const EditCompany = ({ comnyid, onClose }) => {
       ifsc: '',
       banklocation: '',
       accounttype: '',
+      profilePic: null,
     },
     enableReinitialize: true,
     onSubmit: values => {
       const formData = new FormData();
-
-      // Add all form values except profilePic
       Object.keys(values).forEach(key => {
         formData.append(key, values[key]);
       });
 
-      // Handle profile picture
-      if (fileList.length > 0) {
-        if (fileList[0].originFileObj) {
-          // New file uploaded
-          formData.append('profilePic', fileList[0].originFileObj);
-        } else if (fileList[0].url) {
-          // Using existing profile picture
-          formData.append('profilePic', existingProfilePic);
-        }
-      } else if (existingProfilePic) {
-        // No new file, but have existing picture
-        formData.append('profilePic', existingProfilePic);
-      }
-
       dispatch(Editclients({ comnyid, formData }))
-        .then((response) => {
-          if (response.payload?.success || response.payload?.status === 200) {
-            message.success('Company updated successfully');
-            dispatch(ClientData());
-            onClose();
-          } else {
-            message.error(response.payload?.message || 'Failed to update company');
-          }
+        .then(() => {
+          dispatch(ClientData());
+          onClose()
         })
-        .catch((error) => {
-          console.error('Update error:', error);
-          message.error('Failed to update company');
-        });
     },
   });
 
@@ -123,58 +84,18 @@ const EditCompany = ({ comnyid, onClose }) => {
         ifsc: loggedInUser.ifsc || '',
         banklocation: loggedInUser.banklocation || '',
         accounttype: loggedInUser.accounttype || '',
+        profilePic: loggedInUser.profilePic || null,
       };
 
       if (JSON.stringify(newValues) !== JSON.stringify(formik.values)) {
         formik.setValues(newValues);
       }
     }
-  }, [loggedInUser, formik]);
-
-  const uploadProps = {
-    beforeUpload: file => {
-      const isValid = ['image/jpeg', 'image/png', 'image/webp'].includes(file.type);
-      const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (!isValid) {
-        message.error('Please upload JPG/PNG/WEBP file');
-        return false;
-      }
-
-      if (!isLt2M) {
-        message.error('Image must be smaller than 2MB');
-        return false;
-      }
-
-      setFileList([{
-        originFileObj: file,
-        uid: '-1',
-        name: file.name,
-        status: 'done',
-        url: URL.createObjectURL(file)
-      }]);
-      return false;
-    },
-    onRemove: () => {
-      if (existingProfilePic) {
-        // If removing uploaded file, revert to existing profile pic
-        setFileList([{
-          uid: '-1',
-          name: 'Profile Picture',
-          status: 'done',
-          url: existingProfilePic
-        }]);
-      } else {
-        setFileList([]);
-      }
-      return true;
-    },
-    fileList
-  };
+  }, [loggedInUser]);
 
   return (
     <div className="edit-company-modal">
-      <div className="mb-3 border-b pb-1 font-medium"></div>
+       <h2 className="mb-3 border-b pb-1 font-medium"></h2>
       <div className="modal-body">
         <form onSubmit={formik.handleSubmit}>
           {/* Personal Information Section */}
@@ -534,10 +455,13 @@ const EditCompany = ({ comnyid, onClose }) => {
                     Profile Picture
                   </label>
                   <Upload
-                    {...uploadProps}
                     accept="image/*"
                     showUploadList={true}
                     className="mt-1"
+                    beforeUpload={file => {
+                      formik.setFieldValue('profilePic', file);
+                      return false; // Prevent automatic upload
+                    }}
                   >
                     <Button icon={<UploadOutlined />} className="mt-1">
                       Upload Profile Picture

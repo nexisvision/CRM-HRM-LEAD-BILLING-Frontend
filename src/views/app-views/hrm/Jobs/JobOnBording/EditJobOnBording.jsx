@@ -7,6 +7,7 @@ import { editJobonBoardingss, getJobonBoarding } from "./JobOnBoardingReducer/jo
 import { useDispatch, useSelector } from "react-redux";
 import { AddLable, GetLable } from "../../../dashboards/sales/LableReducer/LableSlice";
 import moment from "moment/moment";
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 
@@ -200,15 +201,21 @@ const EditJobOnBording = ({ idd, onClose }) => {
               <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Joining Date <span className="text-red-500">*</span></label>
-                  <DatePicker
-                    className="w-full mt-1"
-                    format="DD-MM-YYYY"
-                    value={values.joiningDate}
-                    onChange={(joiningDate) =>
-                      setFieldValue("joiningDate", joiningDate)
-                    }
-                    onBlur={() => setFieldTouched("joiningDate", true)}
-                  />
+                  <Field name="joiningDate">
+                    {({ field }) => (
+                      <input
+                        type="date"
+                        {...field}
+                        className="w-full mt-1 p-2 border rounded"
+                        value={values.joiningDate ? values.joiningDate.format('YYYY-MM-DD') : ''}
+                        onChange={(e) => {
+                          const date = dayjs(e.target.value);
+                          setFieldValue('joiningDate', date);
+                        }}
+                        onBlur={() => setFieldTouched("joiningDate", true)}
+                      />
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="joiningDate"
                     component="div"

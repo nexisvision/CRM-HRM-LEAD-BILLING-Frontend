@@ -316,13 +316,24 @@ const EditJob = ({ idd, onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
-                  <DatePicker
-                    className="w-full mt-1"
-                    format="DD-MM-YYYY"
-                    value={values.startDate}
-                    onChange={(date) => setFieldValue("startDate", date)}
-                    onBlur={() => setFieldTouched("startDate", true)}
-                  />
+                  <Field name="startDate">
+                    {({ field }) => (
+                      <input
+                        type="date"
+                        {...field}
+                        className="w-full mt-1 p-2 border rounded"
+                        value={values.startDate ? values.startDate.format('YYYY-MM-DD') : ''}
+                        onChange={(e) => {
+                          const date = dayjs(e.target.value);
+                          setFieldValue('startDate', date);
+                          if (values.endDate && date && values.endDate.isBefore(date)) {
+                            setFieldValue('endDate', null);
+                          }
+                        }}
+                        onBlur={() => setFieldTouched("startDate", true)}
+                      />
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="startDate"
                     component="div"
@@ -334,14 +345,22 @@ const EditJob = ({ idd, onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
-
-                  <DatePicker
-                    className="w-full mt-1"
-                    format="DD-MM-YYYY"
-                    value={values.endDate}
-                    onChange={(date) => setFieldValue("endDate", date)}
-                    onBlur={() => setFieldTouched("endDate", true)}
-                  />
+                  <Field name="endDate">
+                    {({ field }) => (
+                      <input
+                        type="date"
+                        {...field}
+                        className="w-full mt-1 p-2 border rounded"
+                        value={values.endDate ? values.endDate.format('YYYY-MM-DD') : ''}
+                        onChange={(e) => {
+                          const date = dayjs(e.target.value);
+                          setFieldValue('endDate', date);
+                        }}
+                        min={values.startDate ? values.startDate.format('YYYY-MM-DD') : ''}
+                        onBlur={() => setFieldTouched("endDate", true)}
+                      />
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="endDate"
                     component="div"

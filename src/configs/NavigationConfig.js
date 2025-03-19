@@ -351,7 +351,7 @@ const extraNavvvTree = [
   {
     key: 'superadmin',
     path: `${APP_PREFIX_PATH}/superadmin`,
-    title: 'SuperAdmin',
+    title: 'SUPERADMIN',
     icon: PlusCircleOutlined,
     breadcrumb: true,
     isGroupTitle: true,
