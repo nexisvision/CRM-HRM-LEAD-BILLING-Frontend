@@ -9,6 +9,7 @@ import TicketList from "../../../../components/TicketTableList.jsx";
 import RegistionTable from "../../../../components/RegistrationTableList.jsx";
 import { Pie } from "react-chartjs-2";
 import { Table, Row, Col, Card, Empty, Badge, Select } from "antd";
+import { MailOutlined, GlobalOutlined, PhoneOutlined, RocketOutlined, BankOutlined, UserOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice.jsx";
 import { GetPlan } from "views/app-views/plan/PlanReducers/PlanSlice.jsx";
@@ -35,6 +36,10 @@ const MonthlyRevenueCard = () => {
   const dispatch = useDispatch();
   const subclients = useSelector((state) => state?.SubClient?.SubClient?.data || []);
   const isLoading = useSelector((state) => state?.SubClient?.isLoading);
+
+  const users = useSelector((state) => state?.user.loggedInUser || []);
+
+  console.log("users",users);
 
   useEffect(() => {
     dispatch(ClientData());
@@ -246,6 +251,8 @@ const DashboardList = () => {
   const [plan, setPlan] = useState("");
   const [users, setUsers] = useState([]);
   const plans = useSelector((state) => state?.Plan?.Plan || []);
+
+  const loggedInUser = useSelector((state) => state?.user?.loggedInUser || {});
 
   useEffect(() => {
     dispatch(ClientData());
@@ -493,135 +500,265 @@ const DashboardList = () => {
 
   return (
     <div className="p-2 bg-gray-50">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex items-center mb-4">
         <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
+      </div>
 
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="relative">
+          {/* Background Pattern */}
+          <div className="h-48 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#ffffff] via-[#f5f9ff] to-[#f0f7ff]">
+              <div className="absolute inset-0" style={{ 
+                backgroundImage: `linear-gradient(rgba(99, 134, 255, 0.03) 1px, transparent 1px),linear-gradient(90deg, rgba(99, 134, 255, 0.03) 1px, transparent 1px)`, 
+                backgroundSize: '20px 20px', 
+                transform: 'skewY(-2deg) scale(1.2)', 
+                transformOrigin: '0 0' 
+              }} />
+              <div className="absolute inset-0" style={{ 
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 2L20 7V17L12 22L4 17V7L12 2Z' stroke='rgba(99, 134, 255, 0.08)' stroke-width='1'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='9' stroke='rgba(99, 134, 255, 0.06)' stroke-width='1'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg width='18' height='18' viewBox='0 0 18 18' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='1' y='1' width='16' height='16' stroke='rgba(99, 134, 255, 0.07)' stroke-width='1'/%3E%3C/svg%3E")`,
+                backgroundPosition: '85% 20%, 15% 40%, 50% 70%',
+                backgroundRepeat: 'repeat',
+                backgroundSize: '64px, 48px, 32px',
+                opacity: 0.7
+              }} />
+            </div>
+          </div>
+
+          {/* Profile Info */}
+          <div className="absolute bottom-0 left-0 right-0 px-6 py-4">
+            <div className="flex items-center gap-6">
+              <div className="relative">
+                <div className="w-28 h-28 rounded-xl border-4 border-white shadow-lg overflow-hidden">
+                  <img 
+                    src={loggedInUser.profilePic || 'https://via.placeholder.com/100'} 
+                    alt={loggedInUser.username} 
+                    className="w-full h-full object-cover" 
+                  />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white shadow-md"></div>
+              </div>
+              <div className="flex flex-col justify-center">
+                <h2 className="text-2xl font-semibold text-gray-800">
+                  {`${loggedInUser.firstName || ''} ${loggedInUser.lastName || ''}`}
+                </h2>
+                <div className="flex items-center mt-2">
+                  <div className="flex items-center gap-2 bg-white/90 backdrop-blur-md rounded-full px-4 py-2 shadow-sm">
+                    <span className="text-blue-500">✉️</span>
+                    <span className="text-sm text-gray-600">{loggedInUser.email}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Information Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-20">
+          {/* Personal Information - Full Width */}
+          <div className="bg-white rounded-xl p-6 shadow-sm col-span-2">
+            <h3 className="text-lg font-semibold text-gray-800 mb-6">Personal Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-blue-50 rounded-lg">
+                  <UserOutlined className="text-xl text-blue-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Full Name</p>
+                  <p className="font-medium text-gray-800">
+                    {loggedInUser?.firstName && loggedInUser?.lastName
+                      ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
+                      : 'Not Set'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-purple-50 rounded-lg">
+                  <MailOutlined className="text-xl text-purple-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="font-medium text-gray-800">{loggedInUser?.email || 'Not Set'}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-green-50 rounded-lg">
+                  <PhoneOutlined className="text-xl text-green-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Phone</p>
+                  <p className="font-medium text-gray-800">{loggedInUser?.phone || 'Not Set'}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-yellow-50 rounded-lg">
+                  <BankOutlined className="text-xl text-yellow-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">GST Number</p>
+                  <p className="font-medium text-gray-800">{loggedInUser?.gstIn || 'Not Set'}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-red-50 rounded-lg">
+                  <GlobalOutlined className="text-xl text-red-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">State</p>
+                  <p className="font-medium text-gray-800">{loggedInUser?.state || 'Not Set'}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-indigo-50 rounded-lg">
+                  <RocketOutlined className="text-xl text-indigo-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Pincode</p>
+                  <p className="font-medium text-gray-800">{loggedInUser?.pincode || 'Not Set'}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Address Section */}
+            <div className="mt-6 pt-6 border-t border-gray-100">
+              <div className="flex items-start gap-3">
+                <div className="p-2.5 bg-orange-50 rounded-lg">
+                  <GlobalOutlined className="text-xl text-orange-500" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-500">Address</p>
+                  <p className="font-medium text-gray-800 break-words mt-1">
+                    {loggedInUser?.address || 'Not Set'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        {/* Yearly Revenue Card */}
-
-
-        {/* Plan Card */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg text-gray-700 font-medium mb-4">Plan Sales</h2>
-          <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold text-[#1b2559]">
-              ${planStats.totalRevenue.toLocaleString()}
-            </span>
-            <div className="flex flex-col">
-              <span className="text-green-500 flex items-center font-bold text-lg">
-                {(planStats.totalSales * 0.01).toFixed(2)}%
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
+        {/* Plan Sales Card */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">Plan Sales</h2>
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-              </span>
+              </div>
+            </div>
+            <div className="flex items-baseline gap-2 mb-2">
+              <span className="text-3xl font-bold text-gray-900">${planStats.totalRevenue.toLocaleString()}</span>
+              <span className="text-sm text-green-500 font-semibold">+{(planStats.totalSales * 0.01).toFixed(2)}%</span>
+            </div>
+            <p className="text-gray-600 text-sm">Total revenue from all plan sales</p>
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500">Active Plans</span>
+                <span className="text-sm font-semibold text-gray-900">{plans.length}</span>
+              </div>
             </div>
           </div>
-          <p className="text-gray-500 text-sm mt-2">Total number of Sales Plan</p>
-          {/* <div className="mt-2 space-y-3">
-              {planStats.planBreakdown.map(plan => (
-                <div key={plan.planId} className="flex flex-col">
-                  <div className="flex items-center space-x-4">
-                    <span className="text-sm font-bold text-gray-500">{plan.salesCount}
-                      <span className="text-sm text-gray-500"> sales</span>
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-500">{plans.length} active plans</span>
-                  </div>
-                </div>
-              ))}
-          </div> */}
         </div>
 
         {/* Companies Card */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg text-gray-700 font-medium mb-4">Companies</h2>
-          <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold text-[#1b2559]">
-              {fndclient?.length || 0}
-            </span>
-            <div className="flex flex-col">
-              <span className="text-green-500 flex items-center font-bold text-lg">
-                {((fndclient?.length || 0) * 0.01).toFixed(2)}%
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">Companies</h2>
+              <div className="p-2 bg-purple-50 rounded-lg">
+                <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
-              </span>
+              </div>
+            </div>
+            <div className="flex items-baseline gap-2 mb-2">
+              <span className="text-3xl font-bold text-gray-900">{fndclient?.length || 0}</span>
+              <span className="text-sm text-green-500 font-semibold">+{((fndclient?.length || 0) * 0.01).toFixed(2)}%</span>
+            </div>
+            <p className="text-gray-600 text-sm">Total registered companies</p>
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500">Active This Month</span>
+                <span className="text-sm font-semibold text-gray-900">{Math.round((fndclient?.length || 0) * 0.8)}</span>
+              </div>
             </div>
           </div>
-          <p className="text-gray-500 text-sm mt-2">Total number of registered companies</p>
         </div>
 
         {/* Costs Card */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg text-gray-700 font-medium mb-4">Costs</h2>
-          <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold text-[#1b2559]">$8,310</span>
-            <span className="text-green-500 flex items-center font-bold text-lg">
-              0.7%
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
-              </svg>
-            </span>
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">Costs</h2>
+              <div className="p-2 bg-green-50 rounded-lg">
+                <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+            </div>
+            <div className="flex items-baseline gap-2 mb-2">
+              <span className="text-3xl font-bold text-gray-900">$8,310</span>
+              <span className="text-sm text-green-500 font-semibold">+0.7%</span>
+            </div>
+            <p className="text-gray-600 text-sm">Total operational costs this year</p>
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500">Previous Year</span>
+                <span className="text-sm font-semibold text-gray-900">$7,894</span>
+              </div>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm mt-2">Compare to last year (2019)</p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-6">
-        <div class="bg-white p-6 rounded-lg shadow flex justify-between items-center">
-          <div class="flex space-x-4 items-center">
-            <div class="flex items-center gap-2 bg-blue-500 rounded-lg p-2">
-              <GoPeople class="text-2xl text-white" />
+        {/* Total Companies Card */}
+        <div class="bg-white p-6 rounded-lg shadow">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="bg-blue-50 p-3 rounded-lg">
+                <GoPeople class="text-2xl text-blue-500" />
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-800">Total Companies</h3>
+                <p class="text-sm text-gray-500">Active companies in the system</p>
+              </div>
             </div>
-
-            <div>
-              <p class="text-sm text-gray-600">Total Companies</p>
+            <div class="text-right">
+              <p class="text-3xl font-bold text-gray-900">{clientdata}</p>
+              <p class="text-sm text-green-500">
+                +{((clientdata || 0) * 0.05).toFixed(1)}% this month
+              </p>
             </div>
           </div>
-          <div class="text-2xl font-bold">{clientdata}</div>
-          {/* <div>
-            <p class="text-sm text-gray-500">Paid Users:</p>
-            <p>8</p>
-          </div> */}
         </div>
 
-        {/* <div class="bg-white p-6 rounded-lg shadow flex justify-between items-center">
-                    <div class="flex space-x-4 items-center">
-
-                        <div class="flex items-center gap-2 bg-blue-500 rounded-lg p-2">
-                            <IoCartOutline class="text-2xl text-white" />
-                        </div>
-
-                        <div>
-                            <p class="text-sm text-gray-600">Total Order</p>
-                        </div>
-                    </div>
-                    <div class="text-2xl font-bold">
-                        87
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Total Order Amount:</p>
-                        <p >$82650</p>
-                    </div>
-                </div> */}
-
-        <div class="bg-white p-6 rounded-lg shadow flex justify-between items-center">
-          <div class="flex space-x-4 items-center">
-            <div class="flex items-center gap-2 bg-blue-500 rounded-lg p-2">
-              <CiTrophy class="text-2xl text-white" />
+        {/* Total Plans Card */}
+        <div class="bg-white p-6 rounded-lg shadow">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="bg-purple-50 p-3 rounded-lg">
+                <CiTrophy class="text-2xl text-purple-500" />
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-800">Total Plans</h3>
+                <p class="text-sm text-gray-500">Available subscription plans</p>
+              </div>
             </div>
-
-            <div>
-              <p class="text-sm text-gray-600">Total Plans</p>
+            <div class="text-right">
+              <p class="text-3xl font-bold text-gray-900">{plan}</p>
+              <p class="text-sm text-purple-500">Most popular: Platinum</p>
             </div>
-          </div>
-          <div class="text-2xl font-bold">{plan}</div>
-          <div>
-            <p class="text-sm text-gray-500">Most Purchase Plan :</p>
-            <p>Platinum</p>
           </div>
         </div>
       </div>
@@ -811,3 +948,9 @@ const DashboardList = () => {
 };
 
 export default DashboardList;
+
+
+
+
+
+

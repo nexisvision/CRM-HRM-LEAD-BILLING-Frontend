@@ -17,6 +17,13 @@ export const creategenaralsett = createAsyncThunk(
     }
   }
 );
+export const updategeneralsetting = createAsyncThunk(
+  'generalsetting/update',
+  async ({ id, data }) => {
+    const response = await UserService.updategeneralsetting(id, data);
+    return response.data;
+  }
+);
 
 
 
@@ -33,31 +40,6 @@ export const getgeneralsettings = createAsyncThunk(
 );
 
 
-export const getAllUsers = createAsyncThunk(
-  "users/getAllUsers",
-  async (thunkAPI) => {
-    try {
-      const response = await UserService.getAllUsers();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
-
-export const getUserById = createAsyncThunk(
-  "users/getUserById",
-  async (userId, thunkAPI) => {
-    try {
-      const response = await UserService.getUserById(userId);
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
 
 export const deletesettingss = createAsyncThunk(
   "users/Deletese",
@@ -70,59 +52,14 @@ export const deletesettingss = createAsyncThunk(
     }
   }
 );
-export const Editicket = createAsyncThunk(
-  "users/Editicket",
-  async ({ idd, formData }, thunkAPI) => {
-    try {
-      const response = await UserService.Editticket(idd, formData);
-      return response; // Return the updated data
-    } catch (error) {
-      return thunkAPI.rejectWithValue(
-        error.response?.data || "Error updating employee"
-      );
-    }
-  }
-);
 
-
-
-const TicketSlice = createSlice({
+const generalsettingSlice = createSlice({
   name: "generalsetting",
   initialState: {
     generalsetting: [],
-    editItem: {},
     isLoading: false,
-    addModel: false,
-    editModal: false,
   },
-  reducers: {
-    toggleAddModal: (state, action) => {
-      state.addModel = action.payload;
-    },
-    toggleEditModal: (state, action) => {
-      state.editModal = action.payload;
-      state.editItem = {};
-    },
-    editUserData: (state, action) => {
-      state.editItem = action.payload;
-      state.editModal = !state.editModal;
-    },
-    handleLogout: (state, action) => {
-      state.isAuth = action.payload;
-      state.loggedInUser = null;
-      localStorage.removeItem("isAuth");
-      localStorage.removeItem("USER");
-      localStorage.removeItem("TOKEN");
-    },
-    toggleDetailModal: (state, action) => {
-      state.detailItem = action.payload;
-      state.detailModal = !state.editModal;
-    },
-    closeDetailModal: (state, action) => {
-      state.detailModal = action.payload;
-      state.detailItem = {};
-    },
-  },
+
   extraReducers: (builder) => {
     builder
       //add
@@ -159,6 +96,8 @@ const TicketSlice = createSlice({
       })
       .addCase(deletesettingss.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.generalsetting = action?.payload;
+        
         message.success(action.payload?.message);
       })
       .addCase(deletesettingss.rejected, (state, action) => {
@@ -167,26 +106,23 @@ const TicketSlice = createSlice({
       })
 
       //update
-      .addCase(Editicket.pending, (state) => {
-        state.isLoading = false;
-        state.error = null;
+      .addCase(updategeneralsetting.pending, (state) => {
+        state.isLoading = true;
       })
-      .addCase(Editicket.fulfilled, (state, action) => {
+      .addCase(updategeneralsetting.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload;
         message.success(action.payload?.message);
-        // Update the state with the updated employee data
       })
-      .addCase(Editicket.rejected, (state, action) => {
+      .addCase(updategeneralsetting.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
         message.error(action.payload?.message);
       });
-
+    
+    
 
   },
 });
 
-export const { toggleAddModal, toggleEditModal, handleLogout, editUserData, toggleDetailModal, closeDetailModal } =
-  TicketSlice.actions;
-export default TicketSlice.reducer;
+export const {  } =
+  generalsettingSlice.actions;
+export default generalsettingSlice.reducer;

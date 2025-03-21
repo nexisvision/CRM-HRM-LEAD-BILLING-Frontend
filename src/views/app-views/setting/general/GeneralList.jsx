@@ -7,6 +7,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { creategenaralsett, deletesettingss, getgeneralsettings } from './generalReducer/generalSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import EditSetting from './EditSetting';
 
 const validationSchema = Yup.object().shape({
   companyName: Yup.string().required('Company name is required'),
@@ -18,6 +19,8 @@ const GeneralList = () => {
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedFavicon, setSelectedFavicon] = useState(null);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [selectedSettingId, setSelectedSettingId] = useState(null);
   const dispatch = useDispatch();
 
   const initialValues = {
@@ -98,15 +101,26 @@ const GeneralList = () => {
             <Col span={24}>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-medium">Current Settings</h2>
-                <Button
-                  // type="primary" 
-                  danger
-                  onClick={handleDelete}
-                  loading={loading}
-                  className="px-4 py-1"
-                >
-                  <DeleteOutlined />
-                </Button>
+                <div>
+                  <Button
+                    type="primary"
+                    onClick={() => {
+                      setSelectedSettingId(alldata[0].id);
+                      setIsEditModalVisible(true);
+                    }}
+                    className="mr-2"
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    danger
+                    onClick={handleDelete}
+                    loading={loading}
+                    className="px-4 py-1"
+                  >
+                    <DeleteOutlined />
+                  </Button>
+                </div>
               </div>
               <div className="flex items-start gap-6">
                 <div>
@@ -261,6 +275,15 @@ const GeneralList = () => {
         )}
       </Formik>}
 
+      <EditSetting
+        visible={isEditModalVisible}
+        onCancel={() => setIsEditModalVisible(false)}
+        settingId={selectedSettingId}
+        onSuccess={() => {
+          setIsEditModalVisible(false);
+          dispatch(getgeneralsettings());
+        }}
+      />
 
     </div>
   );

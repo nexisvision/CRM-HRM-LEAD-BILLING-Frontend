@@ -11,7 +11,7 @@ export const TicketList = () => {
 
   const alldatat = useSelector((state) => state?.Ticket);
   const fnddata = useMemo(() => alldatat?.Ticket?.data || [], [alldatat]);
-  console.log(",mm,,m,m", fnddata);
+ 
 
 
   useEffect(() => {
@@ -45,8 +45,6 @@ export const TicketList = () => {
         compare: (a, b) => a.created_by.length - b.created_by.length,
       },
     },
-
-
     {
       title: "status",
       dataIndex: "status",
@@ -67,35 +65,29 @@ export const TicketList = () => {
   ];
 
   return (
-    <div className="container">
-
-
-      <Flex
-        alignItems="center"
-        justifyContent="space-between"
-        mobileFlex={false}
-      >
-        <Flex className="mb-1" mobileFlex={false}>
-
-          <div className="mb-3">
-
-          </div>
+    <div className="w-full">
+      <div className="w-full">
+        <Flex
+          alignItems="center"
+          justifyContent="space-between"
+          mobileFlex={false}
+          className="w-full mb-4"
+        >
+          <Flex className="w-full md:w-auto" mobileFlex={false}>
+            <div className="w-full md:w-48">
+            </div>
+          </Flex>
         </Flex>
-
-        <Flex alignItems="center" justifyContent="space-between" gap="7px">
-
-        </Flex>
-      </Flex>
-      <div className="table-responsive">
-        <Table
-          columns={tableColumns}
-          dataSource={list}
-          rowKey="id"
-
-        />
+        <div className="w-full overflow-x-auto">
+          <Table
+            columns={tableColumns}
+            dataSource={list}
+            rowKey="id"
+            scroll={{ x: true }}
+            className="w-full"
+          />
+        </div>
       </div>
-
-
     </div>
   );
 };

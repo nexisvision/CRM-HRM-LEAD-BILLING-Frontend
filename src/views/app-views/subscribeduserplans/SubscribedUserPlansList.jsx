@@ -195,33 +195,35 @@ export const SubscribedUserPlansList = () => {
   };
 
   return (
-    <div className="container">
-      <Card>
+    <div className="w-full">
+      <Card className="w-full">
         <Flex
           alignItems="center"
           justifyContent="space-between"
           mobileFlex={false}
-          className="flex flex-wrap  gap-4"
+          className="w-full mb-4"
         >
           <Flex
-            className="flex flex-wrap gap-4 mb-4 md:mb-0"
+            className="w-full md:w-auto"
             mobileFlex={false}
           >
-            <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
+            <div className="w-full md:w-48">
               <Input
                 placeholder="Search"
                 prefix={<SearchOutlined />}
                 onChange={(e) => onSearch(e)}
+                className="w-full"
               />
             </div>
           </Flex>
         </Flex>
-        <div className="table-responsive">
+        <div className="w-full overflow-x-auto">
           <Table
             columns={tableColumns}
             dataSource={users}
             rowKey="id"
-            scroll={{ x: 1200 }}
+            scroll={{ x: true }}
+            className="w-full"
           />
         </div>
         <Modal

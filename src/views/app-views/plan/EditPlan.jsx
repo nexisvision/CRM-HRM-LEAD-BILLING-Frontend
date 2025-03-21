@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Button, Select, Switch, Row, Dropdown, Menu, Col } from 'antd';
+import { Input, Button, Select, Switch, Row, Dropdown, Menu, Col, message } from 'antd';
 import { Editplan, GetPlan } from './PlanReducers/PlanSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -198,7 +198,7 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
                   <Row gutter={16}>
                     <Col span={12}>
                       <div className="form-group mb-4">
-                        <label className="text-gray-600 mb-2 block">Plan Name <span className="text-blue-600">*</span></label>
+                        <label className="text-gray-600 mb-2 block">Plan Name <span className="text-red-500">*</span></label>
                         <Field name="name">
                           {({ field }) => (
                             <Input

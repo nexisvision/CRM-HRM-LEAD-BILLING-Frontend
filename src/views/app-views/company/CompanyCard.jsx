@@ -38,7 +38,7 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
 
   const subscribedPlans = useSelector((state) => state.subplan?.subplan?.data || []);
 
-  console.log(subscribedPlans, "subscribedPlans");
+
   const hasActiveSubscription = subscribedPlans.some(
     plan => plan.client_id === company.id && plan.status !== 'cancelled'
   );

@@ -17,6 +17,21 @@ const getgeneralsetting = async () => {
   }
 };
 
+const updategeneralsetting = async (id, data) => {
+  const token = localStorage.getItem("auth_token");
+  try {
+    const res = await axios.put(`${env.API_ENDPOINT_URL}/settings/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error updating data:", error);
+    throw error;
+  }
+};
+
 const creategenaral = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
@@ -57,33 +72,13 @@ const deletesetting = async (id) => {
   }
 };
 
-const Editticket = async (idd, formData) => {
-  const token = localStorage.getItem("auth_token");
-  try {
-    const res = await axios.put(
-      `${env.API_ENDPOINT_URL}/tickets/${idd}`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return res.data;
-  } catch (error) {
-    console.error("Error updating employee data:", error);
-    throw error;
-  }
-};
-
-
 
 const UserService = {
 
   getgeneralsetting,
   creategenaral,
   deletesetting,
-  Editticket,
+  updategeneralsetting,
 };
 
 export default UserService;

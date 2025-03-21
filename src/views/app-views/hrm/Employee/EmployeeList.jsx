@@ -639,7 +639,7 @@ const EmployeeList = () => {
         visible={isAddEmployeeModalVisible}
         onCancel={() => setIsAddEmployeeModalVisible(false)}
         footer={null}
-        width={800}
+        width={1000}
         className="custom-modal"
       >
         <AddEmployee onClose={() => setIsAddEmployeeModalVisible(false)} />

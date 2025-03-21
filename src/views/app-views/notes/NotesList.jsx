@@ -115,15 +115,21 @@ const NotesList = () => {
           </Flex>
         </Flex>
 
-        <ViewNotes
-          data={getFilteredNotes()}
-          pagination={{
-            total: getFilteredNotes().length,
-            pageSize: 10,
-            showSizeChanger: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-          }}
-        />
+        {list && list.length > 0 ? (
+          <ViewNotes
+            data={getFilteredNotes()}
+            pagination={{
+              total: getFilteredNotes().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
+          />
+        ) : (
+          <div className="w-full text-center py-8">
+            <p className="text-gray-500 text-lg">No notes found</p>
+          </div>
+        )}
         <Modal
           title="Add Notes"
           visible={isAddNotesModalVisible}

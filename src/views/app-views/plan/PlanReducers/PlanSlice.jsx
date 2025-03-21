@@ -190,7 +190,7 @@ const PlanSlice = createSlice({
             .addCase(Editplan.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
-                message.success(action.payload?.message);
+                
             })
             .addCase(Editplan.rejected, (state, action) => {
                 state.isLoading = false;

@@ -78,7 +78,7 @@ const resetpass = async (payload) => {
 const updatesuperadmin = async (id, data) => {
   const token = localStorage.getItem("auth_token");
 
-  const res = await axios.put(`http://localhost:5353/api/v1/super-admin/${id}`,
+  const res = await axios.put(`${env.API_ENDPOINT_URL}/super-admin/${id}`,
     data,
     {
       headers: {

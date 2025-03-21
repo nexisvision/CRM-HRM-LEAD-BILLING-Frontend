@@ -69,34 +69,7 @@ const DepartmentSlice = createSlice({
         addModel: false,
         editModal: false,
     },
-    reducers: {
-        toggleAddModal: (state, action) => {
-            state.addModel = action.payload;
-        },
-        toggleEditModal: (state, action) => {
-            state.editModal = action.payload;
-            state.editItem = {};
-        },
-        editUserData: (state, action) => {
-            state.editItem = action.payload;
-            state.editModal = !state.editModal;
-        },
-        handleLogout: (state, action) => {
-            state.isAuth = action.payload;
-            state.loggedInUser = null
-            localStorage.removeItem("isAuth");
-            localStorage.removeItem("USER");
-            localStorage.removeItem("TOKEN");
-        },
-        toggleDetailModal: (state, action) => {
-            state.detailItem = action.payload;
-            state.detailModal = !state.editModal;
-        },
-        closeDetailModal: (state, action) => {
-            state.detailModal = action.payload;
-            state.detailItem = {};
-        },
-    },
+   
     extraReducers: (builder) => {
         builder
             //add
@@ -105,7 +78,7 @@ const DepartmentSlice = createSlice({
             })
             .addCase(AddDept.fulfilled, (state, action) => {
                 state.isLoading = false;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
             })
             .addCase(AddDept.rejected, (state, action) => {
                 state.isLoading = false;
@@ -119,7 +92,7 @@ const DepartmentSlice = createSlice({
             .addCase(getDept.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.Department = action?.payload;
-                toast.success(action.payload?.data?.message);
+
             })
             .addCase(getDept.rejected, (state, action) => {
                 state.isLoading = false;
@@ -158,10 +131,4 @@ const DepartmentSlice = createSlice({
     },
 });
 
-export const {
-    toggleAddModal,
-    toggleEditModal,
-    handleLogout,
-    editUserData,
-} = DepartmentSlice.actions;
 export default DepartmentSlice.reducer;
