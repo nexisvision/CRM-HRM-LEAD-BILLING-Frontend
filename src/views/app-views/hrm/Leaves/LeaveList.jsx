@@ -102,13 +102,13 @@ const LeaveList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   let allpermisson = [];
 

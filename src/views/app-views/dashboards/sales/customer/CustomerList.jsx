@@ -64,13 +64,13 @@ const CustomerList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   let allpermisson;
 
@@ -286,10 +286,10 @@ const CustomerList = () => {
         </Flex>
         <Flex gap="7px" className="flex">
           {whorole === "super-admin" ||
-          whorole === "client" ||
-          (canCreateClient &&
-            whorole !== "super-admin" &&
-            whorole !== "client") ? (
+            whorole === "client" ||
+            (canCreateClient &&
+              whorole !== "super-admin" &&
+              whorole !== "client") ? (
             <Button
               type="primary"
               className="flex items-center"
@@ -311,8 +311,8 @@ const CustomerList = () => {
       </Flex>
       <div className="table-responsive mt-2">
         {whorole === "super-admin" ||
-        whorole === "client" ||
-        (canViewClient && whorole !== "super-admin" && whorole !== "client") ? (
+          whorole === "client" ||
+          (canViewClient && whorole !== "super-admin" && whorole !== "client") ? (
           <Table
             columns={tableColumns}
             dataSource={users}

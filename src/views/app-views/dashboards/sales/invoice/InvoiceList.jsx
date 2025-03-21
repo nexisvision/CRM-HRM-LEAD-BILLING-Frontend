@@ -106,13 +106,13 @@ export const InvoiceList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : {};
+      ? JSON.parse(roleData.permissions)
+      : {};
 
   let salesInvoicePermissions = [];
   if (
@@ -185,33 +185,33 @@ export const InvoiceList = () => {
     items: [
       ...(canView
         ? [
-            {
-              key: "view",
-              icon: <EyeOutlined />,
-              label: "View Invoice",
-              onClick: () => Viewfunc(row.id),
-            },
-          ]
+          {
+            key: "view",
+            icon: <EyeOutlined />,
+            label: "View Invoice",
+            onClick: () => Viewfunc(row.id),
+          },
+        ]
         : []),
       ...(canUpdate
         ? [
-            {
-              key: "edit",
-              icon: <EditOutlined />,
-              label: "Edit",
-              onClick: () => editfun(row.id),
-            },
-          ]
+          {
+            key: "edit",
+            icon: <EditOutlined />,
+            label: "Edit",
+            onClick: () => editfun(row.id),
+          },
+        ]
         : []),
       ...(canDelete
         ? [
-            {
-              key: "delete",
-              icon: <DeleteOutlined />,
-              label: "Delete",
-              onClick: () => delfun(row.id),
-            },
-          ]
+          {
+            key: "delete",
+            icon: <DeleteOutlined />,
+            label: "Delete",
+            onClick: () => delfun(row.id),
+          },
+        ]
         : []),
     ],
   });

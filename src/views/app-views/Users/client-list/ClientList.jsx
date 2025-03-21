@@ -65,13 +65,13 @@ const ClientList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   let allpermisson;
 
@@ -408,15 +408,15 @@ const ClientList = () => {
               (canCreateClient &&
                 whorole !== "super-admin" &&
                 whorole !== "client")) && (
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={openAddCompanyModal}
-                className="rounded-lg flex items-center shadow-md hover:shadow-lg transition-all"
-              >
-                New Client
-              </Button>
-            )}
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={openAddCompanyModal}
+                  className="rounded-lg flex items-center shadow-md hover:shadow-lg transition-all"
+                >
+                  New Client
+                </Button>
+              )}
             <Button
               type="primary"
               icon={<FileExcelOutlined />}
@@ -434,16 +434,16 @@ const ClientList = () => {
           (canViewClient &&
             whorole !== "super-admin" &&
             whorole !== "client")) && (
-          <Table
-            columns={tableColumns}
-            dataSource={users}
-            rowKey="id"
-            className="ant-table-striped"
-            rowClassName={(record, index) =>
-              index % 2 === 0 ? "bg-gray-50" : "bg-white"
-            }
-          />
-        )}
+            <Table
+              columns={tableColumns}
+              dataSource={users}
+              rowKey="id"
+              className="ant-table-striped"
+              rowClassName={(record, index) =>
+                index % 2 === 0 ? "bg-gray-50" : "bg-white"
+              }
+            />
+          )}
       </div>
       {userProfileVisible && (
         <UserView
@@ -457,7 +457,7 @@ const ClientList = () => {
         visible={isAddCompanyModalVisible}
         onCancel={closeAddCompanyModal}
         footer={null}
-        width={800}
+        width={400}
       >
         <AddClient onClose={closeAddCompanyModal} />
       </Modal>

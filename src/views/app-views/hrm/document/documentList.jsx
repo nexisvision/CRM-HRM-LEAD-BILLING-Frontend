@@ -83,13 +83,13 @@ const DocumentList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   let allpermisson;
 
@@ -240,10 +240,10 @@ const DocumentList = () => {
         <Flex className="mb-1" mobileFlex={false}></Flex>
         <Flex gap="7px">
           {whorole === "super-admin" ||
-          whorole === "client" ||
-          (canCreateDocument &&
-            whorole !== "super-admin" &&
-            whorole !== "client") ? (
+            whorole === "client" ||
+            (canCreateDocument &&
+              whorole !== "super-admin" &&
+              whorole !== "client") ? (
             <Button
               type="primary"
               className="ml-2"
@@ -266,10 +266,10 @@ const DocumentList = () => {
       </Flex>
       <div className="table-responsive mt-4">
         {whorole === "super-admin" ||
-        whorole === "client" ||
-        (canViewDocument &&
-          whorole !== "super-admin" &&
-          whorole !== "client") ? (
+          whorole === "client" ||
+          (canViewDocument &&
+            whorole !== "super-admin" &&
+            whorole !== "client") ? (
           <Table
             columns={tableColumns}
             dataSource={users}

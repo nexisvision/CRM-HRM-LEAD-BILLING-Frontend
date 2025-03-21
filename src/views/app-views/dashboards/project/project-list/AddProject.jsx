@@ -17,7 +17,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AddPro, GetProject } from "./projectReducer/ProjectSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { PlusOutlined } from "@ant-design/icons";
-import { GetTagspro } from "./tagReducer/TagSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { AddLablee, GetLablee } from "../milestone/LableReducer/LableSlice";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
@@ -32,6 +31,72 @@ dayjs.extend(duration);
 
 const { Option } = Select;
 
+const styles = `
+  .ant-select-item-option-content {
+    padding: 12px 16px;
+  }
+
+  .ant-select-item-option-content .flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .ant-select-item-option-content .font-medium {
+    color: #2c3e50;
+    font-size: 14px;
+    flex: 1;
+  }
+
+  .ant-select-item-option-content .rounded-full {
+    border-radius: 16px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    min-width: 80px;
+    justify-content: center;
+  }
+
+  .ant-select-item-option-content .bg-blue-50 {
+    background-color: #f0f7ff;
+    border: 1px solid #e1effe;
+  }
+
+  .ant-select-item-option-content .text-blue-600 {
+    color: #3b82f6;
+  }
+
+  .ant-select-item-option-content .px-2 {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .ant-select-item-option-content .py-1 {
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+
+  .ant-select-item-option-content .text-xs {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .ant-select-item-option {
+    transition: all 0.3s ease;
+  }
+
+  .ant-select-item-option:hover {
+    background-color: #f8fafc;
+  }
+
+  .ant-select-item-option:hover .bg-blue-50 {
+    background-color: #e1effe;
+    border-color: #bfdbfe;
+  }
+`;
+
 const calculateDuration = (startDate, endDate) => {
   const start = dayjs(startDate);
   const end = dayjs(endDate);
@@ -42,7 +107,7 @@ const calculateDuration = (startDate, endDate) => {
   const days = diff.days();
 
   let displayValue = '';
-  
+
   // If there are years or months, only show those
   if (years > 0 || months > 0) {
     if (years > 0) {
@@ -92,10 +157,6 @@ const AddProject = ({ onClose }) => {
 
   useEffect(() => {
     dispatch(ClientData());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(GetTagspro());
   }, [dispatch]);
 
   useEffect(() => {
@@ -287,547 +348,557 @@ const AddProject = ({ onClose }) => {
   }
 
   return (
-    <div className="add-job-form">
-      <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={onSubmit}
-      >
-        {({
-          values,
-          setFieldValue,
-          handleSubmit,
-          setFieldTouched,
-        }) => (
-          <Form className="formik-form" onSubmit={handleSubmit}>
-           <div className="mb-3 border-b pb-[-10px] font-medium"></div>
+    <>
+      <style>{styles}</style>
+      <div className="add-job-form">
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={onSubmit}
+        >
+          {({
+            values,
+            setFieldValue,
+            handleSubmit,
+            setFieldTouched,
+          }) => (
+            <Form className="formik-form" onSubmit={handleSubmit}>
+              <div className="mb-3 border-b pb-[-10px] font-medium"></div>
 
-            <Row gutter={16}>
-              <Col span={24}>
-                <div className="form-item">
-                  <label className="font-semibold">Project Name <span className="text-red-500">*</span></label>
-                  <Field
-                    name="project_name"
-                    className="mt-1"
-                    as={Input}
-                    placeholder="Enter Project Name"
-                    rules={[{ required: true }]}
-                  />
-                  <ErrorMessage
-                    name="project_name"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+              <Row gutter={16}>
+                <Col span={24}>
+                  <div className="form-item">
+                    <label className="font-semibold">Project Name <span className="text-red-500">*</span></label>
+                    <Field
+                      name="project_name"
+                      className="mt-1"
+                      as={Input}
+                      placeholder="Enter Project Name"
+                      rules={[{ required: true }]}
+                    />
+                    <ErrorMessage
+                      name="project_name"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
-              <Col span={24} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Category <span className="text-red-500">*</span></label>
-                  <Select
-                    style={{ width: "100%" }}
-                    placeholder="Select or add new category"
-                    value={values.project_category}
-                    className="mt-1"
-                    onChange={(value) => setFieldValue("project_category", value)}
-                    dropdownRender={(menu) => (
-                      <div>
-                        {menu}
-                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                          <Button
-                            type="link"
-                            icon={<PlusOutlined />}
-                            onClick={() => setIsCategoryModalVisible(true)}
-                          >
-                            Add New Category
-                          </Button>
+                <Col span={24} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Category <span className="text-red-500">*</span></label>
+                    <Select
+                      style={{ width: "100%" }}
+                      placeholder="Select or add new category"
+                      value={values.project_category}
+                      className="mt-1"
+                      onChange={(value) => setFieldValue("project_category", value)}
+                      dropdownRender={(menu) => (
+                        <div>
+                          {menu}
+                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                            <Button
+                              type="link"
+                              icon={<PlusOutlined />}
+                              onClick={() => setIsCategoryModalVisible(true)}
+                            >
+                              Add New Category
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  >
-                    {categories.map((category) => (
-                      <Option key={category.id} value={category.name}>
-                        {category.name}
-                      </Option>
-                    ))}
-                  </Select>
-                  <ErrorMessage
-                    name="project_category"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                      )}
+                    >
+                      {categories.map((category) => (
+                        <Option key={category.id} value={category.name}>
+                          {category.name}
+                        </Option>
+                      ))}
+                    </Select>
+                    <ErrorMessage
+                      name="project_category"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Start Date <span className="text-rose-500">*</span></label>
-                  <input
-                    type="date"
-                    className="w-full mt-1 p-2 border rounded"
-                    value={values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : ''}
-                    onChange={(e) => {
-                      const selectedDate = e.target.value;
-                      setFieldValue("startDate", selectedDate);
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Start Date <span className="text-rose-500">*</span></label>
+                    <input
+                      type="date"
+                      className="w-full mt-1 p-2 border rounded"
+                      value={values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : ''}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        setFieldValue("startDate", selectedDate);
 
-                      if (values.endDate && dayjs(values.endDate).isBefore(selectedDate)) {
-                        setFieldValue("endDate", null);
-                      }
+                        if (values.endDate && dayjs(values.endDate).isBefore(selectedDate)) {
+                          setFieldValue("endDate", null);
+                        }
 
-                      if (selectedDate && values.endDate) {
-                        const displayValue = calculateDuration(selectedDate, values.endDate);
-                        setFieldValue("estimatedmonths", displayValue);
-                      }
-                    }}
-                    onBlur={() => setFieldTouched("startDate", true)}
-                  />
-                  <ErrorMessage
-                    name="startDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                        if (selectedDate && values.endDate) {
+                          const displayValue = calculateDuration(selectedDate, values.endDate);
+                          setFieldValue("estimatedmonths", displayValue);
+                        }
+                      }}
+                      onBlur={() => setFieldTouched("startDate", true)}
+                    />
+                    <ErrorMessage
+                      name="startDate"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">End Date <span className="text-rose-500">*</span></label>
-                  <input
-                    type="date"
-                    className="w-full mt-1 p-2 border rounded"
-                    value={values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : ''}
-                    min={values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : ''}
-                    onChange={(e) => {
-                      const selectedDate = e.target.value;
-                      setFieldValue("endDate", selectedDate);
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">End Date <span className="text-rose-500">*</span></label>
+                    <input
+                      type="date"
+                      className="w-full mt-1 p-2 border rounded"
+                      value={values.endDate ? dayjs(values.endDate).format('YYYY-MM-DD') : ''}
+                      min={values.startDate ? dayjs(values.startDate).format('YYYY-MM-DD') : ''}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        setFieldValue("endDate", selectedDate);
 
-                      if (values.startDate && selectedDate) {
-                        const displayValue = calculateDuration(values.startDate, selectedDate);
-                        setFieldValue("estimatedmonths", displayValue);
-                      }
-                    }}
-                    onBlur={() => setFieldTouched("endDate", true)}
-                  />
-                  <ErrorMessage
-                    name="endDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                        if (values.startDate && selectedDate) {
+                          const displayValue = calculateDuration(values.startDate, selectedDate);
+                          setFieldValue("estimatedmonths", displayValue);
+                        }
+                      }}
+                      onBlur={() => setFieldTouched("endDate", true)}
+                    />
+                    <ErrorMessage
+                      name="endDate"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Estimated Duration <span className="text-red-500">*</span></label>
-                  <Field
-                    name="estimatedmonths"
-                    as={Input}
-                    className="mt-1 bg-gray-100"
-                    placeholder="Duration will be calculated automatically"
-                    disabled={true}
-                  />
-                  <ErrorMessage
-                    name="estimatedmonths"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Estimated Duration <span className="text-red-500">*</span></label>
+                    <Field
+                      name="estimatedmonths"
+                      as={Input}
+                      className="mt-1 bg-gray-100"
+                      placeholder="Duration will be calculated automatically"
+                      disabled={true}
+                    />
+                    <ErrorMessage
+                      name="estimatedmonths"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Client <span className="text-red-500">*</span></label>
-                  <Select
-                    style={{ width: "100%" }}
-                    className="mt-1"
-                    placeholder="Select Client"
-                    loading={!fnd2}
-                    value={values.client}
-                    onChange={(value) => setFieldValue("client", value)}
-                    onBlur={() => setFieldTouched("client", true)}
-                    dropdownRender={(menu) => (
-                      <div>
-                        {menu}
-                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                          <Button
-                            type="link"
-                            icon={<PlusOutlined />}
-                            onClick={() => setIsAddClientModalVisible(true)}
-                          >
-                            Add New Client
-                          </Button>
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Client <span className="text-red-500">*</span></label>
+                    <Select
+                      style={{ width: "100%" }}
+                      className="mt-1"
+                      placeholder="Select Client"
+                      loading={!fnd2}
+                      value={values.client}
+                      onChange={(value) => setFieldValue("client", value)}
+                      onBlur={() => setFieldTouched("client", true)}
+                      dropdownRender={(menu) => (
+                        <div>
+                          {menu}
+                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                            <Button
+                              type="link"
+                              icon={<PlusOutlined />}
+                              onClick={() => setIsAddClientModalVisible(true)}
+                            >
+                              Add New Client
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  >
-                    {fnd2 && fnd2?.length > 0 ? (
-                      fnd2
-                        .filter(client => client.created_by === AllLoggedData.loggedInUser.username)
-                        .map((client) => (
-                          <Option key={client.id} value={client.id}>
-                            {client.firstName || client.username || "Unnamed Client"}
+                      )}
+                    >
+                      {fnd2 && fnd2?.length > 0 ? (
+                        fnd2
+                          .filter(client => client.created_by === AllLoggedData.loggedInUser.username)
+                          .map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.firstName || client.username || "Unnamed Client"}
+                            </Option>
+                          ))
+                      ) : (
+                        <Option value="" disabled>
+                          No Clients Available
+                        </Option>
+                      )}
+                    </Select>
+                    <ErrorMessage
+                      name="client"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Project Members <span className="text-red-500">*</span></label>
+                    <Select
+                      mode="multiple"
+                      style={{ width: "100%" }}
+                      className="mt-1"
+                      placeholder="Select Project Members"
+                      loading={!fnd}
+                      value={values.project_members}
+                      onChange={(value) => setFieldValue("project_members", value)}
+                      onBlur={() => setFieldTouched("project_members", true)}
+                      dropdownRender={(menu) => (
+                        <div>
+                          {menu}
+                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                            <Button
+                              type="link"
+                              icon={<PlusOutlined />}
+                              onClick={() => setIsAddUserModalVisible(true)}
+                            >
+                              Add New User
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    >
+                      {fnd && fnd.length > 0 ? (
+                        fnd.map((employee) => (
+                          <Option key={employee.id} value={employee.id}>
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium">
+                                {employee.username || "Unnamed User"}
+                              </span>
+                              <span className="px-2 py-1 text-xs rounded-full bg-blue-50 text-blue-600">
+                                {employee.Role?.role_name || 'No Role'}
+                              </span>
+                            </div>
                           </Option>
                         ))
-                    ) : (
-                      <Option value="" disabled>
-                        No Clients Available
-                      </Option>
-                    )}
-                  </Select>
-                  <ErrorMessage
-                    name="client"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Project Members <span className="text-red-500">*</span></label>
-                  <Select
-                    mode="multiple"
-                    style={{ width: "100%" }}
-                    className="mt-1"
-                    placeholder="Select Project Members"
-                    loading={!fnd}
-                    value={values.project_members}
-                    onChange={(value) => setFieldValue("project_members", value)}
-                    onBlur={() => setFieldTouched("project_members", true)}
-                    dropdownRender={(menu) => (
-                      <div>
-                        {menu}
-                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                          <Button
-                            type="link"
-                            icon={<PlusOutlined />}
-                            onClick={() => setIsAddUserModalVisible(true)}
-                          >
-                            Add New User
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  >
-                    {fnd && fnd.length > 0 ? (
-                      fnd.map((employee) => (
-                        <Option key={employee.id} value={employee.id}>
-                          {employee.username || "Unnamed User"}
+                      ) : (
+                        <Option value="" disabled>
+                          No Users Available
                         </Option>
-                      ))
-                    ) : (
-                      <Option value="" disabled>
-                        No Users Available
-                      </Option>
-                    )}
-                  </Select>
-                  <ErrorMessage
-                    name="project_members"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-4">
-                <div className="form-group">
-                  <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
-                  <div className="flex gap-0">
-                    <Field name="currency">
-                      {({ field }) => (
-                        <Select
-                          {...field}
-                          className="currency-select"
-                          style={{
-                            width: '60px',
-                            borderTopRightRadius: 0,
-                            borderBottomRightRadius: 0,
-                            borderRight: 0,
-                            backgroundColor: '#f8fafc',
-                          }}
-                          placeholder={<span className="text-gray-400">$</span>}
-                          onChange={(value) => {
-                            if (value === 'add_new') {
-                              setIsAddCurrencyModalVisible(true);
-                            } else {
-                              setFieldValue("currency", value);
-                            }
-                          }}
-                          value={values.currency}
-                          dropdownStyle={{ minWidth: '180px' }}
-                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                          loading={!fnddatass}
-                          dropdownRender={menu => (
-                            <div>
-                              <div
-                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                onClick={() => setIsAddCurrencyModalVisible(true)}
-                              >
-                                <PlusOutlined className="mr-2" />
-                                <span className="text-sm">Add New</span>
-                              </div>
-                              {menu}
-                            </div>
-                          )}
-                        >
-                          {fnddatass?.map((currency) => (
-                            <Option key={currency.id} value={currency.id}>
-                              <div className="flex items-center w-full px-1">
-                                <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
-                                <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
-                                <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
-                              </div>
-                            </Option>
-                          ))}
-                        </Select>
                       )}
-                    </Field>
-                    <Field name="budget">
-                      {({ field, form }) => (
-                        <Input
-                          {...field}
-                          className="price-input"
-                          style={{
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                            borderLeft: '1px solid #d9d9d9',
-                            width: 'calc(100% - 100px)'
-                          }}
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          placeholder="0.00"
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                              form.setFieldValue('budget', value);
-                            }
-                          }}
-                          onKeyPress={(e) => {
-                            const charCode = e.which ? e.which : e.keyCode;
-                            if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-                              e.preventDefault();
-                            }
-                            if (charCode === 46 && field.value.includes('.')) {
-                              e.preventDefault();
-                            }
-                          }}
-                          prefix={
-                            values.currency && (
-                              <span className="text-gray-600 font-medium mr-1">
-                                {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
-                              </span>
-                            )
-                          }
-                        />
-                      )}
-                    </Field>
+                    </Select>
+                    <ErrorMessage
+                      name="project_members"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
                   </div>
-                  <ErrorMessage name="budget" component="div" className="text-red-500 mt-1 text-sm" />
-                </div>
-              </Col>
+                </Col>
 
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Estimated Hours <span className="text-red-500">*</span></label>
-                  <Field
-                    name="estimatedhours"
-                    as={Input}
-                    type="number"
-                    className="mt-1"
-                    placeholder="Enter Estimated Hours"
-                  />
-                  <ErrorMessage
-                    name="estimatedhours"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={24} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Description <span className="text-red-500">*</span></label>
-                  <ReactQuill
-                    className="mt-1"
-                    value={values.project_description}
-                    onChange={(value) =>
-                      setFieldValue("project_description", value)
-                    }
-                    placeholder="Enter project_description"
-                    onBlur={() => setFieldTouched("project_description", true)}
-                  />
-                  <ErrorMessage
-                    name="project_description"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={24} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold"> Tag <span className="text-red-500">*</span></label>
-                  <Select
-                    style={{ width: "100%" }}
-                    className="mt-1"
-                    placeholder="Select or add new tag"
-                    value={values.tag}
-                    onChange={(value) => setFieldValue("tag", value)}
-                    dropdownRender={(menu) => (
-                      <div>
-                        {menu}
-                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                          <Button
-                            type="link"
-                            icon={<PlusOutlined />}
-                            onClick={() => setIsTagModalVisible(true)}
+                <Col span={12} className="mt-4">
+                  <div className="form-group">
+                    <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
+                    <div className="flex gap-0">
+                      <Field name="currency">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className="currency-select"
+                            style={{
+                              width: '60px',
+                              borderTopRightRadius: 0,
+                              borderBottomRightRadius: 0,
+                              borderRight: 0,
+                              backgroundColor: '#f8fafc',
+                            }}
+                            placeholder={<span className="text-gray-400">$</span>}
+                            onChange={(value) => {
+                              if (value === 'add_new') {
+                                setIsAddCurrencyModalVisible(true);
+                              } else {
+                                setFieldValue("currency", value);
+                              }
+                            }}
+                            value={values.currency}
+                            dropdownStyle={{ minWidth: '180px' }}
+                            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                            loading={!fnddatass}
+                            dropdownRender={menu => (
+                              <div>
+                                <div
+                                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                  onClick={() => setIsAddCurrencyModalVisible(true)}
+                                >
+                                  <PlusOutlined className="mr-2" />
+                                  <span className="text-sm">Add New</span>
+                                </div>
+                                {menu}
+                              </div>
+                            )}
                           >
-                            Add New Tag
-                          </Button>
+                            {fnddatass?.map((currency) => (
+                              <Option key={currency.id} value={currency.id}>
+                                <div className="flex items-center w-full px-1">
+                                  <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                  <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                  <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                </div>
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                      <Field name="budget">
+                        {({ field, form }) => (
+                          <Input
+                            {...field}
+                            className="price-input"
+                            style={{
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              borderLeft: '1px solid #d9d9d9',
+                              width: 'calc(100% - 100px)'
+                            }}
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                form.setFieldValue('budget', value);
+                              }
+                            }}
+                            onKeyPress={(e) => {
+                              const charCode = e.which ? e.which : e.keyCode;
+                              if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                e.preventDefault();
+                              }
+                              if (charCode === 46 && field.value.includes('.')) {
+                                e.preventDefault();
+                              }
+                            }}
+                            prefix={
+                              values.currency && (
+                                <span className="text-gray-600 font-medium mr-1">
+                                  {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                                </span>
+                              )
+                            }
+                          />
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage name="budget" component="div" className="text-red-500 mt-1 text-sm" />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Estimated Hours <span className="text-red-500">*</span></label>
+                    <Field
+                      name="estimatedhours"
+                      as={Input}
+                      type="number"
+                      className="mt-1"
+                      placeholder="Enter Estimated Hours"
+                    />
+                    <ErrorMessage
+                      name="estimatedhours"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={24} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Description <span className="text-red-500">*</span></label>
+                    <ReactQuill
+                      className="mt-1"
+                      value={values.project_description}
+                      onChange={(value) =>
+                        setFieldValue("project_description", value)
+                      }
+                      placeholder="Enter project_description"
+                      onBlur={() => setFieldTouched("project_description", true)}
+                    />
+                    <ErrorMessage
+                      name="project_description"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={24} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold"> Tag <span className="text-red-500">*</span></label>
+                    <Select
+                      style={{ width: "100%" }}
+                      className="mt-1"
+                      placeholder="Select or add new tag"
+                      value={values.tag}
+                      onChange={(value) => setFieldValue("tag", value)}
+                      dropdownRender={(menu) => (
+                        <div>
+                          {menu}
+                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                            <Button
+                              type="link"
+                              icon={<PlusOutlined />}
+                              onClick={() => setIsTagModalVisible(true)}
+                            >
+                              Add New Tag
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  >
-                    {tags.map((tag) => (
-                      <Option key={tag.id} value={tag.name}>
-                        {tag.name}
-                      </Option>
-                    ))}
-                  </Select>
-                  <ErrorMessage name="tag" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
+                      )}
+                    >
+                      {tags.map((tag) => (
+                        <Option key={tag.id} value={tag.name}>
+                          {tag.name}
+                        </Option>
+                      ))}
+                    </Select>
+                    <ErrorMessage name="tag" component="div" className="error-message text-red-500 my-1" />
+                  </div>
+                </Col>
 
-              <Col span={24} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Status <span className="text-red-500">*</span></label>
-                  <Select
-                    style={{ width: "100%" }}
-                    className="mt-1"
-                    placeholder="Select or add new status"
-                    value={values.status}
-                    onChange={(value) => setFieldValue("status", value)}
-                    dropdownRender={(menu) => (
-                      <div>
-                        {menu}
-                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                          <Button
-                            type="link"
-                            icon={<PlusOutlined />}
-                            onClick={() => setIsStatusModalVisible(true)}
-                          >
-                            Add New Status
-                          </Button>
+                <Col span={24} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Status <span className="text-red-500">*</span></label>
+                    <Select
+                      style={{ width: "100%" }}
+                      className="mt-1"
+                      placeholder="Select or add new status"
+                      value={values.status}
+                      onChange={(value) => setFieldValue("status", value)}
+                      dropdownRender={(menu) => (
+                        <div>
+                          {menu}
+                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                            <Button
+                              type="link"
+                              icon={<PlusOutlined />}
+                              onClick={() => setIsStatusModalVisible(true)}
+                            >
+                              Add New Status
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  >
-                    {statuses.map((status) => (
-                      <Option key={status.id} value={status.name}>
-                        {status.name}
-                      </Option>
-                    ))}
-                  </Select>
-                  <ErrorMessage
-                    name="status"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-            </Row>
+                      )}
+                    >
+                      {statuses.map((status) => (
+                        <Option key={status.id} value={status.name}>
+                          {status.name}
+                        </Option>
+                      ))}
+                    </Select>
+                    <ErrorMessage
+                      name="status"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+              </Row>
 
-            <div className="form-buttons text-right mt-4">
-              <Button type="default" className="mr-2" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="primary" htmlType="submit">
-                Create
-              </Button>
-            </div>
+              <div className="form-buttons text-right mt-4">
+                <Button type="default" className="mr-2" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  Create
+                </Button>
+              </div>
 
-            {/* Keep only one set of modals at the bottom of the form */}
-            <Modal
-              title="Add New Tag"
-              open={isTagModalVisible}
-              onCancel={() => setIsTagModalVisible(false)}
-              onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible, setFieldValue)}
-              okText="Add Tag"
-            >
-              <Input
-                placeholder="Enter new tag name"
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-              />
-            </Modal>
+              {/* Keep only one set of modals at the bottom of the form */}
+              <Modal
+                title="Add New Tag"
+                open={isTagModalVisible}
+                onCancel={() => setIsTagModalVisible(false)}
+                onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible, setFieldValue)}
+                okText="Add Tag"
+              >
+                <Input
+                  placeholder="Enter new tag name"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                />
+              </Modal>
 
-            <Modal
-              title="Add New Category"
-              open={isCategoryModalVisible}
-              onCancel={() => setIsCategoryModalVisible(false)}
-              onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible, setFieldValue)}
-              okText="Add Category"
-            >
-              <Input
-                placeholder="Enter new category name"
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-              />
-            </Modal>
+              <Modal
+                title="Add New Category"
+                open={isCategoryModalVisible}
+                onCancel={() => setIsCategoryModalVisible(false)}
+                onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible, setFieldValue)}
+                okText="Add Category"
+              >
+                <Input
+                  placeholder="Enter new category name"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                />
+              </Modal>
 
-            <Modal
-              title="Add New Status"
-              open={isStatusModalVisible}
-              onCancel={() => setIsStatusModalVisible(false)}
-              onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible, setFieldValue)}
-              okText="Add Status"
-            >
-              <Input
-                placeholder="Enter new status name"
-                value={newStatus}
-                onChange={(e) => setNewStatus(e.target.value)}
-              />
-            </Modal>
+              <Modal
+                title="Add New Status"
+                open={isStatusModalVisible}
+                onCancel={() => setIsStatusModalVisible(false)}
+                onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible, setFieldValue)}
+                okText="Add Status"
+              >
+                <Input
+                  placeholder="Enter new status name"
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                />
+              </Modal>
 
-            <Modal
-              title="Add User"
-              visible={isAddUserModalVisible}
-              onCancel={() => setIsAddUserModalVisible(false)}
-              footer={null}
-              width={1000}
-            >
-              <AddUser onClose={() => setIsAddUserModalVisible(false)} />
-            </Modal>
+              <Modal
+                title="Add User"
+                visible={isAddUserModalVisible}
+                onCancel={() => setIsAddUserModalVisible(false)}
+                footer={null}
+                width={1000}
+              >
+                <AddUser onClose={() => setIsAddUserModalVisible(false)} />
+              </Modal>
 
-            <Modal
-              title="Add Client"
-              visible={isAddClientModalVisible}
-              onCancel={() => setIsAddClientModalVisible(false)}
-              footer={null}
-              width={800}
-            >
-              <AddClient onClose={() => setIsAddClientModalVisible(false)} />
-            </Modal>
+              <Modal
+                title="Add Client"
+                visible={isAddClientModalVisible}
+                onCancel={() => setIsAddClientModalVisible(false)}
+                footer={null}
+                width={800}
+              >
+                <AddClient onClose={() => setIsAddClientModalVisible(false)} />
+              </Modal>
 
-            <Modal
-              title="Add New Currency"
-              visible={isAddCurrencyModalVisible}
-              onCancel={() => setIsAddCurrencyModalVisible(false)}
-              footer={null}
-              width={600}
-            >
-              <AddCurrencies
-                onClose={() => {
-                  setIsAddCurrencyModalVisible(false);
-                  dispatch(getcurren());
-                }}
-              />
-            </Modal>
-          </Form>
-        )}
-      </Formik>
-    </div>
+              <Modal
+                title="Add New Currency"
+                visible={isAddCurrencyModalVisible}
+                onCancel={() => setIsAddCurrencyModalVisible(false)}
+                footer={null}
+                width={600}
+              >
+                <AddCurrencies
+                  onClose={() => {
+                    setIsAddCurrencyModalVisible(false);
+                    dispatch(getcurren());
+                  }}
+                />
+              </Modal>
+            </Form>
+          )}
+        </Formik>
+      </div>
+    </>
   );
 };
 

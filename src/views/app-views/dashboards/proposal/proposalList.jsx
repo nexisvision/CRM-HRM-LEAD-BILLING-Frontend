@@ -90,11 +90,11 @@ const ProposalList = () => {
   useEffect(() => {
     if (fnddatas) {
       // Filter proposals by created_by matching the logged-in user's username
-      
+
       // Enrich filtered proposals with lead and deal titles
       const enrichedData = fnddatas.map((proposal) => {
 
-        const lead = Leads?.find((l) => l.id === proposal.lead_title);      
+        const lead = Leads?.find((l) => l.id === proposal.lead_title);
         // Match lead by ID
         const deal = Deals?.find((d) => d.id === proposal.deal_title);
 
@@ -120,7 +120,7 @@ const ProposalList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find(role => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
@@ -181,9 +181,9 @@ const ProposalList = () => {
     });
 
     const enrichedData = filteredData.map((proposal) => {
-      
+
       const lead = Leads?.find((l) => l.id === proposal.lead_title);
-      
+
       const deal = Deals?.find((d) => d.id === proposal.deal_title);
 
       return {
@@ -276,7 +276,7 @@ const ProposalList = () => {
       dataIndex: "valid_till",
       render: (date) => (date ? dayjs(date).format("DD-MM-YYYY") : "N/A"),
       sorter: (a, b) => a.valid_till.length - b.valid_till.length,
-    },  
+    },
     {
       title: "Tax",
       dataIndex: "tax",
@@ -293,7 +293,7 @@ const ProposalList = () => {
       render: (total) => <span>{total || 'N/A'}</span>,
       sorter: (a, b) => a.total - b.total,
     },
-    
+
 
     // {
     //   title: "created_by ",

@@ -194,13 +194,13 @@ const ProjectList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   console.log("Parsed Permissions:", parsedPermissions);
 
@@ -254,8 +254,8 @@ const ProjectList = () => {
               projectMembers = Array.isArray(parsed)
                 ? parsed
                 : parsed.project_members
-                ? parsed.project_members
-                : [];
+                  ? parsed.project_members
+                  : [];
             } catch (e) {
               console.error("Error parsing project members string:", e);
               projectMembers = [];
@@ -264,8 +264,8 @@ const ProjectList = () => {
             projectMembers = Array.isArray(item.project_members)
               ? item.project_members
               : item.project_members.project_members
-              ? item.project_members.project_members
-              : [];
+                ? item.project_members.project_members
+                : [];
           }
         }
 
@@ -308,12 +308,12 @@ const ProjectList = () => {
         completedTask: `${Math.round(
           ((new Date() - new Date(item.startDate)) /
             (new Date(item.endDate) - new Date(item.startDate))) *
-            100
+          100
         )}%`,
         progressPercent: Math.round(
           ((new Date() - new Date(item.startDate)) /
             (new Date(item.endDate) - new Date(item.startDate))) *
-            100
+          100
         ),
         dayleft: Math.max(
           0,
@@ -380,45 +380,45 @@ const ProjectList = () => {
       {(whorole === "super-admin" ||
         whorole === "client" ||
         canEditProject) && (
-        <Menu.Item key="edit" onClick={() => editp(id)}>
-          <EditOutlined /> Edit
-        </Menu.Item>
-      )}
+          <Menu.Item key="edit" onClick={() => editp(id)}>
+            <EditOutlined /> Edit
+          </Menu.Item>
+        )}
 
       {(whorole === "super-admin" ||
         whorole === "client" ||
         canDeleteProject) && (
-        <Menu.Item key="delete" onClick={() => deleteItem(id)}>
-          <DeleteOutlined /> Delete
-        </Menu.Item>
-      )}
+          <Menu.Item key="delete" onClick={() => deleteItem(id)}>
+            <DeleteOutlined /> Delete
+          </Menu.Item>
+        )}
     </Menu>
   );
 
   const getDropdownItems = (item) => [
     ...(whorole === "super-admin" || whorole === "client" || canEditProject
       ? [
-          {
-            key: "edit",
-            label: (
-              <div onClick={() => editp(item.id)}>
-                <EditOutlined /> Edit
-              </div>
-            ),
-          },
-        ]
+        {
+          key: "edit",
+          label: (
+            <div onClick={() => editp(item.id)}>
+              <EditOutlined /> Edit
+            </div>
+          ),
+        },
+      ]
       : []),
     ...(whorole === "super-admin" || whorole === "client" || canDeleteProject
       ? [
-          {
-            key: "delete",
-            label: (
-              <div onClick={() => deleteItem(item.id)}>
-                <DeleteOutlined /> Delete
-              </div>
-            ),
-          },
-        ]
+        {
+          key: "delete",
+          label: (
+            <div onClick={() => deleteItem(item.id)}>
+              <DeleteOutlined /> Delete
+            </div>
+          ),
+        },
+      ]
       : []),
   ];
 
@@ -752,15 +752,15 @@ const ProjectList = () => {
                 {(whorole === "super-admin" ||
                   whorole === "client" ||
                   canCreateProject) && (
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={openAddProjectModal}
-                    className="flex items-center"
-                  >
-                    New Project
-                  </Button>
-                )}
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={openAddProjectModal}
+                      className="flex items-center"
+                    >
+                      New Project
+                    </Button>
+                  )}
               </div>
             </Flex>
           </div>
@@ -908,8 +908,8 @@ const ProjectList = () => {
                                 item.dayleft > 10
                                   ? "#52c41a"
                                   : item.dayleft > 5
-                                  ? "#faad14"
-                                  : "#f5222d",
+                                    ? "#faad14"
+                                    : "#f5222d",
                             }}
                           />
                           <div>

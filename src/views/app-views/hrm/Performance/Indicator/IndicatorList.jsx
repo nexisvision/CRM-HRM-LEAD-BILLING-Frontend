@@ -74,13 +74,13 @@ const IndicatorList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   let allpermisson = [];
 
@@ -364,9 +364,9 @@ const IndicatorList = () => {
   );
 
   const checkIndicatorExists = (branch, department, designation) => {
-    return users.some(indicator => 
-      indicator.branch === branch && 
-      indicator.department === department && 
+    return users.some(indicator =>
+      indicator.branch === branch &&
+      indicator.department === department &&
       indicator.designation === designation
     );
   };
@@ -374,12 +374,12 @@ const IndicatorList = () => {
   const handleAddIndicator = (values) => {
     // Check if indicator already exists
     const exists = checkIndicatorExists(values.branch, values.department, values.designation);
-    
+
     if (exists) {
       message.error('An indicator already exists for this branch, department, and designation combination.');
       return false;
     }
-    
+
     // Proceed with adding the indicator
     return true;
   };

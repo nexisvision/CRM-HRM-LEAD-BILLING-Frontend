@@ -50,7 +50,7 @@ const DashboardList = () => {
     const roles = useSelector((state) => state.role?.role?.data);
     const roleData = roles?.find(role => role.id === roleId);
 
-    const whorole = roleData.role_name;
+    const whorole = roleData?.role_name;
 
     const parsedPermissions = Array.isArray(roleData?.permissions)
         ? roleData.permissions
@@ -118,7 +118,7 @@ const DashboardList = () => {
         {
             title: "Contract Value",
             dataIndex: "value",
-           
+
             sorter: {
                 compare: (a, b) => a.value.length - b.value.length,
             },

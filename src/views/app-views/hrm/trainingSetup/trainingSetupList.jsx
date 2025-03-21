@@ -90,13 +90,13 @@ const TrainingSetupList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   let allpermisson;
 
@@ -200,15 +200,15 @@ const TrainingSetupList = () => {
           {(whorole === "super-admin" ||
             whorole === "client" ||
             canCreateClient) && (
-            <Button
-              type="primary"
-              className="ml-2"
-              onClick={openAddTrainingSetupModal}
-            >
-              <PlusOutlined />
-              <span>New</span>
-            </Button>
-          )}
+              <Button
+                type="primary"
+                className="ml-2"
+                onClick={openAddTrainingSetupModal}
+              >
+                <PlusOutlined />
+                <span>New</span>
+              </Button>
+            )}
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
@@ -223,13 +223,13 @@ const TrainingSetupList = () => {
         {(whorole === "super-admin" ||
           whorole === "client" ||
           canViewClient) && (
-          <Table
-            columns={tableColumns}
-            dataSource={users}
-            rowKey="id"
-            scroll={{ x: 1200 }}
-          />
-        )}
+            <Table
+              columns={tableColumns}
+              dataSource={users}
+              rowKey="id"
+              scroll={{ x: 1200 }}
+            />
+          )}
       </div>
 
       <Modal

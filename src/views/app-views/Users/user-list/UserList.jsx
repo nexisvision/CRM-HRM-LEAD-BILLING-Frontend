@@ -71,13 +71,13 @@ const UserList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   let allpermisson;
 
@@ -361,15 +361,15 @@ const UserList = () => {
               (canCreateClient &&
                 whorole !== "super-admin" &&
                 whorole !== "client")) && (
-              <Button
-                type="primary"
-                className="rounded-lg flex items-center shadow-md hover:shadow-lg transition-all"
-                onClick={openAddUserModal}
-              >
-                <PlusOutlined />
-                New
-              </Button>
-            )}
+                <Button
+                  type="primary"
+                  className="rounded-lg flex items-center shadow-md hover:shadow-lg transition-all"
+                  onClick={openAddUserModal}
+                >
+                  <PlusOutlined />
+                  New
+                </Button>
+              )}
             <Button
               type="primary"
               icon={<FileExcelOutlined />}
@@ -386,16 +386,16 @@ const UserList = () => {
           (canViewClient &&
             whorole !== "super-admin" &&
             whorole !== "client")) && (
-          <Table
-            columns={tableColumns}
-            dataSource={users}
-            rowKey="id"
-            className="ant-table-striped"
-            rowClassName={(record, index) =>
-              index % 2 === 0 ? "bg-gray-50" : "bg-white"
-            }
-          />
-        )}
+            <Table
+              columns={tableColumns}
+              dataSource={users}
+              rowKey="id"
+              className="ant-table-striped"
+              rowClassName={(record, index) =>
+                index % 2 === 0 ? "bg-gray-50" : "bg-white"
+              }
+            />
+          )}
       </div>
       <UserView
         data={selectedUser}
@@ -407,7 +407,7 @@ const UserList = () => {
         visible={isAddUserModalVisible}
         onCancel={closeAddUserModal}
         footer={null}
-        width={700}
+        width={450}
       >
         <AddUser onClose={closeAddUserModal} />
       </Modal>

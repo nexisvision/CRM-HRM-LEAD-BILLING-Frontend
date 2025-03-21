@@ -37,7 +37,6 @@ const EditClient = ({ comnyid, onClose }) => {
         // Personal Information
         firstName: clientData.firstName || "",
         lastName: clientData.lastName || "",
-        username: clientData.username || "",
         gender: clientData.gender || "other",
         phoneCode: clientData.phoneCode || "+91",
         phone: clientData.phone || "",
@@ -74,23 +73,22 @@ const EditClient = ({ comnyid, onClose }) => {
       formData.append(key, values[key]);
     }
 
-    dispatch(Editclient({ comnyid, formData }))
-      .then(() => {
-        dispatch(ClientData());
-        resetForm();
-        onClose();
-      })
-      .catch((error) => {
-        console.error("Error during submit:", error);
-        message.error("Failed to edit client");
-      });
+    try {
+      await dispatch(Editclient({ comnyid, formData }));
+      dispatch(ClientData());
+      resetForm();
+      onClose();
+      message.success("Client updated successfully");
+    } catch (error) {
+      message.error("Failed to update client");
+      console.error("Error updating client:", error);
+    }
   };
 
   const [initialValues, setInitialValues] = useState({
     // Personal Information
     firstName: "",
     lastName: "",
-    username: "",
     gender: "other",
     phoneCode: "+91",
     phone: "",
@@ -152,7 +150,7 @@ const EditClient = ({ comnyid, onClose }) => {
           setFieldValue,
           errors,
         }) => {
-  
+
 
           return (
             <Form className="formik-form" onSubmit={handleSubmit}>
@@ -190,23 +188,6 @@ const EditClient = ({ comnyid, onClose }) => {
                     />
                     <ErrorMessage
                       name="lastName"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-
-                <Col span={12} className="mt-2">
-                  <div className="form-item">
-                    <label className="font-semibold">Username <span className="text-red-500">*</span></label>
-                    <Field
-                      name="username"
-                      as={Input}
-                      className="w-full mt-2"
-                      placeholder="Enter Username"
-                    />
-                    <ErrorMessage
-                      name="username"
                       component="div"
                       className="error-message text-red-500 my-1"
                     />

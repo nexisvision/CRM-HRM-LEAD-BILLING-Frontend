@@ -122,75 +122,46 @@ const RoleAndPermissionSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      //add
+      // Add Client
       .addCase(addClient.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(addClient.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload?.data?.message);
       })
       .addCase(addClient.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.message);
       })
 
+      // Get Client Data
       .addCase(ClientData.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(ClientData.fulfilled, (state, action) => {
         state.isLoading = false;
         state.SubClient = action?.payload;
-        toast.success(action.payload?.data?.message);
       })
       .addCase(ClientData.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.message);
+        toast.error("Failed to fetch client data");
       })
 
-      //getall
-      .addCase(getAllUsers.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getAllUsers.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.users = action.payload;
-        toast.success(`Users fetched successfully`);
-      })
-      .addCase(getAllUsers.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
-
-      //getuserbyid
-      .addCase(getUserById.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getUserById.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.detailItem = action.payload?.user;
-        toast.success(action.payload.message);
-      })
-      .addCase(getUserById.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
-      //delete
+      // Delete Client
       .addCase(deleteClient.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(deleteClient.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload.message);
+        toast.success("Client deleted successfully");
       })
       .addCase(deleteClient.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
+        toast.error("Failed to delete client");
       })
-      //update
+
+      // Edit Client
       .addCase(Editclient.pending, (state) => {
-        state.isLoading = false;
-        state.error = null;
+        state.isLoading = true;
       })
       .addCase(Editclient.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -198,7 +169,7 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(Editclient.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to update employee";
+        state.error = action.payload || "Failed to update client";
       });
   },
 });

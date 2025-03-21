@@ -54,13 +54,13 @@ const DepartmentList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   // Update permission checks
 
@@ -307,15 +307,15 @@ const DepartmentList = () => {
           {(whorole === "super-admin" ||
             whorole === "client" ||
             canCreateDepartment) && (
-            <Button
-              type="primary"
-              className="ml-2"
-              onClick={openAddDepartmentModal}
-            >
-              <PlusOutlined />
-              <span>New</span>
-            </Button>
-          )}
+              <Button
+                type="primary"
+                className="ml-2"
+                onClick={openAddDepartmentModal}
+              >
+                <PlusOutlined />
+                <span>New</span>
+              </Button>
+            )}
 
           <Button
             type="primary"
@@ -332,19 +332,19 @@ const DepartmentList = () => {
         {(whorole === "super-admin" ||
           whorole === "client" ||
           canViewDepartment) && (
-          <Table
-            columns={tableColumns}
-            dataSource={getFilteredDepartments()}
-            rowKey="id"
-            pagination={{
-              total: getFilteredDepartments().length,
-              pageSize: 10,
-              showSizeChanger: true,
-              showTotal: (total, range) =>
-                `${range[0]}-${range[1]} of ${total} items`,
-            }}
-          />
-        )}
+            <Table
+              columns={tableColumns}
+              dataSource={getFilteredDepartments()}
+              rowKey="id"
+              pagination={{
+                total: getFilteredDepartments().length,
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} of ${total} items`,
+              }}
+            />
+          )}
       </div>
       <UserView
         data={selectedUser}

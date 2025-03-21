@@ -132,9 +132,8 @@ const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
               {week.map((day, dayIndex) => (
                 <td
                   key={dayIndex}
-                  className={`calendar-cell ${
-                    !day.isCurrentMonth ? "other-month" : ""
-                  }`}
+                  className={`calendar-cell ${!day.isCurrentMonth ? "other-month" : ""
+                    }`}
                   onClick={() => onDateSelect(day.date)}
                   style={{ cursor: "pointer" }}
                 >
@@ -213,13 +212,13 @@ const CalendarApp = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   let allpermisson;
 
@@ -245,10 +244,10 @@ const CalendarApp = () => {
         <Col xs={24} sm={24} md={8} lg={6}>
           <Card className="sidebar-card">
             {whorole === "super-admin" ||
-            whorole === "client" ||
-            (canViewClient &&
-              whorole !== "super-admin" &&
-              whorole !== "client") ? (
+              whorole === "client" ||
+              (canViewClient &&
+                whorole !== "super-admin" &&
+                whorole !== "client") ? (
               <div className="sidebar-events">
                 <h4 className="mb-3">Upcoming Events</h4>
                 {fndata.length === 0 ? (
@@ -275,10 +274,10 @@ const CalendarApp = () => {
                         </div>
                         <div className="event-card-actions">
                           {whorole === "super-admin" ||
-                          whorole === "client" ||
-                          (canDeleteClient &&
-                            whorole !== "super-admin" &&
-                            whorole !== "client") ? (
+                            whorole === "client" ||
+                            (canDeleteClient &&
+                              whorole !== "super-admin" &&
+                              whorole !== "client") ? (
                             <Tooltip title="Delete event">
                               <DeleteOutlined
                                 onClick={() => onDeleteEvent(event.id)}
@@ -297,10 +296,10 @@ const CalendarApp = () => {
         </Col>
         <Col xs={24} sm={24} md={16} lg={18}>
           {whorole === "super-admin" ||
-          whorole === "client" ||
-          (canViewClient &&
-            whorole !== "super-admin" &&
-            whorole !== "client") ? (
+            whorole === "client" ||
+            (canViewClient &&
+              whorole !== "super-admin" &&
+              whorole !== "client") ? (
             <Card className="mb-4">
               <CustomCalendar
                 eventData={fndata}
@@ -313,8 +312,8 @@ const CalendarApp = () => {
       </Row>
 
       {whorole === "super-admin" ||
-      whorole === "client" ||
-      (canCreateClient && whorole !== "super-admin" && whorole !== "client") ? (
+        whorole === "client" ||
+        (canCreateClient && whorole !== "super-admin" && whorole !== "client") ? (
         <Modal
           title="New Event"
           open={modalVisible}

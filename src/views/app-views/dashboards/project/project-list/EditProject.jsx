@@ -15,7 +15,6 @@ import * as Yup from "yup";
 import { Editpro, GetProject } from "./projectReducer/ProjectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-import { GetTagspro } from "./tagReducer/TagSlice";
 import { PlusOutlined } from "@ant-design/icons";
 import { GetLable, AddLable } from "../../sales/LableReducer/LableSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
@@ -37,7 +36,7 @@ const calculateDuration = (startDate, endDate) => {
   const days = diff.days();
 
   let displayValue = '';
-  
+
   // If there are years or months, only show those
   if (years > 0 || months > 0) {
     if (years > 0) {
@@ -163,11 +162,6 @@ const EditProject = ({ id, onClose }) => {
         console.error("Edit API error:", error);
       });
   };
-
-
-  useEffect(() => {
-    dispatch(GetTagspro());
-  }, [dispatch]);
 
   useEffect(() => {
     dispatch(getcurren());
@@ -327,7 +321,7 @@ const EditProject = ({ id, onClose }) => {
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <>
             <Form className="formik-form" onSubmit={handleSubmit}>
-            <div className="mb-3 border-b pb-[-10px] font-medium"></div>
+              <div className="mb-3 border-b pb-[-10px] font-medium"></div>
 
               <Row gutter={16}>
                 <Col span={24}>

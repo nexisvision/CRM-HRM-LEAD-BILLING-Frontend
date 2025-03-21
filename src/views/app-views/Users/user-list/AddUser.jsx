@@ -31,6 +31,73 @@ const initialValues = {
   password: ''
 };
 
+const styles = `
+  .create-user-form {
+    padding: 24px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .form-field {
+    margin-bottom: 24px;
+  }
+
+  .form-field:last-child {
+    margin-bottom: 32px;
+  }
+
+  .form-field label {
+    display: block;
+    margin-bottom: 8px;
+    color: #374151;
+  }
+
+  .form-field input {
+    width: 100%;
+  }
+
+  .submit-buttons {
+    margin-top: 32px;
+  }
+
+  .submit-button {
+    width: 100%;
+    height: 40px;
+  }
+
+  .otp-input-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 24px 0;
+  }
+
+  .otp-input {
+    width: 45px !important;
+    height: 45px;
+    padding: 0;
+    font-size: 20px;
+    text-align: center;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: white;
+    transition: all 0.3s;
+  }
+
+  .otp-input:hover {
+    border-color: #60a5fa;
+  }
+
+  .otp-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+
+  .verify-email-modal {
+    max-width: 400px;
+  }
+`;
+
 const AddUser = ({ visible, onClose }) => {
   const dispatch = useDispatch();
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -121,133 +188,145 @@ const AddUser = ({ visible, onClose }) => {
     }
   };
 
+  const handleResendOtp = async () => {
+    try {
+      const response = await axios.post(
+        `${env.API_ENDPOINT_URL}/auth/resend-signup-otp`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${otpToken}`,
+          },
+        }
+      );
+      if (response.data.success) {
+        setOtpToken(response.data?.data?.sessionToken);
+        message.success("OTP resent successfully");
+        setOtp("");
+      } else {
+        message.error("Failed to resend OTP");
+      }
+    } catch (error) {
+      message.error("Failed to resend OTP");
+    }
+  };
+
   return (
     <div>
+      <style>{styles}</style>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched, setFieldValue, handleSubmit }) => (
-          <Form className="space-y-4">
-            <div className="mb-3 border-b pb-[-10px] font-medium"></div>
+        {({ errors, touched, setFieldValue }) => (
+          <Form className="create-user-form">
+            <div className="form-field">
+              <label className="font-semibold">
+                Name <span className="text-red-500">*</span>
+              </label>
+              <Field
+                name="username"
+                as={Input}
+                placeholder="Enter Name"
+                className="mt-1"
+              />
+              <ErrorMessage
+                name="username"
+                component="div"
+                className="error-message text-red-500 mt-1 text-sm"
+              />
+            </div>
 
-            <Row gutter={[16, 16]}>
-              <Col span={12}>
-                <div className="space-y-2">
-                  <div className="form-item">
-                    <label className="font-semibold">Name <span className="text-red-500">*</span></label>
-                    <Field
-                      name="username"
-                      as={Input}
-                      placeholder="Enter Name"
-                      className="w-full mt-2"
-                      rules={[{ required: true }]}
-                    />
-                    <ErrorMessage
-                      name="username"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </div>
-              </Col>
-              <Col span={12}>
-                <div className="space-y-2">
-                  <div className="form-item">
-                    <label className="font-semibold">Email <span className="text-red-500">*</span></label>
-                    <Field
-                      name="email"
-                      as={Input}
-                      className="w-full mt-2"
-                      placeholder="Enter Email"
-                      rules={[{ required: true }]}
-                    />
-                    <ErrorMessage
-                      name="email"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </div>
-              </Col>
-            </Row>
+            <div className="form-field">
+              <label className="font-semibold">
+                Email <span className="text-red-500">*</span>
+              </label>
+              <Field
+                name="email"
+                as={Input}
+                placeholder="Enter Email"
+                className="mt-1"
+              />
+              <ErrorMessage
+                name="email"
+                component="div"
+                className="error-message text-red-500 mt-1 text-sm"
+              />
+            </div>
 
-            <Row gutter={[16, 16]}>
-              <Col span={12}>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    User Role <span className="text-red-500">*</span>
-                  </label>
-                  <Select
-                    className="w-full"
-                    placeholder="Select Role"
-                    onChange={(value) => setFieldValue('role_id', value)}
-                    status={errors.role_id && touched.role_id ? 'error' : ''}
-                    dropdownRender={(menu) => (
-                      <>
-                        {menu}
-                        <Button
-                          type="link"
-                          block
-                          // icon={<PlusOutlined />}
-                          onClick={() => setShowRoleModal(true)}
-                        >
-                          + Add New Role
-                        </Button>
-                      </>
-                    )}
-                  >
-                    {filteredRoles.map((tag) => (
-                      <Option key={tag?.id} value={tag?.id}>
-                        {tag?.role_name}
-                      </Option>
-                    ))}
-                  </Select>
-                  {errors.role_id && touched.role_id && (
-                    <div className="text-red-500 text-sm mt-1">{errors.role_id}</div>
-                  )}
-                </div>
-              </Col>
-              <Col span={12}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Password <span className="text-red-500">*</span></label>
-                  <div className="relative">
-                    <Field
-                      name="password"
-                      as={Input.Password}
-                      placeholder="Password"
-                      className="mt-1 w-full"
-                    />
+            <div className="form-field">
+              <label className="font-semibold">
+                User Role <span className="text-red-500">*</span>
+              </label>
+              <Select
+                className="w-full"
+                placeholder="Select Role"
+                onChange={(value) => setFieldValue('role_id', value)}
+                dropdownRender={(menu) => (
+                  <>
+                    {menu}
                     <Button
-                      className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
-                      onClick={() => setFieldValue("password", generatePassword())}
+                      type="link"
+                      block
+                      onClick={() => setShowRoleModal(true)}
                     >
-                      <ReloadOutlined />
+                      + Add New Role
                     </Button>
-                  </div>
-                  <ErrorMessage
-                    name="password"
-                    component="div"
-                    className="text-red-500"
-                  />
-                </div>
-              </Col>
-            </Row>
-
-            <div className="flex justify-end gap-2 mt-6">
-              <Button
-                onClick={onClose}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md"
+                  </>
+                )}
               >
-                Cancel
-              </Button>
+                {filteredRoles.map((tag) => (
+                  <Option key={tag?.id} value={tag?.id}>
+                    {tag?.role_name}
+                  </Option>
+                ))}
+              </Select>
+              {errors.role_id && touched.role_id && (
+                <div className="text-red-500 text-sm mt-1">{errors.role_id}</div>
+              )}
+            </div>
+
+            <div className="form-field">
+              <label className="font-semibold">
+                Password <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Field
+                  name="password"
+                  as={Input.Password}
+                  placeholder="Password"
+                  className="mt-1 w-full"
+                />
+                <Button
+                  className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:bg-transparent -translate-y-1/2 flex items-center z-10"
+                  onClick={() => setFieldValue("password", generatePassword())}
+                >
+                  <ReloadOutlined />
+                </Button>
+              </div>
+              <ErrorMessage
+                name="password"
+                component="div"
+                className="text-red-500 mt-1 text-sm"
+              />
+            </div>
+
+            <div className="submit-buttons">
               <Button
                 type="primary"
                 htmlType="submit"
-                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+                className="submit-button"
+                size="large"
               >
-                Create
+                Create User
+              </Button>
+              <Button
+                onClick={onClose}
+                className="submit-button mt-3"
+                size="large"
+              >
+                Cancel
               </Button>
             </div>
           </Form>
@@ -256,32 +335,95 @@ const AddUser = ({ visible, onClose }) => {
 
       {/* OTP Modal */}
       <Modal
-        title="Verify OTP"
+        title={
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold text-gray-800">Verify Your Email</h2>
+            <p className="text-gray-500 mt-2">
+              Enter the 6-digit code sent to your email
+            </p>
+          </div>
+        }
         visible={showOtpModal}
         onCancel={() => setShowOtpModal(false)}
         footer={null}
         centered
-        className="rounded-lg"
+        width={400}
+        className="verify-email-modal"
       >
-        <div className="p-4 space-y-4">
-          <h2 className="text-xl font-semibold">OTP Verification</h2>
-          <p className="text-gray-600">
-            An OTP has been sent to your registered email. Please enter the OTP below to verify your account.
-          </p>
+        <div className="p-4">
+          <div className="otp-input-container">
+            {[...Array(6)].map((_, index) => (
+              <Input
+                key={index}
+                className="otp-input"
+                maxLength={1}
+                value={otp[index] || ''}
+                onChange={(e) => {
+                  const newOtp = otp.split('');
+                  newOtp[index] = e.target.value;
+                  setOtp(newOtp.join(''));
+
+                  // Auto-focus next input
+                  if (e.target.value && index < 5) {
+                    const nextInput = document.querySelector(`input.otp-input:nth-child(${index + 2})`);
+                    if (nextInput) nextInput.focus();
+                  }
+                }}
+                onKeyDown={(e) => {
+                  // Handle backspace
+                  if (e.key === 'Backspace' && !otp[index] && index > 0) {
+                    const prevInput = document.querySelector(`input.otp-input:nth-child(${index})`);
+                    if (prevInput) prevInput.focus();
+                  }
+                }}
+                onPaste={(e) => {
+                  e.preventDefault();
+                  const pastedData = e.clipboardData.getData('text').trim();
+
+                  if (/^\d{6}$/.test(pastedData)) {
+                    setOtp(pastedData);
+                    const lastInput = document.querySelector(`input.otp-input:nth-child(6)`);
+                    if (lastInput) lastInput.focus();
+                  }
+                }}
+              />
+            ))}
+          </div>
+
           <input
-            type="number"
-            placeholder="Enter OTP"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
+            type="text"
+            style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}
+            onPaste={(e) => {
+              e.preventDefault();
+              const pastedData = e.clipboardData.getData('text').trim();
+
+              if (/^\d{6}$/.test(pastedData)) {
+                setOtp(pastedData);
+                const lastInput = document.querySelector(`input.otp-input:nth-child(6)`);
+                if (lastInput) lastInput.focus();
+              }
+            }}
           />
+
           <Button
             type="primary"
+            block
+            size="large"
             onClick={handleOtpVerify}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+            className="mt-6"
           >
-            Verify OTP
+            Verify Email
           </Button>
+
+          <div className="text-center mt-4">
+            <Button
+              type="link"
+              onClick={handleResendOtp}
+              className="text-blue-600 hover:text-blue-700"
+            >
+              Resend Code
+            </Button>
+          </div>
         </div>
       </Modal>
 
@@ -292,12 +434,11 @@ const AddUser = ({ visible, onClose }) => {
         onCancel={() => setShowRoleModal(false)}
         footer={null}
         width={1000}
-        style={{ top: 20 }}
       >
         <AddRole
           onClose={() => {
             setShowRoleModal(false);
-            dispatch(roledata()); // Refresh roles after adding
+            dispatch(roledata());
           }}
         />
       </Modal>

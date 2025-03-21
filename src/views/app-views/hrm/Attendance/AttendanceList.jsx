@@ -96,11 +96,11 @@ const AttendanceList = () => {
               !employeeAttendanceMap[attendance.employee].attendanceByDay[day]
             ) {
               employeeAttendanceMap[attendance.employee].attendanceByDay[day] =
-                {
-                  status: "P",
-                  startTime: attendance.startTime,
-                  endTime: attendance.endTime,
-                };
+              {
+                status: "P",
+                startTime: attendance.startTime,
+                endTime: attendance.endTime,
+              };
 
               const startTime = dayjs(attendance.startTime, "HH:mm:ss");
               const endTime = dayjs(attendance.endTime, "HH:mm:ss");
@@ -180,13 +180,13 @@ const AttendanceList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   let allpermisson = [];
 
@@ -303,9 +303,8 @@ const AttendanceList = () => {
             if (attendance.status === "L") {
               return (
                 <Tooltip
-                  title={`Leave Type: ${attendance.leaveType}, Remark: ${
-                    attendance.remark || "N/A"
-                  }, Status: ${attendance.statusText}`}
+                  title={`Leave Type: ${attendance.leaveType}, Remark: ${attendance.remark || "N/A"
+                    }, Status: ${attendance.statusText}`}
                 >
                   <Tag color="orange" className="m-0">
                     L
@@ -447,10 +446,10 @@ const AttendanceList = () => {
         </div>
         <div className="flex justify-end gap-2">
           {whorole === "super-admin" ||
-          whorole === "client" ||
-          (canCreateAttendance &&
-            whorole !== "super-admin" &&
-            whorole !== "client") ? (
+            whorole === "client" ||
+            (canCreateAttendance &&
+              whorole !== "super-admin" &&
+              whorole !== "client") ? (
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -464,10 +463,10 @@ const AttendanceList = () => {
       </div>
       <div className="overflow-x-auto">
         {whorole === "super-admin" ||
-        whorole === "client" ||
-        (canViewAttendance &&
-          whorole !== "super-admin" &&
-          whorole !== "client") ? (
+          whorole === "client" ||
+          (canViewAttendance &&
+            whorole !== "super-admin" &&
+            whorole !== "client") ? (
           <>
             <div className="mb-4 flex flex-wrap gap-3">
               <Tag color="green">P - Present</Tag>

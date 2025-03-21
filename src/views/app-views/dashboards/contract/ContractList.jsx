@@ -187,13 +187,13 @@ const ContractList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
   console.log("parsedPermissions", parsedPermissions);
 
   let contractPermissions = [];
@@ -261,11 +261,11 @@ const ContractList = () => {
         compare: (a, b) => {
           const clientA = String(
             clientData?.find((client) => client.id === a.client)?.username ||
-              a.client
+            a.client
           );
           const clientB = String(
             clientData?.find((client) => client.id === b.client)?.username ||
-              b.client
+            b.client
           );
           return clientA.localeCompare(clientB);
         },
@@ -397,15 +397,15 @@ const ContractList = () => {
           {(whorole === "super-admin" ||
             whorole === "client" ||
             canCreateContract) && (
-            <Button
-              type="primary"
-              className="ml-2"
-              onClick={openAddContractModal}
-            >
-              <PlusOutlined />
-              <span>New</span>
-            </Button>
-          )}
+              <Button
+                type="primary"
+                className="ml-2"
+                onClick={openAddContractModal}
+              >
+                <PlusOutlined />
+                <span>New</span>
+              </Button>
+            )}
 
           <Button
             type="primary"
@@ -422,19 +422,19 @@ const ContractList = () => {
         {(whorole === "super-admin" ||
           whorole === "client" ||
           canViewContract) && (
-          <Table
-            columns={tableColumns}
-            dataSource={getFilteredContracts()}
-            rowKey="id"
-            pagination={{
-              total: getFilteredContracts().length,
-              pageSize: 10,
-              showSizeChanger: true,
-              showTotal: (total, range) =>
-                `${range[0]}-${range[1]} of ${total} items`,
-            }}
-          />
-        )}
+            <Table
+              columns={tableColumns}
+              dataSource={getFilteredContracts()}
+              rowKey="id"
+              pagination={{
+                total: getFilteredContracts().length,
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} of ${total} items`,
+              }}
+            />
+          )}
       </div>
       <UserView
         data={selectedUser}

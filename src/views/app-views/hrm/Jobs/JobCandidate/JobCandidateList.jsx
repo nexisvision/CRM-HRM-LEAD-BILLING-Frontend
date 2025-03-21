@@ -116,7 +116,7 @@ const JobCandidateList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find(role => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
@@ -209,7 +209,7 @@ const JobCandidateList = () => {
           tmp.innerHTML = html;
           return tmp.textContent || tmp.innerText || 'N/A';
         };
-        
+
         const plainText = stripHtml(text);
         return plainText.length > 50 ? `${plainText.substring(0, 50)}...` : plainText;
       },

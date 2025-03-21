@@ -140,13 +140,13 @@ const JobApplicationList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   // Updated permissions check
   const jobApplicationPermissions =
@@ -383,15 +383,15 @@ const JobApplicationList = () => {
         <Flex gap="7px">
           {(whorole === "super-admin" ||
             (canCreateJobApplication && whorole !== "super-admin")) && (
-            <Button
-              type="primary"
-              className="ml-2"
-              onClick={openAddJobApplicationModal}
-            >
-              <PlusOutlined />
-              <span>New</span>
-            </Button>
-          )}
+              <Button
+                type="primary"
+                className="ml-2"
+                onClick={openAddJobApplicationModal}
+              >
+                <PlusOutlined />
+                <span>New</span>
+              </Button>
+            )}
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
@@ -405,20 +405,20 @@ const JobApplicationList = () => {
       <div className="table-responsive mt-2">
         {(whorole === "super-admin" ||
           (canViewJobApplication && whorole !== "super-admin")) && (
-          <Table
-            columns={tableColumns}
-            dataSource={getFilteredApplications()}
-            rowKey="id"
-            scroll={{ x: 1400 }}
-            pagination={{
-              total: getFilteredApplications().length,
-              pageSize: 10,
-              showSizeChanger: true,
-              showTotal: (total, range) =>
-                `${range[0]}-${range[1]} of ${total} items`,
-            }}
-          />
-        )}
+            <Table
+              columns={tableColumns}
+              dataSource={getFilteredApplications()}
+              rowKey="id"
+              scroll={{ x: 1400 }}
+              pagination={{
+                total: getFilteredApplications().length,
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} of ${total} items`,
+              }}
+            />
+          )}
       </div>
       <UserView
         data={selectedUser}

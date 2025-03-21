@@ -107,13 +107,13 @@ const RoleList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   let allpermisson;
 
@@ -258,10 +258,10 @@ const RoleList = () => {
         </Flex>
         <Flex gap="7px">
           {whorole === "super-admin" ||
-          whorole === "client" ||
-          (canCreateClient &&
-            whorole !== "super-admin" &&
-            whorole !== "client") ? (
+            whorole === "client" ||
+            (canCreateClient &&
+              whorole !== "super-admin" &&
+              whorole !== "client") ? (
             <Button type="primary" className="ml-2" onClick={openAddRoleModal}>
               <PlusOutlined />
               <span>New</span>
@@ -274,8 +274,8 @@ const RoleList = () => {
       </Flex>
       <div className="table-responsive mt-2">
         {whorole === "super-admin" ||
-        whorole === "client" ||
-        (canViewClient && whorole !== "super-admin" && whorole !== "client") ? (
+          whorole === "client" ||
+          (canViewClient && whorole !== "super-admin" && whorole !== "client") ? (
           <Table
             columns={tableColumns}
             dataSource={getFilteredRoles()}

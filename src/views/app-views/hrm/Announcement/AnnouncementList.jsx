@@ -77,7 +77,7 @@ const AnnouncementList = () => {
       const matchesDate =
         !searchDate ||
         dayjs(announcement.date).format("YYYY-MM-DD") ===
-          searchDate.format("YYYY-MM-DD");
+        searchDate.format("YYYY-MM-DD");
 
       return matchesText && matchesDate;
     });
@@ -126,13 +126,13 @@ const AnnouncementList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   // Simplified permission extraction
   const announcementPermissions =
@@ -160,38 +160,38 @@ const AnnouncementList = () => {
   const getDropdownItems = (elm) => [
     ...(canView
       ? [
-          {
-            key: "view",
-            icon: <EyeOutlined />,
-            label: "View Details",
-            onClick: () => {
-              message.info("View Details clicked");
-            },
+        {
+          key: "view",
+          icon: <EyeOutlined />,
+          label: "View Details",
+          onClick: () => {
+            message.info("View Details clicked");
           },
-        ]
+        },
+      ]
       : []),
     ...(canUpdate
       ? [
-          {
-            key: "edit",
-            icon: <EditOutlined />,
-            label: "Edit",
-            onClick: () => {
-              navigate(`/app/hrm/announcement/edit/${elm.id}`);
-            },
+        {
+          key: "edit",
+          icon: <EditOutlined />,
+          label: "Edit",
+          onClick: () => {
+            navigate(`/app/hrm/announcement/edit/${elm.id}`);
           },
-        ]
+        },
+      ]
       : []),
     ...(canDelete
       ? [
-          {
-            key: "delete",
-            icon: <DeleteOutlined />,
-            label: "Delete",
-            onClick: () => deleteUser(elm.id),
-            danger: true,
-          },
-        ]
+        {
+          key: "delete",
+          icon: <DeleteOutlined />,
+          label: "Delete",
+          onClick: () => deleteUser(elm.id),
+          danger: true,
+        },
+      ]
       : []),
   ];
 

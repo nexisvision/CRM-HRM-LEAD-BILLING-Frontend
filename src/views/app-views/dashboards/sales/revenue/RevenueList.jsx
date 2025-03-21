@@ -91,13 +91,13 @@ const RevenueList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   let allpermisson;
 
@@ -393,10 +393,10 @@ const RevenueList = () => {
           </Flex>
           <Flex gap="7px" className="flex">
             {whorole === "super-admin" ||
-            whorole === "client" ||
-            (canCreateRevenue &&
-              whorole !== "super-admin" &&
-              whorole !== "client") ? (
+              whorole === "client" ||
+              (canCreateRevenue &&
+                whorole !== "super-admin" &&
+                whorole !== "client") ? (
               <Button
                 type="primary"
                 className="ml-2"
@@ -419,10 +419,10 @@ const RevenueList = () => {
         </Flex>
         <div className="table-responsive">
           {whorole === "super-admin" ||
-          whorole === "client" ||
-          (canViewRevenue &&
-            whorole !== "super-admin" &&
-            whorole !== "client") ? (
+            whorole === "client" ||
+            (canViewRevenue &&
+              whorole !== "super-admin" &&
+              whorole !== "client") ? (
             <Table
               columns={tableColumns}
               dataSource={getFilteredRevenues()}

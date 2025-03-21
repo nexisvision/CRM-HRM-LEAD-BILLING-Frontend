@@ -13,7 +13,6 @@ import Meeting from "../views/app-views/hrm/Meeting/MeetingReducer/MeetingSlice"
 import Announce from "../views/app-views/hrm/Announcement/AnnouncementReducer/AnnouncementSlice"
 import Project from "../views/app-views/dashboards/project/project-list/projectReducer/ProjectSlice"
 import TaskCalander from "../views/app-views/dashboards/taskcalendar/TaskCalendarReducer/TaskCalendarSlice"
-import Tags from "../views/app-views/dashboards/project/project-list/tagReducer/TagSlice"
 import Leads from "../views/app-views/dashboards/leads/LeadReducers/LeadSlice"
 import EventSetup from "../views/app-views/hrm/EventSetup/EventSetupService/EventSetupSlice"
 import Deals from "../views/app-views/dashboards/deals/DealReducers/DealSlice"
@@ -94,7 +93,6 @@ const rootReducer = (asyncReducers) => (state, action) => {
         Announce,
         Project,
         TaskCalander,
-        Tags,
         Leads,
         EventSetup,
         Deals,

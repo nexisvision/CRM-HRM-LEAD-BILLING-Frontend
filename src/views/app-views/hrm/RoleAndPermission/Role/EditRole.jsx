@@ -17,8 +17,6 @@ const EditRole = ({ id, onClose }) => {
   const [modulePermissions, setModulePermissions] = useState({});
   const [singleEmp, setSingleEmp] = useState(null);
 
-  const role = alldept?.role?.data?.find((item) => item.id === id);
-
   const modules = React.useMemo(
     () => ["Staff", "CRM", "Project", "HRM", "Account"],
     []
@@ -90,60 +88,48 @@ const EditRole = ({ id, onClose }) => {
 
   useEffect(() => {
     if (id && alldept?.role?.data) {
+      const role = alldept.role.data.find(item => item.id === id);
       if (role) {
         setSingleEmp(role);
         form.setFieldsValue({
           role_name: role.role_name,
         });
 
-        const rolePermissions = role.permissions;
-        // Set initial module permissions based on the existing role permissions
-        const initialPermissions = {};
-        console.log("Role permissions:", rolePermissions); // Log the role permissions for debugging
+        // Parse the permissions string if it's a string
+        let rolePermissions;
+        try {
+          rolePermissions = typeof role.permissions === 'string'
+            ? JSON.parse(role.permissions)
+            : role.permissions;
+        } catch (error) {
+          console.error('Error parsing permissions:', error);
+          rolePermissions = {};
+        }
 
-        // Iterate over the keys of role.permissions
-        Object?.keys(rolePermissions)?.forEach((moduleKey) => {
-          const subModules = rolePermissions[moduleKey]; // Get the submodules for the current module key
-          if (Array?.isArray(subModules)) {
-            // Ensure it's an array
-            subModules?.forEach((subModule) => {
-              // Check if subModule has a key and permissions
-              if (subModule?.key && subModule?.permissions) {
-                initialPermissions[subModule?.key] = {};
-                subModule?.permissions?.forEach((permission) => {
-                  initialPermissions[subModule.key][permission] = true; // Set to true if permission exists
+        // Initialize permissions object
+        const initialPermissions = {};
+
+        // Iterate through each module's permissions
+        Object.keys(rolePermissions || {}).forEach(moduleKey => {
+          const modulePermissions = rolePermissions[moduleKey];
+          if (Array.isArray(modulePermissions)) {
+            modulePermissions.forEach(item => {
+              if (item.key && Array.isArray(item.permissions)) {
+                // Set each permission to true for this submodule
+                initialPermissions[item.key] = {};
+                item.permissions.forEach(permission => {
+                  initialPermissions[item.key][permission] = true;
                 });
               }
             });
-          } else {
-            console.warn(
-              `Expected an array for moduleKey: ${moduleKey}, but got:`,
-              subModules
-            );
           }
         });
-        console.log("initialPermissions", initialPermissions); // Log the initial permissions
-        setModulePermissions(initialPermissions); // Set the permissions for the edit modal
+
+        console.log('Setting initial permissions:', initialPermissions);
+        setModulePermissions(initialPermissions);
       }
     }
-  }, [id, alldept, form, role]);
-
-  useEffect(() => {
-    if (singleEmp?.permissions) {
-      const initialPermissions = {};
-      modules.forEach((module) => {
-        if (singleEmp.permissions[module.toLowerCase()]) {
-          Object.keys(singleEmp.permissions[module.toLowerCase()]).forEach(
-            (subModule) => {
-              initialPermissions[subModule.replace(/_/g, " ")] =
-                singleEmp.permissions[module.toLowerCase()][subModule];
-            }
-          );
-        }
-      });
-      setModulePermissions(initialPermissions);
-    }
-  }, [singleEmp, modules]);
+  }, [id, alldept, form]);
 
   const handleModuleClick = (moduleName) => {
     setActiveTab(moduleName);

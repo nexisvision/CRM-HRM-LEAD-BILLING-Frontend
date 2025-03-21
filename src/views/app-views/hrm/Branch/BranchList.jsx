@@ -58,13 +58,13 @@ const BranchList = () => {
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find((role) => role.id === roleId);
 
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === "string"
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   let branchPermissions = [];
 
@@ -228,7 +228,18 @@ const BranchList = () => {
         const manager = alluserdata?.find(
           (item) => item?.id === branchManagerId
         );
-        return manager ? manager?.username : "Unknown";
+        return manager ? (
+          <div className="manager-cell">
+            <span className="manager-name">
+              {manager.username || "Unknown"}
+            </span>
+            <span className="role-badge">
+              {manager.Role?.role_name || 'No Role'}
+            </span>
+          </div>
+        ) : (
+          "Unknown"
+        );
       },
       sorter: (a, b) => {
         const nameA =
@@ -419,6 +430,28 @@ const styles = `
 
   .table-responsive {
     overflow-x: auto;
+  }
+
+  .manager-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .manager-name {
+    font-weight: 500;
+    color: #2c3e50;
+  }
+
+  .role-badge {
+    padding: 2px 8px;
+    background-color: #f0f7ff;
+    border: 1px solid #e1effe;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #3b82f6;
+    font-weight: 500;
+    white-space: nowrap;
   }
 `;
 
