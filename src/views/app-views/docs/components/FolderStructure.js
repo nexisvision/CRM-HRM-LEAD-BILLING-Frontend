@@ -120,7 +120,7 @@ const FolderStructure = () => {
 	return (
 		<div>
 			<h2>Folder Structure</h2>
-			<p>Emilus uses Create React App folder structure to keep its content.</p>
+			<p>Raiser uses Create React App folder structure to keep its content.</p>
 			<div className="mb-4">
 				<DirectoryTree
 					multiple

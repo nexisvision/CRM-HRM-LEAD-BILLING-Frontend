@@ -20,7 +20,7 @@ const jwt = () => {
 	return (
 		<div>
 			<h2>JWT</h2>
-			<p>Emilus provide a set of code to let you work with JWT authentication & API with the server application, integration process is described below.</p>
+			<p>Raiser provide a set of code to let you work with JWT authentication & API with the server application, integration process is described below.</p>
 			<p>We are using <code>localStorage</code> &amp; Redux to store tokens info and authenticate the user.</p>
 			<div className="mt-4">
 				<h4>Interceptor</h4>

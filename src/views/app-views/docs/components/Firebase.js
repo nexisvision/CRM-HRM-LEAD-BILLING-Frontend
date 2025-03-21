@@ -56,7 +56,7 @@ const firebase = () => {
 	return (
 		<div>
 			<h2>Firebase</h2>
-			<p>Emilus comes with Firebase integration and uses it as default authentication option in demo, you can use or remove it depend on your project fit.</p>
+			<p>Raiser comes with Firebase integration and uses it as default authentication option in demo, you can use or remove it depend on your project fit.</p>
 			<div className="mt-4">
 				<h4>Config Firebase</h4>
 				<p>Go to <code>FirebaseConfig.js</code> located at directory <code>configs/</code> and enter the config value that able to acquire from your firebase account.</p>

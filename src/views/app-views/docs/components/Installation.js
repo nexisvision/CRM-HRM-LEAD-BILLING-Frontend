@@ -6,7 +6,7 @@ const Installation = () => {
 			<h2>Installation</h2>
 			<div className="mt-4">
 				<h4>Environment Setup</h4>
-				<p>Emilus required some prerequisite, you many need to install the following tools before starting the app.</p>
+				<p>Raiser required some prerequisite, you many need to install the following tools before starting the app.</p>
 				<div className="d-flex mt-4">
 					<div> - </div>
 					<div className=" ml-3">

@@ -19,12 +19,12 @@ const Introduction = () => {
 		<div>
 			<h2>Introduction</h2>
 			<p className="font-size-md">
-				<strong>Emilus</strong> -
+				<strong>Raiser</strong> -
 				A developer friendly & highly scalable admin
 				dashboard template built with React & top notch technologies stack.
 				It offers a clean code base and detailed documentation which allow you
 				to develop your web application faster and cost effectively.
-				Emilus can be used to build any modern web application including a SaaS, admin panels, CRM, CMS, e-commerce panel, etc.
+				Raiser can be used to build any modern web application including a SaaS, admin panels, CRM, CMS, e-commerce panel, etc.
 			</p>
 			<p className="font-size-md">
 				<strong>NOTE: </strong>

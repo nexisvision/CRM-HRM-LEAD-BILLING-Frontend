@@ -6,7 +6,7 @@ const MockApi = () => {
 	return (
 		<div>
 			<h2>Mock Api</h2>
-			<p>Emilus uses <a href="https://miragejs.com/" target="_blank" rel="noreferrer">miragejs</a> for mocking API calls, all the api interaction in our demo are work under miragejs.</p>
+			<p>Raiser uses <a href="https://miragejs.com/" target="_blank" rel="noreferrer">miragejs</a> for mocking API calls, all the api interaction in our demo are work under miragejs.</p>
 			<div className="mt-4">
 				<h4>Using mock api</h4>
 				<p class="mt-1">If you have wish to use mock api, you can follow the steps below to create a fake db data &amp; api</p>

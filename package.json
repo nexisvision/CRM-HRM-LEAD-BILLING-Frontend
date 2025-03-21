@@ -1,5 +1,5 @@
 {
-  "name": "emilus",
+  "name": "Raiser",
   "version": "4.0.2",
   "private": true,
   "dependencies": {
@@ -20,6 +20,7 @@
     "axios": "^0.21.0",
     "chart.js": "^4.4.8",
     "classnames": "^2.5.1",
+    "caniuse-lite": "^1.0.30001706",
     "concurrently": "^5.3.0",
     "d3-fetch": "^2.0.0",
     "d3-geo": "^3.1.1",
@@ -127,5 +128,5 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15"
   },
-  "proxy": "https://api.raiser.in"
+  "proxy": "http://localhost:5353"
 }

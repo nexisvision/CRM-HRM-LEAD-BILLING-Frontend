@@ -77,7 +77,7 @@ const Routing = () => {
 	return (
 		<div>
 			<h2>Routing</h2>
-			<p>Emilus use <a href="https://reactrouter.com/" target="_blank" rel="noopener noreferrer">react-router</a> as base routing system. To add a new route in the template, you can follow the steps below.</p>
+			<p>Raiser use <a href="https://reactrouter.com/" target="_blank" rel="noopener noreferrer">react-router</a> as base routing system. To add a new route in the template, you can follow the steps below.</p>
 			<div className="mt-4">
 				<h4 className="font-weight-bold">Overview</h4>
 				<p class="my-1">You can find the template's router configuration in <code>src/configs/RoutesConfig.js</code>, there's 2 type of route group as following.</p>

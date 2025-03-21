@@ -51,8 +51,9 @@ const AttendanceList = () => {
   const leaveData = useSelector((state) => state.Leave?.Leave?.data || []);
   const fndleavedata = leaveData.filter((item) => item.created_by === user);
   const allholidaudata = useSelector(
-    (state) => state.holiday?.holidays?.data || []
+    (state) => state.holidays?.holidays?.data || []
   );
+
 
   useEffect(() => {
     if (employeeData) {
@@ -181,6 +182,7 @@ const AttendanceList = () => {
   const roleData = roles?.find((role) => role.id === roleId);
 
   const whorole = roleData?.role_name;
+
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
@@ -351,13 +353,13 @@ const AttendanceList = () => {
       <div>
         <div>
           Total Working Hours: {totalHours}H : {totalMinutes}M
-        </div>
-        <div>
+        </div>  
+        {/* <div>
           Early OUT Hours: {earlyOutHours}H : {earlyOutMinutes}M
         </div>
         <div>
           Late IN Hours: {startTime.hour() - 9}H : {startTime.minute()}M
-        </div>
+        </div> */}
       </div>
     );
 

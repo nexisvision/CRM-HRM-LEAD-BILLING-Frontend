@@ -110,7 +110,6 @@ const AddAttendance = ({ onClose }) => {
     dispatch(addAttendance(formattedValues))
     .then(() => {
 
-          console.log("Attendance added successfully:", formattedValues);
         dispatch(getAttendances());
         message.success("Attendance added successfully!");
         onClose();
@@ -276,49 +275,7 @@ const AddAttendance = ({ onClose }) => {
               </Col>
 
               {/* Late and Half Day Selection */}
-              <Col span={12}>
-                <div style={{ marginBottom: "16px" }}>
-                  <label className="font-semibold">Late <span className="text-red-500">*</span></label>
-                  <Field
-                    as={Select}
-                    name="late"
-                    placeholder="Was the employee late?"
-                    style={{ width: "100%" }}
-                    className="w-full mt-1"
-                    onChange={(value) => setFieldValue("late", value)}
-                  >
-                    <Option value="yes">Yes</Option>
-                    <Option value="no">No</Option>
-                  </Field>
-                  {errors.late && touched.late && (
-                    <div style={{ color: "red", fontSize: "12px" }}>
-                      {errors.late}
-                    </div>
-                  )}
-                </div>
-              </Col>
-
-              <Col span={12}>
-                <div style={{ marginBottom: "16px" }}>
-                  <label className="font-semibold">Half Day <span className="text-red-500">*</span></label>
-                  <Field
-                    as={Select}
-                    name="halfDay"
-                    placeholder="Was it a half day?"
-                    style={{ width: "100%" }}
-                    className="w-full mt-1"
-                    onChange={(value) => setFieldValue("halfDay", value)}
-                  >
-                    <Option value="yes">Yes</Option>
-                    <Option value="no">No</Option>
-                  </Field>
-                  {errors.halfDay && touched.halfDay && (
-                    <div style={{ color: "red", fontSize: "12px" }}>
-                      {errors.halfDay}
-                    </div>
-                  )}
-                </div>
-              </Col>
+              
 
               {/* Comment Field */}
               <Col span={24}>

@@ -5,7 +5,7 @@ import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 const appConfigStr = `import { SIDE_NAV_LIGHT, NAV_TYPE_SIDE, DIR_LTR } from 'constants/ThemeConstant';
 import { env } from './EnvironmentConfig'
 
-export const APP_NAME = 'Emilus';
+export const APP_NAME = 'Raiser';
 export const API_BASE_URL = env.API_ENDPOINT_URL
 export const APP_PREFIX_PATH = '/app';
 export const AUTH_PREFIX_PATH = '/auth';
@@ -82,7 +82,7 @@ const TemplateSetting = () => {
 	return (
 		<div>
 			<h2>Template Setting</h2>
-			<p>Emilus comes with a variety of different theme & layout, you can try them from quick view panel in our demo and copy the config to your project.</p>
+			<p>Raiser comes with a variety of different theme & layout, you can try them from quick view panel in our demo and copy the config to your project.</p>
 			<div className="mt-4">
 				<h4 className="font-weight-bold">Config Template basic</h4>
 				<p>You can change your template basic setup at <code>src/configs/AppConfigs.js</code></p>

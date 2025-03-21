@@ -18,7 +18,24 @@ function FileList() {
   useEffect(() => {
     if (allprojectdata) {
       const fnddata = allprojectdata.find((item) => item.id === id);
-      const projectFiles = fnddata?.files ? JSON.parse(fnddata.files) : [];
+      
+      // Safely parse the files data
+      let projectFiles = [];
+      if (fnddata?.files) {
+        try {
+          // Check if it's already an object
+          if (typeof fnddata.files === 'object') {
+            projectFiles = Array.isArray(fnddata.files) ? fnddata.files : [];
+          } else {
+            // Try to parse string
+            projectFiles = JSON.parse(fnddata.files);
+          }
+        } catch (error) {
+          console.error('Error parsing files:', error);
+          projectFiles = [];
+        }
+      }
+      
       setFiles(projectFiles);
     }
   }, [allprojectdata, id]);

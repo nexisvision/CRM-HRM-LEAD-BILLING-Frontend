@@ -336,7 +336,7 @@ const UtilityClasses = () => {
 			<Row>
 				<Col xs={24} sm={24} md={26} lg={18}>
 					<h2>Utility Classes</h2>
-					<p>Emilus comes with utility css class inspired by bootstrap, which help you style your element quickly & handy.</p>
+					<p>Raiser comes with utility css class inspired by bootstrap, which help you style your element quickly & handy.</p>
 					{
 						utilTree.map(elm => (
 							<div className="mt-4" key={elm.title} id={elm.title}>
