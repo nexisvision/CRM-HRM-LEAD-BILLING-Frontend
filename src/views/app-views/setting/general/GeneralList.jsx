@@ -12,7 +12,7 @@ import EditSetting from './EditSetting';
 const validationSchema = Yup.object().shape({
   companyName: Yup.string().required('Company name is required'),
   title: Yup.string().required('Site title is required'),
-  description: Yup.string().required('Description is required'),
+  termsandconditions: Yup.string().required('termsandconditions is required'),
 });
 
 const GeneralList = () => {
@@ -26,7 +26,7 @@ const GeneralList = () => {
   const initialValues = {
     companyName: '',
     title: '',
-    description: '',
+    termsandconditions: '',
   };
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const GeneralList = () => {
       }
       formData.append('companyName', values.companyName);
       formData.append('title', values.title);
-      formData.append('termsandconditions', values.description);
+      formData.append('termsandconditions', values.termsandconditions);
 
       await dispatch(creategenaralsett(formData));
       await dispatch(getgeneralsettings());
@@ -225,16 +225,16 @@ const GeneralList = () => {
                   </div>
                 </Col>
 
-                {/* Description */}
+                {/* termsandconditions */}
                 <Col span={24}>
                   <div className="form-item">
                     <label className="block  font-medium text-gray-700 mb-2">
-                      Description <span className="text-red-500">*</span>
+                      termsandconditions <span className="text-red-500">*</span>
                     </label>
                     <ReactQuill
                       theme="snow"
-                      value={values.description}
-                      onChange={(content) => setFieldValue('description', content)}
+                      value={values.termsandconditions}
+                      onChange={(content) => setFieldValue('termsandconditions', content)}
                       modules={{
                         toolbar: [
                           ['bold', 'italic', 'underline'],

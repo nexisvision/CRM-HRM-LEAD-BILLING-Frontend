@@ -271,7 +271,7 @@ const ESignaturePage = () => {
 
   return (
     <div className="p-4">
-      <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+      <div className="bg-white p-6 rounded-lg  mb-6">
         <h2 className="text-xl font-semibold mb-4">
           {isEditMode ? 'Edit Signature' : 'Draw Signature'}
         </h2>
@@ -334,7 +334,7 @@ const ESignaturePage = () => {
 
       {/* Saved Signatures Table */}
       {savedSignatures.length > 0 && (
-        <div className="bg-white p-6 rounded-lg shadow-lg mt-6">
+        <div className="bg-white p-6 rounded-lg mt-6">
           <h2 className="text-xl font-semibold mb-4">Saved Signatures</h2>
           <Table
             columns={columns}

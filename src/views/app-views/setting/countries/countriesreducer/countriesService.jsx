@@ -67,10 +67,10 @@ const deleteCountries = async (id) => {
 };
 
 
-const UserAddCountries = {
+const CountriesService = {
     GetAllCountries,
     AddCountries,
     updateCountries,
     deleteCountries
 }
-export default UserAddCountries;
+export default CountriesService;

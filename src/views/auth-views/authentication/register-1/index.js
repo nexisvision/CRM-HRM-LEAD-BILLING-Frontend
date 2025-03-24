@@ -12,25 +12,9 @@ const backgroundStyle = {
 const RegisterOne = props => {
 	const theme = useSelector(state => state.theme.currentTheme)
 	return (
-		<div className="h-100" style={backgroundStyle}>
-			<div className="container d-flex flex-column justify-content-center h-100">
-				<Row justify="center">
-					<Col xs={20} sm={20} md={20} lg={7}>
-						<Card>
-							<div className="my-2">
-								<div className="text-center">
-									<img className="img-fluid" src={`/img/${theme === 'light' ? 'logo.png' : 'logo-white.png'}`} alt="" />
-									<p className="text-muted">Create a new account:</p>
-								</div>
-								<Row justify="center">
-									<Col xs={24} sm={24} md={20} lg={20}>
-										<RegisterForm {...props} />
-									</Col>
-								</Row>
-							</div>
-						</Card>
-					</Col>
-				</Row>
+		<div className="min-h-screen w-full bg-gray-100 flex items-center justify-center p-4">
+			<div className="w-full max-w-[1000px] h-[600px] bg-white rounded-2xl shadow-lg overflow-hidden">
+				<RegisterForm />
 			</div>
 		</div>
 	)

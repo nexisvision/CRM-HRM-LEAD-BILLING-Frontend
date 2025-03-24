@@ -302,6 +302,9 @@ export const LoginForm = (props) => {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Sign In to Raiser
             </h1>
+            <p className="text-gray-600">
+              Welcome back! Please sign in to continue
+            </p>
           </div>
 
           <Form
@@ -380,6 +383,17 @@ export const LoginForm = (props) => {
                 →
               </span>
             </Button>
+
+            <div className="text-center mt-6 border-t pt-6">
+              <span className="text-gray-600">Don't have an account? </span>
+              <Button
+                type="link"
+                onClick={() => navigate('/auth/register')}
+                className="text-blue-600 hover:text-blue-700 font-medium p-0"
+              >
+                Sign Up
+              </Button>
+            </div>
           </Form>
         </div>
       </div>

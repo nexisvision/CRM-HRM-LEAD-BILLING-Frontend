@@ -73,7 +73,7 @@ const deletesetting = async (id) => {
 };
 
 
-const UserService = {
+const SettingService = {
 
   getgeneralsetting,
   creategenaral,
@@ -81,4 +81,4 @@ const UserService = {
   updategeneralsetting,
 };
 
-export default UserService;
+export default SettingService;

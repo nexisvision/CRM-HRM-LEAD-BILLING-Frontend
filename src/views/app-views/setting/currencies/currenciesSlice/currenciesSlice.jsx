@@ -1,16 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./currenciesService";
-import { toast } from "react-toastify";
+import CurrenciesService from "./currenciesService";
 
 import { message } from "antd";
 
 
 
 export const addcurren = createAsyncThunk(
-    "users/addcurren",
+    "currencies/addcurren",
     async (userData, thunkAPI) => {
         try {
-            const response = await UserService.addcurr(userData);
+            const response = await CurrenciesService.addcurr(userData);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -22,10 +21,10 @@ export const addcurren = createAsyncThunk(
 
 
 export const getcurren = createAsyncThunk(
-    "leave/getcurr",
+    "currencies/getcurr",
     async (thunkAPI) => {
         try {
-            const response = await UserService.getcurr();
+            const response = await CurrenciesService.getcurr();
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -33,37 +32,13 @@ export const getcurren = createAsyncThunk(
     }
 );
 
-export const getAllUsers = createAsyncThunk(
-    "users/getAllUsers",
-    async (thunkAPI) => {
-        try {
-            const response = await UserService.getAllUsers();
-            return response;
-        } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data);
-        }
-    }
-);
-
-
-export const getUserById = createAsyncThunk(
-    "users/getUserById",
-    async (userId, thunkAPI) => {
-        try {
-            const response = await UserService.getUserById(userId);
-            return response;
-        } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data);
-        }
-    }
-);
 
 
 export const deletecurren = createAsyncThunk(
-    "users/deletecurren",
+    "currencies/deletecurren",
     async (userId, thunkAPI) => {
         try {
-            const response = await UserService.delcurr(userId);
+            const response = await CurrenciesService.delcurr(userId);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -71,11 +46,10 @@ export const deletecurren = createAsyncThunk(
     }
 );
 export const editscurren = createAsyncThunk(
-    "users/editscurren",
+    "currencies/editscurren",
     async ({ id, values }, thunkAPI) => {
         try {
-            console.log("idinslice", id)
-            const response = await UserService.editcurr(id, values);
+            const response = await CurrenciesService.editcurr(id, values);
             return response; // Return the updated data
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
@@ -97,34 +71,6 @@ const currenciesSlice = createSlice({
         addModel: false,
         editModal: false,
     },
-    reducers: {
-        toggleAddModal: (state, action) => {
-            state.addModel = action.payload;
-        },
-        toggleEditModal: (state, action) => {
-            state.editModal = action.payload;
-            state.editItem = {};
-        },
-        editUserData: (state, action) => {
-            state.editItem = action.payload;
-            state.editModal = !state.editModal;
-        },
-        handleLogout: (state, action) => {
-            state.isAuth = action.payload;
-            state.loggedInUser = null
-            localStorage.removeItem("isAuth");
-            localStorage.removeItem("USER");
-            localStorage.removeItem("TOKEN");
-        },
-        toggleDetailModal: (state, action) => {
-            state.detailItem = action.payload;
-            state.detailModal = !state.editModal;
-        },
-        closeDetailModal: (state, action) => {
-            state.detailModal = action.payload;
-            state.detailItem = {};
-        },
-    },
     extraReducers: (builder) => {
         builder
             //add
@@ -133,12 +79,12 @@ const currenciesSlice = createSlice({
             })
             .addCase(addcurren.fulfilled, (state, action) => {
                 state.isLoading = false;
-                // message.success(action.payload?.message);
+                message.success(action.payload?.data?.message);
             })
 
             .addCase(addcurren.rejected, (state, action) => {
                 state.isLoading = false;
-                // message.error(action.payload?.message);
+                message.error(action.payload?.data?.message);
             })
 
 
@@ -148,11 +94,11 @@ const currenciesSlice = createSlice({
             .addCase(getcurren.fulfilled, (state, action) => {
                 state.currencies = action.payload;
                 state.isLoading = false;
-                toast.success(action.payload?.message);
+                // message.success(action.payload?.data?.message);
             })
             .addCase(getcurren.rejected, (state, action) => {
                 state.isLoading = false;
-                message.error(action.payload?.message);
+                message.error(action.payload?.data?.message);
             })
 
 
@@ -163,12 +109,12 @@ const currenciesSlice = createSlice({
             })
             .addCase(deletecurren.fulfilled, (state, action) => {
                 state.isLoading = false;
-                // message.success(action.payload.message);
+                message.success(action.payload?.data?.message);
             })
 
             .addCase(deletecurren.rejected, (state, action) => {
                 state.isLoading = false;
-                // message.error(action.payload?.response?.data?.message);
+                message.error(action.payload?.data?.message);
             })
             //update
 
@@ -179,22 +125,16 @@ const currenciesSlice = createSlice({
             .addCase(editscurren.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
-                // message.success(action.payload?.message);
+                message.success(action.payload?.data?.message);
             })
 
             .addCase(editscurren.rejected, (state, action) => {
                 state.isLoading = false;
-                // state.error = action.payload;
-                // message.error(action.payload?.response?.data?.message);
+                message.error(action.payload?.data?.message);
             });
     },
 });
 
 
-export const {
-    toggleAddModal,
-    toggleEditModal,
-    handleLogout,
-    editUserData,
-} = currenciesSlice.actions;
+
 export default currenciesSlice.reducer;

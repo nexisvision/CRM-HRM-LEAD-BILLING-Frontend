@@ -54,7 +54,7 @@ const adddelnote = async (id) => {
   }
 };
 
-const editelnote = async (idd, formData) => {
+const editenote = async (idd, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
@@ -75,11 +75,11 @@ const editelnote = async (idd, formData) => {
 
 
 
-const UserService = {
+const NotesService = {
   getnote,
   addnote,
   adddelnote,
-  editelnote,
+  editenote,
 };
 
-export default UserService;
+export default NotesService;

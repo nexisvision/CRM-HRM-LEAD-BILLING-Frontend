@@ -1,14 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./DepartmentService";
-import { toast } from "react-toastify";
+import DepartmentService from "./DepartmentService";
 
 import { message } from "antd";
 
 export const AddDept = createAsyncThunk(
-    "users/addUser",
+    "department/addDept",
     async (userData, thunkAPI) => {
         try {
-            const response = await UserService.AddDepartment(userData);
+            const response = await DepartmentService.AddDepartment(userData);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -19,10 +18,10 @@ export const AddDept = createAsyncThunk(
 
 
 export const getDept = createAsyncThunk(
-    "emp/getDept",
+    "department/getDept",
     async (thunkAPI) => {
         try {
-            const response = await UserService.GetDept();
+            const response = await DepartmentService.GetDept();
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -32,10 +31,10 @@ export const getDept = createAsyncThunk(
 
 
 export const DeleteDept = createAsyncThunk(
-    "users/deleteUser",
+    "department/deleteDept",
     async (userId, thunkAPI) => {
         try {
-            const response = await UserService.DeleteDept(userId);
+            const response = await DepartmentService.DeleteDept(userId);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -43,11 +42,11 @@ export const DeleteDept = createAsyncThunk(
     }
 );
 export const EditDept = createAsyncThunk(
-    "users/updateEmployee",
+    "department/updateDept",
     async ({ comnyid, values }, thunkAPI) => {
         try {
             console.log("idinslice", comnyid)
-            const response = await UserService.EditDept(comnyid, values);
+                const response = await DepartmentService.EditDept(comnyid, values);
             return response; // Return the updated data
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
@@ -96,7 +95,7 @@ const DepartmentSlice = createSlice({
             })
             .addCase(getDept.rejected, (state, action) => {
                 state.isLoading = false;
-                toast.error(action.payload?.message);
+                message.error(action.payload?.message);
             })
 
 
@@ -127,7 +126,7 @@ const DepartmentSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload;
                 message.error(action.payload?.message);
-            });
+                });
     },
 });
 

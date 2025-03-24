@@ -24,6 +24,8 @@ import {
   MoreOutlined,
   InfoCircleOutlined,
   EyeOutlined,
+  ShopOutlined,
+  ShoppingOutlined,
 } from "@ant-design/icons";
 import AddPlan from "./AddPlan";
 import EditPlan from "./EditPlan";
@@ -527,40 +529,54 @@ const PlanList = () => {
                             {plan.name}
                           </div>
                         </div>
-                        {isAdmin && (
-                          <div
-                            className="flex items-center gap-2"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Switch
-                              checked={plan.status === "active"}
-                              onChange={() =>
-                                togglePlan(plan.id, plan.status, plan)
-                              }
-                              className={
-                                plan.status === "active" ? "bg-blue-600" : ""
-                              }
-                            />
-                            <Dropdown
-                              menu={{ items: getMenuItems(plan) }}
-                              placement="bottomRight"
-                              trigger={["click"]}
+                        <div className="flex items-center gap-2">
+                          {plan.is_default && (
+                            <Tag color="blue" className="mr-2">
+                              Default Plan
+                            </Tag>
+                          )}
+                          {isAdmin && (
+                            <div
+                              className="flex items-center gap-2"
+                              onClick={(e) => e.stopPropagation()}
                             >
-                              <Button
-                                type="text"
-                                icon={
-                                  <MoreOutlined className="text-gray-600" />
+                              <Switch
+                                checked={plan.status === "active"}
+                                onChange={() =>
+                                  togglePlan(plan.id, plan.status, plan)
+                                }
+                                className={
+                                  plan.status === "active" ? "bg-blue-600" : ""
                                 }
                               />
-                            </Dropdown>
-                          </div>
-                        )}
+                              <Dropdown
+                                menu={{ items: getMenuItems(plan) }}
+                                placement="bottomRight"
+                                trigger={["click"]}
+                              >
+                                <Button
+                                  type="text"
+                                  icon={
+                                    <MoreOutlined className="text-gray-600" />
+                                  }
+                                />
+                              </Dropdown>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     }
                   >
                     <div className="space-y-6">
                       {/* Price Section */}
-                      <div className="text-center bg-blue-50 p-8 rounded-xl shadow-inner">
+                      <div className="text-center bg-blue-50 p-8 rounded-xl shadow-inner relative">
+                        {plan.is_default && (
+                          <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-2">
+                            <Tag color="blue" className="px-2 py-1 rounded-full">
+                              Default
+                            </Tag>
+                          </div>
+                        )}
                         <div className="text-6xl font-bold text-blue-600">
                           <span className="text-3xl">
                             {selectedCurrency?.currencyIcon || ""}
@@ -608,11 +624,31 @@ const PlanList = () => {
                         </div>
 
                         <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
-                          <CloudUploadOutlined className="text-blue-500 text-xl" />
+                          <ShopOutlined className="text-green-500 text-xl" />
+                          <div>
+                            <div className="text-sm text-gray-500">Customers</div>
+                            <div className="font-semibold">
+                              {plan.max_customers} customers
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+                          <ShoppingOutlined className="text-orange-500 text-xl" />
+                          <div>
+                            <div className="text-sm text-gray-500">Vendors</div>
+                            <div className="font-semibold">
+                              {plan.max_vendors} vendors
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+                          <CloudUploadOutlined className="text-purple-500 text-xl" />
                           <div>
                             <div className="text-sm text-gray-500">Storage</div>
                             <div className="font-semibold">
-                              {plan.storage_limit} GB
+                              {plan.storage_limit} MB
                             </div>
                           </div>
                         </div>
@@ -630,15 +666,26 @@ const PlanList = () => {
                         </div>
                       )}
 
+                      {/* Add Default Plan Badge */}
+                      {plan.is_default && (
+                        <div className="mt-4 text-center">
+                          <Text type="secondary" className="text-sm">
+                            This is the default plan for new users
+                          </Text>
+                        </div>
+                      )}
+
                       {/* Buy Button */}
                       {!isAdmin && (
                         <Button
                           type="primary"
                           block
                           onClick={() => handleBuyClick(plan)}
-                          className="mt-6 h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 border-0 rounded-lg transform transition-all duration-300 hover:scale-105"
+                          className={`mt-6 h-12 text-base font-medium rounded-lg transform transition-all duration-300 hover:scale-105 ${
+                            plan.is_default ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
+                          }`}
                         >
-                          {plan.status === "active" ? "Choose Plan" : ""}
+                          {plan.status === "active" ? (plan.is_default ? "Default Plan" : "Choose Plan") : ""}
                         </Button>
                       )}
                     </div>

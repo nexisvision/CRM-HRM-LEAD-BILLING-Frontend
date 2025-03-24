@@ -1,14 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./notesService";
+import NotesService from "./notesService";
 import { toast } from "react-toastify";
 import { message } from "antd";
 
 
 export const addnotess = createAsyncThunk(
-  "users/addnotess",
+  "notes/addnotess",
   async ({ id, formData }, thunkAPI) => {
     try {
-      const response = await UserService.addnote(id, formData);
+      const response = await NotesService.addnote(id, formData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -18,10 +18,10 @@ export const addnotess = createAsyncThunk(
 
 
 export const getnotess = createAsyncThunk(
-  "emp/getnotess",
+    "notes/getnotess",
   async (id, thunkAPI) => {
     try {
-      const response = await UserService.getnote(id);
+      const response = await NotesService.getnote(id);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -30,10 +30,10 @@ export const getnotess = createAsyncThunk(
 );
 
 export const delnotess = createAsyncThunk(
-  "users/delnotess",
+  "notes/delnotess",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.adddelnote(userId);
+      const response = await NotesService.adddelnote(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -41,10 +41,10 @@ export const delnotess = createAsyncThunk(
   }
 );
 export const editnotess = createAsyncThunk(
-  "users/editnotess",
+  "notes/editnotess",
   async ({ idd, formData }, thunkAPI) => {
     try {
-      const response = await UserService.editelnote(idd, formData);
+      const response = await NotesService.editenote(idd, formData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -65,34 +65,7 @@ const NotesSlice = createSlice({
     addModel: false,
     editModal: false,
   },
-  reducers: {
-    toggleAddModal: (state, action) => {
-      state.addModel = action.payload;
-    },
-    toggleEditModal: (state, action) => {
-      state.editModal = action.payload;
-      state.editItem = {};
-    },
-    editUserData: (state, action) => {
-      state.editItem = action.payload;
-      state.editModal = !state.editModal;
-    },
-    handleLogout: (state, action) => {
-      state.isAuth = action.payload;
-      state.loggedInUser = null;
-      localStorage.removeItem("isAuth");
-      localStorage.removeItem("USER");
-      localStorage.removeItem("TOKEN");
-    },
-    toggleDetailModal: (state, action) => {
-      state.detailItem = action.payload;
-      state.detailModal = !state.editModal;
-    },
-    closeDetailModal: (state, action) => {
-      state.detailModal = action.payload;
-      state.detailItem = {};
-    },
-  },
+  
   extraReducers: (builder) => {
     builder
       //add
@@ -152,6 +125,5 @@ const NotesSlice = createSlice({
   },
 });
 
-export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  NotesSlice.actions;
+
 export default NotesSlice.reducer;

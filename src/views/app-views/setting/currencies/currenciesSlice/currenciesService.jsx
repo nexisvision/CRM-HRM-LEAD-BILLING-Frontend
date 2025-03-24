@@ -80,7 +80,7 @@ const editcurr = async (id, values) => {
 
 
 
-const UserService = {
+const CurrenciesService = {
 
   getcurr,
   addcurr,
@@ -89,4 +89,4 @@ const UserService = {
 
 };
 
-export default UserService;
+export default CurrenciesService;

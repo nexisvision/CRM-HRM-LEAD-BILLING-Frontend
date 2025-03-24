@@ -75,7 +75,7 @@ const EditPro = async (id, values) => {
 };
 
 
-const UserService = {
+const ProjectService = {
 
   GetProject,
   AddProject,
@@ -83,4 +83,4 @@ const UserService = {
   EditPro,
 };
 
-export default UserService;
+export default ProjectService;

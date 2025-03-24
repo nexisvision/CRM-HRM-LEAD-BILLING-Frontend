@@ -286,10 +286,10 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
             <h4 className="text-sm font-medium text-gray-700 mb-3">Company Details</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <p className="text-xs text-gray-500">Employee ID</p>
-                <Tooltip title={company.employeeId || 'Not Available'}>
+                <p className="text-xs text-gray-500">website</p>
+                <Tooltip title={company.website || 'Not Available'}>
                   <p className="text-sm font-medium text-gray-800 truncate">
-                    {company.employeeId || 'Not Available'}
+                    {company.website || 'Not Available'}
                   </p>
                 </Tooltip>
               </div>

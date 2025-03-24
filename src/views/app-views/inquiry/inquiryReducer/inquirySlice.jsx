@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./inquiryService";
+import InquiryService from "./inquiryService";
 import { toast } from "react-toastify";
 
 
 export const addinqu = createAsyncThunk(
-  "users/addinqu",
+  "inquiry/addinqu",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.addinq(userData);
+      const response = await InquiryService.addinq(userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -16,44 +16,23 @@ export const addinqu = createAsyncThunk(
 );
 
 
-export const getinqu = createAsyncThunk("emp/getinqu", async (thunkAPI) => {
+export const getinqu = createAsyncThunk(
+  "inquiry/getinqu", async (thunkAPI) => {
   try {
-    const response = await UserService.getinq();
+    const response = await InquiryService.getinq();
     return response;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response.data);
   }
 });
 
-export const getAllUsers = createAsyncThunk(
-  "users/getAllUsers",
-  async (thunkAPI) => {
-    try {
-      const response = await UserService.getAllUsers();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
 
-export const getUserById = createAsyncThunk(
-  "users/getUserById",
-  async (userId, thunkAPI) => {
-    try {
-      const response = await UserService.getUserById(userId);
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
 
 export const deleteinqu = createAsyncThunk(
-  "users/deleteinqu",
+  "inquiry/deleteinqu",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.delinq(userId);
+      const response = await InquiryService.delinq(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -61,10 +40,10 @@ export const deleteinqu = createAsyncThunk(
   }
 );
 export const editinqu = createAsyncThunk(
-  "users/editinqu",
+  "inquiry/editinqu",
   async ({ idd, values }, thunkAPI) => {
     try {
-      const response = await UserService.editinq(idd, values);
+      const response = await InquiryService.editinq(idd, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -76,7 +55,7 @@ export const editinqu = createAsyncThunk(
 
 
 
-const RoleAndPermissionSlice = createSlice({
+const InquirySlice = createSlice({
   name: "inquiry",
   initialState: {
     inquiry: [],
@@ -85,34 +64,7 @@ const RoleAndPermissionSlice = createSlice({
     addModel: false,
     editModal: false,
   },
-  reducers: {
-    toggleAddModal: (state, action) => {
-      state.addModel = action.payload;
-    },
-    toggleEditModal: (state, action) => {
-      state.editModal = action.payload;
-      state.editItem = {};
-    },
-    editUserData: (state, action) => {
-      state.editItem = action.payload;
-      state.editModal = !state.editModal;
-    },
-    handleLogout: (state, action) => {
-      state.isAuth = action.payload;
-      state.loggedInUser = null;
-      localStorage.removeItem("isAuth");
-      localStorage.removeItem("USER");
-      localStorage.removeItem("TOKEN");
-    },
-    toggleDetailModal: (state, action) => {
-      state.detailItem = action.payload;
-      state.detailModal = !state.editModal;
-    },
-    closeDetailModal: (state, action) => {
-      state.detailModal = action.payload;
-      state.detailItem = {};
-    },
-  },
+  
   extraReducers: (builder) => {
     builder
       //add 
@@ -178,6 +130,5 @@ const RoleAndPermissionSlice = createSlice({
   },
 });
 
-export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+
+export default InquirySlice.reducer;

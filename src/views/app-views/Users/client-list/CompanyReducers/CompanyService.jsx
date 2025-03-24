@@ -79,7 +79,7 @@ const EditClient = async (comnyid, formData) => {
 
 
 
-const UserService = {
+const CompanyService = {
 
   ClientData,
   createClient,
@@ -88,4 +88,4 @@ const UserService = {
 
 };
 
-export default UserService;
+export default CompanyService;

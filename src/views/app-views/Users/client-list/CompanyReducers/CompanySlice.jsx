@@ -1,12 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./CompanyService";
-import { toast } from "react-toastify";
+import CompanyService from "./CompanyService";
+import { message } from "antd";
+
 
 export const addClient = createAsyncThunk(
-  "users/addUser",
+  "client/addClient",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.createClient(userData);
+      const response = await CompanyService.createClient(userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -16,36 +17,10 @@ export const addClient = createAsyncThunk(
 
 
 export const ClientData = createAsyncThunk(
-  "emp/getClient",
+  "client/getClient",
   async (thunkAPI) => {
     try {
-      const response = await UserService.ClientData();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
-
-export const getAllUsers = createAsyncThunk(
-  "users/getAllUsers",
-  async (thunkAPI) => {
-    try {
-      const response = await UserService.getAllUsers();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
-
-export const getUserById = createAsyncThunk(
-  "users/getUserById",
-  async (userId, thunkAPI) => {
-    try {
-      const response = await UserService.getUserById(userId);
+      const response = await CompanyService.ClientData();
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -55,10 +30,10 @@ export const getUserById = createAsyncThunk(
 
 
 export const deleteClient = createAsyncThunk(
-  "users/deleteUser",
+  "client/deleteClient",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.DeleteClient(userId);
+      const response = await CompanyService.DeleteClient(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -66,10 +41,10 @@ export const deleteClient = createAsyncThunk(
   }
 );
 export const Editclient = createAsyncThunk(
-  "users/updateEmployee",
+  "client/updateClient",
   async ({ comnyid, formData }, thunkAPI) => {
     try {
-      const response = await UserService.EditClient(comnyid, formData);
+      const response = await CompanyService.EditClient(comnyid, formData);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -79,11 +54,9 @@ export const Editclient = createAsyncThunk(
   }
 );
 
-// Async thunk for updating a user
 
 
-
-const RoleAndPermissionSlice = createSlice({
+const CompanySlice = createSlice({
   name: "SubClient",
   initialState: {
     SubClient: [],
@@ -92,34 +65,7 @@ const RoleAndPermissionSlice = createSlice({
     addModel: false,
     editModal: false,
   },
-  reducers: {
-    toggleAddModal: (state, action) => {
-      state.addModel = action.payload;
-    },
-    toggleEditModal: (state, action) => {
-      state.editModal = action.payload;
-      state.editItem = {};
-    },
-    editUserData: (state, action) => {
-      state.editItem = action.payload;
-      state.editModal = !state.editModal;
-    },
-    handleLogout: (state, action) => {
-      state.isAuth = action.payload;
-      state.loggedInUser = null;
-      localStorage.removeItem("isAuth");
-      localStorage.removeItem("USER");
-      localStorage.removeItem("TOKEN");
-    },
-    toggleDetailModal: (state, action) => {
-      state.detailItem = action.payload;
-      state.detailModal = !state.editModal;
-    },
-    closeDetailModal: (state, action) => {
-      state.detailModal = action.payload;
-      state.detailItem = {};
-    },
-  },
+ 
   extraReducers: (builder) => {
     builder
       // Add Client
@@ -143,7 +89,7 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(ClientData.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error("Failed to fetch client data");
+        message.error("Failed to fetch client data");
       })
 
       // Delete Client
@@ -152,11 +98,11 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(deleteClient.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success("Client deleted successfully");
+        message.success(action?.payload?.data?.message);
       })
       .addCase(deleteClient.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error("Failed to delete client");
+        message.error(action?.payload?.data?.message);
       })
 
       // Edit Client
@@ -166,14 +112,13 @@ const RoleAndPermissionSlice = createSlice({
       .addCase(Editclient.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
+        message.success(action?.payload?.data?.message);
       })
       .addCase(Editclient.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to update client";
+        message.error(action?.payload?.data?.message);
       });
   },
 });
 
-export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+export default CompanySlice.reducer;

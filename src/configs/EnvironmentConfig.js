@@ -1,5 +1,4 @@
 const dev = {
-
 	API_ENDPOINT_URL: 'http://localhost:5353/api/v1'
 };
 

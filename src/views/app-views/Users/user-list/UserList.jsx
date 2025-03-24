@@ -32,6 +32,8 @@ import { MdOutlineEmail } from "react-icons/md";
 import EmailVerification from "../../company/EmailVerification";
 import { debounce } from "lodash";
 
+const { Option } = Select;
+
 const UserList = () => {
   const dispatch = useDispatch();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
@@ -44,6 +46,7 @@ const UserList = () => {
   const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] =
     useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedRole, setSelectedRole] = useState('All');
 
   const paymentStatusList = ["active", "blocked"];
 
@@ -319,6 +322,23 @@ const UserList = () => {
     },
   ];
 
+  // Filter users based on search and role
+  const getFilteredUsers = () => {
+    let filteredData = [...users];
+
+    // Apply role filter
+    if (selectedRole !== 'All') {
+      filteredData = filteredData.filter(user => user.role_id === selectedRole);
+    }
+
+    return filteredData;
+  };
+
+  // Handle role filter change
+  const handleRoleFilter = (value) => {
+    setSelectedRole(value);
+  };
+
   return (
     <Card bodyStyle={{ padding: "0" }} className="rounded-xl overflow-hidden">
       <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-blue-50 p-6 border-b border-gray-100">
@@ -338,7 +358,7 @@ const UserList = () => {
                 style={{ borderRadius: "8px" }}
               />
             </div>
-            <div className="mb-3">
+            <div className="mb-3 mr-3">
               <Select
                 defaultValue="All"
                 className="min-w-[180px]"
@@ -346,11 +366,27 @@ const UserList = () => {
                 placeholder="Status"
                 style={{ borderRadius: "8px" }}
               >
-                <Select.Option value="All">All Status</Select.Option>
+                <Option value="All">All Status</Option>
                 {paymentStatusList.map((elm) => (
-                  <Select.Option key={elm} value={elm}>
+                  <Option key={elm} value={elm}>
                     {elm}
-                  </Select.Option>
+                  </Option>
+                ))}
+              </Select>
+            </div>
+            <div className="mb-3">
+              <Select
+                defaultValue="All"
+                className="min-w-[180px]"
+                onChange={handleRoleFilter}
+                placeholder="Select Role"
+                style={{ borderRadius: "8px" }}
+              >
+                <Option value="All">All Roles</Option>
+                {fnddata?.map((role) => (
+                  <Option key={role.id} value={role.id}>
+                    {role.role_name}
+                  </Option>
                 ))}
               </Select>
             </div>
@@ -388,7 +424,7 @@ const UserList = () => {
             whorole !== "client")) && (
             <Table
               columns={tableColumns}
-              dataSource={users}
+              dataSource={getFilteredUsers()}
               rowKey="id"
               className="ant-table-striped"
               rowClassName={(record, index) =>
@@ -416,7 +452,7 @@ const UserList = () => {
         visible={isEditUserModalVisible}
         onCancel={closeEditUserModal}
         footer={null}
-        width={700}
+        width={1000}
       >
         <EditUser onClose={closeEditUserModal} idd={idd} />
       </Modal>

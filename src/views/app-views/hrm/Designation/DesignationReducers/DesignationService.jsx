@@ -77,7 +77,7 @@ const EditDesignation = async (id, values) => {
 };
 
 
-const UserService = {
+const DesignationService = {
 
   GetDes,
   AddDesignation,
@@ -86,4 +86,4 @@ const UserService = {
 
 };
 
-export default UserService;
+export default DesignationService;

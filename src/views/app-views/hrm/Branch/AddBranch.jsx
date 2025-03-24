@@ -120,7 +120,6 @@ const AddBranch = ({ onClose }) => {
         dispatch(getBranch());
         resetForm();
         onClose();
-        message.success('Branch added successfully!');
       })
       .catch((error) => {
         console.error('Add API error:', error);

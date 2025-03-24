@@ -1,64 +1,64 @@
-// import axios from 'axios';
-// import { API_BASE_URL } from 'configs/AppConfig';
-// import { signOutSuccess } from 'store/slices/authSlice';
-// import store from '../store';
-// import { AUTH_TOKEN } from 'constants/AuthConstant';
-// import { notification } from 'antd';
+import axios from 'axios';
+import { API_BASE_URL } from 'configs/AppConfig';
+import { signOutSuccess } from 'store/slices/authSlice';
+import store from '../store';
+import { AUTH_TOKEN } from 'constants/AuthConstant';
+import { notification } from 'antd';
 
-// const unauthorizedCode = [400, 401, 403]
+const unauthorizedCode = [400, 401, 403]
 
-// const service = axios.create({
-// 	baseURL: API_BASE_URL,
-// 	timeout: 60000
-// })
+const service = axios.create({
+	baseURL: API_BASE_URL,
+	timeout: 60000
+})
 
-// const TOKEN_PAYLOAD_KEY = 'authorization'
+const TOKEN_PAYLOAD_KEY = 'authorization'
 
-// service.interceptors.request.use(config => {
-// 	const jwtToken = localStorage.getItem(AUTH_TOKEN) || null;
+service.interceptors.request.use(config => {
+	const jwtToken = localStorage.getItem(AUTH_TOKEN) || null;
 
-// 	if (jwtToken) {
-// 		config.headers[TOKEN_PAYLOAD_KEY] = jwtToken
-// 	}
+	if (jwtToken) {
+		config.headers[TOKEN_PAYLOAD_KEY] = jwtToken
+	}
 
-// 	return config
-// }, error => {
-// 	notification.error({
-// 		message: 'Error'
-// 	})
-// 	Promise.reject(error)
-// })
+	return config
+}, error => {
+	notification.error({
+		message: 'Error'
+	})
+	Promise.reject(error)
+})
 
-// service.interceptors.response.use((response) => {
-// 	return response.data
-// }, (error) => {
+service.interceptors.response.use((response) => {
+	return response.data
+}, (error) => {
 
-// 	let notificationParam = {
-// 		message: ''
-// 	}
+	let notificationParam = {
+		message: ''
+	}
 
-// 	if (unauthorizedCode.includes(error.response.status)) {
-// 		notificationParam.message = 'Authentication Fail'
-// 		notificationParam.description = 'Please login again'
-// 		localStorage.removeItem(AUTH_TOKEN)
-// 		store.dispatch(signOutSuccess())
-// 	}
+	if (unauthorizedCode.includes(error.response.status)) {
+		notificationParam.message = 'Authentication Fail'
+		notificationParam.description = 'Please login again'
+		localStorage.removeItem(AUTH_TOKEN)
+		store.dispatch(signOutSuccess())
+	}
 
-// 	if (error.response.status === 404) {
-// 		notificationParam.message = 'Not Found'
-// 	}
+	if (error.response.status === 404) {
+		notificationParam.message = 'Not Found'
+	}
 
-// 	if (error.response.status === 500) {
-// 		notificationParam.message = 'Internal Server Error'
-// 	}
+	if (error.response.status === 500) {
+		notificationParam.message = 'Internal Server Error'
+	}
 
-// 	if (error.response.status === 508) {
-// 		notificationParam.message = 'Time Out'
-// 	}
+	if (error.response.status === 508) {
+		notificationParam.message = 'Time Out'
+	}
 
-// 	notification.error(notificationParam)
+	notification.error(notificationParam)
 
-// 	return Promise.reject(error);
-// });
+	return Promise.reject(error);
+});
 
-// export default service
+export default service

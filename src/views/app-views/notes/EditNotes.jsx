@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Input, Button, Select, Row, Col } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
-import { addnotess, getnotess } from "./notesReducer/notesSlice";
+import { editnotess, getnotess } from "./notesReducer/notesSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { empdata } from "../hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { ClientData } from "../company/CompanyReducers/CompanySlice";
 const { Option } = Select;
 // Validation Schema
 const validationSchema = Yup.object().shape({
@@ -15,42 +15,69 @@ const validationSchema = Yup.object().shape({
   type: Yup.string().required("Type is required"),
   assignto: Yup.array().min(1, "Please select at least one user"),
 });
-const EditNotes = ({ onClose }) => {
+const EditNotes = ({ onClose, idd }) => {
   const dispatch = useDispatch();
   const alllogeddata = useSelector((state) => state.user);
   const id = alllogeddata.loggedInUser.id;
-  useEffect(() => {
-    dispatch(empdata());
+  
+      useEffect(() => {
+        dispatch(ClientData());
   }, [dispatch]);
-  const allempdata = useSelector((state) => state.employee);
-  const empData = allempdata?.employee?.data;
-  const initialValues = {
+  
+  const allempdata = useSelector((state) => state.ClientData);
+  const note = useSelector((state) => state.notes.notes);
+  const notes = note.data;
+  const empData = allempdata?.ClientData?.data;
+ 
+  const [initialValues, setInitialValues] = useState({
     title: "",
     description: "",
-    type: "Personal",
+    type: "",
     assignto: [],
-  };
+  });
+
+  useEffect(() => {
+    if (notes) {
+      const selectedNote = notes.find((item) => item.id === idd);
+      
+      if (selectedNote) {
+        // Parse the employees string to get the employee array
+        const employeesData = selectedNote.employees ? 
+          JSON.parse(selectedNote.employees) : { employee: [] };
+
+        setInitialValues({
+          title: selectedNote.note_title,
+          description: selectedNote.description,
+          type: selectedNote.notetype,
+          assignto: employeesData.employee || [],
+        });
+      }
+    }
+  }, [notes, idd]);
+
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       const formData = {
-        note_title: values.title,
+        note_title: values.title.trim(),
         notetype: values.type,
-        employees:
-          values.type === "Shared" ? { employee: values.assignto } : null,
-        description: values.description,
+        employees: {
+          employee: values.type === "Shared" ? values.assignto : []
+        },
+        description: values.description.trim(),
       };
-      dispatch(addnotess({ id, formData })).then(() => {
+
+      dispatch(editnotess({ idd, formData })).then(() => {
         dispatch(getnotess(id)).unwrap();
-        // message.success("Notes added successfully!");
         resetForm();
         onClose();
       });
     } catch (error) {
-      // message.error(error.message || "Failed to add note");
+      console.error('Edit error:', error);
     } finally {
       setSubmitting(false);
     }
   };
+
   return (
     <div className="add-notes-form">
       <div className="mb-3 border-b pb-1 font-medium"></div>
@@ -58,11 +85,10 @@ const EditNotes = ({ onClose }) => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
+        enableReinitialize={true}
       >
         {({ values, setFieldValue, isSubmitting, errors, touched }) => (
           <Form>
-
-
             <Row gutter={16}>
               <Col span={24}>
                 <div className="mb-4">

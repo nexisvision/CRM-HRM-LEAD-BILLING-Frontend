@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./generalService";
+import SettingService from "./generalService";
 import { toast } from "react-toastify";
 import { message } from "antd";
 
 
 
 export const creategenaralsett = createAsyncThunk(
-  "users/addtgg",
+  "setting/addsett",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.creategenaral(userData);
+      const response = await SettingService.creategenaral(userData);
 
       return response;
     } catch (error) {
@@ -18,9 +18,9 @@ export const creategenaralsett = createAsyncThunk(
   }
 );
 export const updategeneralsetting = createAsyncThunk(
-  'generalsetting/update',
+  'setting/updatesett',
   async ({ id, data }) => {
-    const response = await UserService.updategeneralsetting(id, data);
+    const response = await SettingService.updategeneralsetting(id, data);
     return response.data;
   }
 );
@@ -28,10 +28,10 @@ export const updategeneralsetting = createAsyncThunk(
 
 
 export const getgeneralsettings = createAsyncThunk(
-  "emp/getgenaral",
+  "setting/getsett",
   async (loginData, thunkAPI) => {
     try {
-      const response = await UserService.getgeneralsetting(loginData);
+      const response = await SettingService.getgeneralsetting(loginData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -42,10 +42,10 @@ export const getgeneralsettings = createAsyncThunk(
 
 
 export const deletesettingss = createAsyncThunk(
-  "users/Deletese",
+  "setting/Deletesett",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.deletesetting(userId);
+      const response = await SettingService.deletesetting(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);

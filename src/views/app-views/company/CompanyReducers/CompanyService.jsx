@@ -36,6 +36,28 @@ const createClient = async (payload) => {
   }
 };
 
+
+const registerClient = async (payload) => {
+  const token = localStorage.getItem("auth_token");
+
+  try {
+    const res = await axios.post(
+      `${env.API_ENDPOINT_URL}/clients/register`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+
 const DeleteClient = async (id) => {
   const token = localStorage.getItem("auth_token");
 
@@ -146,6 +168,7 @@ const UserService = {
   assignplan,
   sendemailotp,
   otpverify,
+  registerClient,
 };
 
 export default UserService;

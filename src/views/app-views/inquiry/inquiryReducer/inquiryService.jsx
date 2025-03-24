@@ -77,13 +77,11 @@ const editinq = async (idd, values) => {
 
 
 
-const UserService = {
-
+const InquiryService = {
   getinq,
   addinq,
   delinq,
   editinq,
-
 };
 
-export default UserService;
+export default InquiryService;

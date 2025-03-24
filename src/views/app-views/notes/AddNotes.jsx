@@ -6,7 +6,7 @@ import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { addnotess, getnotess } from "./notesReducer/notesSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { empdata } from "../hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { ClientData } from "../company/CompanyReducers/CompanySlice";
 const { Option } = Select;
 const validationSchema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
@@ -17,14 +17,20 @@ const validationSchema = Yup.object().shape({
 const AddNotes = ({ onClose }) => {
   const dispatch = useDispatch();
   const alllogeddata = useSelector((state) => state.user);
+
+
+
+
   const id = alllogeddata.loggedInUser.id;
   useEffect(() => {
-    dispatch(empdata());
+dispatch(ClientData());
   }, [dispatch]);
-  const allempdata = useSelector((state) => state.employee);
-  const empData = allempdata?.employee?.data;
+
+  const allempdata = useSelector((state) => state.ClientData);
+  // const allempdata = useSelector((state) => state.employee);
+  const empData = allempdata?.ClientData?.data;
   const initialValues = {
-    title: "",
+    note_title: "",
     description: "",
     type: "",
     assignto: [],
@@ -34,9 +40,13 @@ const AddNotes = ({ onClose }) => {
       const formData = {
         note_title: values.title.trim(),
         notetype: values.type,
-        employees: values.type === "Shared" ? JSON.stringify({ employee: values.assignto }) : null,
+        employees: values.type === "Shared" ? {
+          employee: values.assignto
+        } : null,
         description: values.description.trim(),
       };
+
+
       dispatch(addnotess({ id, formData })).then(() => {
         dispatch(getnotess(id)).unwrap();
         resetForm();

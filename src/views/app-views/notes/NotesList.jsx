@@ -19,8 +19,8 @@ import { getnotess } from "./notesReducer/notesSlice";
 const NotesList = () => {
   const [isAddNotesModalVisible, setIsAddNotesModalVisible] = useState(false);
   const [isEditNotesModalVisible, setIsEditNotesModalVisible] = useState(false);
-  const [list, setList] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [filteredNotes, setFilteredNotes] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -32,15 +32,23 @@ const NotesList = () => {
   }, [dispatch, id]);
 
   const allnotedata = useSelector((state) => state.notes);
-  const fnddata = allnotedata.notes?.data;
+  const notes = allnotedata.notes?.data || [];
 
-  console.log("fnddata", fnddata);
-
+  // Update filtered notes whenever notes or search text changes
   useEffect(() => {
-    if (fnddata) {
-      setList(fnddata);
+    if (!searchText.trim()) {
+      setFilteredNotes(notes);
+    } else {
+      const filtered = notes.filter(note => 
+        note.note_title?.toLowerCase().includes(searchText.toLowerCase().trim())
+      );
+      setFilteredNotes(filtered);
     }
-  }, [fnddata]);
+  }, [notes, searchText]);
+
+  const handleSearch = (e) => {
+    setSearchText(e.target.value);
+  };
 
   const openAddNotesModal = () => {
     setIsAddNotesModalVisible(true);
@@ -50,45 +58,9 @@ const NotesList = () => {
     setIsAddNotesModalVisible(false);
   };
 
-
   // Close Add Job Modal
   const closeEditNotesModal = () => {
     setIsEditNotesModalVisible(false);
-  };
-
-  // Add the search handler function
-  const onSearch = (e) => {
-    const value = e.target.value.toLowerCase();
-    setSearchText(value);
-
-    // If search value is empty, show all data
-    if (!value) {
-      setList(fnddata);
-      return;
-    }
-
-    // Filter the data based on note title
-    const filtered = fnddata.filter(note =>
-      note.note_title?.toLowerCase().includes(value)
-    );
-
-    setList(filtered);
-  };
-
-  // Add filter function
-  const getFilteredNotes = () => {
-    if (!list) return [];
-
-    let filtered = list;
-
-    // Apply search filter
-    if (searchText) {
-      filtered = filtered.filter(note =>
-        note.note_title?.toLowerCase().includes(searchText.toLowerCase())
-      );
-    }
-
-    return filtered;
   };
 
   return (
@@ -98,49 +70,60 @@ const NotesList = () => {
           <Flex className="mb-1" mobileFlex={false}>
             <div className="mr-md-3 mb-3">
               <Input
-                placeholder="Search by note title..."
+                placeholder="Search notes by title..."
                 prefix={<SearchOutlined />}
-                onChange={onSearch}
+                onChange={handleSearch}
                 value={searchText}
                 allowClear
                 className="search-input"
+                style={{ minWidth: 200 }}
               />
             </div>
           </Flex>
           <Flex gap="7px" className="flex">
-            <Button type="primary" className="ml-2" onClick={openAddNotesModal}>
-              <PlusOutlined />
-              <span>New</span>
+            <Button 
+              type="primary" 
+              className="ml-2" 
+              onClick={openAddNotesModal}
+              icon={<PlusOutlined />}
+            >
+              New Note
             </Button>
           </Flex>
         </Flex>
 
-        {list && list.length > 0 ? (
+        {/* Notes List */}
+        {filteredNotes.length > 0 ? (
           <ViewNotes
-            data={getFilteredNotes()}
+            data={filteredNotes}
             pagination={{
-              total: getFilteredNotes().length,
+              total: filteredNotes.length,
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} notes`
             }}
           />
         ) : (
-          <div className="w-full text-center py-8">
-            <p className="text-gray-500 text-lg">No notes found</p>
+          <div className="text-center py-8">
+            <p className="text-gray-500 text-lg">
+              {searchText ? 'No notes found matching your search' : 'No notes available'}
+            </p>
           </div>
         )}
+
+        {/* Add Note Modal */}
         <Modal
-          title="Add Notes"
+          title="Add Note"
           visible={isAddNotesModalVisible}
           onCancel={closeAddNotesModal}
           footer={null}
           width={800}
+          destroyOnClose
           className="mt-[-70px]"
         >
           <AddNotes onClose={closeAddNotesModal} />
         </Modal>
-        <Modal
+        {/* <Modal
           title="Edit Notes"
           visible={isEditNotesModalVisible}
           onCancel={closeEditNotesModal}
@@ -150,38 +133,28 @@ const NotesList = () => {
           className="mt-[-70px]"
         >
           <EditNotes onClose={closeEditNotesModal} />
-        </Modal>
+        </Modal> */}
       </Card>
+
+      <style jsx>{`
+        .search-input {
+          transition: all 0.3s;
+        }
+
+        .search-input:hover,
+        .search-input:focus {
+          border-color: #40a9ff;
+          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+          .search-input {
+            width: 100%;
+          }
+        }
+      `}</style>
     </>
   );
 };
 
-// Add styles
-const styles = `
-  .search-input {
-    transition: all 0.3s;
-    min-width: 200px;
-  }
-
-  .search-input:hover,
-  .search-input:focus {
-    border-color: #40a9ff;
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
-  }
-
-  @media (max-width: 768px) {
-    .search-input {
-      width: 100%;
-      margin-bottom: 1rem;
-    }
-  }
-`;
-
-const NotesListWithStyles = () => (
-  <>
-    <style>{styles}</style>
-    <NotesList />
-  </>
-);
-
-export default NotesListWithStyles;
+export default NotesList;

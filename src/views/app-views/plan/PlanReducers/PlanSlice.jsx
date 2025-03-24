@@ -1,14 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./PlanService";
+import PlanService from "./PlanService";
 import { toast } from "react-toastify";
 import { message } from "antd";
 
 
 export const planbutus = createAsyncThunk(
-    "users/planbutus",
+    "plan/planbutus",
     async (userData, thunkAPI) => {
         try {
-            const response = await UserService.planbuy(userData);
+            const response = await PlanService.planbuy(userData);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -19,10 +19,10 @@ export const planbutus = createAsyncThunk(
 
 
 export const CreatePlan = createAsyncThunk(
-    "users/addplan",
+    "plan/addplan",
     async (userData, thunkAPI) => {
         try {
-            const response = await UserService.AddPlan(userData);
+            const response = await PlanService.AddPlan(userData);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -34,10 +34,10 @@ export const CreatePlan = createAsyncThunk(
 
 
 export const GetPlan = createAsyncThunk(
-    "leave/getLeave",
+    "plan/getplan",
     async (thunkAPI) => {
         try {
-            const response = await UserService.Getplan();
+            const response = await PlanService.Getplan();
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -45,38 +45,13 @@ export const GetPlan = createAsyncThunk(
     }
 );
 
-
-export const getAllUsers = createAsyncThunk(
-    "users/getAllUsers",
-    async (thunkAPI) => {
-        try {
-            const response = await UserService.getAllUsers();
-            return response;
-        } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data);
-        }
-    }
-);
-
-
-export const getUserById = createAsyncThunk(
-    "users/getUserById",
-    async (userId, thunkAPI) => {
-        try {
-            const response = await UserService.getUserById(userId);
-            return response;
-        } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data);
-        }
-    }
-);
 
 
 export const DeleteP = createAsyncThunk(
-    "users/deleteUser",
+    "plan/deleteplan",
     async (userId, thunkAPI) => {
         try {
-            const response = await UserService.DeletePlan(userId);
+            const response = await PlanService.DeletePlan(userId);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -84,11 +59,11 @@ export const DeleteP = createAsyncThunk(
     }
 );
 export const Editplan = createAsyncThunk(
-    "users/updateEmployee",
+    "plan/updatepaln",
     async ({ id, values }, thunkAPI) => {
         try {
             console.log("idinslice", id)
-            const response = await UserService.EditP(id, values);
+            const response = await PlanService.EditP(id, values);
             return response; // Return the updated data
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
@@ -110,34 +85,6 @@ const PlanSlice = createSlice({
         addModel: false,
 
         editModal: false,
-    },
-    reducers: {
-        toggleAddModal: (state, action) => {
-            state.addModel = action.payload;
-        },
-        toggleEditModal: (state, action) => {
-            state.editModal = action.payload;
-            state.editItem = {};
-        },
-        editUserData: (state, action) => {
-            state.editItem = action.payload;
-            state.editModal = !state.editModal;
-        },
-        handleLogout: (state, action) => {
-            state.isAuth = action.payload;
-            state.loggedInUser = null
-            localStorage.removeItem("isAuth");
-            localStorage.removeItem("USER");
-            localStorage.removeItem("TOKEN");
-        },
-        toggleDetailModal: (state, action) => {
-            state.detailItem = action.payload;
-            state.detailModal = !state.editModal;
-        },
-        closeDetailModal: (state, action) => {
-            state.detailModal = action.payload;
-            state.detailItem = {};
-        },
     },
     extraReducers: (builder) => {
         builder
@@ -212,10 +159,5 @@ const PlanSlice = createSlice({
     },
 });
 
-export const {
-    toggleAddModal,
-    toggleEditModal,
-    handleLogout,
-    editUserData,
-} = PlanSlice.actions;
+
 export default PlanSlice.reducer;

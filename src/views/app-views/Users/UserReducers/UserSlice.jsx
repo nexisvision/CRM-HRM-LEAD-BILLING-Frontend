@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./UserService";
-import { toast } from "react-toastify";
 import axios from "axios";
 import { message } from "antd";
 import { env } from "configs/EnvironmentConfig";
@@ -8,7 +7,7 @@ import { env } from "configs/EnvironmentConfig";
 
 
 export const AddUserss = createAsyncThunk(
-  "users/addtu",
+  "users/adduser",
   async (userData, thunkAPI) => {
     try {
       const response = await UserService.Createuser(userData);
@@ -22,7 +21,7 @@ export const AddUserss = createAsyncThunk(
 
 
 export const GetUsers = createAsyncThunk(
-  "emp/getUsers", // action type
+  "users/getUsers", // action type
   async (loginData, thunkAPI) => {
     const token = localStorage.getItem("auth_token");
     try {
@@ -34,19 +33,6 @@ export const GetUsers = createAsyncThunk(
       return response.data; // This will be available in the reducer as `action.payload`
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
-    }
-  }
-);
-
-
-export const getAllUsers = createAsyncThunk(
-  "users/getAllUsers",
-  async (thunkAPI) => {
-    try {
-      const response = await UserService.getAllUsers();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
@@ -66,7 +52,7 @@ export const getUserById = createAsyncThunk(
 
 
 export const Dleteusetr = createAsyncThunk(
-  "users/Dleteusetreet",
+  "users/Dleteuser",
   async (userId, thunkAPI) => {
     try {
       const response = await UserService.DeleteUser(userId);
@@ -101,34 +87,7 @@ const UserSlice = createSlice({
     addModel: false,
     editModal: false,
   },
-  reducers: {
-    toggleAddModal: (state, action) => {
-      state.addModel = action.payload;
-    },
-    toggleEditModal: (state, action) => {
-      state.editModal = action.payload;
-      state.editItem = {};
-    },
-    editUserData: (state, action) => {
-      state.editItem = action.payload;
-      state.editModal = !state.editModal;
-    },
-    handleLogout: (state, action) => {
-      state.isAuth = action.payload;
-      state.loggedInUser = null;
-      localStorage.removeItem("isAuth");
-      localStorage.removeItem("USER");
-      localStorage.removeItem("TOKEN");
-    },
-    toggleDetailModal: (state, action) => {
-      state.detailItem = action.payload;
-      state.detailModal = !state.editModal;
-    },
-    closeDetailModal: (state, action) => {
-      state.detailModal = action.payload;
-      state.detailItem = {};
-    },
-  },
+  
   extraReducers: (builder) => {
     builder
       //add
@@ -150,26 +109,14 @@ const UserSlice = createSlice({
       .addCase(GetUsers.fulfilled, (state, action) => {
         state.isLoading = false;
         state.Users = action?.payload;
-        toast.success(action.payload?.data?.message);
+        // message.success(action.payload?.data?.message);
       })
       .addCase(GetUsers.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.message);
+        message.error(action.payload?.message);
       })
 
       //getall
-      .addCase(getAllUsers.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getAllUsers.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.users = action.payload;
-        toast.success(`Users fetched successfully`);
-      })
-      .addCase(getAllUsers.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
 
       //getuserbyid
       .addCase(getUserById.pending, (state) => {
@@ -178,11 +125,11 @@ const UserSlice = createSlice({
       .addCase(getUserById.fulfilled, (state, action) => {
         state.isLoading = false;
         state.detailItem = action.payload?.user;
-        toast.success(action.payload.message);
+        message.success(action.payload?.message);
       })
       .addCase(getUserById.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
+        message.error(action.payload?.message);
       })
       //delete
       .addCase(Dleteusetr.pending, (state) => {
@@ -216,6 +163,5 @@ const UserSlice = createSlice({
   },
 });
 
-export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  UserSlice.actions;
+
 export default UserSlice.reducer;

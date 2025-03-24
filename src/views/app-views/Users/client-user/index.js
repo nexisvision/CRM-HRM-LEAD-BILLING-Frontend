@@ -1,13 +1,13 @@
-import React from 'react';
-import ClientUserList from './ClientUserList';
+// import React from 'react';
+// import ClientUserList from './ClientUserList';
 
 
-const ClientUser = () => (
+// const ClientUser = () => (
 
-	<div className="mail">
-		<ClientUserList />
-	</div>
+// 	<div className="mail">
+// 		<ClientUserList />
+// 	</div>
 
-);
+// );
 
-export default ClientUser;
+// export default ClientUser;

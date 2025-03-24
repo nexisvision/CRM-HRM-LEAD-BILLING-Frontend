@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserAddCountries from "./countriesService";
-import { toast } from "react-toastify";
+import CountriesService from "./countriesService";
+import { message } from "antd";
 import axios from 'axios';
 import { env } from "configs/EnvironmentConfig";
 
@@ -27,7 +27,7 @@ export const getallcountries = createAsyncThunk(
     "countries/GetAllCountries",
     async (_, thunkAPI) => {
         try {
-            const response = await UserAddCountries.GetAllCountries();
+            const response = await CountriesService.GetAllCountries();
             return response.data;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -39,7 +39,7 @@ export const updatecountries = createAsyncThunk(
     "countries/updateCountries",
     async ({ idd, values }, thunkAPI) => {
         try {
-            const response = await UserAddCountries.updateCountries(idd, values);
+            const response = await CountriesService.updateCountries(idd, values);
             return response.data;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -51,7 +51,7 @@ export const DeletePs = createAsyncThunk(
     "countries/deleteCountry",
     async (id, { rejectWithValue, dispatch }) => {
         try {
-            const response = await UserAddCountries.deleteCountries(id);
+            const response = await CountriesService.deleteCountries(id);
             dispatch(getallcountries());
             return { id, ...response };
         } catch (error) {
@@ -72,25 +72,7 @@ const countriesSlice = createSlice({
         addModel: false,
         editModal: false,
     },
-    reducers: {
-        setSelectedCountries: (state, action) => {
-            state.selectedCountries = action.payload;
-        },
-        clearCountriesState: (state) => {
-            state.error = null;
-            state.success = false;
-            state.message = '';
-        },
-        toggleEditModal: (state, action) => {
-            state.editModal = action.payload;
-            state.editItem = {};
-        },
-        editUserData: (state, action) => {
-            state.editItem = action.payload;
-            state.editModal = !state.editModal;
-        },
 
-    },
     extraReducers: (builder) => {
         builder
             .addCase(addCountry.pending, (state) => {
@@ -100,12 +82,12 @@ const countriesSlice = createSlice({
             .addCase(addCountry.fulfilled, (state, action) => {
                 state.countries.push(action.payload);
                 state.isLoading = false;
-                // message.success(action.payload?.message);
+                message.success(action.payload?.data?.message);
             })
             .addCase(addCountry.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-                // message.error(action.payload?.message);
+                message.error(action.payload?.data?.message);
             })
 
             .addCase(getallcountries.pending, (state, action) => {
@@ -117,7 +99,7 @@ const countriesSlice = createSlice({
             })
             .addCase(getallcountries.rejected, (state, action) => {
                 state.isLoading = false;
-                toast.error(action.payload?.message);
+                message.error(action.payload?.data?.message);
             })
             .addCase(updatecountries.pending, (state, action) => {
                 state.isLoading = true;
@@ -125,11 +107,11 @@ const countriesSlice = createSlice({
             .addCase(updatecountries.fulfilled, (state, action) => {
                 state.editItem = action.payload.data;
                 state.isLoading = false;
-                // message.success(action.payload?.message);
+                message.success(action.payload?.data?.message);
             })
             .addCase(updatecountries.rejected, (state, action) => {
                 state.isLoading = false;
-                // message.error(action.payload?.message);
+                    message.error(action.payload?.data?.message);
             })
             .addCase(DeletePs.pending, (state) => {
                 state.isLoading = true;
@@ -139,18 +121,17 @@ const countriesSlice = createSlice({
             .addCase(DeletePs.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.countries = state.countries.filter(country => country.id !== action.payload.id);
-                // message.success(action.payload?.message);
+                message.success(action.payload?.data?.message);
             })
 
 
             .addCase(DeletePs.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-                // message.error(action.payload?.message);
+                message.error(action.payload?.data?.message);
             })
 
     }
 });
 
-export const { setSelectedCountries, clearCountriesState } = countriesSlice.actions;
 export default countriesSlice.reducer;

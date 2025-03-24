@@ -34,12 +34,10 @@ const MonthlyRevenueCard = () => {
   const [selectedYear, setSelectedYear] = useState(moment().year());
 
   const dispatch = useDispatch();
-  const subclients = useSelector((state) => state?.SubClient?.SubClient?.data || []);
-  const isLoading = useSelector((state) => state?.SubClient?.isLoading);
+  const subclients = useSelector((state) => state?.ClientData?.ClientData?.data || []);
+  const isLoading = useSelector((state) => state?.ClientData?.isLoading);
 
-  const users = useSelector((state) => state?.user.loggedInUser || []);
-
-  console.log("users",users);
+console.log("asdsadas",subclients);
 
   useEffect(() => {
     dispatch(ClientData());
@@ -253,6 +251,8 @@ const DashboardList = () => {
   const plans = useSelector((state) => state?.Plan?.Plan || []);
 
   const loggedInUser = useSelector((state) => state?.user?.loggedInUser || {});
+  const subclients = useSelector((state) => state?.ClientData?.ClientData?.data || []);
+
 
   useEffect(() => {
     dispatch(ClientData());
@@ -272,11 +272,15 @@ const DashboardList = () => {
 
   const allticket = useSelector((state) => state.Ticket);
   const fnddataticket = allticket.Ticket.data;
-  const subscriptions = useSelector((state) => state?.subplan?.subplan?.data || []);
 
 
   const alldatas = useSelector((state) => state.subplan);
   const fnddtat = useMemo(() => alldatas.subplan.data || [], [alldatas.subplan.data]);
+
+
+console.log("wefwefwefewf",fnddtat);
+
+console.log("plan data",fnddataplan);
 
   useEffect(() => {
     dispatch(getsubplandata());
@@ -304,9 +308,6 @@ const DashboardList = () => {
   }, [fnddtat]);
 
 
-  useEffect(() => {
-    dispatch(getsubplandata());
-  }, [dispatch]);
 
   useEffect(() => {
     dispatch(getallcountries());
@@ -437,18 +438,75 @@ const DashboardList = () => {
   ];
 
 
-  const chartData = {
-    labels: planNames, // Dynamically setting labels
-    datasets: [
-      {
-        data: planPrices, // Dynamically setting data
+  // Calculate subscription data for pie chart
+  const chartData = useMemo(() => {
+    if (!fnddtat || !fndplan) return {
+      labels: [],
+      datasets: [{
+        data: [],
         backgroundColor: ["#ff8717", "#4d7c0f", "#ffb821", "#007bff", "#dc3545", "#28a745"],
         borderWidth: 1,
+      }]
+    };
+
+    // Group subscriptions by plan
+    const subscriptionsByPlan = fnddtat.reduce((acc, subscription) => {
+      const planId = subscription.plan_id;
+      acc[planId] = (acc[planId] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Create chart data with plan names and subscription counts
+    const labels = [];
+    const data = [];
+    const planDetails = [];
+
+    fndplan.forEach(plan => {
+      const subscriptionCount = subscriptionsByPlan[plan.id] || 0;
+      if (subscriptionCount > 0) { // Only show plans that have subscriptions
+        labels.push(plan.name);
+        data.push(subscriptionCount);
+        planDetails.push(`${plan.name} (${plan.price} / ${plan.duration})`);
+      }
+    });
+
+    return {
+      labels: planDetails, // Use detailed labels
+      datasets: [{
+        data: data,
+        backgroundColor: ["#ff8717", "#4d7c0f", "#ffb821", "#007bff", "#dc3545", "#28a745"],
+        borderWidth: 1,
+      }]
+    };
+  }, [fnddtat, fndplan]);
+
+  // Chart options
+  const chartOptions = {
+    plugins: {
+      legend: {
+        position: 'right',
+        labels: {
+          boxWidth: 15,
+          padding: 15,
+          usePointStyle: true,
+          pointStyle: 'circle',
+          font: {
+            size: 12
+          }
+        }
       },
-    ],
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const label = context.label || '';
+            const value = context.raw || 0;
+            return `${label}: ${value} subscription${value !== 1 ? 's' : ''}`;
+          }
+        }
+      }
+    },
+    maintainAspectRatio: false
   };
-
-
 
   const calculateRegionDistribution = () => {
     if (!fnddataclint || !Array.isArray(fnddataclint)) return [];
@@ -473,14 +531,14 @@ const DashboardList = () => {
 
   // Calculate plan sales statistics
   const calculatePlanStats = () => {
-    if (!plans.length || !subscriptions.length) return {
+    if (!plans.length || !fnddtat.length) return {
       totalSales: 0,
       totalRevenue: 0,
       planBreakdown: []
     };
 
     const planStats = plans.map(plan => {
-      const planSales = subscriptions.filter(sub => sub.plan_id === plan.id);
+      const planSales = fnddtat.filter(sub => sub.plan_id === plan.id);
       return {
         planId: plan.id,
         planName: plan.name,
@@ -490,7 +548,7 @@ const DashboardList = () => {
     });
 
     return {
-      totalSales: subscriptions.length,
+      totalSales: fnddtat.length,
       totalRevenue: planStats.reduce((total, plan) => total + plan.revenue, 0),
       planBreakdown: planStats
     };
@@ -774,16 +832,7 @@ const DashboardList = () => {
               {planNames.length > 0 ? (
                 <Pie
                   data={chartData}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                      legend: {
-                        display: true,
-                        position: "bottom",
-                      },
-                    },
-                  }}
+                  options={chartOptions}
                   className="w-[300px] h-[300px]"
                 />
               ) : (
@@ -808,16 +857,11 @@ const DashboardList = () => {
             style={{ height: "450px" }}
           >
             <div className="flex justify-between items-center mb-4">
-              <h1 className="text-xl font-medium">Recent Order</h1>
-              <div className="flex-shrink-0">
-                <DateRangeFilter
-                  onDateRangeChange={(range) => {
-                  }}
-                />
-              </div>
+              <h1 className="text-xl font-medium">Clients</h1>
+              
             </div>
             <div className="flex-grow pb-11">
-              <RecentOrderGraph className="h-full" />
+              <RecentOrderGraph subclients={subclients} className="h-full" />
             </div>
           </div>
         </Col>
@@ -898,14 +942,14 @@ const DashboardList = () => {
         </Col>
       </Row>
 
-      <div className="container mx-auto p-4 bg-white  rounded-lg shadow mt-8">
+      <div className="w-full p-4 bg-white rounded-lg shadow mt-8">
         <h1 className="text-xl font-medium text-black">Tickets</h1>
-        <div className="">
+        <div className="w-full">
           <TicketList />
         </div>
       </div>
 
-      <div className="container p-4 bg-white rounded-lg shadow mt-8">
+      <div className="w-full p-4 bg-white rounded-lg shadow mt-8">
         <h1 className="text-xl font-medium text-black">
           Recent Users Registration
         </h1>
@@ -926,7 +970,7 @@ const DashboardList = () => {
         )}
       </div>
 
-      <div className="container mx-auto p-4 bg-white  rounded-lg shadow mt-8">
+      <div className="w-full p-4 bg-white rounded-lg shadow mt-8">
         <h1 className="text-xl font-medium text-black">Subscribed User Plans</h1>
         <div className="table-responsive">
           <Table

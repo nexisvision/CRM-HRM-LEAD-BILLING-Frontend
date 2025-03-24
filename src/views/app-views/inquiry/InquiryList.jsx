@@ -256,7 +256,7 @@ const InquiryList = () => {
               loading={isSearching}
             />
           </div>
-          <div className="mb-3">
+          {/* <div className="mb-3">
             <Select
               defaultValue="All"
               className="w-100"
@@ -271,7 +271,7 @@ const InquiryList = () => {
                 </Option>
               ))}
             </Select>
-          </div>
+          </div> */}
         </Flex>
         <Flex gap="7px">
           <Button type="primary" className="ml-2" onClick={openAddinquiryModal}>

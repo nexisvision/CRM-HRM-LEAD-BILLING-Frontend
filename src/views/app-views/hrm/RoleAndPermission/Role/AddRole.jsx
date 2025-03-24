@@ -9,6 +9,7 @@ const AddRole = ({ onClose, resetForm }) => {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState('Staff');
   const [modulePermissions, setModulePermissions] = useState({});
+  const [moduleCheckboxes, setModuleCheckboxes] = useState({});
 
   // Define the modules with their submodules and permissions
   const modules = [
@@ -88,57 +89,50 @@ const AddRole = ({ onClose, resetForm }) => {
     setActiveTab(moduleName);
   };
 
-  const handleSelectAllModule = (checked) => {
+  const handleModuleCheckboxChange = (moduleName, checked) => {
+    // Update module checkbox state
+    setModuleCheckboxes(prev => ({
+      ...prev,
+      [moduleName]: checked
+    }));
+
+    // Update all permissions for this module's submodules
     const newPermissions = { ...modulePermissions };
-    subModules[activeTab].forEach(submodule => {
-      newPermissions[submodule] = {};
-      permissions.forEach(permission => {
-        newPermissions[submodule][permission] = checked;
-      });
+    subModules[moduleName].forEach(submodule => {
+      newPermissions[submodule.key] = {
+        view: checked,
+        create: checked,
+        update: checked,
+        delete: checked
+      };
     });
     setModulePermissions(newPermissions);
   };
-  const isAllModuleSelected = () => {
-    return subModules[activeTab].every(submodule =>
-      permissions.every(perm => modulePermissions[submodule]?.[perm])
-    );
-  };
 
-  const handleSelectAllSubmodule = (submodule) => {
-    setModulePermissions(prev => {
-      const currentPermissions = prev[submodule] || {};
-      const allSelected = permissions.every(perm => currentPermissions[perm]);
-
-      const newPermissions = {};
-      permissions.forEach(perm => {
-        newPermissions[perm] = !allSelected;
-      });
-
-      return {
-        ...prev,
-        [submodule]: newPermissions
-      };
-    });
-  };
-
-  const handlePermissionToggle = (submodule, permission) => {
+  const handlePermissionToggle = (submoduleKey, permission) => {
     setModulePermissions(prev => ({
       ...prev,
-      [submodule]: {
-        ...(prev[submodule] || {}),
-        [permission]: !(prev[submodule]?.[permission] || false)
+      [submoduleKey]: {
+        ...(prev[submoduleKey] || {}),
+        [permission]: !(prev[submoduleKey]?.[permission] || false)
       }
     }));
 
+    // Check if all permissions for this module are selected
+    const module = Object.keys(subModules).find(
+      moduleName => subModules[moduleName].some(sub => sub.key === submoduleKey)
+    );
 
+    if (module) {
+      const allSelected = subModules[module].every(submodule =>
+        Object.values(modulePermissions[submodule.key] || {}).every(Boolean)
+      );
+      setModuleCheckboxes(prev => ({
+        ...prev,
+        [module]: allSelected
+      }));
+    }
   };
-
-  const isAllSelected = (submodule) => {
-    return permissions.every(perm => modulePermissions[submodule]?.[perm]);
-  };
-
-
-
 
   const onFinish = (values) => {
     const payload = {
@@ -194,11 +188,7 @@ const AddRole = ({ onClose, resetForm }) => {
             <Button
               key={module}
               type={activeTab === module ? 'primary' : 'default'}
-              onClick={() => handleModuleClick(module)}
-              style={{
-                backgroundColor: activeTab === module ? '#1890ff' : 'white',
-                color: activeTab === module ? 'white' : 'rgba(0, 0, 0, 0.65)'
-              }}
+              onClick={() => setActiveTab(module)}
             >
               {module}
             </Button>
@@ -208,29 +198,24 @@ const AddRole = ({ onClose, resetForm }) => {
         <table className="w-full border-collapse border">
           <thead>
             <tr className="bg-gray-50">
-              <th className="border py-2 gap-2 flex space-x-4 items-center">
-                {activeTab && (
-                  <Checkbox
-                    className="ml-2"
-                    checked={isAllModuleSelected()}
-                    onChange={(e) => handleSelectAllModule(e.target.checked)}
-                  />
-                )}
+              <th className="border py-2 px-4 text-left">
+                <Checkbox
+                  checked={moduleCheckboxes[activeTab]}
+                  onChange={(e) => handleModuleCheckboxChange(activeTab, e.target.checked)}
+                  className="mr-2"
+                />
                 MODULE
               </th>
               <th className="border p-2">PERMISSIONS</th>
             </tr>
           </thead>
           <tbody>
-            {subModules[activeTab].map(submodule => (
+            {subModules[activeTab]?.map(submodule => (
               <tr key={submodule.key} className="hover:bg-gray-50">
-                <td className="border p-2">
-                  <Checkbox
-                    checked={isAllSelected(submodule.key)}
-                    onChange={() => handleSelectAllSubmodule(submodule.key)}
-                  >
-                    {submodule.title}
-                  </Checkbox>
+                <td className="border p-2 pl-4">
+                  <div className="flex items-center">
+                    <span>{submodule.title}</span>
+                  </div>
                 </td>
                 <td className="border p-2">
                   <div className="flex space-x-4">

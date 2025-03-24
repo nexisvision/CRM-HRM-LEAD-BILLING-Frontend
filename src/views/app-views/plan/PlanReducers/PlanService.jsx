@@ -101,7 +101,7 @@ const planbuy = async (payload) => {
 };
 
 
-const UserService = {
+const PlanService = {
 
   Getplan,
   AddPlan,
@@ -111,4 +111,4 @@ const UserService = {
 
 };
 
-export default UserService;
+export default PlanService;

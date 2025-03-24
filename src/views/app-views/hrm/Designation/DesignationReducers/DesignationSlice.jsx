@@ -1,29 +1,26 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./DesignationService";
-import { toast } from "react-toastify";
+import DesignationService from "./DesignationService";
 import { message } from "antd";
 
 
 export const AddDes = createAsyncThunk(
-    "users/addUser",
+    "designation/addDes",
     async (userData, thunkAPI) => {
         try {
-            const response = await UserService.AddDesignation(userData);
+            const response = await DesignationService.AddDesignation(userData);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
         }
     }
 );
-
-
 
 
 export const getDes = createAsyncThunk(
-    "emp/getEmp",
+    "designation/getDes",
     async (thunkAPI) => {
         try {
-            const response = await UserService.GetDes();
+            const response = await DesignationService.GetDes();
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -31,13 +28,11 @@ export const getDes = createAsyncThunk(
     }
 );
 
-
-
 export const DeleteDes = createAsyncThunk(
-    "users/deleteUser",
+    "designation/deleteDes",
     async (userId, thunkAPI) => {
         try {
-            const response = await UserService.DeleteDes(userId);
+            const response = await DesignationService.DeleteDes(userId);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -45,21 +40,17 @@ export const DeleteDes = createAsyncThunk(
     }
 );
 export const EditDes = createAsyncThunk(
-    "users/updateEmployee",
+    "designation/updateDes",
     async ({ id, values }, thunkAPI) => {
         try {
             console.log("idinslice", id)
-            const response = await UserService.EditDesignation(id, values);
+            const response = await DesignationService.EditDesignation(id, values);
             return response; // Return the updated data
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
         }
     }
 );
-
-
-
-
 
 
 const DesignationSlice = createSlice({
@@ -74,7 +65,7 @@ const DesignationSlice = createSlice({
     
     extraReducers: (builder) => {
         builder
-            //add
+           
             .addCase(AddDes.pending, (state) => {
                 state.isLoading = true;
             })
@@ -87,21 +78,17 @@ const DesignationSlice = createSlice({
                 message.error(action.payload?.message);
             })
 
-
             .addCase(getDes.pending, (state) => {
                 state.isLoading = true;
             })
             .addCase(getDes.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.Designation = action?.payload;
-                toast.success(action.payload?.data?.message);
             })
             .addCase(getDes.rejected, (state, action) => {
                 state.isLoading = false;
-                toast.error(action.payload?.message);
+                message.error(action.payload?.message);
             })
-
-
             //delete
             .addCase(DeleteDes.pending, (state) => {
                 state.isLoading = true;
@@ -115,7 +102,6 @@ const DesignationSlice = createSlice({
                 message.error(action.payload?.message);
             })
             //update
-
             .addCase(EditDes.pending, (state) => {
                 state.isLoading = false;
                 state.error = null;
@@ -133,11 +119,4 @@ const DesignationSlice = createSlice({
             });
     },
 });
-
-export const {
-    toggleAddModal,
-    toggleEditModal,
-    handleLogout,
-    editUserData,
-} = DesignationSlice.actions;
 export default DesignationSlice.reducer;

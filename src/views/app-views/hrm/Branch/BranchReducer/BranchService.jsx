@@ -81,7 +81,7 @@ const editbra = async (idd, values) => {
 
 
 
-const UserService = {
+const BranchService = {
 
   getbra,
   addbra,
@@ -89,4 +89,4 @@ const UserService = {
   editbra,
 };
 
-export default UserService;
+export default BranchService;

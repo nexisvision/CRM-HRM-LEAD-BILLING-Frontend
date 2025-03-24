@@ -1,14 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./EmployeeService";
-import { toast } from "react-toastify";
+import EmployeeService from "./EmployeeService";
+import { message } from "antd";
+
 
 
 
 export const addEmp = createAsyncThunk(
-    "users/addUser",
+    "employee/addEmp",
     async (userData, thunkAPI) => {
         try {
-            const response = await UserService.createEmp(userData);
+            const response = await EmployeeService.createEmp(userData);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -20,10 +21,10 @@ export const addEmp = createAsyncThunk(
 
 
 export const empdata = createAsyncThunk(
-    "emp/getEmp",
+    "employee/getEmp",
     async (loginData, thunkAPI) => {
         try {
-            const response = await UserService.fetchEmpData(loginData);
+            const response = await EmployeeService.fetchEmpData(loginData);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -33,10 +34,10 @@ export const empdata = createAsyncThunk(
 
 
 export const getAllUsers = createAsyncThunk(
-    "users/getAllUsers",
+    "employee/getAllUsers",
     async (thunkAPI) => {
         try {
-            const response = await UserService.getAllUsers();
+            const response = await EmployeeService.getAllUsers();
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -46,10 +47,10 @@ export const getAllUsers = createAsyncThunk(
 
 
 export const getUserById = createAsyncThunk(
-    "users/getUserById",
+    "employee/getUserById",
     async (userId, thunkAPI) => {
         try {
-            const response = await UserService.getUserById(userId);
+            const response = await EmployeeService.getUserById(userId);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -59,10 +60,10 @@ export const getUserById = createAsyncThunk(
 
 
 export const deleteEmp = createAsyncThunk(
-    "users/deleteUser",
+    "employee/deleteEmp",
     async (userId, thunkAPI) => {
         try {
-            const response = await UserService.Empdelete(userId);
+            const response = await EmployeeService.Empdelete(userId);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -70,20 +71,17 @@ export const deleteEmp = createAsyncThunk(
     }
 );
 export const updateEmp = createAsyncThunk(
-    "users/updateEmployee",
-    async ({ idd, updatedFormValues }, thunkAPI) => {
+    "employee/updateEmp",
+    async ({ idd, values }, thunkAPI) => {
+        console.log("updatedFormValues",values);
         try {
-            const response = await UserService.EditEmp(idd, updatedFormValues);
+                const response = await EmployeeService.EditEmp(idd, values);
             return response; // Return the updated data
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
         }
     }
 );
-
-
-
-
 
 
 const EmployeeSlice = createSlice({
@@ -95,34 +93,7 @@ const EmployeeSlice = createSlice({
         addModel: false,
         editModal: false,
     },
-    reducers: {
-        toggleAddModal: (state, action) => {
-            state.addModel = action.payload;
-        },
-        toggleEditModal: (state, action) => {
-            state.editModal = action.payload;
-            state.editItem = {};
-        },
-        editUserData: (state, action) => {
-            state.editItem = action.payload;
-            state.editModal = !state.editModal;
-        },
-        handleLogout: (state, action) => {
-            state.isAuth = action.payload;
-            state.loggedInUser = null
-            localStorage.removeItem("isAuth");
-            localStorage.removeItem("USER");
-            localStorage.removeItem("TOKEN");
-        },
-        toggleDetailModal: (state, action) => {
-            state.detailItem = action.payload;
-            state.detailModal = !state.editModal;
-        },
-        closeDetailModal: (state, action) => {
-            state.detailModal = action.payload;
-            state.detailItem = {};
-        },
-    },
+   
     extraReducers: (builder) => {
         builder
             //add
@@ -146,11 +117,11 @@ const EmployeeSlice = createSlice({
             .addCase(empdata.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.employee = action?.payload;
-                toast.success(action.payload?.data?.message);
+
             })
             .addCase(empdata.rejected, (state, action) => {
                 state.isLoading = false;
-                toast.error(action.payload?.message);
+                message.error(action.payload?.message);
             })
 
             //delete
@@ -185,10 +156,4 @@ const EmployeeSlice = createSlice({
     },
 });
 
-export const {
-    toggleAddModal,
-    toggleEditModal,
-    handleLogout,
-    editUserData,
-} = EmployeeSlice.actions;
 export default EmployeeSlice.reducer;

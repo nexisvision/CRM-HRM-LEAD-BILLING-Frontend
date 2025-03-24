@@ -8,6 +8,97 @@ import { getcurren } from '../setting/currencies/currenciesSlice/currenciesSlice
 import { PlusOutlined } from '@ant-design/icons';
 import AddCurrencies from '../setting/currencies/AddCurrencies';
 const { Option } = Select;
+
+// Add this component for duration selection
+const DurationSelector = ({ value, onChange }) => {
+  const [selectedType, setSelectedType] = useState('Lifetime');
+  const [customValue, setCustomValue] = useState('');
+
+  useEffect(() => {
+    // Set initial value
+    onChange('Lifetime');
+  }, []);
+
+  const handleTypeChange = (type) => {
+    setSelectedType(type);
+    setCustomValue(''); // Reset value when changing type
+    if (type === 'Lifetime') {
+      onChange('Lifetime');
+    }
+  };
+
+  const handleCustomValueChange = (val, type) => {
+    // For monthly, limit to 11
+    if (type === 'Month' && Number(val) > 11) {
+      return;
+    }
+    
+    // Ensure value is positive and not zero
+    if (val && Number(val) > 0) {
+      setCustomValue(val);
+      const formattedValue = `${val} ${type}${Number(val) > 1 ? 's' : ''}`;
+      onChange(formattedValue);
+    } else {
+      setCustomValue('');
+      onChange(''); // Clear the value if invalid
+    }
+  };
+
+  return (
+    <div className="duration-selector">
+      <div className="flex gap-4 mb-4">
+        <Button
+          type={selectedType === 'Lifetime' ? 'primary' : 'default'}
+          onClick={() => handleTypeChange('Lifetime')}
+          className="flex-1 h-10"
+        >
+          Lifetime
+        </Button>
+        <Button
+          type={selectedType === 'Monthly' ? 'primary' : 'default'}
+          onClick={() => handleTypeChange('Monthly')}
+          className="flex-1 h-10"
+        >
+          Monthly
+        </Button>
+        <Button
+          type={selectedType === 'Yearly' ? 'primary' : 'default'}
+          onClick={() => handleTypeChange('Yearly')}
+          className="flex-1 h-10"
+        >
+          Yearly
+        </Button>
+      </div>
+
+      {selectedType !== 'Lifetime' && (
+        <div className="mt-4">
+          <Input
+            type="number"
+            min="1"
+            max={selectedType === 'Monthly' ? "11" : undefined}
+            placeholder={`Enter number of ${selectedType === 'Monthly' ? 'months (max 11)' : 'years'}`}
+            value={customValue}
+            onChange={(e) => handleCustomValueChange(e.target.value, selectedType === 'Monthly' ? 'Month' : 'Year')}
+            className="w-full h-10 rounded-md"
+            suffix={selectedType === 'Monthly' ? 'Months' : 'Years'}
+            onKeyPress={(e) => {
+              // Prevent negative numbers and decimals
+              if (e.key === '-' || e.key === '.' || e.key === 'e') {
+                e.preventDefault();
+              }
+            }}
+          />
+          {selectedType === 'Monthly' && (
+            <div className="text-xs text-gray-500 mt-1">
+              For durations longer than 11 months, please use yearly option
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const AddPlan = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -15,6 +106,8 @@ const AddPlan = ({ onClose }) => {
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedYear, setSelectedYear] = useState(null);
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
+  const [storageUnit, setStorageUnit] = useState('MB');
+  const formikRef = React.useRef();
 
   useEffect(() => {
     dispatch(getcurren());
@@ -31,40 +124,38 @@ const AddPlan = ({ onClose }) => {
     return '';
   };
 
+  // Updated initial values to match backend schema
   const initialValues = {
     name: '',
+    currency: getInitialCurrency(),
     price: '',
     duration: '',
+    trial_period: '',
     max_users: '',
+    max_clients: '',
     max_customers: '',
     max_vendors: '',
-    max_clients: '',
     storage_limit: '',
-    currency: getInitialCurrency(),
-    trial: false,
-    trial_period: '',
+    features: {},
+    is_default: false,
+    status: 'active',
+    trial: false // for UI toggle
   };
+
   const handleSubmit = (values, { resetForm }) => {
-    let formattedDuration = 'Lifetime';
-
-    if (durationType === 'Monthly' && selectedMonth) {
-      formattedDuration = `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`;
-    } else if (durationType === 'Yearly' && selectedYear) {
-      formattedDuration = `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`;
-    }
-
     const payload = {
       ...values,
-      duration: formattedDuration,
-      max_users: String(values.max_users),
-      max_customers: String(values.max_customers),
-      max_vendors: String(values.max_vendors),
-      max_clients: String(values.max_clients),
-      storage_limit: String(values.storage_limit),
-      price: String(values.price),
-      trial_period: values.trial ? String(values.trial_period) : ''
+      max_users: String(values.max_users || ''),
+      max_customers: String(values.max_customers || ''),
+      max_vendors: String(values.max_vendors || ''),
+      max_clients: String(values.max_clients || ''),
+      storage_limit: String(values.storage_limit || ''),
+      price: String(values.price || ''),
+      trial_period: values.trial ? (values.trial_period || null) : null,
+      features: values.features || {},
+      is_default: values.is_default || false,
+      status: values.status || 'active'
     };
-
 
     dispatch(CreatePlan(payload))
       .then(() => {
@@ -85,6 +176,7 @@ const AddPlan = ({ onClose }) => {
         initialValues={initialValues}
         enableReinitialize={true}
         onSubmit={handleSubmit}
+        innerRef={formikRef}
       >
         {({ values, errors, touched, setFieldValue, handleChange }) => {
           const handleMenuClick = (e) => {
@@ -158,6 +250,17 @@ const AddPlan = ({ onClose }) => {
                           )}
                         </Field>
                         <ErrorMessage name="name" component="div" className="text-red-500 mt-1 text-sm" />
+                      </div>
+                    </Col>
+
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <label className="text-gray-600 mb-2 block">Make Default Plan</label>
+                        <Switch
+                          checked={values.is_default}
+                          onChange={(checked) => setFieldValue('is_default', checked)}
+                          className="mr-2"
+                        />
                       </div>
                     </Col>
 
@@ -261,25 +364,22 @@ const AddPlan = ({ onClose }) => {
 
                     <Col span={12}>
                       <div className="form-group mb-4">
-                        <label className="text-gray-600 mb-2 block">Duration <span className="text-red-500">*</span></label>
-                        <Dropdown
-                          overlay={mainMenu}
-                          trigger={['click']}
-                          className="w-full"
-                        >
-                          <Button className="w-full flex justify-between items-center">
-                            <span>
-                              {durationType === 'Monthly' && selectedMonth
-                                ? `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`
-                                : durationType === 'Yearly' && selectedYear
-                                  ? `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`
-                                  : durationType === 'Lifetime'
-                                    ? 'Lifetime'
-                                    : 'Select Duration'}
-                            </span>
-                            <span className="text-gray-400">▼</span>
-                          </Button>
-                        </Dropdown>
+                        <label className="text-gray-600 mb-2 block">
+                          Duration <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="duration">
+                          {({ field, form }) => (
+                            <DurationSelector
+                              value={field.value}
+                              onChange={(value) => form.setFieldValue('duration', value)}
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage
+                          name="duration"
+                          component="div"
+                          className="text-red-500 mt-1 text-sm"
+                        />
                       </div>
                     </Col>
                   </Row>
@@ -375,22 +475,48 @@ const AddPlan = ({ onClose }) => {
 
                     <Col span={12}>
                       <div className="form-group mb-4">
-                        <label className="text-gray-600 mb-2 block">Storage Limit (MB) <span className="text-red-500">*</span></label>
-                        <Field name="storage_limit">
-                          {({ field, form }) => (
-                            <Input
-                              {...field}
-                              placeholder="Maximum Storage Limit"
-                              type="number"
-                              min="1"
-                              suffix="MB"
-                              className="w-full rounded-md"
-                              onChange={(e) => {
-                                form.setFieldValue('storage_limit', String(e.target.value));
-                              }}
-                            />
-                          )}
-                        </Field>
+                        <label className="text-gray-600 mb-2 block">Storage Limit</label>
+                        <div className="flex gap-2">
+                          <Field name="storage_limit">
+                            {({ field, form }) => (
+                              <Input
+                                {...field}
+                                placeholder="Enter Storage Limit"
+                                type="number"
+                                min="1"
+                                className="w-full rounded-md"
+                                style={{ width: 'calc(100% - 100px)' }}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  const mbValue = storageUnit === 'GB' ? String(Number(value) * 1024) : value;
+                                  form.setFieldValue('storage_limit', mbValue);
+                                }}
+                                value={storageUnit === 'GB' ? 
+                                  field.value ? String(Number(field.value) / 1024) : '' 
+                                  : field.value
+                                }
+                              />
+                            )}
+                          </Field>
+                          <Select
+                            value={storageUnit}
+                            onChange={(value) => {
+                              setStorageUnit(value);
+                              const currentValue = formikRef.current?.values.storage_limit;
+                              if (currentValue) {
+                                const newValue = value === 'GB' 
+                                  ? String(Number(currentValue) / 1024)
+                                  : String(Number(currentValue) * 1024);
+                                formikRef.current?.setFieldValue('storage_limit', newValue);
+                              }
+                            }}
+                            style={{ width: '90px' }}
+                            className="rounded-md"
+                          >
+                            <Option value="MB">MB</Option>
+                            <Option value="GB">GB</Option>
+                          </Select>
+                        </div>
                         <ErrorMessage name="storage_limit" component="div" className="text-red-500 mt-1 text-sm" />
                       </div>
                     </Col>
@@ -494,6 +620,51 @@ const AddPlan = ({ onClose }) => {
           display: flex !important;
           align-items: center !important;
           width: 100% !important;
+        }
+
+        .duration-selector .ant-btn {
+          border-radius: 6px;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s;
+        }
+
+        .duration-selector .ant-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .duration-selector .ant-btn-primary {
+          background-color: #4169E1;
+          border-color: #4169E1;
+        }
+
+        .duration-selector .ant-btn-primary:hover {
+          background-color: #3154b3;
+          border-color: #3154b3;
+        }
+
+        .duration-selector .ant-input-number,
+        .duration-selector .ant-input {
+          width: 100%;
+          border-radius: 6px;
+        }
+
+        .duration-selector .ant-input-number:hover,
+        .duration-selector .ant-input:hover {
+          border-color: #4169E1;
+        }
+
+        .duration-selector .ant-input-number:focus,
+        .duration-selector .ant-input:focus {
+          border-color: #4169E1;
+          box-shadow: 0 0 0 2px rgba(65, 105, 225, 0.2);
+        }
+
+        .duration-selector .ant-input-number-handler-wrap {
+          border-radius: 0 6px 6px 0;
         }
       `}</style>
     </div>

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Input,
   Button,
-  Select,
   message,
   Row,
   Col,
@@ -13,78 +12,73 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import { editpolicys, getpolicys } from "./policyReducer/policySlice";
-import { getBranch } from "../hrm/Branch/BranchReducer/BranchSlice";
 import { UploadOutlined } from '@ant-design/icons';
-const { Option } = Select;
+
+const validationSchema = Yup.object({
+  title: Yup.string()
+    .required("Title is required")
+    .max(100, "Title must not exceed 100 characters"),
+  description: Yup.string()
+    .required("Description is required")
+    .min(10, "Description must be at least 10 characters"),
+  file: Yup.mixed().nullable()
+});
 
 const EditpolicyList = ({ idd, onClose }) => {
   const dispatch = useDispatch();
   const [fileList, setFileList] = useState([]);
-
-  useEffect(() => {
-    dispatch(getBranch());
-  }, [dispatch]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     dispatch(getpolicys());
   }, [dispatch]);
 
-  const allbranch = useSelector((state) => state.Branch);
-  const fndbranch = allbranch.Branch.data;
-
   const allpolicy = useSelector((state) => state.policy);
   const fndpolicy = allpolicy.policy.data;
 
+  const [initialValues, setInitialValues] = useState({
+    title: "",
+    description: "",
+    file: null
+  });
+
   useEffect(() => {
     if (fndpolicy) {
-      const findofferdatas = fndpolicy.find((item) => item.id === idd);
-      if (findofferdatas) {
+      const findPolicyData = fndpolicy.find((item) => item.id === idd);
+      if (findPolicyData) {
         setInitialValues({
-          branch: findofferdatas.branch,
-          title: findofferdatas.title,
-          description: findofferdatas.description,
+          title: findPolicyData.title,
+          description: findPolicyData.description,
         });
       }
     }
   }, [fndpolicy, idd]);
 
-  const onSubmit = async (values, { resetForm, setSubmitting }) => {
+  const onSubmit = async (values, { setSubmitting }) => {
+    setLoading(true);
     try {
       const formData = new FormData();
 
-      Object.keys(values).forEach(key => {
-        if (key === 'file' && values[key]) {
-          formData.append('file', values[key]);
-        } else if (values[key]) {
-          formData.append(key, values[key]);
-        }
-      });
+      formData.append("title", values.title.trim());
+      formData.append("description", values.description.trim());
 
-      const response = await dispatch(editpolicys({ idd, formData })).unwrap();
-
-      if (response) {
-        message.success('Policy added successfully!');
-        dispatch(getpolicys());
-        resetForm();
-        onClose();
+      if (values.file) {
+        formData.append("file", values.file);
       }
+
+      await dispatch(editpolicys({ idd, formData })).unwrap();
+      await dispatch(getpolicys());
+      
+      message.success('Policy updated successfully!');
+      onClose();
     } catch (error) {
-      console.error("Submission error:", error);
-      message.error(error?.message || "An error occurred while adding the policy.");
+      message.error(error?.message || "An error occurred while updating the policy.");
     } finally {
+      setLoading(false);
       setSubmitting(false);
     }
   };
-  const [initialValues, setInitialValues] = useState({
-    branch: "",
-    title: "",
-    description: "",
-  });
-  const validationSchema = Yup.object({
-    branch: Yup.string().required("Please select a Branch."),
-    title: Yup.string().required("Please enter a Title."),
-    description: Yup.string().required("Please enter a description."),
-  });
+
   return (
     <div>
       <div className="mb-3 border-b pb-1 font-medium"></div>
@@ -95,7 +89,7 @@ const EditpolicyList = ({ idd, onClose }) => {
         onSubmit={onSubmit}
         enableReinitialize
       >
-        {({ values, setFieldValue, setFieldTouched, handleSubmit }) => (
+        {({ values, setFieldValue, handleSubmit }) => (
           <Form
             onSubmit={handleSubmit}
             style={{
@@ -105,96 +99,84 @@ const EditpolicyList = ({ idd, onClose }) => {
             }}
           >
             <Row gutter={16}>
-              <Col span={12} className="mb-4">
-                <div className="form-item">
-                  <label className="font-semibold">Branch</label>
-                  <Field name="branch">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full"
-                        placeholder="Select Branch"
-                        onChange={(value) => setFieldValue("branch", value)}
-                        value={values.branch}
-                        onBlur={() => setFieldTouched("branch", true)}
-                      >
-                        {fndbranch?.map((branch) => (
-                          <Option key={branch.id} value={branch.id}>
-                            {branch.branchName}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="branch"
-                    component="div"
-                    className="error-message text-red-500 my-1"
+              <Col span={24}>
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Title <span className="text-red-500">*</span></label>
+                  <Field
+                    name="title"
+                    as={Input}
+                    placeholder="Enter Title"
                   />
-                </div>
-              </Col>
-
-              <Col span={12}>
-                <div className="form-item ">
-                  <label className="font-semibold ">Title</label>
-                  <Field name="title" as={Input} placeholder="Enter Title" />
                   <ErrorMessage
                     name="title"
                     component="div"
-                    className="error-message text-red-500  my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
 
               <Col span={24}>
-                <div className="form-item mt-4">
-                  <label className="font-semibold">Description</label>
-                  <ReactQuill
-                    value={values.description}
-                    onChange={(value) => setFieldValue("description", value)}
-                    onBlur={() => setFieldTouched("description", true)}
-                    placeholder="Enter Description"
-                  />
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Description <span className="text-red-500">*</span></label>
+                  <Field name="description">
+                    {({ field }) => (
+                      <ReactQuill
+                        value={field.value}
+                        onChange={(value) => setFieldValue("description", value)}
+                        placeholder="Enter Description"
+                      />
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="description"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
 
-              <div className="mt-4 w-full">
-                <span className="block  font-semibold p-2">Add File</span>
-                <Col span={24}>
-                  <Field name="file">
-                    {({ field }) => (
-                      <Upload
-                        fileList={fileList}
-                        beforeUpload={(file) => {
-                          setFieldValue("file", file);
-                          setFileList([file]);
-                          return false;
-                        }}
-                        onRemove={() => {
-                          setFieldValue("file", null);
-                          setFileList([]);
-                        }}
-                      >
-                        <Button icon={<UploadOutlined />} disabled={fileList.length > 0}>
-                          Choose File
-                        </Button>
-                      </Upload>
-                    )}
-                  </Field>
-                </Col>
-              </div>
+              <Col span={24}>
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Upload File</label>
+                  <Upload
+                    fileList={fileList}
+                    beforeUpload={(file) => {
+                      setFieldValue("file", file);
+                      setFileList([file]);
+                      return false;
+                    }}
+                    onRemove={() => {
+                      setFieldValue("file", null);
+                      setFileList([]);
+                    }}
+                  >
+                    <Button icon={<UploadOutlined />} disabled={fileList.length > 0}>
+                      Choose File
+                    </Button>
+                  </Upload>
+                  <ErrorMessage
+                    name="file"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+              </Col>
             </Row>
-            <div style={{ textAlign: "right", marginTop: "16px" }}>
-              <Button style={{ marginRight: 8 }} onClick={onClose}>
+
+            <div className="flex justify-end gap-2 mt-4">
+              <Button
+                onClick={onClose}
+                disabled={loading}
+                style={{ marginRight: '8px' }}
+              >
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit">
-                Submit
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+              >
+                Update
               </Button>
             </div>
           </Form>

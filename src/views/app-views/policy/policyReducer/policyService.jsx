@@ -78,7 +78,7 @@ const editpolicy = async (idd, formData) => {
 };
 
 
-const UserService = {
+const PolicyService = {
 
   getpolicy,
   addpolicy,
@@ -87,4 +87,4 @@ const UserService = {
 
 };
 
-export default UserService;
+export default PolicyService;

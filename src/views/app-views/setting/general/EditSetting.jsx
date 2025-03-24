@@ -13,15 +13,16 @@ const EditSetting = ({ visible, onCancel, settingId, onSuccess }) => {
   const [selectedFavicon, setSelectedFavicon] = useState(null);
   const dispatch = useDispatch();
 
-  const alldata = useSelector((state) => state.generalsetting.generalsetting.data);
-  const currentSetting = alldata?.find(setting => setting.id === settingId);
+  const alldata = useSelector((state) => state.generalsetting?.generalsetting?.data || []);
+  const currentSetting = Array.isArray(alldata) ? 
+    alldata.find(setting => setting.id === settingId) : null;
 
   useEffect(() => {
     if (currentSetting) {
       form.setFieldsValue({
         companyName: currentSetting.companyName,
         title: currentSetting.title,
-        description: currentSetting.termsandconditions,
+        termsandconditions: currentSetting.termsandconditions,
       });
     }
   }, [currentSetting, form]);
@@ -51,7 +52,7 @@ const EditSetting = ({ visible, onCancel, settingId, onSuccess }) => {
       }
       formData.append('companyName', values.companyName);
       formData.append('title', values.title);
-      formData.append('termsandconditions', values.description);
+      formData.append('termsandconditions', values.termsandconditions);
 
       await dispatch(updategeneralsetting({ id: settingId, data: formData }));
       message.success('Settings updated successfully');
@@ -125,9 +126,9 @@ const EditSetting = ({ visible, onCancel, settingId, onSuccess }) => {
         </Form.Item>
 
         <Form.Item
-          name="description"
-          label="Description"
-          rules={[{ required: true, message: 'Please enter description' }]}
+          name="termsandconditions"
+          label="termsandconditions"
+          rules={[{ required: true, message: 'Please enter termsandconditions' }]}
         >
           <ReactQuill
             theme="snow"

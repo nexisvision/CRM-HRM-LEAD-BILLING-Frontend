@@ -54,12 +54,12 @@ const Empdelete = async (id) => {
   }
 };
 
-const EditEmp = async (idd, updatedFormValues) => {
+const EditEmp = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
       `${env.API_ENDPOINT_URL}/employees/${idd}`,
-      updatedFormValues,
+      values,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -73,11 +73,11 @@ const EditEmp = async (idd, updatedFormValues) => {
   }
 };
 
-const UserService = {
+const EmployeeService = {
   fetchEmpData,
   createEmp,
   Empdelete,
   EditEmp,
 };
 
-export default UserService;
+export default EmployeeService;

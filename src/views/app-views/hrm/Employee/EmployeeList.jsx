@@ -63,7 +63,8 @@ const EmployeeList = () => {
   const [sub, setSub] = useState(false);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
-  const tabledata = useSelector((state) => state.employee);
+  const tabledata = useSelector((state) => state.employee || []);
+
   const departmentData = useSelector(
     (state) => state.Department?.Department?.data || []
   );
@@ -73,17 +74,16 @@ const EmployeeList = () => {
   const branchDataa = useSelector((state) => state.Branch?.Branch?.data || []);
   const salaryData = useSelector((state) => state.salary?.salary?.data || []);
 
-  useEffect(() => {
-    dispatch(roledata());
-  }, [dispatch]);
 
   useEffect(() => {
     dispatch(empdata());
+    dispatch(roledata());
     dispatch(getSalaryss());
     dispatch(getDept());
     dispatch(getDes());
     dispatch(getBranch());
   }, [dispatch]);
+
 
   useEffect(() => {
     if (tabledata?.employee?.data) {
@@ -94,6 +94,7 @@ const EmployeeList = () => {
         const designation = designationData.find(
           (desig) => desig.id === employee.designation
         );
+
         const branch = branchDataa.find((br) => br.id === employee.branch);
 
         return {
@@ -444,7 +445,7 @@ const EmployeeList = () => {
           color="purple"
           className="text-sm px-3 py-1 rounded-full font-medium"
         >
-          {designation || "N/A"}
+          {designation}
         </Tag>
       ),
       sorter: (a, b) => a.designation?.localeCompare(b.designation) || 0,
@@ -459,16 +460,7 @@ const EmployeeList = () => {
       ),
       sorter: (a, b) => moment(a.joiningDate) - moment(b.joiningDate),
     },
-    {
-      title: "Leave Date",
-      dataIndex: "leaveDate",
-      render: (text) => (
-        <div className="text-gray-600">
-          {text ? moment(text).format("DD MMM YYYY") : "N/A"}
-        </div>
-      ),
-      sorter: (a, b) => moment(a.leaveDate) - moment(b.leaveDate),
-    },
+   
     {
       title: "Salary Status",
       key: "salaryStatus",
@@ -630,12 +622,7 @@ const EmployeeList = () => {
       </div>
 
       <Modal
-        title={
-          <div className="flex items-center gap-2 text-gray-700">
-            <PlusOutlined className="text-lg" />
-            <span className="font-medium">Add New Employee</span>
-          </div>
-        }
+        title="Add Employee"
         visible={isAddEmployeeModalVisible}
         onCancel={() => setIsAddEmployeeModalVisible(false)}
         footer={null}
@@ -646,21 +633,17 @@ const EmployeeList = () => {
       </Modal>
 
       <Modal
-        title={
-          <div className="flex items-center gap-2 text-gray-700">
-            <EditOutlined className="text-lg" />
-            <span className="font-medium">Edit Employee</span>
-          </div>
-        }
+        title="Edit Employee"
         visible={isEditEmployeeModalVisible}
         onCancel={() => setIsEditEmployeeModalVisible(false)}
         footer={null}
-        width={800}
+        width={1000}
         className="custom-modal"
       >
         <EditEmployee
           onClose={() => setIsEditEmployeeModalVisible(false)}
           idd={selectedEmployeeId}
+          
           initialData={
             users.find((user) => user.id === selectedEmployeeId) || {}
           }
@@ -668,16 +651,11 @@ const EmployeeList = () => {
       </Modal>
 
       <Modal
-        title={
-          <div className="flex items-center gap-2 text-gray-700">
-            <EyeOutlined className="text-lg" />
-            <span className="font-medium">View Employee Details</span>
-          </div>
-        }
+        title="View Employee"
         visible={isViewEmployeeModalVisible}
         onCancel={() => setIsViewEmployeeModalVisible(false)}
         footer={null}
-        width={800}
+        width={1000}
         className="custom-modal"
       >
         <ViewEmployee

@@ -104,11 +104,11 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     dispatch(getallcountries());
   }, [dispatch]);
 
-  useEffect(() => {
-    dispatch(getDept());
-    dispatch(getDes());
-    dispatch(getBranch());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(getDept());
+  //   dispatch(getDes());
+  //   dispatch(getBranch());
+  // }, [dispatch]);
 
   useEffect(() => {
     dispatch(getcurren());
@@ -267,10 +267,9 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
   };
 
   return (
-    <div className="add-employee p-6">
+    <div className="add-employee">
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({
@@ -282,14 +281,17 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
           setFieldTouched,
         }) => (
           <Form
-            className="space-y-4"
+            className="space-y-6"
             onSubmit={handleSubmit}
             onFinishFailed={onFinishFailed}
           >
-            <h1 className="text-lg font-bold mb-4">Personal Details</h1>
+            <div className="mb-3 border-b pb-1 font-medium">
+              <h1 className="text-xl font-bold text-gray-800">Personal Details</h1>
+            </div>
+
             <Row gutter={16}>
               <Col span={12}>
-                <div className="form-item">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">
                     First Name <span className="text-red-500">*</span>
                   </label>
@@ -297,17 +299,17 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                     name="firstName"
                     as={Input}
                     placeholder="John"
-                    className="mt-1"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="firstName"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
               <Col span={12}>
-                <div className="form-item">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">
                     Last Name <span className="text-red-500">*</span>
                   </label>
@@ -315,19 +317,19 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                     name="lastName"
                     as={Input}
                     placeholder="Doe"
-                    className="mt-1"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="lastName"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <div className="form-item">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">
                     Username <span className="text-red-500">*</span>
                   </label>
@@ -335,17 +337,17 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                     name="username"
                     as={Input}
                     placeholder="john_doe"
-                    className="mt-1"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="username"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
               <Col span={12}>
-                <div className="form-item mt-2">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">
                     Password <span className="text-red-500">*</span>
                   </label>
@@ -354,7 +356,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                       name="password"
                       as={Input.Password}
                       placeholder="Password"
-                      className="mt-1 w-full"
+                      className="w-full mt-1"
                     />
                     <Button
                       className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
@@ -368,14 +370,14 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                   <ErrorMessage
                     name="password"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <div className="form-item">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">
                     Email <span className="text-red-500">*</span>
                   </label>
@@ -383,18 +385,18 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                     name="email"
                     as={Input}
                     placeholder="johndoe@example.com"
-                    className="mt-1"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="email"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
               <Col span={12}>
-                <div className="form-group">
-                  <label className="text-gray-600 font-semibold mb-2 block">
+                <div style={{ marginBottom: "16px" }}>
+                  <label className="font-semibold">
                     Phone <span className="text-red-500">*</span>
                   </label>
                   <div className="flex gap-0">
@@ -402,7 +404,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                       {({ field }) => (
                         <Select
                           {...field}
-                          className="phone-code-select"
+                          className="w-full mt-1"
                           style={{
                             width: "80px",
                             borderTopRightRadius: 0,
@@ -462,7 +464,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                       {({ field }) => (
                         <Input
                           {...field}
-                          className="phone-input"
+                          className="w-full mt-1"
                           style={{
                             borderTopLeftRadius: 0,
                             borderBottomLeftRadius: 0,
@@ -474,13 +476,6 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                           onChange={(e) =>
                             handlePhoneNumberChange(e, setFieldValue)
                           }
-                          // prefix={
-                          //   values.phoneCode && (
-                          //     <span className="text-gray-600 font-medium mr-1">
-                          //       {values.phoneCode}
-                          //     </span>
-                          //   )
-                          // }
                         />
                       )}
                     </Field>
@@ -495,7 +490,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <div className="form-item">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">
                     Address <span className="text-red-500">*</span>
                   </label>
@@ -503,17 +498,17 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                     name="address"
                     as={Input}
                     placeholder="Enter Address"
-                    className="mt-1"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="address"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
               <Col span={12}>
-                <div className="form-item">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">
                     Joining Date <span className="text-red-500">*</span>
                   </label>
@@ -530,14 +525,14 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                   <ErrorMessage
                     name="joiningDate"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <div className="form-item">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">
                     Branch <span className="text-red-500">*</span>
                   </label>
@@ -545,7 +540,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                         placeholder="Select Branch"
                         dropdownRender={(menu) => (
                           <>
@@ -553,10 +548,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                             <Button
                               type="link"
                               block
-                              onClick={() => {
-                                openAddBranchModal();
-                                dispatch(getBranch());
-                              }}
+                              onClick={openAddBranchModal}
                             >
                               + Add New Branch
                             </Button>
@@ -580,13 +572,13 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                   <ErrorMessage
                     name="branch"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
 
               <Col span={12}>
-                <div className="form-item mt-1">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">
                     Department <span className="text-red-500">*</span>
                   </label>
@@ -622,13 +614,13 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                   <ErrorMessage
                     name="department"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
 
               <Col span={12}>
-                <div className="form-item mt-2">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">
                     Designation <span className="text-red-500">*</span>
                   </label>
@@ -666,13 +658,13 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                   <ErrorMessage
                     name="designation"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
 
               <Col span={12}>
-                <div className="form-item mt-2">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">
                     Salary <span className="text-red-500">*</span>
                   </label>
@@ -681,110 +673,112 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                     as={Input}
                     placeholder="$"
                     type="number"
-                    className="mt-1"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="salary"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
             </Row>
-            <h1 className="text-lg font-bold mb-3 mt-4">Bank Details</h1>
+
+            <div className="mb-3 border-b pb-1 font-medium">
+              <h1 className="text-xl font-bold text-gray-800">Bank Details</h1>
+            </div>
+
             <Row gutter={16}>
               <Col span={12}>
-                <div className="form-item">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Account Holder Name </label>
                   <Field
                     name="accountholder"
                     as={Input}
                     placeholder="John Doe"
-                    className="mt-1"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="accountholder"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
               <Col span={12}>
-                <div className="form-item">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Account Number </label>
                   <Field
                     name="accountnumber"
                     as={Input}
                     placeholder="123456789"
                     type="number"
-                    className="mt-1"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="accountnumber"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <div className="form-item">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Bank Name </label>
                   <Field
                     name="bankname"
                     as={Input}
                     placeholder="Bank Name"
-                    className="mt-1"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="bankname"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
               <Col span={12}>
-                <div className="form-item">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">IFSC </label>
                   <Field
                     name="ifsc"
                     as={Input}
                     placeholder="IFSC"
-                    className="mt-1"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="ifsc"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <div className="form-item">
+                <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Bank Location </label>
                   <Field
                     name="banklocation"
                     as={Input}
                     placeholder="Bank Location"
-                    className="mt-1"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="banklocation"
                     component="div"
-                    className="text-red-500"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>
             </Row>
 
-            <Col span={24} className="mt-4 ">
+            <div className="mb-3 border-b pb-1 font-medium">
               <div className="flex justify-between items-center">
-                <label className="text-lg font-semibold mb-3 mt-4">
-                  Salary
-                </label>
+                <h1 className="text-xl font-bold text-gray-800">Salary Details</h1>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -795,12 +789,13 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                   <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
                 </label>
               </div>
-            </Col>
+            </div>
+
             {salary && (
               <>
                 <Row gutter={16}>
                   <Col span={12}>
-                    <div className="form-item">
+                    <div style={{ marginBottom: "16px" }}>
                       <label className="font-semibold">Payroll Type </label>
                       <Field name="payslipType">
                         {({ field }) => (
@@ -828,7 +823,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                   </Col>
 
                   <Col span={12}>
-                    <div className="form-item">
+                    <div style={{ marginBottom: "16px" }}>
                       <label className="font-semibold">Currency </label>
                       <Field name="currency">
                         {({ field }) => (
@@ -860,7 +855,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
 
                 <Row gutter={16}>
                   <Col span={12}>
-                    <div className="form-item">
+                    <div style={{ marginBottom: "16px" }}>
                       <label className="font-semibold">Net Salary </label>
                       <Field
                         name="netSalary"
@@ -878,7 +873,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                   </Col>
 
                   <Col span={12}>
-                    <div className="form-item">
+                    <div style={{ marginBottom: "16px" }}>
                       <label className="font-semibold">Status </label>
                       <Field name="status">
                         {({ field }) => (
@@ -903,7 +898,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                   </Col>
 
                   <Col span={12}>
-                    <div className="form-item mt-3">
+                    <div style={{ marginBottom: "16px" }}>
                       <label className="font-semibold">Bank Account</label>
                       <Field
                         name="bankAccount"
@@ -922,11 +917,20 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                 </Row>
               </>
             )}
-            <div className="text-right mt-4">
-              <Button type="default" className="mr-2" onClick={() => onClose()}>
+
+            <div className="text-right">
+              <Button 
+                type="default" 
+                className="mr-2" 
+                onClick={() => onClose()}
+              >
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit" loading={isSubmitting}>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                loading={isSubmitting}
+              >
                 {isSubmitting ? "Submitting..." : "Submit"}
               </Button>
             </div>
@@ -1001,67 +1005,120 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
           }}
         />
       </Modal>
-      <style jsx>{`
-        .ant-select-dropdown .ant-select-item {
-          padding: 8px 12px !important;
+      <style jsx global>{`
+        /* Input field styling */
+        .date-input {
+          padding: 8px 12px;
+          border: 1px solid #d9d9d9;
+          border-radius: 6px;
+          font-size: 14px;
+          color: #333;
+          background-color: #fff;
+          transition: all 0.3s;
+          cursor: pointer;
+          height: 36px;
+          width: 100%;
         }
 
-        .ant-select-dropdown .ant-select-item-option-content > div {
-          display: flex !important;
-          align-items: center !important;
-          width: 100% !important;
+        .date-input:hover {
+          border-color: #40a9ff;
         }
 
-        //    .contract-select .ant-select-selection-item {
-        //   display: flex !important;
-        //   align-items: center !important;
-        //   justify-content: center !important;
-        //   font-size: 16px !important;
-        // }
-
-        // .contract-select .ant-select-selection-item > div {
-        //   display: flex !important;
-        //   align-items: center !important;
-        // }
-
-        // .contract-select .ant-select-selection-item span:not(:first-child) {
-        //   display: none !important;
-        // }
-
-        .phone-code-select .ant-select-selector {
-          // height: 32px !important;
-          // padding: 0 8px !important;
-          background-color: #f8fafc !important;
-          border-top-right-radius: 0 !important;
-          border-bottom-right-radius: 0 !important;
-          border-right: 0 !important;
+        .date-input:focus {
+          outline: none;
+          border-color: #40a9ff;
+          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
         }
 
-        .phone-code-select .ant-select-selection-item {
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          font-size: 16px !important;
+        /* Calendar popup styling */
+        ::-webkit-calendar-picker {
+          width: 300px;
+          height: 300px;
+          background: white;
+          border: 1px solid #d9d9d9;
+          border-radius: 8px;
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
         }
 
-        .phone-code-select .ant-select-selection-item > div {
-          display: flex !important;
-          align-items: center !important;
+        /* Calendar icon */
+        .date-input::-webkit-calendar-picker-indicator {
+          cursor: pointer;
+          padding: 4px;
+          margin-right: -4px;
+          opacity: 0.6;
+          transition: opacity 0.2s;
+          width: 20px;
+          height: 20px;
         }
 
-        .phone-code-select .ant-select-selection-item span:not(:first-child) {
-          display: none !important;
+        .date-input::-webkit-calendar-picker-indicator:hover {
+          opacity: 1;
         }
 
-        // .phone-input::-webkit-inner-spin-button,
-        // .phone-input::-webkit-outer-spin-button {
-        //   -webkit-appearance: none;
-        //   margin: 0;
-        // }
+        /* Date text styling */
+        .date-input::-webkit-datetime-edit {
+          padding: 0;
+          margin: 0;
+        }
 
-        // .phone-input {
-        //   -moz-appearance: textfield;
-        // }
+        .date-input::-webkit-datetime-edit-fields-wrapper {
+          padding: 0;
+        }
+
+        .date-input::-webkit-datetime-edit-text,
+        .date-input::-webkit-datetime-edit-month-field,
+        .date-input::-webkit-datetime-edit-day-field,
+        .date-input::-webkit-datetime-edit-year-field {
+          color: #666;
+          padding: 0 2px;
+        }
+
+        /* Selected date text color */
+        .date-input:valid::-webkit-datetime-edit-text,
+        .date-input:valid::-webkit-datetime-edit-month-field,
+        .date-input:valid::-webkit-datetime-edit-day-field,
+        .date-input:valid::-webkit-datetime-edit-year-field {
+          color: #333;
+        }
+
+        /* Calendar header */
+        ::-webkit-calendar-picker-header {
+          background: #fafafa;
+          border-bottom: 1px solid #f0f0f0;
+          padding: 8px;
+          font-weight: 500;
+        }
+
+        /* Calendar grid */
+        ::-webkit-calendar-picker-grid {
+          padding: 8px;
+        }
+
+        /* Calendar days */
+        ::-webkit-calendar-picker-day-cell {
+          height: 32px;
+          width: 32px;
+          border-radius: 4px;
+          text-align: center;
+          line-height: 32px;
+          cursor: pointer;
+        }
+
+        ::-webkit-calendar-picker-day-cell:hover {
+          background: #e6f7ff;
+        }
+
+        /* Selected day */
+        ::-webkit-calendar-picker-day-cell:selected {
+          background: #1890ff;
+          color: white;
+        }
+
+        /* Today's date */
+        ::-webkit-calendar-picker-day-cell:today {
+          border: 1px solid #1890ff;
+          color: #1890ff;
+        }
       `}</style>
     </div>
   );

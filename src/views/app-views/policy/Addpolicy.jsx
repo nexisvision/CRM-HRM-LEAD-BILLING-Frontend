@@ -1,18 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { Input, Button, Select, message, Row, Col, Upload } from "antd";
+import React, { useState } from "react";
+import { Input, Button, message, Row, Col, Upload } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import ReactQuill from "react-quill";
 import { Addpolicys, getpolicys } from "./policyReducer/policySlice";
-import { getBranch } from "../hrm/Branch/BranchReducer/BranchSlice";
 import { UploadOutlined } from "@ant-design/icons";
 import "react-quill/dist/quill.snow.css";
 
-const { Option } = Select;
-
 const validationSchema = Yup.object({
-  branch: Yup.string().required("Branch is required"),
   title: Yup.string()
     .required("Title is required")
     .max(100, "Title must not exceed 100 characters"),
@@ -27,16 +23,7 @@ const AddpolicyList = ({ onClose }) => {
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    dispatch(getBranch())
-      .unwrap()
-      .catch(() => message.error("Failed to fetch branches"));
-  }, [dispatch]);
-
-  const branches = useSelector((state) => state.Branch.Branch?.data || []);
-
   const initialValues = {
-    branch: "",
     title: "",
     description: "",
     file: null
@@ -46,7 +33,6 @@ const AddpolicyList = ({ onClose }) => {
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append("branch", values.branch);
       formData.append("title", values.title);
       formData.append("description", values.description);
 
@@ -78,37 +64,8 @@ const AddpolicyList = ({ onClose }) => {
       >
         {({ setFieldValue }) => (
           <Form>
-
-
             <Row gutter={16}>
-              <Col span={12}>
-                <div className="mb-4">
-                  <label className="block mb-1 font-semibold">Branch <span className="text-red-500">*</span></label>
-                  <Field name="branch">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full"
-                        placeholder="Select Branch"
-                        onChange={(value) => setFieldValue("branch", value)}
-                      >
-                        {branches.map((branch) => (
-                          <Option key={branch.id} value={branch.id}>
-                            {branch.branchName}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="branch"
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12}>
+              <Col span={24}>
                 <div className="mb-4">
                   <label className="block mb-1 font-semibold">Title <span className="text-red-500">*</span></label>
                   <Field
@@ -146,7 +103,7 @@ const AddpolicyList = ({ onClose }) => {
 
               <Col span={24}>
                 <div className="mb-4">
-                  <label className="block mb-1 font-semibold ">Upload File <span className="text-red-500">*</span></label>
+                  <label className="block mb-1 font-semibold">Upload File <span className="text-red-500">*</span></label>
                   <Upload
                     fileList={fileList}
                     beforeUpload={(file) => {

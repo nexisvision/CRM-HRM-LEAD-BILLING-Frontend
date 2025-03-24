@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./ProjectService";
+import ProjectService from "./ProjectService";
 import { toast } from "react-toastify";
 
 import { message } from "antd";
 
 
 export const AddPro = createAsyncThunk(
-  "users/AddPro",
+  "project/AddProject",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.AddProject(userData);
+      const response = await ProjectService.AddProject(userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -20,10 +20,10 @@ export const AddPro = createAsyncThunk(
 
 
 export const GetProject = createAsyncThunk(
-  "emp/GetProject",
+  "project/GetProject",
   async (thunkAPI) => {
     try {
-      const response = await UserService.GetProject();
+      const response = await ProjectService.GetProject();
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -31,38 +31,13 @@ export const GetProject = createAsyncThunk(
   }
 );
 
-
-export const getAllUsers = createAsyncThunk(
-  "users/getAllUsers",
-  async (thunkAPI) => {
-    try {
-      const response = await UserService.getAllUsers();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
-
-export const getUserById = createAsyncThunk(
-  "users/getUserById",
-  async (userId, thunkAPI) => {
-    try {
-      const response = await UserService.getUserById(userId);
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
 
 
 export const DeletePro = createAsyncThunk(
-  "users/DeletePro",
+  "project/Deleteproject",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.DeletePro(userId);
+      const response = await ProjectService.DeletePro(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -70,11 +45,11 @@ export const DeletePro = createAsyncThunk(
   }
 );
 export const Editpro = createAsyncThunk(
-  "users/Editpro",
+  "project/Editproject",
   async ({ id, values }, thunkAPI) => {
     try {
 
-      const response = await UserService.EditPro(id, values);
+      const response = await ProjectService.EditPro(id, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -97,34 +72,7 @@ const ProjectSlice = createSlice({
     addModel: false,
     editModal: false,
   },
-  reducers: {
-    toggleAddModal: (state, action) => {
-      state.addModel = action.payload;
-    },
-    toggleEditModal: (state, action) => {
-      state.editModal = action.payload;
-      state.editItem = {};
-    },
-    editUserData: (state, action) => {
-      state.editItem = action.payload;
-      state.editModal = !state.editModal;
-    },
-    handleLogout: (state, action) => {
-      state.isAuth = action.payload;
-      state.loggedInUser = null;
-      localStorage.removeItem("isAuth");
-      localStorage.removeItem("USER");
-      localStorage.removeItem("TOKEN");
-    },
-    toggleDetailModal: (state, action) => {
-      state.detailItem = action.payload;
-      state.detailModal = !state.editModal;
-    },
-    closeDetailModal: (state, action) => {
-      state.detailModal = action.payload;
-      state.detailItem = {};
-    },
-  },
+  
   extraReducers: (builder) => {
     builder
       //add
@@ -184,6 +132,5 @@ const ProjectSlice = createSlice({
   },
 });
 
-export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  ProjectSlice.actions;
+
 export default ProjectSlice.reducer;

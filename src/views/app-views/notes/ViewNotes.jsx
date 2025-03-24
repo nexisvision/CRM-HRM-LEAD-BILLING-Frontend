@@ -61,7 +61,7 @@ function ViewNotes() {
     setIdd(idd);
   };
 
-  const deleteUser = (userId) => {
+  const deletefunc = (userId) => {
     dispatch(delnotess(userId)).then(() => {
       dispatch(getnotess(id));
       setUsers(users.filter((item) => item.id !== userId));
@@ -87,7 +87,7 @@ function ViewNotes() {
           <Button
             type="text"
             icon={<DeleteOutlined />}
-            onClick={() => deleteUser(note.id)}
+            onClick={() => deletefunc(note.id)}
             className="action-btn delete hover:bg-red-50 hover:text-red-600"
           />
         </div>
@@ -198,7 +198,7 @@ function ViewNotes() {
             <Button
               type="text"
               icon={<DeleteOutlined />}
-              onClick={() => deleteUser(note.id)}
+              onClick={() => deletefunc(note.id)}
               className="action-btn delete"
             />
           </div>

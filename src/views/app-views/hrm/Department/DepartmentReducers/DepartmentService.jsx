@@ -1,6 +1,7 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 
+
 const GetDept = async () => {
   const token = localStorage.getItem("auth_token");
   try {
@@ -76,7 +77,7 @@ const EditDept = async (comnyid, values) => {
 
 
 
-const UserService = {
+const DepartmentService = {
 
   GetDept,
   AddDepartment,
@@ -85,4 +86,4 @@ const UserService = {
 
 };
 
-export default UserService;
+export default DepartmentService;
